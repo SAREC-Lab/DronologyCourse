@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<project name="copy" basedir="." default="copy-files">
+
+	<!-- define ant4eclipse tasks -->
+	<!-- define ant tasks -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+
+	<target name="copy-files">
+		<echo>#### Copying ${fromDir} to ${toDir} (pattern ${pattern} ####</echo>
+		<copy todir="${toDir}" >
+			<fileset dir="${fromDir}">
+				<include name="${pattern}" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="delete-files">
+
+		<if>
+			<available file="${src}" type="dir" />
+			<then>
+				<echo>Delete files:</echo>
+				<echo>   - src:     ${src}</echo>
+				<echo>   - pattern: ${pattern}</echo>
+				<fileset id="files" dir="${src}" defaultexcludes="false" includes="${pattern}" />
+				<delete includeemptydirs="true">
+					<fileset refid="files" />
+				</delete>
+			</then>
+		</if>
+	</target>
+	
+	<target name="flatten-files">
+		<echo>#### Copying ${fromDir} to ${toDir} (pattern ${pattern}) ####</echo>
+	<copy toDir="${toDir}">
+	  <fileset dir="${fromDir}">
+	    <include name="${pattern}"/>
+	    <exclude name="*"/>
+	  </fileset>
+		<!--	<cutdirsmapper dirs="1"/>-->
+	  <regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/> 
+	</copy>
+	</target>
+	
+	
+</project>
