@@ -17,13 +17,13 @@
 
 
 	<target name="copy-directory">
-		<echo>#### Copying ${fromDir} to ${toDir}  ####</echo>
+		<echo>#### Copying ${fromDir} from  ${fromDir}\.. to ${toDir} ${name}  ####</echo>
 
-		<touch file="${toDir}" mkdirs="true" verbose="true"/>
+		<mkdir dir="${toDir}" />
 
 		<copy todir="${toDir}" >
-			<fileset dir="${fromDir.parent}">
-				<include name="${fromDir}/**"/>
+			<fileset dir="${fromDir}">
+				<include name="${name}/**"/>
 			</fileset>
 		</copy>
 	</target>

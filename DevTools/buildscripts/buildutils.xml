@@ -1,0 +1,142 @@
+<project name="BuildUtils">
+
+	<target name="copy-libs">
+
+		<echo>Copying library files to: ${result.dirname}/build/lib ...</echo>
+
+		<copy file="${sourceCodeDir}/lib/at.jku.ase.logging.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/lib/log4j-1.2.16.jar" todir="${result.dirname}/build/lib" />
+
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/commons-lang-2.5.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/xstream-1.4.4.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/json-20110217.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/commons-collections-3.2.1.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/commons-collections4-4.0/commons-collections4-4.0.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/commons-math3-3.2.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/commons-io-2.4.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/gson-2.2.4.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/guava-15.0.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/stateless4j-1.0.0.jar" todir="${result.dirname}/build/lib" />
+		<copy file="${sourceCodeDir}/../at.jku.mevss.lib/lib/commons-dbcp2-2.0.1.jar" todir="${result.dirname}/build/lib" />
+	
+				
+		
+		
+	</target>
+	
+	
+	
+		<target name="-copy-memodelAPI">
+			<copy file="../result/${jar.memodel}" tofile="${result.dirname}/build/lib/${jar.memodel}" overwrite="true" />
+		</target>
+
+		<target name="-copy-ckAPI">
+			<copy file="../result/${jar.ck.api}" tofile="${result.dirname}/build/lib/${jar.ck.api}" overwrite="true" />
+		</target>
+	
+	<target name="-copy-ckService">
+			<copy file="../result/${jar.ck.service}" tofile="${result.dirname}/build/lib/${jar.ck.service}" overwrite="true" />
+		</target>
+
+
+		<target name="-copy-ckCompiler">
+			<copy file="../result/${jar.ck.compiler}" tofile="${result.dirname}/build/lib/${jar.ck.compiler}" overwrite="true" />
+		</target>
+		
+		<target name="-copy-publisherAPI">
+			<copy file="../result/${jar.publisher.api}" tofile="${result.dirname}/build/lib/${jar.publisher.api}" overwrite="true" />
+			</target>
+	
+	<target name="-copy-subscriberAPI">
+			<copy file="../result/${jar.subscriber.api}" tofile="${result.dirname}/build/lib/${jar.subscriber.api}" overwrite="true" />
+			</target>
+	
+	<target name="-copy-processorAPI">
+			<copy file="../result/${jar.processor.api}" tofile="${result.dirname}/build/lib/${jar.processor.api}" overwrite="true" />
+			</target>
+	
+	<target name="-copy-serviceAPI">
+		<copy file="../result/${jar.meservice.api}" tofile="${result.dirname}/build/lib/${jar.meservice.api}" overwrite="true" />
+	</target>
+	
+	<target name="-copy-persistenceAPI">
+		<copy file="../result/${jar.persistence.api}" tofile="${result.dirname}/build/lib/${jar.persistence.api}" overwrite="true" />
+	</target>
+
+	<target name="-copy-rtcAPI">
+			<copy file="../result/${jar.ck.rtc}" tofile="${result.dirname}/build/lib/${jar.ck.rtc}" overwrite="true" />
+		</target>
+	
+
+	<target name="-copy-scAPI">
+			<copy file="../result/${jar.sc.api}" tofile="${result.dirname}/build/lib/${jar.sc.api}" overwrite="true" />
+		</target>
+	
+	<target name="-copy-distributor">
+				<copy file="../result/${jar.distributor}" tofile="${result.dirname}/build/lib/${jar.distributor}" overwrite="true" />
+				</target>
+
+
+	<target name="check-preconditions">
+		<!-- check if properties are set -->
+		<fail message="Properties &quot;buildDir&quot; and &quot;sourceCodeDir&quot; need to be set to a value">
+			<condition>
+				<and>
+					<or>
+						<equals arg1="${buildDirs}" arg2="" />
+						<not>
+							<isset property="buildDirs" />
+						</not>
+					</or>
+					<or>
+						<equals arg1="${sourceCodeDir}" arg2="" />
+						<not>
+							<isset property="sourceCodeDir" />
+						</not>
+					</or>
+				</and>
+			</condition>
+		</fail>
+	</target>
+
+	<target name="cleanup">
+		<!-- Copy to result -->
+		<copy file="${result.dirname}/${result.filename}" todir="${result.dirname}/../../result" />
+		<!-- Cleanup (we only want to see the .dot and .jar files) -->
+		<delete dir="${result.dirname}/build" />
+		
+	</target>
+
+
+
+	<target name="pack">
+		<!-- Package the runnable jar file -->
+		<jar destfile="${result.dirname}/${result.filename}" basedir="${result.dirname}/build/bin">
+			<!--	<fileset dir="${resultdir}/build/src" includes="**/*.java"/>
+			<zipfileset dir="${result.dirname}/build/bin" prefix="" />
+					<zipfileset src="${result.dirname}/build/lib/at.jku.ase.logging.jar" />
+					<zipfileset src="${result.dirname}/build/lib/log4j-1.2.16.jar" />
+					<zipfileset src="${result.dirname}/build/lib/json-20110217.jar" />
+					<zipfileset src="${result.dirname}/build/lib/commons-collections-3.2.1.jar" /> -->
+
+
+			<!--	<manifest>
+						<attribute name="Main-Class" value="at.jku.mevss.java.publisher.Publisher" />
+					</manifest> -->
+		</jar>
+	</target>
+
+
+	<target name="prepare">
+		<!-- Clean/Create the build directory structure used by compile -->
+		<delete dir="${result.dirname}" />
+		<mkdir dir="${result.dirname}" />
+		<mkdir dir="${result.dirname}/build/src" />
+		<mkdir dir="${result.dirname}/build/bin" />
+		<mkdir dir="${result.dirname}/build/lib" />
+	</target>
+	
+
+
+</project>
+

@@ -1,0 +1,53 @@
+<project name="build-ME-MemodelAPI" default="dronology-core">
+	<import file="./buildutils.xml" />
+
+
+	<target name="dronology-core">
+		<property name="result.dirname" value="${buildDir}/result" />
+		<property name="result.filename" value="${jar.core}" />
+
+		<echo>Build me baby one more time...</echo>
+		<echo>Output set to: ${result.dirname}/${result.filename}</echo>
+		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
+
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare" inheritall="true" />
+		<!--<antcall target="copy-source" inheritall="true" />
+		<antcall target="copy-libs" inheritall="true" />-->
+		<antcall target="compile" inheritall="true" />
+		<antcall target="pack" inheritall="true" />
+		<antcall target="cleanup" inheritall="true" />
+
+	</target>
+
+
+	<target name="copy-source">
+		<!-- Copy required files -->
+		<copy todir="${result.dirname}/build/src">
+			<fileset dir="${sourceCodeDir}" />
+		</copy>
+		<copy todir="${result.dirname}/build/src">
+			<fileset dir="${sourceCodeDir}/../at.jku.mevss.memodel/src" />
+			<fileset dir="${sourceCodeDir}/../at.jku.mevss.util/src" />
+		</copy>
+	</target>
+
+	<target name="compile">
+		<!-- Compile files -->
+		<path id="classpath">
+			<fileset dir="${result.dirname}/build/lib" includes="*.jar" />
+		</path>
+		<javac sourcepath="" srcdir="${result.dirname}/build/src" destdir="${result.dirname}/build/bin" classpathref="classpath" nowarn="true" debug="true">
+			<compilerarg line="-g" />
+
+			<include name="edu/nd/**/*.java" />
+			
+	
+
+			<!--<exclude name="at/jku/mevss/memodel/internal/MeModelActivator.java" />-->
+		
+
+		</javac>
+	</target>
+
+</project>
