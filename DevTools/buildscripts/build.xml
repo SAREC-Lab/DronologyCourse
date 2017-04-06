@@ -12,8 +12,8 @@
 
 		<antcall target="check-preconditions" inheritall="true" />
 		<antcall target="prepare" inheritall="true" />
-		<!--<antcall target="copy-source" inheritall="true" />
-		<antcall target="copy-libs" inheritall="true" />-->
+		<antcall target="copy-source" inheritall="true" />
+		<!--<antcall target="copy-libs" inheritall="true" />-->
 		<antcall target="compile" inheritall="true" />
 		<antcall target="pack" inheritall="true" />
 		<antcall target="cleanup" inheritall="true" />
@@ -23,13 +23,17 @@
 
 	<target name="copy-source">
 		<!-- Copy required files -->
+		<echo>copy: ${sourceCodeDir} to : ${result.dirname}/build/src  </echo>
 		<copy todir="${result.dirname}/build/src">
 			<fileset dir="${sourceCodeDir}" />
 		</copy>
+
 		<copy todir="${result.dirname}/build/src">
-			<fileset dir="${sourceCodeDir}/../at.jku.mevss.memodel/src" />
-			<fileset dir="${sourceCodeDir}/../at.jku.mevss.util/src" />
+			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/src" />
+			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/code" />
 		</copy>
+
+
 	</target>
 
 	<target name="compile">
@@ -40,12 +44,13 @@
 		<javac sourcepath="" srcdir="${result.dirname}/build/src" destdir="${result.dirname}/build/bin" classpathref="classpath" nowarn="true" debug="true">
 			<compilerarg line="-g" />
 
-			<include name="edu/nd/**/*.java" />
+			<include name="edu/nd/dronology/core/**/*.java" />
+			<include name="model/**/*.java" />
+			<include name="view/**/*.java" /> 
 			
-	
+			
+			<exclude name="edu/nd/dronology/core/test/controller/CoordinateTransformationTest.java" />
 
-			<!--<exclude name="at/jku/mevss/memodel/internal/MeModelActivator.java" />-->
-		
 
 		</javac>
 	</target>
