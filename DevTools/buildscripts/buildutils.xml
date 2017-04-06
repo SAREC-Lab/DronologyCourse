@@ -100,8 +100,7 @@
 	</target>
 
 	<target name="cleanup">
-		<!-- Copy to result -->
-		<copy file="${result.dirname}/${result.filename}" todir="${result.dirname}/../../result" />
+
 		<!-- Cleanup (we only want to see the .dot and .jar files) -->
 		<delete dir="${result.dirname}" />
 		
