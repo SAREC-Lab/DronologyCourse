@@ -3,10 +3,31 @@ package edu.nd.dronology.core.drone_status;
 import java.util.HashMap;
 import java.util.Map;
 
+//Singleton class
 public class DroneCollectionStatus {
 	Map<String,DroneStatus> drones;
 	
-	public DroneCollectionStatus(){
+	private static DroneCollectionStatus instance = null;
+	  
+	public static DroneCollectionStatus getInstance() {
+	  if(instance == null) {
+	      instance = new DroneCollectionStatus();
+	  }
+	  return instance;
+    }
+	
+	public void testStatus(){
+		System.out.println("Print current drone dump");
+		for(DroneStatus droneStatus: drones.values()){
+			System.out.println(droneStatus.toString());
+		}
+	}
+	
+	public Map<String,DroneStatus> getDrones(){
+		return drones;
+	}
+
+	protected DroneCollectionStatus(){
 		drones = new HashMap<String,DroneStatus>();
 	}
 	

@@ -1,4 +1,5 @@
 package virtual_drone_simulator;
+import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.VirtualDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
@@ -95,11 +96,6 @@ public class FlightSimulator {
 		
 		double distanceMoved = Math.sqrt(Math.pow(heightIncrement,2)+Math.pow(widthIncrement,2));
 		
-	//	if (previousDistance < getRemainingDistance())
-	//		System.out.println("Stopping here:");
-		
-	//	System.out.println("Distance Moved: " + distanceMoved + " Ht: " + heightIncrement + "Wdth: " + widthIncrement);
-	//	System.out.println("Remaining distance: " + getRemainingDistance());
 		if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200){
 			previousDistance = getRemainingDistance();
 			System.out.println("Waypoint reached");

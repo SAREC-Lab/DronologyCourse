@@ -1,6 +1,7 @@
 package edu.nd.dronology.core.drones_runtime;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.drone_status.DroneStatus;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
@@ -15,6 +16,7 @@ import view.DroneImage;
  */
 public interface iDrone {
 	
+	public DroneStatus getDroneStatus();
 
 	/**
 	 * 

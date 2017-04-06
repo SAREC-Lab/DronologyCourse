@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.drone_status.DroneStatus;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
 import edu.nd.dronology.core.flight_manager.iFlightDirector;
 import edu.nd.dronology.core.utilities.Coordinates;
@@ -21,7 +22,6 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	iDrone drone;  // Controls primitive flight commands for drone
 	Coordinates currentPosition;
 	String droneName;
-	DroneImage droneImage;
 	DroneSeparationMonitor safetyMgr;
 	Coordinates basePosition; // In current version drones always return to base at the end of their flights.
 	DroneFlightModeState droneState;
@@ -47,6 +47,7 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 		droneSafetyState = new DroneSafetyModeState();
 		currentPosition = null; //new Coordinates(lat,lon,alt); // NEED TO SET CURRENT POSITION.
 		droneName = drnName;
+		drone.getDroneStatus().setStatus(droneState.getStatus());
 		this.flightDirector = new SoloDirector(this); // Don't really want to create it here.
 		thread = new Thread(this);
 	}
@@ -57,9 +58,9 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	 * @param lon
 	 * @param alt
 	 */
-	public void setCoordinates(long lat, long lon, int alt) {
-		drone.setCoordinates(lat, lon, alt); 		
-	}
+//	public void setCoordinates(long lat, long lon, int alt) {
+//		drone.setCoordinates(lat, lon, alt); 	
+//	}
 	
 	
 	/**
@@ -127,8 +128,10 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 			throw new FlightZoneException("Target Altitude is 0");
 		System.out.println("TAKING OFF DRONE: " + getDroneName());
 		droneState.setModeToTakingOff();
+		drone.getDroneStatus().setStatus(droneState.getStatus());
 		drone.takeOff(targetAltitude); 
 		droneState.setModeToFlying();
+		drone.getDroneStatus().setStatus(droneState.getStatus());
 	}
 
 	/**
@@ -145,23 +148,6 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	 */
 	public Coordinates getCoordinates() {
 		return drone.getCoordinates();
-	}
-
-	/**
-	 * Registers an image with the drone
-	 * @param img
-	 */
-	public void registerImage(DroneImage img) {
-		this.droneImage = img;		
-	}
-
-	
-	/**
-	 * Keeps the coordinates of the drone image for display synched with actual drone coordinates
-	 * @param img
-	 */
-	public void updateImageLocation() throws FlightZoneException {
-		droneImage.updateImageCoordinates();	
 	}
 
 	public void startThread() {
@@ -284,8 +270,10 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	public void land() throws FlightZoneException {
 		if (!droneState.isLanding() || !droneState.isOnGround()){
 			droneState.setModeToLanding();
+			drone.getDroneStatus().setStatus(droneState.getStatus());
 			drone.land();
 			droneState.setModeToOnGround();
+			drone.getDroneStatus().setStatus(droneState.getStatus());
      		unassignFlight();
 		}
 	}
@@ -314,14 +302,6 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	public void setBaseCoordinates(Coordinates basePosition) {
 		this.basePosition = new Coordinates(basePosition.getLatitude(), basePosition.getLongitude(), basePosition.getAltitude());
 		currentPosition = new Coordinates(basePosition.getLatitude(), basePosition.getLongitude(), basePosition.getAltitude());		
-	}
-
-	/**
-	 * 
-	 * @return image associated with drone
-	 */
-	public DroneImage getDroneImage() {
-		return droneImage;
 	}
 
 	/**

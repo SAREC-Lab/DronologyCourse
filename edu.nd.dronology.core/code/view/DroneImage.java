@@ -19,7 +19,7 @@ import javafx.scene.image.ImageView;
 public class DroneImage {
 	ImageView droneImageView;
 	ImageView droneOnGroundImageView;
-	FlightZoneView fzView;
+	DronologyRunner fzView;
 	DecimalDegreesToXYConverter coordTrans;	
 	
 	ManagedDrone drone;
@@ -30,7 +30,7 @@ public class DroneImage {
 	 * @param fzView View for displaying drone image
 	 * @throws FlightZoneException 
 	 */
-	public DroneImage(ManagedDrone drone2, FlightZoneView fzView) throws FlightZoneException{
+	public DroneImage(ManagedDrone drone2, DronologyRunner fzView) throws FlightZoneException{
 		this.drone = drone2;
 		this.fzView = fzView;
 		coordTrans = DecimalDegreesToXYConverter.getInstance();

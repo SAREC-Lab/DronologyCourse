@@ -4,8 +4,7 @@ import java.util.ArrayList;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.physical_environment.BaseManager;
-import edu.nd.dronology.core.zone_manager.FlightZoneException;
-import view.FlightZoneView;
+import view.DronologyRunner;
 
 /**
  * Holds a fleet of virtual or physical drones.
@@ -15,27 +14,20 @@ import view.FlightZoneView;
 public class DroneFleet {
 	ArrayList<ManagedDrone> availableDrones;
 	ArrayList<ManagedDrone> busyDrones;
-	final static int fleetSize = 5;
+	final static int fleetSize = 1;
 	
 	/**
 	 * Specifies whether virtual or physical drones will be created according to the previously specified
 	 * runtime drone type.  (See RuntimeDroneTypes.java)
 	 * @param fzView 
 	 */
-	public DroneFleet(BaseManager baseMgr, FlightZoneView fzView){
+	public DroneFleet(BaseManager baseMgr, DronologyRunner fzView){
 		if (RuntimeDroneTypes.getInstance().isSimulation())
 			availableDrones = (new VirtualDroneFleetFactory(fleetSize, baseMgr).getDrones());
 		else
 			availableDrones = (new PhysicalDroneFleetFactory(fleetSize, baseMgr).getDrones());
 		
-		for(ManagedDrone drone: availableDrones){
-			try {
-				fzView.createDroneImage(drone);
-			} catch (FlightZoneException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		
 		busyDrones = new ArrayList<ManagedDrone>();
 	}
 	
