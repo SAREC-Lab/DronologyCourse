@@ -1,4 +1,4 @@
-<project name="build-ME-MemodelAPI" default="dronology-core">
+<project name="build-dronology.core" default="dronology-core">
 	<import file="./buildutils.xml" />
 
 

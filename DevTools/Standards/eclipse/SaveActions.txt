@@ -1,0 +1,17 @@
+. Perform the selected on save
+ - Format source code
+    * Format all lines
+ - Organize imports
+ - Additional actions
+    - Tab "Code Organizing":
+        * Remove trailing white spaces on all lines
+    - Tab "Code Style"
+        * Use blocks in if/while/etc: Always
+  	- Tab "Missing code"
+	    * Add missing "@Override" annotations
+	    * Add missing "@Override" annotations to implementations of interface methods
+	    * Add missing "@Deprecated" annotations
+    - Tab "Unnecessary code"
+        * Remove unused imports
+	    * Removed unnecessary casts
+	    * Remove unnecessary NON-NLS tags
