@@ -1,0 +1,19 @@
+$target = Current target platform:  Eclipse RCP 3.6 Helios
+$java = Java 1.6
+
+ 1. Get the latest RCP Version of Eclipse
+ 2. Apply preference importing/changes from the guidelines folder:
+    a) -> Window -> Preferences -> Java -> Code Style -> Cleanup
+    b) -> Window -> Preferences -> Java -> Code Style -> Formatter
+    c) -> File -> Import -> Preferences -> Compiler Preferences
+    d) Manually apply changes from SaveActions.txt
+ 3. Download the eclipse target platform ( $target, see above )
+ 3. Define the eclipse target platform ( $target )
+    -> Window -> Preferences -> Plug-in development -> Target Platform -> Add -> Start from Nothing -> Add directory of $target 
+ 4. Define the eclipse API baseline platform ( $target )
+    -> Window -> Preferences -> Plug-in development -> API Baseline -> Add -> Add directory of $target 
+ 4. Download and define the JDK version
+ 	-> Window -> Preferences -> Java -> Installed JREs -> Add and select $java. 
+ 5. Set the default encoding for Text "Content Types" to UTF8
+ 6. Install the Plugins: Subclipse, EclEmma, FindBugs, JUnit, (SWTBot if you want it)
+ 
