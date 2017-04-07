@@ -68,7 +68,11 @@ public class DroneStatus implements Serializable{
     }
 	
 	public long getLongitude(){
-		return 0l;
-	};
+		return longitude;
+	}
+	
+	public long getLatitude(){
+		return latitude;
+	}
 
 }

@@ -7,8 +7,8 @@ import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
+import edu.nd.dronology.core.start.DronologyRunner;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
-import view.DronologyRunner;
 
 /**
  * Tracks the status of all flights as they move through the cycle of pending, awaiting take off, current, to completed.

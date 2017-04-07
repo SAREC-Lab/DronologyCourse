@@ -1,6 +1,6 @@
 
 
-package view;
+package edu.nd.dronology.core.start;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,6 +18,7 @@ import edu.nd.dronology.core.zone_manager.ZoneBounds;
 import model.flights.data.FlightPlanWayPointCollection;
 import model.flights.data.InteractiveWayPointDot;
 import model.flights.xml.SaveXMLFlight;
+import view.DefaultLocalView;
 import view.DroneImage;
 
 /**
@@ -36,9 +37,13 @@ public class DronologyRunner{
 	static long yRange = 960;
 			 	
 	static int LeftDivider = 180;
-	ArrayList<FlightPlan> currentFlights;
-	ArrayList<FlightPlan> pendingFlights;
+//	ArrayList<FlightPlan> currentFlights;
+//	ArrayList<FlightPlan> pendingFlights;
 	ArrayList<FlightPlan> completedFlights;
+	
+	public static void main(String[] args) throws InterruptedException, FlightZoneException {		
+		new DronologyRunner();
+	}
 	
 	/**
 	 * Initial setup included setting simulation type
@@ -54,15 +59,10 @@ public class DronologyRunner{
 			e.printStackTrace();
 		}		
 
-		try {
-			startFlightManager();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		new DefaultLocalView();
 		startFlightManager();	
 		flightManager.loadFlightFromXML();
+
 	}
 	
 	/**
@@ -85,22 +85,6 @@ public class DronologyRunner{
 		baseManager = new BaseManager(5);
 	}
 	
-	/**
-	 * 	
-	 * @return X range of screen display
-	 */
-//	public long getXRange(){
-//		return xRange;
-//	}
-	
-	/**
-	 * 
-	 * @return Y range of screen display
-	 */
-	public long getYRange(){
-		return yRange;
-	}
-		
 }	
 
 

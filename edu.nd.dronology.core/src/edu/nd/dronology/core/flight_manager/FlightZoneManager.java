@@ -7,10 +7,10 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
 import edu.nd.dronology.core.physical_environment.BaseManager;
+import edu.nd.dronology.core.start.DronologyRunner;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import model.flights.xml.LoadXMLFlight;
-import view.DronologyRunner;
 
 public class FlightZoneManager implements Runnable{
 	Flights flights;

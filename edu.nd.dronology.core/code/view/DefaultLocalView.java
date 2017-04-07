@@ -1,7 +1,9 @@
 package view;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
 import edu.nd.dronology.core.drone_status.DroneStatus;
@@ -50,51 +52,72 @@ public class DefaultLocalView extends Application {
 	static long yRange = 960;
 	Map<String,DroneStatus> drones;
 	Map<String,ImageView> allDroneImages;
+	DecimalDegreesToXYConverter coordTransform ;
 	
 	static int LeftDivider = 180;	
     private FlightZoneStatusPanel leftStatusDisplay;	
     
-    private void loadDroneStatus(){
+    private void loadDroneStatus() throws FlightZoneException{
     	Map<String,DroneStatus> drones = DroneCollectionStatus.getInstance().getDrones();
     	
-    	// Check if any drones have been removed.
-    	//for(String droneID: allDroneImages.keySet()){
-    	//	if (!(drones.containsKey(droneID))){
-    	//		// Do something to remove it
-    	//	}	
-    	//}
+      	// Check if any drones have been removed.
+    	// FIX
+    	//r(String droneID: allDroneImages.keySet()){
+    	//f (!(drones.containsKey(droneID))){
+    	//root.getChildren().remove(allDroneImages.get(droneID));
+    	//
+    	//	
+    	//
     	
-    	// Check all drones and update their positions
+    	// Check all drones and update their positions   		
+    	
+    	// Create temporary Array Map of images to add.
+    	Map<String,ImageView> imagesToAdd = new HashMap<String,ImageView>();
     	for(String droneID: drones.keySet()){
+    		
+    		// Get current coordinates for each drone
+    		// These need to be transformed to x,y coordinates for the screen.
+    		DroneStatus droneStatus = drones.get(droneID);
+    		Point point = coordTransform.getPoint(droneStatus.getLatitude(), droneStatus.getLongitude());    		
+    		
+    		ImageView imgView;
     		if (!(allDroneImages.containsKey(droneID))){  // This drone is not known and must be added.
-    			Image droneImage = new Image("images\\drone.png",50,50,true,true);
-    			ImageView imgView = new ImageView(droneImage);
-    			imgView.setX(drones.get(droneID).);
-    			allDroneImages.put(droneID,new ImageView(droneImage));
-    			
-    			
-    			droneImageView = new ImageView(droneImage);
-    			droneImageView.setX(pnt.x);
-    			droneImageView.setY(pnt.y);	
+    			Image drnImage = new Image("images\\drone.png",50,50,true,true);
+    			imgView = new ImageView(drnImage);
+    			imgView.setX(point.getX());
+    			imgView.setY(point.getY());
+    			imagesToAdd.put(droneID, imgView);
+    		} else {    			
+    			allDroneImages.get(droneID).setX(point.getX());
+    			allDroneImages.get(droneID).setY(point.getY());   			
     		}
     	}
-    		
+    	
+    	// Add the new managed drones.
+    	for (String droneID: imagesToAdd.keySet()){
+    		allDroneImages.put(droneID,imagesToAdd.get(droneID));
+    		root.getChildren().add(imagesToAdd.get(droneID));  // add to JavaFX control
+    	}    		
     }
 
 	/**
 	 * Initial setup included setting simulation type
 	 * @param args
 	 */
-	public static void DefaultLocalView(String[] args){		
-		launch(args);
+	public static void DefaultLocalView(){	
+		ZoneBounds zoneBounds = ZoneBounds.getInstance();
+	    //zoneBounds.setZoneBounds(42722381, -86290828, 41660473, -86140256, 100);
+	    zoneBounds.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
+		DecimalDegreesToXYConverter.getInstance().setUp(xRange, yRange, LeftDivider);
+		launch();
 	}
 	
 	@Override
 	public void start(Stage stage) throws Exception { 
-		    delImageViews = new ArrayList<ImageView>();
+		System.out.println("ARRIVED HERE");
+		    coordTransform = DecimalDegreesToXYConverter.getInstance();	
 	        root = new AnchorPane();	
 	       
-	        imageViewQueue = new ArrayList<ImageView>();
 			scene = new Scene(root,xRange,yRange); 
 			
 			stage.setScene(scene);
@@ -102,9 +125,7 @@ public class DefaultLocalView extends Application {
 			
 			Canvas canvas = new Canvas(LeftDivider, yRange);
 	        GraphicsContext gc = canvas.getGraphicsContext2D();
-			root.getChildren().add(canvas);
-			
-			
+			root.getChildren().add(canvas);		
 			
 			ZoneBounds zb = ZoneBounds.getInstance();
 			String flightArea = "(" + DegreesFormatter.prettyFormatDegrees(zb.getNorthLatitude()) + "," + 
@@ -113,41 +134,25 @@ public class DefaultLocalView extends Application {
 					DegreesFormatter.prettyFormatDegrees(zb.getEastLongitude())+")";
 			
 			stage.setTitle("Formation Simulator: " + flightArea);
-
-		
+	
 			leftStatusDisplay = new FlightZoneStatusPanel(gc, LeftDivider,(int)yRange);
 			setZone();
 
-	        displayFlightInfo(gc);
+			// need to add this back in
+	        //displayFlightInfo(gc);
 
 	        new AnimationTimer() { 
 	            @Override
 	            public void handle(long now) {
 	            	
-	            	// We cannot directly call loadImage from another thread.  FX thread has to load them itself.
-	            	while (!imageViewQueue.isEmpty()){
-	            		loadImage(imageViewQueue.get(0));
-	            	    imageViewQueue.remove(0);
-	            	}
-	            	
-	            	for(ImageView imgView: delImageViews){
-	            		if(root.getChildren().contains(imgView))
-	            			root.getChildren().remove(imgView);
-	            	}
+	            	try {
+						loadDroneStatus();
+					} catch (FlightZoneException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	            		
-	            	for(DroneImage droneImage: allDroneImages){
-	            			// The droneImage holds references to both the ImageView and an inner drone.
-	            			// Ask the droneImage object to update the ImageView's coordinates from the drone's current position.
-	            			//iDrone drone = droneImage.getDroneFromImage();
-	            			try {
-								droneImage.updateImageCoordinates();
-							} catch (FlightZoneException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-	            	} 
-	            	//displayFlightInfo(gc);  // Side panel
-	            }
+		       }
 	        }.start();
 	}	
 	
@@ -186,74 +191,6 @@ public class DefaultLocalView extends Application {
 //		    root.getChildren().add(base.getCircle());	    
 //	}
 	
-	/** 
-	 * Add an drone image
-	 * @param droneImg
-	 */
-	public void addDroneImage(DroneImage droneImg){
-		allDroneImages.add(droneImg);
-	}
-	
-	/**
-	 * Remove a drone image
-	 * @param droneImg
-	 * @throws FlightZoneException
-	 */
-	public void removeDroneImage(DroneImage droneImg) throws FlightZoneException{
-		if(allDroneImages.contains(droneImg))
-			allDroneImages.remove(droneImg);
-	    else 
-	    	throw new FlightZoneException("DroneFlight image not found in list and therefore not removed.");
-	}
-	
-	/**
-	 * Creates a drone image for a drone
-	 * @param drone
-	 * @throws FlightZoneException 
-	 */
-	public void createDroneImage(ManagedDrone drone) throws FlightZoneException{
-		DroneImage droneImage;
-		if(drone.getDroneImage()== null){
-			droneImage = new DroneImage(drone,this);
-			drone.registerImage(droneImage);
-		} else 
-			droneImage = drone.getDroneImage();
-		imageViewQueue.add(droneImage.getDroneImage());
-		allDroneImages.add(droneImage);  
-	}
-	
-	/**
-	 * Remove drone image given a drone object
-	 * @param drone
-	 */
-	public void removeDroneImage(ManagedDrone drone){
-		if (drone.getDroneImage()!=null){
-			DroneImage droneImage = drone.getDroneImage();
-			delImageViews.add(droneImage.getDroneImage());
-		}
-	}
-	
-	/**
-	 * Load an image view
-	 * Refactoring needed
-	 * @param imgView
-	 */
-	public void loadImage(ImageView imgView){	
-		if(!(root.getChildren().contains(imgView)))
-			root.getChildren().add(imgView);
-	}
-	
-	/**
-	 * Remove an image view
-	 * Refactoring needed
-	 * @param imgView
-	 */
-	public void removeImage(ImageView imgView){
-		System.out.println(" NOW REMOVING AN IMAGE ");
-		if (root.getChildren().contains(imgView))
-			root.getChildren().remove(imgView);
-	}
-	
 	/**
 	 * 	
 	 * @return X range of screen display
@@ -270,12 +207,7 @@ public class DefaultLocalView extends Application {
 		return yRange;
 	}
 	
-	public void setPlanningMode(boolean planningStatus){
-		if (planningStatus == true)
-			planningMode = true;
-		else
-			planningMode = false;
-	}
+	
 	
 }	
 
