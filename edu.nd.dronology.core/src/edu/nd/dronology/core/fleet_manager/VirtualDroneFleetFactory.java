@@ -21,6 +21,8 @@ public class VirtualDroneFleetFactory extends DroneFleetFactory{
 		Coordinates currentPosition = managedDrone.getBaseCoordinates();
 		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		//drone.setBaseCoordinates(BaseCoordinates.getInstance().getNextBase());
+		
+		
 		return managedDrone;
 	}
 	

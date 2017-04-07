@@ -10,7 +10,7 @@ import edu.nd.dronology.core.physical_environment.BaseManager;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import model.flights.xml.LoadXMLFlight;
-import view.FlightZoneView;
+import view.DronologyRunner;
 
 public class FlightZoneManager implements Runnable{
 	Flights flights;
@@ -19,13 +19,13 @@ public class FlightZoneManager implements Runnable{
     DroneSeparationMonitor safetyMgr;
     DroneFleet droneFleet;
 
-	FlightZoneView fzView;
+	DronologyRunner fzView;
 	/**
 	 * Constructs a new FlightZoneManager.
 	 * @param fzView
 	 * @throws InterruptedException
 	 */
-	public FlightZoneManager(FlightZoneView fzView, BaseManager baseMgr) throws InterruptedException{
+	public FlightZoneManager(DronologyRunner fzView, BaseManager baseMgr) throws InterruptedException{
 		this.fzView = fzView;
 		droneFleet = new DroneFleet(baseMgr,fzView);
 		safetyMgr = new DroneSeparationMonitor();
@@ -70,7 +70,6 @@ public class FlightZoneManager implements Runnable{
 	 */
 	private void launchSingleDroneToWayPoints() throws FlightZoneException{
 		// Check to make sure that there is a pending flight plan and available drone.
-		System.out.println("Launching");
 		if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()){
 			ManagedDrone drone = droneFleet.getAvailableDrone(); 
 			if (drone != null) {

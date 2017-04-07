@@ -9,7 +9,7 @@ public class DroneStatus implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -3319827887969940655L;
-	public enum flightStatus {Unknown, OnGround, AwaitingTakeOffClearance, TakingOff, Flying, Landing};
+	//public enum flightStatus {Unknown, OnGround, AwaitingTakeOffClearance, TakingOff, Flying, Landing};
 	long latitude;
 	long longitude;
 	int altitude;
@@ -17,7 +17,7 @@ public class DroneStatus implements Serializable{
 	double batteryLevel;
 	double velocity;
 	Map<String,String> info;
-	flightStatus status;
+	String status;
 
 	public DroneStatus(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity){
 		this.ID = ID;
@@ -27,7 +27,7 @@ public class DroneStatus implements Serializable{
 		this.batteryLevel = batteryLevel;
 		this.velocity = velocity;
 		info = new HashMap<String,String>();
-		status = flightStatus.Unknown;
+		status = "UNKNOWN";
 	}
 	
 	public void setInfoItem(String infoID, String infoValue){
@@ -39,7 +39,7 @@ public class DroneStatus implements Serializable{
 			info.remove(infoID);
 	}
 	
-	public void setStatus(flightStatus status){
+	public void setStatus(String status){
 		this.status = status;
 	}
 	
@@ -59,12 +59,16 @@ public class DroneStatus implements Serializable{
 	
 	@Override
 	public String toString(){		
-		return "ID: " + ID + " Pos: (" + latitude + "," + longitude + "," + altitude + ") " + " Vel: " + velocity + " Bat: " + batteryLevel;		
+		return "ID: " + ID + " Pos: (" + latitude + "," + longitude + "," + altitude + ") " + " Vel: " + velocity + " Bat: " + batteryLevel + " --- " + this.status;		
 	}
 
 	@Override
 	public int hashCode() {
         return 17 + ID.hashCode(); 
     }
+	
+	public long getLongitude(){
+		return 0l;
+	};
 
 }

@@ -1,6 +1,8 @@
 package edu.nd.dronology.core.fleet_manager;
 import java.util.ArrayList;
 
+import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
+import edu.nd.dronology.core.drone_status.DroneStatus;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.physical_environment.BaseManager;
@@ -23,7 +25,10 @@ public abstract class DroneFleetFactory {
 	 */
 	public DroneFleetFactory(int fleetSize, BaseManager baseManager){
 		for(int j=0;j<fleetSize;j++){
-			ManagedDrone drone = makeDroneAtUniqueBase(baseManager);
+			
+			// THIS NEEDS FIXING.  iDRONE updates coordinates and must therefore update the status.  Need
+			// to push this downwards.			
+			ManagedDrone drone = makeDroneAtUniqueBase(baseManager); 
 			drones.add(drone);
 			drone.startThread();
 			this.baseManager = baseManager;

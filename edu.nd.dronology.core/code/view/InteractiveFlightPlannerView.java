@@ -22,12 +22,12 @@ public class InteractiveFlightPlannerView {
 	Stage mainStage;
 	Scene mainScene;
 	FlightPlanWayPointCollection wayPoints;
-	FlightZoneView fzv;
+	DronologyRunner fzv;
 	private double xOffset = 10;
 	private double yOffset = 700;
 	SaveXMLFlight saveFlight;
 	
-	public InteractiveFlightPlannerView(Scene mainScene, Stage mainStage, FlightPlanWayPointCollection flightPlanWayPointCollection, FlightZoneView fzv){
+	public InteractiveFlightPlannerView(Scene mainScene, Stage mainStage, FlightPlanWayPointCollection flightPlanWayPointCollection, DronologyRunner fzv){
 		this.mainStage = mainStage;
 		this.mainScene = mainScene;	
 		wayPoints = flightPlanWayPointCollection;
@@ -80,7 +80,7 @@ public class InteractiveFlightPlannerView {
         new EventHandler<ActionEvent>() {
            @Override
            public void handle(final ActionEvent e) {
-        	   fzv.setPlanningMode(true);
+////        	   fzv.setPlanningMode(true);
         	}});
         return btnNewFlight;
 	}
@@ -101,7 +101,7 @@ public class InteractiveFlightPlannerView {
        		   if (file != null) {
        		       System.out.println("Selected " + file);
        		       try {
-       		    	    fzv.setPlanningMode(false);
+////       		    	    fzv.setPlanningMode(false);
     				    new SaveXMLFlight(file.getAbsolutePath(),wayPoints);
 				   } catch (IOException | FlightZoneException e1) {
     					// TODO Auto-generated catch block

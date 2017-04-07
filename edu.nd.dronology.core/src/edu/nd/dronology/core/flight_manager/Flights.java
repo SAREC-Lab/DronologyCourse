@@ -8,7 +8,7 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
-import view.FlightZoneView;
+import view.DronologyRunner;
 
 /**
  * Tracks the status of all flights as they move through the cycle of pending, awaiting take off, current, to completed.
@@ -22,7 +22,7 @@ public class Flights {
 	ArrayList<FlightPlan> completedFlights;
 	static int maximumAllowedCurrentFlights = 2;
 	DroneSeparationMonitor safetyMgr;  
-	FlightZoneView fzView;
+	DronologyRunner fzView;
 	boolean grounded = false;
 	
 	/**
@@ -31,7 +31,7 @@ public class Flights {
 	 * @param safetyMgr  Needed to check for safe takeoff
 	 * @throws InterruptedException
 	 */
-	public Flights(FlightZoneView fzView, DroneSeparationMonitor safetyMgr) throws InterruptedException{
+	public Flights(DronologyRunner fzView, DroneSeparationMonitor safetyMgr) throws InterruptedException{
 		this.fzView = fzView;
 		pendingFlights = new ArrayList<FlightPlan>();
 		currentFlights = new ArrayList<FlightPlan>();

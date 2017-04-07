@@ -1,4 +1,6 @@
 package edu.nd.dronology.core.drones_runtime;
+import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
+import edu.nd.dronology.core.drone_status.DroneStatus;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import virtual_drone_simulator.DroneVoltageSimulator;
@@ -15,6 +17,7 @@ public class VirtualDrone implements iDrone{
 	// Drone characteristics
 	Coordinates currentPosition;
 	String droneName;
+	DroneStatus droneStatus;  //PHYS
 	
 	// Virtual drone requires simulators
 	DroneVoltageSimulator voltageSimulator;
@@ -30,11 +33,15 @@ public class VirtualDrone implements iDrone{
 		currentPosition = null; 
 		sim = new FlightSimulator(this);
 		droneName = drnName;
+		droneStatus = new DroneStatus(drnName,0,0,0,0.0,0.0);  // Not initialized yet  //PHYS
+		DroneCollectionStatus.getInstance().addDrone(droneStatus); //PHYS	
 	}
+
 	
 	@Override
 	public void setCoordinates(long lat, long lon, int alt) {  // For physical drone this must be set by reading position
-		currentPosition = new Coordinates(lat,lon,alt);
+		currentPosition = new Coordinates(lat,lon,alt);	
+		droneStatus.updateCoordinates(lat,lon,alt);
 	}
 	
 	@Override
@@ -54,7 +61,8 @@ public class VirtualDrone implements iDrone{
 
 	@Override
 	public void takeOff(int targetAltitude) throws FlightZoneException {
-		voltageSimulator.startBatteryDrain();
+		voltageSimulator.startBatteryDrain(); 
+		droneStatus.updateBatteryLevel(voltageSimulator.getVoltage()); // Need more incremental drain!!
 		try {			
 			Thread.sleep(targetAltitude*100);  // Simulates attaining height.  Later move to simulator.
 		} catch (InterruptedException e) {
@@ -91,14 +99,18 @@ public class VirtualDrone implements iDrone{
 	
 	@Override
 	public double getBatteryStatus(){
+		droneStatus.updateBatteryLevel(voltageSimulator.getVoltage());
 		return voltageSimulator.getVoltage();
 	}
 
 	@Override
 	public boolean move(int i) {  // ALSO NEEDS THINKING ABOUT FOR non-VIRTUAL
 	//	System.out.println("Trying to move: " + droneName);
-		return sim.move(10);
-		//return true;// remove boolean return type!!
+		getBatteryStatus();
+		boolean moveStatus = sim.move(10);
+		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());
+		DroneCollectionStatus.getInstance().testStatus();
+		return moveStatus;
 	}
 
 	@Override
@@ -113,6 +125,12 @@ public class VirtualDrone implements iDrone{
 			return true;
 		else
 			return false;
+	}
+
+
+	@Override
+	public DroneStatus getDroneStatus() {
+		return droneStatus;
 	}
 
 	
