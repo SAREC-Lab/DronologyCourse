@@ -1,80 +1,63 @@
-<project name="build-dronology.core" default="dronology-core">
+<project name="test-dronology.core" default="dronology-core">
 	<import file="./buildutils.xml" />
-
-
+	<import file="./build_dronology.core.xml" />
 
 	<target name="dronology-core">
-		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
-		<property name="result.dirname" value="${buildDir}/result" />
 		<property name="result.filename" value="${jar.core}" />
+		<property name="build.dir" value="${tmp.dir}/build" />
+		<echo>Output set to: ${tmp.dir}</echo>
+		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
 
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare-test" inheritall="true" />
+		<antcall target="copy-tests" inheritall="true" />
+		<antcall target="compile" inheritall="true" />
 
-		<antcall target="preparedirs" inheritall="true" />
-		<antcall target="copy-source" inheritall="true" />
-		<antcall target="junit" inheritall="true" />
-		<!-- <antcall target="cleanup" inheritall="true" />-->
+		<antcall target="test" inheritall="true" />
+		<antcall target="cleanup" inheritall="true" />
+
 
 
 	</target>
+	
+	
+	<target name="prepare-test" depends="prepare">
+			<!-- Clean/Create the build directory structure used by compile -->
+			<delete dir="${report.dir}" />
+			<mkdir dir="${report.dir}" />
+		</target>
 
-
-	<target name="preparedirs">
-		<!-- Clean/Create the build directory structure used by compile -->
-		<delete dir="${report.dir}" />
-		<mkdir dir="${report.dir}" />
-	</target>
-
-
-	<target name="copy-source">
-		<!-- Copy required files -->
-		<echo>copy: ${sourceCodeDir} to : ${result.dirname}/build/src  </echo>
-		<copy todir="${result.dirname}/build/src">
-			<fileset dir="${sourceCodeDir}" />
-		</copy>
-
-		<copy todir="${result.dirname}/build/src">
-			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/src" />
-			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/code" />
-			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/test" />
+	<target name="copy-tests" depends="copy-source">
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/test" />
 		</copy>
 
 
 	</target>
 
+	<path id="classpath.base">
+		</path>
 
-	<!-- Compile Java source from ${src.dir} and output it to ${web.classes.dir} -->
-	<target name="compile" description="compile source code">
+		<path id="classpath.test">
+			<pathelement location="${build.dir}/bin" />
+			<path refid="classpath.base" />
+		</path>
 
-	</target>
+	
+	<target name="test">
+		<property name="basedir" value="${build.dir}/src" />
+		<junit fork="no">
 
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<formatter type="xml" usefile="true" />
 
-
-	<target name="junit" depends="compile">
-
-		<junit printsummary="yes" haltonfailure="no">
-
-			<!--
-			<classpath location="lib/junit-4.11.jar" />
-			<classpath location="lib/hamcrest-core-1.3.jar" />
-		-->
-
-			<classpath location="${test.classes.dir}" />
-
-			<formatter type="xml" />
-			<formatter type="plain" />
-
-			<batchtest fork="yes" todir="${report.dir}">
-				<fileset dir="${result.dirname}/build/src">
+			<batchtest todir="${report.dir}">
+				<fileset dir="${build.dir}/src">
 					<include name="**/*Test*.java" />
 				</fileset>
 			</batchtest>
-			
-			
-			
-
-			
-			
-
 		</junit>
 	</target>
+
 </project>

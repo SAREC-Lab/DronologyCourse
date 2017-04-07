@@ -18,7 +18,7 @@
 
 	<target name="copy-directory">
 		<echo>#### Copying ${fromDir} from  ${fromDir}\.. to ${toDir} ${name}  ####</echo>
-
+		<delete dir="${toDir}" />
 		<mkdir dir="${toDir}" />
 
 		<copy todir="${toDir}" >
