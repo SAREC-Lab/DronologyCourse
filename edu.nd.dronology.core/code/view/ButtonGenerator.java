@@ -39,7 +39,7 @@ public class ButtonGenerator {
 	 * @param stage
 	 * @return
 	 */
-	Button makeQuickFlightPickerButton(final FlightZoneView flightZoneView, String btnText, Stage stage){
+	Button makeQuickFlightPickerButton(final DronologyRunner flightZoneView, String btnText, Stage stage){
 	    Button quickLoad = createButton(btnText, 120);
 	    quickLoad.setOnAction(
 	    new EventHandler<ActionEvent>() {
@@ -58,10 +58,10 @@ public class ButtonGenerator {
 	 * @param stage
 	 * @return
 	 */
-	Button defineFlightButton(final FlightZoneView flightZoneView, String btnText, Stage stage){
+	Button defineFlightButton(final DronologyRunner flightZoneView, String btnText, Stage stage){
 	    Button quickLoad = createButton(btnText, 120);
-	    FlightZoneView fzv = flightZoneView;
-	    quickLoad.setOnAction(
+	    DronologyRunner fzv = flightZoneView;
+	 /*   quickLoad.setOnAction(
 	    new EventHandler<ActionEvent>() {
 	       @Override
 	       public void handle(final ActionEvent e) {       	   
@@ -69,7 +69,8 @@ public class ButtonGenerator {
 	    	   new InteractiveFlightPlannerView(flightZoneView.scene,stage, flightZoneView.flightPlanWayPointCollection, fzv);
 	   	       }
 	    });
-	    return quickLoad;
+	 */
+	   return quickLoad;
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class ButtonGenerator {
 	 * @param stage
 	 * @return
 	 */
-	Button makeFlightPickerButton(final FlightZoneView flightZoneView, String btnText, Stage stage){
+	Button makeFlightPickerButton(final DronologyRunner flightZoneView, String btnText, Stage stage){
 		Button btnFlights = createButton(btnText, 120);
 		btnFlights.setOnAction(
 	       new EventHandler<ActionEvent>() {
@@ -127,7 +128,7 @@ public class ButtonGenerator {
 	 * @param stage
 	 * @return
 	 */
-	Button makeReturnHomeButton(final FlightZoneView flightZoneView, String btnText, Stage stage){
+	Button makeReturnHomeButton(final DronologyRunner flightZoneView, String btnText, Stage stage){
 	    Button platoonBtn = createButton(btnText, 120);
 	    platoonBtn.setOnAction(
 	    new EventHandler<ActionEvent>() {

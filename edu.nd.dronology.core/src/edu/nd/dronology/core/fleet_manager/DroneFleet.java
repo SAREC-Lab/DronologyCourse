@@ -14,7 +14,7 @@ import view.DronologyRunner;
 public class DroneFleet {
 	ArrayList<ManagedDrone> availableDrones;
 	ArrayList<ManagedDrone> busyDrones;
-	final static int fleetSize = 1;
+	final static int fleetSize = 2;
 	
 	/**
 	 * Specifies whether virtual or physical drones will be created according to the previously specified
