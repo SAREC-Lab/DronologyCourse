@@ -1,25 +1,17 @@
-
-
 package edu.nd.dronology.core.start;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
 import edu.nd.dronology.core.flight_manager.FlightPlan;
 import edu.nd.dronology.core.flight_manager.FlightZoneManager;
 import edu.nd.dronology.core.flight_manager.Flights;
 import edu.nd.dronology.core.physical_environment.BaseManager;
-import edu.nd.dronology.core.physical_environment.DroneBase;
 import edu.nd.dronology.core.utilities.DecimalDegreesToXYConverter;
-import edu.nd.dronology.core.utilities.DegreesFormatter;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import edu.nd.dronology.core.zone_manager.ZoneBounds;
-import model.flights.data.FlightPlanWayPointCollection;
-import model.flights.data.InteractiveWayPointDot;
-import model.flights.xml.SaveXMLFlight;
+import helloworld.HelloWorld;
+import javafx.application.Application;
 import view.DefaultLocalView;
-import view.DroneImage;
+
 
 /**
  * Starts up the drone simulation
@@ -42,7 +34,7 @@ public class DronologyRunner{
 	ArrayList<FlightPlan> completedFlights;
 	
 	public static void main(String[] args) throws InterruptedException, FlightZoneException {		
-		new DronologyRunner();
+		new DronologyRunner(args);
 	}
 	
 	/**
@@ -51,18 +43,17 @@ public class DronologyRunner{
 	 * @throws FlightZoneException 
 	 * @throws InterruptedException 
 	 */
-	public DronologyRunner() throws FlightZoneException, InterruptedException{		
+	public DronologyRunner(String[] args) throws FlightZoneException, InterruptedException{		
 		RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 		try {
 			runtimeMode.setVirtualEnvironment();
 		} catch (FlightZoneException e) {
 			e.printStackTrace();
 		}		
-
-		new DefaultLocalView();
+		 
+		Application.launch(HelloWorld.class, args);
 		startFlightManager();	
 		flightManager.loadFlightFromXML();
-
 	}
 	
 	/**

@@ -109,7 +109,7 @@ public class VirtualDrone implements iDrone{
 		getBatteryStatus();
 		boolean moveStatus = sim.move(10);
 		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());
-		DroneCollectionStatus.getInstance().testStatus();
+		//DroneCollectionStatus.getInstance().testStatus();
 		return moveStatus;
 	}
 

@@ -14,6 +14,7 @@ import edu.nd.dronology.core.flight_manager.FlightZoneManager;
 import edu.nd.dronology.core.flight_manager.Flights;
 import edu.nd.dronology.core.physical_environment.BaseManager;
 import edu.nd.dronology.core.physical_environment.DroneBase;
+import edu.nd.dronology.core.start.DronologyRunner;
 import edu.nd.dronology.core.utilities.DecimalDegreesToXYConverter;
 import edu.nd.dronology.core.utilities.DegreesFormatter;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
@@ -52,10 +53,13 @@ public class DefaultLocalView extends Application {
 	static long yRange = 960;
 	Map<String,DroneStatus> drones;
 	Map<String,ImageView> allDroneImages;
-	DecimalDegreesToXYConverter coordTransform ;
-	
+	DecimalDegreesToXYConverter coordTransform ;	
 	static int LeftDivider = 180;	
     private FlightZoneStatusPanel leftStatusDisplay;	
+    
+    public static void main(String[] args) {
+        launch(args);
+    }
     
     private void loadDroneStatus() throws FlightZoneException{
     	Map<String,DroneStatus> drones = DroneCollectionStatus.getInstance().getDrones();
@@ -104,16 +108,16 @@ public class DefaultLocalView extends Application {
 	 * Initial setup included setting simulation type
 	 * @param args
 	 */
-	public static void DefaultLocalView(){	
+	public DefaultLocalView(String[] args){	
 		ZoneBounds zoneBounds = ZoneBounds.getInstance();
 	    //zoneBounds.setZoneBounds(42722381, -86290828, 41660473, -86140256, 100);
 	    zoneBounds.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
 		DecimalDegreesToXYConverter.getInstance().setUp(xRange, yRange, LeftDivider);
-		launch();
+		//launch(args);
 	}
 	
 	@Override
-	public void start(Stage stage) throws Exception { 
+	public void start(Stage stage) { 
 		System.out.println("ARRIVED HERE");
 		    coordTransform = DecimalDegreesToXYConverter.getInstance();	
 	        root = new AnchorPane();	
@@ -128,6 +132,9 @@ public class DefaultLocalView extends Application {
 			root.getChildren().add(canvas);		
 			
 			ZoneBounds zb = ZoneBounds.getInstance();
+			zb.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
+			DecimalDegreesToXYConverter.getInstance().setUp(xRange, yRange, LeftDivider);  //Setup happens only once.  Must happen after Zonebounds are set.
+  
 			String flightArea = "(" + DegreesFormatter.prettyFormatDegrees(zb.getNorthLatitude()) + "," + 
 					DegreesFormatter.prettyFormatDegrees(zb.getWestLongitude()) + ") - (" + 
 					DegreesFormatter.prettyFormatDegrees(zb.getSouthLatitude()) + "," + 
@@ -135,13 +142,18 @@ public class DefaultLocalView extends Application {
 			
 			stage.setTitle("Formation Simulator: " + flightArea);
 	
-			leftStatusDisplay = new FlightZoneStatusPanel(gc, LeftDivider,(int)yRange);
-			setZone();
+			//leftStatusDisplay = new FlightZoneStatusPanel(gc, LeftDivider,(int)yRange);
+			//try {
+			//	setZone();
+			//} catch (InterruptedException e1) {
+			//	// TODO Auto-generated catch block
+			//	e1.printStackTrace();
+			//}
 
 			// need to add this back in
 	        //displayFlightInfo(gc);
 
-	        new AnimationTimer() { 
+	      /*  new AnimationTimer() { 
 	            @Override
 	            public void handle(long now) {
 	            	
@@ -154,6 +166,7 @@ public class DefaultLocalView extends Application {
 	            		
 		       }
 	        }.start();
+	        */
 	}	
 	
 
@@ -161,13 +174,7 @@ public class DefaultLocalView extends Application {
 		return LeftDivider;
 	}
 	
-//	private void displayFlightInfo(GraphicsContext gc){
-//		leftStatusDisplay.displayTopOfPanel();
-//		leftStatusDisplay.displayCurrentFlights(flights.getCurrentFlights(), flights.getAwaitingTakeOffFlights()); // delegate
-//		leftStatusDisplay.displayPendingFlights(flights.getPendingFlights());
-//		leftStatusDisplay.displayCompletedFlights(flights.getCompletedFlights());
-//	}
-			
+
 	/**
 	 * Set Zone bounds
 	 * @throws InterruptedException
