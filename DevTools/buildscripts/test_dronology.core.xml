@@ -1,0 +1,63 @@
+<project name="test-dronology.core" default="dronology-core">
+	<import file="./buildutils.xml" />
+	<import file="./build_dronology.core.xml" />
+
+	<target name="dronology-core">
+		<property name="result.filename" value="${jar.core}" />
+		<property name="build.dir" value="${tmp.dir}/build" />
+		<echo>Output set to: ${tmp.dir}</echo>
+		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
+
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare-test" inheritall="true" />
+		<antcall target="copy-tests" inheritall="true" />
+		<antcall target="compile" inheritall="true" />
+
+		<antcall target="test" inheritall="true" />
+		<antcall target="cleanup" inheritall="true" />
+
+
+
+	</target>
+	
+	
+	<target name="prepare-test" depends="prepare">
+			<!-- Clean/Create the build directory structure used by compile -->
+			<delete dir="${report.dir}" />
+			<mkdir dir="${report.dir}" />
+		</target>
+
+	<target name="copy-tests" depends="copy-source">
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/test" />
+		</copy>
+
+
+	</target>
+
+	<path id="classpath.base">
+		</path>
+
+		<path id="classpath.test">
+			<pathelement location="${build.dir}/bin" />
+			<path refid="classpath.base" />
+		</path>
+
+	
+	<target name="test">
+		<property name="basedir" value="${build.dir}/src" />
+		<junit fork="no">
+
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<formatter type="xml" usefile="true" />
+
+			<batchtest todir="${report.dir}">
+				<fileset dir="${build.dir}/src">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+</project>
