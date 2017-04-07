@@ -79,19 +79,19 @@
 
 	<target name="check-preconditions">
 		<!-- check if properties are set -->
-		<fail message="Properties &quot;buildDir&quot; and &quot;sourceCodeDir&quot; need to be set to a value">
+		<fail message="Properties &quot;tmp.dir&quot; and &quot;src.dir&quot; need to be set to a value">
 			<condition>
 				<and>
 					<or>
-						<equals arg1="${buildDirs}" arg2="" />
+						<equals arg1="${tmp.dir}" arg2="" />
 						<not>
-							<isset property="buildDirs" />
+							<isset property="tmp.dir" />
 						</not>
 					</or>
 					<or>
-						<equals arg1="${sourceCodeDir}" arg2="" />
+						<equals arg1="${src.dir}" arg2="" />
 						<not>
-							<isset property="sourceCodeDir" />
+							<isset property="src.dir" />
 						</not>
 					</or>
 				</and>
@@ -102,7 +102,7 @@
 	<target name="cleanup">
 
 		<!-- Cleanup (we only want to see the .dot and .jar files) -->
-		<delete dir="${result.dirname}" />
+		<delete dir="${tmp.dir}" />
 		
 	</target>
 
@@ -110,7 +110,7 @@
 
 	<target name="pack">
 		<!-- Package the runnable jar file -->
-		<jar destfile="${result.dirname}/${result.filename}" basedir="${result.dirname}/build/bin">
+		<jar destfile="${tmp.dir}/jar/${result.filename}" basedir="${build.dir}/bin">
 			<!--	<fileset dir="${resultdir}/build/src" includes="**/*.java"/>
 			<zipfileset dir="${result.dirname}/build/bin" prefix="" />
 					<zipfileset src="${result.dirname}/build/lib/at.jku.ase.logging.jar" />
@@ -128,11 +128,12 @@
 
 	<target name="prepare">
 		<!-- Clean/Create the build directory structure used by compile -->
-		<delete dir="${result.dirname}" />
-		<mkdir dir="${result.dirname}" />
-		<mkdir dir="${result.dirname}/build/src" />
-		<mkdir dir="${result.dirname}/build/bin" />
-		<mkdir dir="${result.dirname}/build/lib" />
+		<delete dir="${tmp.dir}" />
+		<delete dir="${publish.dir}" />
+		<mkdir dir="${tmp.dir}" />
+		<mkdir dir="${tmp.dir}/build/src" />
+		<mkdir dir="${tmp.dir}/build/bin" />
+		<mkdir dir="${tmp.dir}/build/lib" />
 	</target>
 	
 

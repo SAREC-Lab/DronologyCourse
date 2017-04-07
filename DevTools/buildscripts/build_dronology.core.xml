@@ -3,34 +3,40 @@
 
 
 	<target name="dronology-core">
-		<property name="result.dirname" value="${buildDir}/result" />
 		<property name="result.filename" value="${jar.core}" />
-
-		<echo>Build me baby one more time...</echo>
-		<echo>Output set to: ${result.dirname}/${result.filename}</echo>
+		<property name="build.dir" value="${tmp.dir}/build" />
+		<echo>Output set to: ${tmp.dir}</echo>
 		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
 
 		<antcall target="check-preconditions" inheritall="true" />
 		<antcall target="prepare" inheritall="true" />
 		<antcall target="copy-source" inheritall="true" />
-		<!--<antcall target="copy-libs" inheritall="true" />-->
 		<antcall target="compile" inheritall="true" />
 		<antcall target="pack" inheritall="true" />
+		<antcall target="publish-jar" inheritall="true" />
 		<antcall target="cleanup" inheritall="true" />
+
+		<!--<antcall target="copy-libs" inheritall="true" />
+		
+		
+	-->
+
+
 
 	</target>
 
+	<target name="publish-jar">
+		<copy file="${tmp.dir}\jar\${result.filename}" tofile="${publish.dir}\${result.filename}" overwrite="true" />
+	</target>
 
 	<target name="copy-source">
 		<!-- Copy required files -->
-		<echo>copy: ${sourceCodeDir} to : ${result.dirname}/build/src  </echo>
-		<copy todir="${result.dirname}/build/src">
-			<fileset dir="${sourceCodeDir}" />
-		</copy>
+		<echo>copy: ${sourceCodeDir} to : ${build.dir}/src  </echo>
 
-		<copy todir="${result.dirname}/build/src">
-			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/src" />
-			<fileset dir="${sourceCodeDir}/../edu.nd.dronology.core/code" />
+
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/src" />
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/code" />
 		</copy>
 
 
@@ -39,16 +45,16 @@
 	<target name="compile">
 		<!-- Compile files -->
 		<path id="classpath">
-			<fileset dir="${result.dirname}/build/lib" includes="*.jar" />
+			<fileset dir="${build.dir}/lib" includes="*.jar" />
 		</path>
-		<javac sourcepath="" srcdir="${result.dirname}/build/src" destdir="${result.dirname}/build/bin" classpathref="classpath" nowarn="true" debug="true">
+		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
 			<compilerarg line="-g" />
 
 			<include name="edu/nd/dronology/core/**/*.java" />
 			<include name="model/**/*.java" />
-			<include name="view/**/*.java" /> 
+			<include name="view/**/*.java" />
 			<include name="virtual_drone_simulator/**/*.java" />
-			
+
 			<exclude name="edu/nd/dronology/core/test/controller/CoordinateTransformationTest.java" />
 
 
