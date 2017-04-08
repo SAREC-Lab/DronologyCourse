@@ -34,18 +34,9 @@ public class DroneBase {
 	 * @param altitude of base
 	 * @throws FlightZoneException 
 	 */
-	public DroneBase(String baseName, long lat, long lon, int alt, int radius) throws FlightZoneException{
+	public DroneBase(String baseName, long lat, long lon, int alt) throws FlightZoneException{
 		basePosition = new Coordinates(lat,lon,alt);
-		coordTransform = DecimalDegreesToXYConverter.getInstance();
 		this.baseName = baseName;	
-		circle = new Circle();
-		circle.setRadius(radius);
-		Point point = coordTransform.getPoint(lat, lon);
-		circle.setCenterX(point.getX()+radius*.6);
-		circle.setCenterY(point.getY()+radius*.6);
-		circle.setFill(Color.LIGHTYELLOW);
-		circle.setStroke(Color.BLACK);
-		circle.setStrokeWidth(1);
 	}
 	
 	/**

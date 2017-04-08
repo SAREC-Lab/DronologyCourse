@@ -50,32 +50,6 @@ import edu.nd.dronology.core.utilities.PointDelta;
 		return (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
 	}
 	
-	/** 
-	 * Checks if the two drones will get any closer in the future.  
-	 * @param D1 Drone 1
-	 * @param D2 Drone 2
-	 * @return
-	 */
-	public boolean willGetCloser(ManagedDrone D1, ManagedDrone D2){
-		if (D1 == null || D2 == null)
-			System.out.println("NULL HERE");
-		long longDelta = Math.abs(D1.getLongitude() - D2.getLongitude());
-		long latDelta = Math.abs(D1.getLatitude() - D2.getLatitude());
-		long currentDistance = (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
-		// There are times when D1 or D2 coordinates are in the process of being reset by their individual drone threads
-		// This would cause a null pointer exception.  Instead of adding more complex synchronization code we skip analysis under such circumstances.
-		if(!(D1.getTargetCoordinates() == null ||D2.getTargetCoordinates() == null)){
-			long longNextDelta = Math.abs((D1.getTargetCoordinates()).getLongitude() - (D2.getTargetCoordinates()).getLongitude());
-			long latNextDelta = Math.abs((D1.getTargetCoordinates()).getLatitude() - (D2.getTargetCoordinates()).getLatitude());
-			long nextDistance = (long) Math.sqrt((Math.pow(longNextDelta, 2)) + (Math.pow(latNextDelta, 2)));
-			if (nextDistance >= currentDistance)
-				return false;
-			else
-				return true;
-		} else
-			return false; // Skipped the check because coordinates were being reset.
-	}
-	
 	/**
 	 * Checks if a drone has permission to take off. A drone may NOT take off if any other drone currently attached to the
 	 * safety manager is in the vicinity.
@@ -85,7 +59,7 @@ import edu.nd.dronology.core.utilities.PointDelta;
 	public boolean permittedToTakeOff(ManagedDrone managedDrone){
 		for(ManagedDrone drone2: drones){
 			if (!managedDrone.equals(drone2) && drone2.getFlightModeState().isFlying())
-				if (getDistance(managedDrone,drone2) < safetyZone*2) // We require extra distance prior to takeoff
+				if (getDistance(managedDrone,drone2) < safetyZone*1.5) // We require extra distance prior to takeoff
 					return false;		
 		}
 		return true;

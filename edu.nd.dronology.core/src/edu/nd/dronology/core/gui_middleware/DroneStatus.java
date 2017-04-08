@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.drone_status;
+package edu.nd.dronology.core.gui_middleware;
 
 import java.io.Serializable;
 import java.util.HashMap;

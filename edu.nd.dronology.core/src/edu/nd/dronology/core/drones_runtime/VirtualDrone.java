@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.drones_runtime;
-import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
-import edu.nd.dronology.core.drone_status.DroneStatus;
+import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
+import edu.nd.dronology.core.gui_middleware.DroneStatus;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import virtual_drone_simulator.DroneVoltageSimulator;

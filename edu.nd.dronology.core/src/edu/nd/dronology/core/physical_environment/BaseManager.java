@@ -8,12 +8,10 @@ import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 
-
 public class BaseManager {
 	//GraphicsContext gc;
 	int numberOfBases = 0;
 	int baseID;
-	int radius = 40;
 	//ArrayList<DroneBase> droneBases;
 	HashMap<String,DroneBase> baseMap;
 	
@@ -46,7 +44,7 @@ public class BaseManager {
 			Coordinates basePosition = baseCoords.getNextBase();
 			String baseName = "Base-" + new Integer(baseID++).toString();
 			if(!baseMap.containsKey(baseName)){
-				DroneBase droneBase = new DroneBase(baseName, basePosition.getLatitude(), basePosition.getLongitude(), basePosition.getAltitude(), radius);
+				DroneBase droneBase = new DroneBase(baseName, basePosition.getLatitude(), basePosition.getLongitude(), basePosition.getAltitude());
 				baseMap.put(baseName, droneBase);
 			}
 				else

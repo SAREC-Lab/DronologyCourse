@@ -1,11 +1,11 @@
-package helloworld;
+package edu.nd.dronology.core.gui;
 
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
-import edu.nd.dronology.core.drone_status.DroneStatus;
+import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
+import edu.nd.dronology.core.gui_middleware.DroneStatus;
 import edu.nd.dronology.core.utilities.DecimalDegreesToXYConverter;
 import edu.nd.dronology.core.utilities.DegreesFormatter;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
@@ -24,7 +24,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import view.FlightZoneStatusPanel;
 
-public class HelloWorld extends Application {
+public class LocalGUISimpleDisplay extends Application {
 	Scene scene;
 	AnchorPane root;
 	static long xRange = 1600;
@@ -41,6 +41,7 @@ public class HelloWorld extends Application {
     
      @Override
    public void start(Stage stage) {
+    	allDroneImages = new HashMap<String,ImageView>();
 	    coordTransform = DecimalDegreesToXYConverter.getInstance();	
         root = new AnchorPane();	
        
@@ -68,6 +69,7 @@ public class HelloWorld extends Application {
 		new AnimationTimer() { 
             @Override
             public void handle(long now) {
+            	//System.out.println("Loading");
             	loadDroneStatus();
             	           		
 	       }

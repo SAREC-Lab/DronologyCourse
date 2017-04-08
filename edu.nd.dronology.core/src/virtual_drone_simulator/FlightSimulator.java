@@ -1,7 +1,7 @@
 package virtual_drone_simulator;
-import edu.nd.dronology.core.drone_status.DroneCollectionStatus;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.VirtualDrone;
+import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
 import edu.nd.dronology.core.utilities.Coordinates;
 
 /**

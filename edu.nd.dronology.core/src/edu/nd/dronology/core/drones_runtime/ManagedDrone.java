@@ -4,9 +4,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
-import edu.nd.dronology.core.drone_status.DroneStatus;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
 import edu.nd.dronology.core.flight_manager.iFlightDirector;
+import edu.nd.dronology.core.gui_middleware.DroneStatus;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import model.drone.runtime.DroneSafetyModeState;
@@ -52,17 +52,6 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 		thread = new Thread(this);
 	}
 		
-	/**
-	 * Sets drone coordinates
-	 * @param lat
-	 * @param lon
-	 * @param alt
-	 */
-//	public void setCoordinates(long lat, long lon, int alt) {
-//		drone.setCoordinates(lat, lon, alt); 	
-//	}
-	
-	
 	/**
 	 * Assigns a flight directive to the managed drone
 	 * @param flightDirective
@@ -128,7 +117,7 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 			throw new FlightZoneException("Target Altitude is 0");
 		System.out.println("TAKING OFF DRONE: " + getDroneName());
 		droneState.setModeToTakingOff();
-		drone.getDroneStatus().setStatus(droneState.getStatus());
+		drone.getDroneStatus().setStatus(droneState.getStatus());  // A bit ugly, but this was added to keep state for GUI middleware updated.
 		drone.takeOff(targetAltitude); 
 		droneState.setModeToFlying();
 		drone.getDroneStatus().setStatus(droneState.getStatus());
@@ -173,9 +162,6 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 			if (flightDirector!=null && droneState.isFlying()){
 				
 				targetCoordinates = flightDirector.flyToNextPoint();
-				
-				
-				
 				
 				// Move the drone.  Returns FALSE if it cannot move because it has reached destination
 				if (!drone.move(10)) 
