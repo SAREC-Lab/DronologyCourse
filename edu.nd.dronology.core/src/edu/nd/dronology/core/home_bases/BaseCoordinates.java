@@ -1,5 +1,5 @@
 
-package edu.nd.dronology.core.physical_environment;
+package edu.nd.dronology.core.home_bases;
 
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.ZoneBounds;
@@ -37,8 +37,11 @@ public class BaseCoordinates {
 		ZoneBounds zoneBounds = ZoneBounds.getInstance();
 		long lat = zoneBounds.getNorthLatitude()-zoneBounds.getYRange()/20; // will break in other world quadrants
 		long lon = zoneBounds.getWestLongitude()-zoneBounds.getXRange()/20;
+		
 		long xRange = zoneBounds.getXRange();
 		long lonDelta = (xRange/NumberOfBases)*currentBaseNumber++;
+		long temp = lon+lonDelta;
+		System.out.println("Base coords: " + lat + " " + temp);
 		return new Coordinates(lat, lon+lonDelta, 0);
 	}	
 }

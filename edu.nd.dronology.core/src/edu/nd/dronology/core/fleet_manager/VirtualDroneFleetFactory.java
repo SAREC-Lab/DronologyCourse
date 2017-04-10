@@ -4,7 +4,7 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.VirtualDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
-import edu.nd.dronology.core.physical_environment.BaseManager;
+import edu.nd.dronology.core.home_bases.BaseManager;
 import edu.nd.dronology.core.utilities.Coordinates;
 
 public class VirtualDroneFleetFactory extends DroneFleetFactory{

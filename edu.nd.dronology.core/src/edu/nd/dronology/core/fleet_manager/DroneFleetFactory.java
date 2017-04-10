@@ -5,8 +5,8 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
 import edu.nd.dronology.core.gui_middleware.DroneStatus;
-import edu.nd.dronology.core.physical_environment.BaseManager;
-import edu.nd.dronology.core.physical_environment.DroneBase;
+import edu.nd.dronology.core.home_bases.BaseManager;
+import edu.nd.dronology.core.home_bases.DroneBase;
 
 /**
  * Abstract factory class for drone fleet factory

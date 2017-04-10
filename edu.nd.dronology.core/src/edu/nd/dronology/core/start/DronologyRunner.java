@@ -3,7 +3,7 @@ import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
 import edu.nd.dronology.core.flight_manager.FlightZoneManager;
 import edu.nd.dronology.core.flight_manager.Flights;
 import edu.nd.dronology.core.gui.JavaFXGUILauncher;
-import edu.nd.dronology.core.physical_environment.BaseManager;
+import edu.nd.dronology.core.home_bases.BaseManager;
 import edu.nd.dronology.core.utilities.DecimalDegreesToXYConverter;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import edu.nd.dronology.core.zone_manager.ZoneBounds;
@@ -55,7 +55,7 @@ public class DronologyRunner{
 	public void startFlightManager() throws InterruptedException, FlightZoneException{
 		ZoneBounds zoneBounds = ZoneBounds.getInstance();
 	    zoneBounds.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
-		constructBases(1);
+		constructBases(5);
 		flightManager = new FlightZoneManager(this, baseManager);
 		flights = flightManager.getFlights();
 		flightManager.startThread();

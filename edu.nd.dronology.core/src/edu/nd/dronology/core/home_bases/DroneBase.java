@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.physical_environment;
+package edu.nd.dronology.core.home_bases;
 
 import java.awt.Point;
 

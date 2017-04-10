@@ -4,7 +4,7 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.PhysicalDrone;
 import edu.nd.dronology.core.drones_runtime.VirtualDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
-import edu.nd.dronology.core.physical_environment.BaseManager;
+import edu.nd.dronology.core.home_bases.BaseManager;
 
 /**
  * Creates a fleet of physical drones.
