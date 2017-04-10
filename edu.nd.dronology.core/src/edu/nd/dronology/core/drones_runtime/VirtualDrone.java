@@ -3,8 +3,8 @@ import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
 import edu.nd.dronology.core.gui_middleware.DroneStatus;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
-import virtual_drone_simulator.DroneVoltageSimulator;
-import virtual_drone_simulator.FlightSimulator;
+import edu.nd.dronology.virtual_drone_simulator.DroneVoltageSimulator;
+import edu.nd.dronology.virtual_drone_simulator.FlightSimulator;
 
 /**
  * Creates a virtual drone.

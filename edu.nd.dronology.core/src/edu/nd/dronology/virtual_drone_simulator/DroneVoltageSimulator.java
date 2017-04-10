@@ -1,4 +1,4 @@
-package virtual_drone_simulator;
+package edu.nd.dronology.virtual_drone_simulator;
 
 /**
  * Voltage simulator.  For every minute of flight, the battery decreases by 0.25 volts.
