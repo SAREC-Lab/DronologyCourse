@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: net.mv Logging Plug-In
+Bundle-SymbolicName: net.mv.logging
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: net.mv.logging.internal.Activator
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/log4j-core-2.7.jar,
+ .,
+ lib/log4j-api-2.7.jar,
+ conf/
+Export-Package: net.mv.logging,
+ org.apache.logging.log4j,
+ org.apache.logging.log4j.core,
+ org.apache.logging.log4j.core.appender,
+ org.apache.logging.log4j.core.config.plugins,
+ org.apache.logging.log4j.core.layout
+Import-Package: org.apache.commons.logging
+Bundle-Vendor: Michael Vierhauser
