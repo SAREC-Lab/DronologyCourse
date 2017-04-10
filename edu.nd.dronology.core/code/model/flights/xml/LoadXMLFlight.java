@@ -45,7 +45,9 @@ public class LoadXMLFlight {
 	  String filename = RetrieveLastFileName();
 	  System.out.println("Loading file: " + filename);
 	  try {	
-	     File inputFile = new File(filename);
+		  
+		 File inputFile = new File("configuration\\CollisionTest.xml");
+	    // File inputFile = new File(filename);
 	     SAXParserFactory factory = SAXParserFactory.newInstance();
 	     SAXParser saxParser = factory.newSAXParser();
 	     XMLFlightPlanImportHandler userhandler = new XMLFlightPlanImportHandler(flightZoneMgr);

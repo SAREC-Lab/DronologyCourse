@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<flights>
+<flight>
+<wayPoint>
+	<latitude>41730893</latitude>
+	<longitude>-86172481</longitude>
+	<alt>10</alt>
+</wayPoint>
+<wayPoint>
+	<latitude>41731263</latitude>
+	<longitude>-86242254</longitude>
+	<alt>10</alt>
+</wayPoint>
+</flight>
+<flight>
+<wayPoint>
+	<latitude>41731316</latitude>
+	<longitude>-86242201</longitude>
+	<alt>10</alt>
+</wayPoint>
+<wayPoint>
+	<latitude>41730893</latitude>
+	<longitude>-86172587</longitude>
+	<alt>10</alt>
+</wayPoint>
+</flight>
+</flights>
