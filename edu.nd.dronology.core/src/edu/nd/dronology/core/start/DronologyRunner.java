@@ -11,7 +11,7 @@ import edu.nd.dronology.core.zone_manager.ZoneBounds;
 /**
  * Starts up the Dronology System
  * @author Jane Cleland-Huang
- * @version 0.1
+ * @version 0.11
  *
  */
 public class DronologyRunner{
@@ -45,6 +45,7 @@ public class DronologyRunner{
 		startLocalGUIs(args);
 		startFlightManager();	
 		flightManager.loadFlightFromXML(); // Just for testing.
+		System.out.println("Running Dronology");
 	}
 	
 	/**
