@@ -37,6 +37,7 @@
 		<copy todir="${build.dir}/src">
 			<fileset dir="${src.dir}/../edu.nd.dronology.core/src" />
 			<fileset dir="${src.dir}/../edu.nd.dronology.core/code" />
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/gui" />
 		</copy>
 
 
