@@ -45,7 +45,7 @@ public class DronologyRunner{
 		startLocalGUIs(args);
 		startFlightManager();	
 		flightManager.loadFlightFromXML(); // Just for testing.
-		System.out.println("Running Dronology");
+		System.out.println("Running Dronology Test 2.1.");
 	}
 	
 	/**
