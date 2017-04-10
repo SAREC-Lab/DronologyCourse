@@ -45,7 +45,7 @@ public class DronologyRunner{
 		startLocalGUIs(args);
 		startFlightManager();	
 		flightManager.loadFlightFromXML(); // Just for testing.
-		System.out.println("Running Dronology Test 1 from arch-refactoring branch.");
+		System.out.println("Running Dronology Test 2.");
 	}
 	
 	/**
