@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.fleet_manager;
+package edu.nd.dronology.core.gui_middleware;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,10 +13,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
-import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
+
 @RunWith(Parameterized.class)
-public class TestRuntimeDroneTypes {
+public class TestDroneCollectionStatus {
 
 	
 
@@ -39,8 +40,8 @@ public class TestRuntimeDroneTypes {
 	@Test
 	public void testgetInstanceNonThreaded() {
 		
-		instance1 = RuntimeDroneTypes.getInstance();
-		instance2 = RuntimeDroneTypes.getInstance();
+		instance1 = DroneCollectionStatus.getInstance();
+		instance2 = DroneCollectionStatus.getInstance();
 		
 		assertNotNull(instance1);
 		assertNotNull(instance2);
@@ -49,7 +50,7 @@ public class TestRuntimeDroneTypes {
 	
 
 	@Test
-	public void testgetInstance() {
+	public void testgetInstanceThreaded() {
 
 		final CyclicBarrier gate = new CyclicBarrier(3);
 
@@ -61,7 +62,7 @@ public class TestRuntimeDroneTypes {
 				} catch (InterruptedException | BrokenBarrierException e) {
 					e.printStackTrace();
 				}
-				instance1 = RuntimeDroneTypes.getInstance();
+				instance1 = DroneCollectionStatus.getInstance();
 			}
 		};
 		Thread t2 = new Thread() {
@@ -71,7 +72,7 @@ public class TestRuntimeDroneTypes {
 				} catch (InterruptedException | BrokenBarrierException e) {
 					e.printStackTrace();
 				}
-				instance2 = RuntimeDroneTypes.getInstance();
+				instance2 = DroneCollectionStatus.getInstance();
 			}
 		};
 
@@ -91,7 +92,7 @@ public class TestRuntimeDroneTypes {
 
 	}
 
-	private RuntimeDroneTypes instance1;
-	private RuntimeDroneTypes instance2;
+	private DroneCollectionStatus instance1;
+	private DroneCollectionStatus instance2;
 
 }
