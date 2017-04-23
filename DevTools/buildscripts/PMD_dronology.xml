@@ -1,0 +1,33 @@
+
+<project name="pmd" basedir="." default="PMD">
+	<import file="./buildutils.xml" />
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+
+
+
+	<target name="prepare-test" depends="prepare">
+		<!-- Clean/Create the build directory structure used by compile -->
+		<delete dir="${report.dir}" />
+		<mkdir dir="${report.dir}" />
+	</target>
+
+
+	<target name="PMD">
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare-test" inheritall="true" />
+		<antcall target="check_pmd" inheritall="true" />
+	</target>
+
+
+	<target name="check_pmd">
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+		<pmd rulesetfiles="fullRuleSet.xml">
+			<formatter type="html" toFile="${report.dir}/pmd_report.html" toConsole="true"/>
+
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/src" >
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
+	</target>
+
+</project>
