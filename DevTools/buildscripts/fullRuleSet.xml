@@ -78,7 +78,6 @@
    <rule ref="rulesets/java/controversial.xml/AvoidUsingShortType"/>
    <rule ref="rulesets/java/controversial.xml/AvoidUsingVolatile"/>
    <rule ref="rulesets/java/design.xml/BadComparison"/>
-   <rule ref="rulesets/java/javabeans.xml/BeanMembersShouldSerialize"/>
    <rule ref="rulesets/java/basic.xml/BigIntegerInstantiation"/>
    <rule ref="rulesets/java/naming.xml/BooleanGetMethodName"/>
    <rule ref="rulesets/java/basic.xml/BooleanInstantiation"/>
@@ -98,7 +97,7 @@
    <rule ref="rulesets/java/clone.xml/CloneMethodReturnTypeMustMatchClassName"/>
    <rule ref="rulesets/java/clone.xml/CloneThrowsCloneNotSupportedException"/>
    <rule ref="rulesets/java/design.xml/CloseResource"/>
-   <rule ref="rulesets/java/basic.xml/CollapsibleIfStatements"/>
+  <!--  <rule ref="rulesets/java/basic.xml/CollapsibleIfStatements"/>-->
    <rule ref="rulesets/vm/basic.xml/CollapsibleIfStatements"/>
    <rule ref="rulesets/java/comments.xml/CommentContent"/>
    <rule ref="rulesets/java/comments.xml/CommentDefaultAccessModifier"/>
@@ -222,7 +221,7 @@
    <rule ref="rulesets/java/coupling.xml/LooseCoupling"/>
    <rule ref="rulesets/java/coupling.xml/LoosePackageCoupling"/>
    <rule ref="rulesets/java/j2ee.xml/MDBAndSessionBeanNamingConvention"/>
-   <rule ref="rulesets/java/optimizations.xml/MethodArgumentCouldBeFinal"/>
+ 
    <rule ref="rulesets/apex/style.xml/MethodNamingConventions"/>
    <rule ref="rulesets/java/naming.xml/MethodNamingConventions"/>
    <rule ref="rulesets/java/sunsecure.xml/MethodReturnsInternalArray"/>
@@ -275,7 +274,7 @@
    <rule ref="rulesets/pom/basic.xml/ProjectVersionAsDependencyVersion"/>
    <rule ref="rulesets/java/clone.xml/ProperCloneImplementation"/>
    <rule ref="rulesets/java/logging-jakarta-commons.xml/ProperLogger"/>
-   <rule ref="rulesets/java/optimizations.xml/RedundantFieldInitializer"/>
+  <!--   <rule ref="rulesets/java/optimizations.xml/RedundantFieldInitializer"/>-->
    <rule ref="rulesets/java/j2ee.xml/RemoteInterfaceNamingConvention"/>
    <rule ref="rulesets/java/j2ee.xml/RemoteSessionInterfaceNamingConvention"/>
    <rule ref="rulesets/java/migrating.xml/ReplaceEnumerationWithIterator"/>
