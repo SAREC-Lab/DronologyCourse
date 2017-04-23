@@ -127,7 +127,7 @@
 				<file file="${result.exec.file}" />
 			</executiondata>
 			<!--  the class files and optional source files ...  -->
-			<structure name="JaCoCo Ant Example">
+			<structure name="JaCoCo Dronology Code Coverage">
 				<classfiles>
 					<fileset dir="${build.dir}/bin" >
 						<exclude name="**/*Test*.class"/>
