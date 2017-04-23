@@ -1,4 +1,4 @@
-package model.drone.runtime;
+package edu.nd.dronology.core.drones_runtime;
 
 /**
  * Associates a drone safety state object with a drone.

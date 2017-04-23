@@ -9,7 +9,6 @@ import edu.nd.dronology.core.flight_manager.iFlightDirector;
 import edu.nd.dronology.core.gui_middleware.DroneStatus;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
-import model.drone.runtime.DroneSafetyModeState;
 import view.DroneImage;
 
 /**

@@ -3,26 +3,32 @@ package edu.nd.dronology.core.fleet_manager;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.VirtualDrone;
 import edu.nd.dronology.core.drones_runtime.iDrone;
-import edu.nd.dronology.core.flight_manager.SoloDirector;
-import edu.nd.dronology.core.home_bases.BaseManager;
 import edu.nd.dronology.core.utilities.Coordinates;
 
 public class VirtualDroneFleetFactory extends DroneFleetFactory{
+		
+	protected VirtualDroneFleetFactory() {
+		
+	}
 	
-	public VirtualDroneFleetFactory(int fleetSize, BaseManager baseMgr) {
-		super(fleetSize, baseMgr);
+	private static VirtualDroneFleetFactory instance = null;
+	
+	public static VirtualDroneFleetFactory getInstance() {
+		if(instance == null) {
+			instance = new VirtualDroneFleetFactory();
+		}
+		return instance;
 	}
 	
 	@Override
-	protected ManagedDrone makeDroneAtUniqueBase(BaseManager baseManager){
-		iDrone drone = new VirtualDrone(createDroneID(uniqDroneID++));
-		ManagedDrone managedDrone = new ManagedDrone(drone,createDroneID(uniqDroneID++));
-		baseManager.assignDroneToBase(managedDrone); // Assigns drone.  Sets coordiantes.
-		Coordinates currentPosition = managedDrone.getBaseCoordinates();
+	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude){
+		iDrone drone = new VirtualDrone(createDroneID(droneID));
+		ManagedDrone managedDrone = new ManagedDrone(drone,droneID);
+		Coordinates currentPosition = new Coordinates(latitude, longitude,altitude);
+		managedDrone.setBaseCoordinates(currentPosition);
 		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
-		//drone.setBaseCoordinates(BaseCoordinates.getInstance().getNextBase());
-		
-		
+		managedDrone.startThread();
+		DroneFleet.getInstance().setAvailableDrone(managedDrone);
 		return managedDrone;
 	}
 	

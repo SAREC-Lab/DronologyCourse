@@ -1,10 +1,7 @@
 package edu.nd.dronology.core.fleet_manager;
 
 import java.util.ArrayList;
-
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.home_bases.BaseManager;
-import edu.nd.dronology.core.start.DronologyRunner;
 
 /**
  * Holds a fleet of virtual or physical drones.
@@ -14,19 +11,24 @@ import edu.nd.dronology.core.start.DronologyRunner;
 public class DroneFleet {
 	ArrayList<ManagedDrone> availableDrones;
 	ArrayList<ManagedDrone> busyDrones;
-	final static int fleetSize = 2;
+	private static DroneFleet instance = null;
+	
+	public static DroneFleet getInstance() {
+		if(instance == null) {
+			instance = new DroneFleet();
+		}
+		return instance;
+	}
 	
 	/**
 	 * Specifies whether virtual or physical drones will be created according to the previously specified
 	 * runtime drone type.  (See RuntimeDroneTypes.java)
-	 * @param fzView 
 	 */
-	public DroneFleet(BaseManager baseMgr, DronologyRunner fzView){
+	protected DroneFleet(){
 		if (RuntimeDroneTypes.getInstance().isSimulation())
-			availableDrones = (new VirtualDroneFleetFactory(fleetSize, baseMgr).getDrones());
+			availableDrones = VirtualDroneFleetFactory.getInstance().getDrones(); 
 		else
-			availableDrones = (new PhysicalDroneFleetFactory(fleetSize, baseMgr).getDrones());
-		
+			availableDrones = PhysicalDroneFleetFactory.getInstance().getDrones();
 		
 		busyDrones = new ArrayList<ManagedDrone>();
 	}
@@ -36,6 +38,7 @@ public class DroneFleet {
 	 * @return true if drone is available, false if it is not.
 	 */
 	public boolean hasAvailableDrone(){
+		System.out.println("Drones available: " + availableDrones.size());
 		if (availableDrones.size() > 0)
 			return true;
 		else
@@ -57,10 +60,11 @@ public class DroneFleet {
 			return null;
 	}
 	
-	public void setupPlatoon(){
-		System.out.println("Ready to setup Platoon");
+	public void setAvailableDrone(ManagedDrone managedDrone){
+		availableDrones.add(managedDrone);
 	}
 	
+		
 	/**
 	 * When a drone completes a mission, returns it to the pool of available drones.
 	 * @param drone
@@ -71,5 +75,6 @@ public class DroneFleet {
 			availableDrones.add(drone);
 		}
 	}
+	
 }
 

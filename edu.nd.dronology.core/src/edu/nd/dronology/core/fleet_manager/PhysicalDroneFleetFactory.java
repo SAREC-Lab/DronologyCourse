@@ -1,10 +1,6 @@
 package edu.nd.dronology.core.fleet_manager;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.PhysicalDrone;
-import edu.nd.dronology.core.drones_runtime.VirtualDrone;
-import edu.nd.dronology.core.drones_runtime.iDrone;
-import edu.nd.dronology.core.home_bases.BaseManager;
 
 /**
  * Creates a fleet of physical drones.
@@ -14,15 +10,22 @@ import edu.nd.dronology.core.home_bases.BaseManager;
  */
 public class PhysicalDroneFleetFactory extends DroneFleetFactory{
 
-	public PhysicalDroneFleetFactory(int fleetSize, BaseManager baseMgr) {
-		super(fleetSize, baseMgr);
+	protected PhysicalDroneFleetFactory() {		
 	}
+	
+	private static PhysicalDroneFleetFactory instance = null;
+	
+	public static PhysicalDroneFleetFactory getInstance() {
+		if(instance == null) {
+			instance = new PhysicalDroneFleetFactory();
+		}
+		return instance;
+	}
+	
 	@Override
-	protected ManagedDrone makeDroneAtUniqueBase(BaseManager baseManager){
-		iDrone drone = new PhysicalDrone(createDroneID(uniqDroneID++));
-		ManagedDrone managedDrone = new ManagedDrone(drone,createDroneID(uniqDroneID++));
-		baseManager.assignDroneToBase(managedDrone); // Assigns drone.  Sets coordinates
-		//drone.setBaseCoordinates(BaseCoordinates.getInstance().getNextBase());
-		return managedDrone;
+	public ManagedDrone initializeDrone(String DroneID, String DroneType, long latitude, long longitude,
+			int altitude) {
+	
+		return null;
 	}
 }

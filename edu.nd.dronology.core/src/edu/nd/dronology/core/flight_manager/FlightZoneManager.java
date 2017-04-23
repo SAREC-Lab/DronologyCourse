@@ -4,32 +4,28 @@ import java.util.ArrayList;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
-import edu.nd.dronology.core.home_bases.BaseManager;
-import edu.nd.dronology.core.start.DronologyRunner;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import model.flights.xml.LoadXMLFlight;
 
 public class FlightZoneManager implements Runnable{
-	Flights flights;
 	
+	Flights flights;	
     int currentDronesInFlight = 0;	
     DroneSeparationMonitor safetyMgr;
     DroneFleet droneFleet;
-
-	DronologyRunner fzView;
+	//DronologyRunner fzView;
 	/**
 	 * Constructs a new FlightZoneManager.
 	 * @param fzView
 	 * @throws InterruptedException
 	 */
-	public FlightZoneManager(DronologyRunner fzView, BaseManager baseMgr) throws InterruptedException{
-		this.fzView = fzView;
-		droneFleet = new DroneFleet(baseMgr,fzView);
+	public FlightZoneManager() throws InterruptedException{
+	//	this.fzView = fzView;
+		droneFleet = DroneFleet.getInstance();
 		safetyMgr = new DroneSeparationMonitor();
-		flights = new Flights(fzView, safetyMgr);
+		flights = new Flights(safetyMgr);
 	}
 	
 	public DroneFleet getDroneFleet(){

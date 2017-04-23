@@ -1,13 +1,9 @@
 package edu.nd.dronology.core.flight_manager;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
-import edu.nd.dronology.core.start.DronologyRunner;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 
 /**
@@ -22,7 +18,6 @@ public class Flights {
 	ArrayList<FlightPlan> completedFlights;
 	static int maximumAllowedCurrentFlights = 2;
 	DroneSeparationMonitor safetyMgr;  
-	DronologyRunner fzView;
 	boolean grounded = false;
 	
 	/**
@@ -31,8 +26,7 @@ public class Flights {
 	 * @param safetyMgr  Needed to check for safe takeoff
 	 * @throws InterruptedException
 	 */
-	public Flights(DronologyRunner fzView, DroneSeparationMonitor safetyMgr) throws InterruptedException{
-		this.fzView = fzView;
+	public Flights(DroneSeparationMonitor safetyMgr) throws InterruptedException{
 		pendingFlights = new ArrayList<FlightPlan>();
 		currentFlights = new ArrayList<FlightPlan>();
 		completedFlights = new ArrayList<FlightPlan>();
@@ -189,7 +183,6 @@ public class Flights {
 				if (drone.getFlightModeState().isOnGround()){
 				    safetyMgr.detachDrone(drone);
 					justLanded.add(flightPlan);	
-					//fzView.removeDroneImage(drone);
 					System.out.println("Drone " + drone.getDroneName() + " has landed.");
 				}
 			}
