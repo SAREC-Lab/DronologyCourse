@@ -1,0 +1,76 @@
+<project name="build-logger" default="logger">
+	<import file="./buildutils.xml" />
+
+
+	<target name="logger">
+		<property name="result.filename" value="${jar.logger}" />
+		<property name="build.dir" value="${tmp.dir}/build" />
+		<echo>Output set to: ${tmp.dir}</echo>
+		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
+
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare" inheritall="true" />
+		<antcall target="copy-source" inheritall="true" />
+	
+		<antcall target="copy-logger-libs" inheritall="true" />
+			
+		
+		<antcall target="compile" inheritall="true" />
+		<antcall target="pack" inheritall="true" />
+		<antcall target="publish-jar" inheritall="true" />
+		<antcall target="cleanup" inheritall="true" />
+
+		<!--<antcall target="copy-libs" inheritall="true" />
+		
+		
+	-->
+
+
+
+	</target>
+	
+	
+	<target name="copy-logger-libs">
+
+		<echo>Copying library files from : ${src.dir}  ${build.dir}/lib</echo>
+
+		
+		<copy file="{src.dir}/../../../net.mv.logging/lib/log4j-api-2.7.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../net.mv.logging/lib/log4j-core-2.7.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../net.mv.logging/lib/commons-logging-1.2.jar" todir="${build.dir}/lib" />
+							
+		
+		
+		
+	</target>
+
+	<target name="publish-jar">
+		<copy file="${tmp.dir}\jar\${result.filename}" tofile="${publish.dir}\${result.filename}" overwrite="true" />
+	</target>
+
+	<target name="copy-source">
+		<!-- Copy required files -->
+		<echo>copy:${src.dir} to : ${build.dir}/src  </echo>
+
+
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../net.mv.logging/src" />
+		</copy>
+
+
+	</target>
+
+	<target name="compile">
+		<!-- Compile files -->
+		<path id="classpath">
+			<fileset dir="${build.dir}/lib" includes="*.jar" />
+		</path>
+		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
+			<compilerarg line="-g" />
+			<include name="net/mv/logging/**/*.java" />
+			<exclude name="net/mv/logging/internal/**/*.java" />
+
+		</javac>
+	</target>
+
+</project>
