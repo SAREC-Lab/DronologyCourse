@@ -52,7 +52,7 @@
    <rule ref="rulesets/java/controversial.xml/AvoidFinalLocalVariable"/>
    <rule ref="rulesets/apex/style.xml/AvoidGlobalModifier"/>
    <rule ref="rulesets/java/design.xml/AvoidInstanceofChecksInCatchClause"/>
-   <rule ref="rulesets/java/optimizations.xml/AvoidInstantiatingObjectsInLoops"/>
+  <!--  <rule ref="rulesets/java/optimizations.xml/AvoidInstantiatingObjectsInLoops"/>-->
    <rule ref="rulesets/java/controversial.xml/AvoidLiteralsInIfCondition"/>
    <rule ref="rulesets/apex/style.xml/AvoidLogicInTrigger"/>
    <rule ref="rulesets/java/strictexception.xml/AvoidLosingExceptionInformation"/>
@@ -103,7 +103,9 @@
    <rule ref="rulesets/java/comments.xml/CommentDefaultAccessModifier"/>
    <rule ref="rulesets/java/comments.xml/CommentRequired">
    <properties>
+   
      <property name="fieldCommentRequirement" value="Ignored"/>
+     <property name="publicMethodCommentRequirement" value="Ignored"/>
   </properties>
    </rule>
    <rule ref="rulesets/java/design.xml/CompareObjectsWithEquals"/>
@@ -213,11 +215,11 @@
    <rule ref="rulesets/java/coupling.xml/LawOfDemeter"/>
    <rule ref="rulesets/java/j2ee.xml/LocalHomeNamingConvention"/>
    <rule ref="rulesets/java/j2ee.xml/LocalInterfaceSessionNamingConvention"/>
-   <rule ref="rulesets/java/optimizations.xml/LocalVariableCouldBeFinal"/>
+   <!-- <rule ref="rulesets/java/optimizations.xml/LocalVariableCouldBeFinal"/>-->
    <rule ref="rulesets/java/logging-java.xml/LoggerIsNotStaticFinal"/>
    <rule ref="rulesets/java/design.xml/LogicInversion"/>
    <rule ref="rulesets/java/migrating.xml/LongInstantiation"/>
-   <rule ref="rulesets/java/naming.xml/LongVariable"/>
+ <!--  <rule ref="rulesets/java/naming.xml/LongVariable"/>-->
    <rule ref="rulesets/java/coupling.xml/LooseCoupling"/>
    <rule ref="rulesets/java/coupling.xml/LoosePackageCoupling"/>
    <rule ref="rulesets/java/j2ee.xml/MDBAndSessionBeanNamingConvention"/>
@@ -263,7 +265,7 @@
    <rule ref="rulesets/java/design.xml/NonThreadSafeSingleton"/>
    <rule ref="rulesets/java/controversial.xml/NullAssignment"/>
    <rule ref="rulesets/java/controversial.xml/OneDeclarationPerLine"/>
-   <rule ref="rulesets/java/controversial.xml/OnlyOneReturn"/>
+   <!-- <rule ref="rulesets/java/controversial.xml/OnlyOneReturn"/>-->
    <rule ref="rulesets/java/design.xml/OptimizableToArrayCall"/>
    <rule ref="rulesets/java/basic.xml/OverrideBothEqualsAndHashcode"/>
    <rule ref="rulesets/java/naming.xml/PackageCase"/>
