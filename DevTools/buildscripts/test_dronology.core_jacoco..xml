@@ -96,9 +96,8 @@
 				<formatter type="plain" usefile="false" />
 				<formatter type="xml" usefile="true" />
 
-				<classpath location="../libs/cob/cobertura-2.1.1.jar" />
-				<classpath location="../libs/cob/slf4j-api-1.7.5.jar" />
-				<classpath location="../libs/cob/hamcrest-core-1.3.jar" />
+				<classpath location="../libs/test/slf4j-api-1.7.5.jar" />
+				<classpath location="../libs/test/hamcrest-core-1.3.jar" />
 	
 				<classpath location="${build.dir}/bin" />
 
