@@ -22,7 +22,7 @@
 	<target name="check_pmd">
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
 		<pmd rulesetfiles="fullRuleSet.xml">
-			<formatter type="html" toFile="${report.dir}/pmd_report.html" toConsole="true"/>
+			<formatter type="html" toFile="${report.dir}/pmd_report.xml" toConsole="true"/>
 
 			<fileset dir="${src.dir}/../edu.nd.dronology.core/src" >
 				<include name="**/*.java"/>
