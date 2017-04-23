@@ -1,0 +1,150 @@
+<project xmlns:jacoco="antlib:org.jacoco.ant" name="jacoco" default="build">
+	<import file="./buildutils.xml" />
+	<import file="./build_dronology.core.xml" />
+
+
+
+
+	<property name="result.dir" location="./target" />
+	<property name="result.classes.dir" location="${result.dir}/classes" />
+	<property name="result.report.dir" location="${result.dir}/site/jacoco" />
+	<property name="result.exec.file" location="${result.dir}/jacoco.exec" />
+	<!--  Step 1: Import JaCoCo Ant tasks  -->
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="../libs/jacoco/jacocoant.jar" />
+	</taskdef>
+	<target name="clean">
+		<delete dir="${result.dir}" />
+
+
+	</target>
+	
+	
+	<target name="build">
+			<property name="build.dir" value="${tmp.dir}/build" />
+			<antcall target="clean" inheritall="true" />
+			<antcall target="check-preconditions" inheritall="true" />
+			<antcall target="prepare-test" inheritall="true" />
+			<antcall target="copy-source" inheritall="true" />
+			<antcall target="copy-tests" inheritall="true" />
+			<antcall target="compile" inheritall="true" />
+			<antcall target="test" inheritall="true" />
+			<antcall target="report" inheritall="true" />
+			<antcall target="cleanup" inheritall="true" />
+			
+			<delete dir="${result.dir}" />
+			
+			
+		</target>
+
+
+	<target name="copy-tests" depends="copy-source">
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../edu.nd.dronology.core/test" />
+		</copy>
+	</target>
+
+	<target name="prepare-test" depends="prepare">
+		<!-- Clean/Create the build directory structure used by compile -->
+		<delete dir="${report.dir}" />
+		<mkdir dir="${report.dir}" />
+
+		<delete dir="${coverage.dir}" />
+		<mkdir dir="${coverage.dir}" />
+	</target>
+
+
+	<target name="compile">
+		<mkdir dir="${build.dir}/bin" />
+		<mkdir dir="${build.dir}/lib" />
+
+		<!-- Compile files -->
+		<path id="classpath">
+			<fileset dir="${build.dir}/lib" includes="*.jar" />
+		</path>
+		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
+			<compilerarg line="-g" />
+
+			<include name="edu/nd/dronology/core/**/*.java" />
+			<include name="model/**/*.java" />
+			<include name="view/**/*.java" />
+			<include name="virtual_drone_simulator/**/*.java" />
+
+			<exclude name="edu/nd/dronology/core/test/controller/CoordinateTransformationTest.java" />
+
+
+		</javac>
+
+
+
+	</target>
+	<path id="classpath.base">
+	</path>
+	<path id="classpath.test">
+		<pathelement location="${build.dir}/bin" />
+		<path refid="classpath.base" />
+	</path>
+
+
+	<target name="test" >
+		<!--
+	 Step 2: Wrap test execution with the JaCoCo coverage task 
+	-->
+		<jacoco:coverage destfile="${result.exec.file}">
+			<junit dir="./" failureproperty="test.failure" printsummary="yes" fork="true" haltonerror="false">
+				<classpath refid="classpath.test" />
+				<formatter type="plain" usefile="false" />
+				<formatter type="xml" usefile="true" />
+
+				<classpath location="../libs/cob/cobertura-2.1.1.jar" />
+				<classpath location="../libs/cob/slf4j-api-1.7.5.jar" />
+				<classpath location="../libs/cob/hamcrest-core-1.3.jar" />
+	
+				<classpath location="${build.dir}/bin" />
+
+				<batchtest fork="yes" todir="${report.dir}">
+					<fileset dir="${build.dir}/bin">
+						<include name="**/Test*" />
+						<include name="**/*Tests*" />
+						<exclude name="**/TestingUtils*" />
+						<exclude name="**/Test*$*" />
+						<exclude name="**/AllTests*" />
+					</fileset>
+				</batchtest>
+			</junit>
+
+
+
+
+		</jacoco:coverage>
+	</target>
+	<target name="report" >
+		<!--  Step 3: Create coverage report  -->
+		<jacoco:report>
+			<!--
+	 This task needs the collected execution data and ... 
+	-->
+			<executiondata>
+				<file file="${result.exec.file}" />
+			</executiondata>
+			<!--  the class files and optional source files ...  -->
+			<structure name="JaCoCo Ant Example">
+				<classfiles>
+					<fileset dir="${build.dir}/bin" >
+						<exclude name="**/*Test*.class"/>
+					</fileset>
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="${build.dir}/src" />
+				</sourcefiles>
+			</structure>
+			<!--  to produce reports in different formats.  -->
+			<html destdir="${coverage.dir}" />
+			<xml destfile="${coverage.dir}/report.xml" />
+		</jacoco:report>
+	</target>
+	
+
+
+</project>
+
