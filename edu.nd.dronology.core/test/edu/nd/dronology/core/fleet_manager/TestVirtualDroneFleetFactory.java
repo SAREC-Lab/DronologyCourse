@@ -16,15 +16,9 @@ public class TestVirtualDroneFleetFactory {
 
 	@Before
 	public void setUp() throws Exception {
-<<<<<<< HEAD
-		try {
-			testInstance = new VirtualDroneFleetFactory();
-		} catch (FlightZoneException e) {
-			e.printStackTrace();
-		}
-=======
+
 		testInstance = new VirtualDroneFleetFactory();
->>>>>>> branch 'master' of https://github.com/SAREC-Lab/Dronology.git
+
 
 	}
 
