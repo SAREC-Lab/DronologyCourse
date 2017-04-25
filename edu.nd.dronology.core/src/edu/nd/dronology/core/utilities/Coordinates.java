@@ -108,13 +108,4 @@ public class Coordinates {
 			return false;		
 	}
 	
-	@Override
-	public int hashCode(){
-		int hash = 17;
-        hash = 89 * hash + (this.altitude);
-        hash = 89 * hash + (int) (this.longitude ^ (this.longitude >>> 32));
-        hash = 89 * hash + (int) (this.latitude ^ (this.latitude >>> 32));
-        return hash;
-	}
-	
 }

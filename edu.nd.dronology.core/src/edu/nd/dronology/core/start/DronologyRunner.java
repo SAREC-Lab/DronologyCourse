@@ -47,7 +47,8 @@ public class DronologyRunner{
 		startFlightManager();	
 				
 		///  The following statements are temporary.  The functionality should be provided by external clients.
-		testLoad();
+		testLoad2b();
+		testLoad2a();
 		flightManager.loadFlightFromXML(); // Just for testing.
 		System.out.println("Running Dronology Test 2.1.");
 	}
@@ -75,6 +76,26 @@ public class DronologyRunner{
 			DronologySetupDronesAccessPoint setup = DronologySetupDronesAccessPoint.getInstance();
 			setup.initializeDrones(newDrones,false);
 		
+	}
+	
+	public void testLoad2a(){
+		ArrayList<String[]> newDrones = new ArrayList<String[]>();
+		String[] D1 = {"DRN1","Iris3DR","41760000","-86222901","0"};
+		String[] D2 = {"DRN2","Iris3DR","41750802","-86202481","10"}; 
+		newDrones.add(D1);
+		newDrones.add(D2);
+		DronologySetupDronesAccessPoint setup = DronologySetupDronesAccessPoint.getInstance();
+		setup.initializeDrones(newDrones,false);
+	
+	}
+	
+	public void testLoad2b(){
+		ArrayList<String[]> newDrones = new ArrayList<String[]>();
+		String[] D3 = {"DRN3","Iris3DR","41740893","-86182505","0"};
+		newDrones.add(D3);
+		DronologySetupDronesAccessPoint setup = DronologySetupDronesAccessPoint.getInstance();
+		setup.initializeDrones(newDrones,false);
+	
 	}
 	
 }	
