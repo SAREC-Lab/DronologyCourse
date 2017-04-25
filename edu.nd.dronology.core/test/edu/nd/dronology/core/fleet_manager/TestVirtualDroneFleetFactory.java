@@ -25,7 +25,7 @@ public class TestVirtualDroneFleetFactory {
 	@Before
 	public void setUp() throws Exception {
 		try {
-			testInstance = new VirtualDroneFleetFactory(3, new BaseManager(5));
+			testInstance = new VirtualDroneFleetFactory();
 		} catch (FlightZoneException e) {
 			e.printStackTrace();
 		}
