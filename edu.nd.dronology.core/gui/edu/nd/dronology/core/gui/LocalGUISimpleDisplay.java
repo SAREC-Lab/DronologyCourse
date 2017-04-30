@@ -22,17 +22,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import view.FlightZoneStatusPanel;
 
 public class LocalGUISimpleDisplay extends Application {
-	Scene scene;
-	AnchorPane root;
-	static long xRange = 1600;
-	static long yRange = 960;
-	Map<String,DroneStatus> drones;
-	Map<String,ImageView> allDroneImages;
-	DecimalDegreesToXYConverter coordTransform ;	
-	static int LeftDivider = 180;	
+	private Scene scene;
+	private AnchorPane root;
+	private static long xRange = 1600;
+	private static long yRange = 960;
+	private Map<String,ImageView> allDroneImages;
+	private DecimalDegreesToXYConverter coordTransform ;	
+	private static int LeftDivider = 180;	
     private FlightZoneStatusPanel leftStatusDisplay;	
     
    public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package view;
+package edu.nd.dronology.core.gui;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,11 +20,11 @@ import javafx.scene.text.FontWeight;
  */
 public class FlightZoneStatusPanel {
 	
-	int panelWidth;
-	int panelHeight;
-	GraphicsContext gc;
-	int rowCtr;
-	DateFormat df = new SimpleDateFormat("HH:mm:ss");
+	private int panelWidth;
+	private int panelHeight;
+	private GraphicsContext gc;
+	private int rowCtr;
+	private DateFormat df = new SimpleDateFormat("HH:mm:ss");
 	
 	/**
 	 * Create the flight display board

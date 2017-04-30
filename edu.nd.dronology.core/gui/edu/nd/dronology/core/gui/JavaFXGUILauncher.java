@@ -3,7 +3,7 @@ package edu.nd.dronology.core.gui;
 import javafx.application.Application;
 
 public class JavaFXGUILauncher extends Thread{
-	String[] mainArgs;
+	private String[] mainArgs;
 	
 	public JavaFXGUILauncher(String[] args){
 		mainArgs = args;

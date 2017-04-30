@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
+import edu.nd.dronology.core.gui_middleware.load_flights.LoadXMLFlight;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
-import model.flights.xml.LoadXMLFlight;
 
 public class FlightZoneManager implements Runnable{
 	
@@ -113,18 +113,18 @@ public class FlightZoneManager implements Runnable{
 		}
 	}
 	
-	/**
-	 * Given a complete filepath to a well structured XML file, loads one flight.
-	 * @param fileName
-	 */
-	public void loadFlightFromXML(String fileName){
-		new LoadXMLFlight(this,fileName);
-	}
+//	/**
+//	 * Given a complete filepath to a well structured XML file, loads one flight.
+//	 * @param fileName
+//	 */
+//	public void loadFlightFromXML(String fileName){
+//		new LoadXMLFlight(this,fileName);
+//	}
 	
-	/**
-	 * Given a complete filepath to a well structured XML file, loads one flight.
-	 * @param fileName
-	 */
+//	/**
+//	 * Given a complete filepath to a well structured XML file, loads one flight.
+//	 * @param fileName
+//	 */
 	public void loadFlightFromXML(){
 		new LoadXMLFlight(this);
 	}

@@ -1,4 +1,4 @@
-package model.flights.xml;
+package edu.nd.dronology.core.gui_middleware.load_flights;
 
 import java.util.ArrayList;
 
