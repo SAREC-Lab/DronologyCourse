@@ -11,14 +11,14 @@ import edu.nd.dronology.core.utilities.PointDelta;
  *
  */
 	public class DroneSeparationMonitor{
-	ArrayList<ManagedDrone> drones = new ArrayList<ManagedDrone>();
+	ArrayList<ManagedDrone> drones = new ArrayList<>();
 	Long safetyZone;  // Set arbitrarily for now.
 	
 	/**
 	 * Construct the safety manager.  SafetyZone size is hard coded at 10000 degree points.
 	 */
 	public DroneSeparationMonitor(){
-		drones = new ArrayList<ManagedDrone>();
+		drones = new ArrayList<>();
 		safetyZone = (long) 10000; 
 	}
 	
@@ -72,6 +72,7 @@ import edu.nd.dronology.core.utilities.PointDelta;
 			for(ManagedDrone drone2: drones) {
 				if (!drone.equals(drone2) && drone.getFlightModeState().isFlying() && drone2.getFlightModeState().isFlying()){//!drone.isUnderSafetyDirectives() && !drone2.isUnderSafetyDirectives()){
 					if (getDistance(drone,drone2) < safetyZone){
+							// Do not remove even though not used right now.
 							double angle1 = PointDelta.computeAngle(drone.getCoordinates(),drone.getTargetCoordinates());
 							double angle2 = PointDelta.computeAngle(drone2.getCoordinates(),drone2.getTargetCoordinates());
 							//new Roundabout(drone, drone2);

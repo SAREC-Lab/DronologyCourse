@@ -46,7 +46,7 @@ public class LoadXMLFlight {
 	  System.out.println("Loading file: " + filename);
 	  try {	
 		  
-		 File inputFile = new File("configuration\\CollisionTest.xml");
+		 File inputFile = new File("configuration2\\CollisionTest.xml");
 	    // File inputFile = new File(filename);
 	     SAXParserFactory factory = SAXParserFactory.newInstance();
 	     SAXParser saxParser = factory.newSAXParser();

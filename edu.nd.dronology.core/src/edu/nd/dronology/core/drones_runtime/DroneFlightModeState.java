@@ -14,7 +14,7 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  */
 public class DroneFlightModeState {
 	// Status
-		public enum FlightMode {OnGround, AwaitingTakeOffClearance, TakingOff, Flying, Landing};
+		public enum FlightMode {OnGround, AwaitingTakeOffClearance, TakingOff, Flying, Landing}
 	    FlightMode currentFlightMode = FlightMode.OnGround;
 	     	    
 	    /**

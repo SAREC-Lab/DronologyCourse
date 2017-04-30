@@ -12,13 +12,13 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  *
  */
 public class Flights {
-	ArrayList<FlightPlan> pendingFlights;
-	ArrayList<FlightPlan> awaitingTakeOffFlights;
-	ArrayList<FlightPlan> currentFlights;
-	ArrayList<FlightPlan> completedFlights;
-	static int maximumAllowedCurrentFlights = 2;
-	DroneSeparationMonitor safetyMgr;  
-	boolean grounded = false;
+	private ArrayList<FlightPlan> pendingFlights;
+	private ArrayList<FlightPlan> awaitingTakeOffFlights;
+	private ArrayList<FlightPlan> currentFlights;
+	private ArrayList<FlightPlan> completedFlights;
+	private static int maximumAllowedCurrentFlights = 2;
+	private DroneSeparationMonitor safetyMgr;  
+	private boolean grounded = false;
 	
 	/**
 	 * Constructor
@@ -27,10 +27,10 @@ public class Flights {
 	 * @throws InterruptedException
 	 */
 	public Flights(DroneSeparationMonitor safetyMgr) throws InterruptedException{
-		pendingFlights = new ArrayList<FlightPlan>();
-		currentFlights = new ArrayList<FlightPlan>();
-		completedFlights = new ArrayList<FlightPlan>();
-		awaitingTakeOffFlights = new ArrayList<FlightPlan>();
+		pendingFlights = new ArrayList<>();
+		currentFlights = new ArrayList<>();
+		completedFlights = new ArrayList<>();
+		awaitingTakeOffFlights = new ArrayList<>();
 		this.safetyMgr = safetyMgr;
 	}
 	
@@ -45,7 +45,7 @@ public class Flights {
 		
 		// Clear awaitingTakeOffFlights
 		// Deep copy
-		ArrayList<FlightPlan> tempList = (ArrayList<FlightPlan>) awaitingTakeOffFlights.clone();
+		ArrayList<FlightPlan> tempList = (ArrayList<FlightPlan>) awaitingTakeOffFlights.clone();  //Michael can fix this as he doesn't like clones :-)
 		for(FlightPlan flightPlan: tempList){
 			ManagedDrone drone = flightPlan.getAssignedDrone();
 			if(awaitingTakeOffFlights.contains(drone)){
@@ -174,9 +174,10 @@ public class Flights {
 	/**
 	 * Checks to see if any flights have just landed.
 	 * @param droneFleet
+	 * @param safetyMgr
 	 */
 	public void checkForLandedFlights(DroneFleet droneFleet, DroneSeparationMonitor safetyMgr){
-		ArrayList<FlightPlan> justLanded = new ArrayList<FlightPlan>();
+		ArrayList<FlightPlan> justLanded = new ArrayList<>();
 		for(FlightPlan flightPlan: currentFlights){
 			if(flightPlan.getAssignedDrone() != null){
 				ManagedDrone drone = flightPlan.getAssignedDrone();

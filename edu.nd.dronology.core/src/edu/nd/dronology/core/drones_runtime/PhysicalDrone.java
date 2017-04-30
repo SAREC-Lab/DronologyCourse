@@ -12,7 +12,7 @@ import view.DroneImage;
  * @author Jane
  *
  */
-public class PhysicalDrone implements iDrone, Runnable {
+public class PhysicalDrone implements IDrone, Runnable {
 	
 	public PhysicalDrone(String drnName) {
 		

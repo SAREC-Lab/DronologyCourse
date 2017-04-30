@@ -8,7 +8,6 @@ import edu.nd.dronology.core.fleet_manager.VirtualDroneFleetFactory;
 
 public class DronologySetupDronesAccessPoint {
 
-	//private DroneFleet
 	private static DronologySetupDronesAccessPoint instance = null;
 	protected DronologySetupDronesAccessPoint() {
 		

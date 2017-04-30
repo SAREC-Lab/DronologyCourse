@@ -4,7 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
-import edu.nd.dronology.core.flight_manager.iFlightDirector;
+import edu.nd.dronology.core.flight_manager.IFlightDirector;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 
@@ -14,35 +14,34 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  * @author Jane Cleland-Huang
  * @version 0.01
  */
-public class ManagedDrone extends Observable implements Runnable, Observer{
+public class ManagedDrone extends Observable implements Runnable{
 	
-	iDrone drone;  // Controls primitive flight commands for drone
-	Coordinates currentPosition;
-	String droneName;
-	DroneSeparationMonitor safetyMgr;
-	Coordinates basePosition; // In current version drones always return to base at the end of their flights.
-	DroneFlightModeState droneState;
-	DroneSafetyModeState droneSafetyState;
-	boolean missionCompleted = false;
-	Coordinates targetCoordinates = null;
+	private IDrone drone;  // Controls primitive flight commands for drone
+	private String droneName;
+	private DroneSeparationMonitor safetyMgr;
+	private Coordinates basePosition; // In current version drones always return to base at the end of their flights.
+	private DroneFlightModeState droneState;
+	private DroneSafetyModeState droneSafetyState;
+	private boolean missionCompleted = false;
+	private Coordinates targetCoordinates = null;
 	
-	Thread thread;	
-	int normalSleep= 1;
-	int currentSleep = normalSleep;
+	private Thread thread;	
+	private int normalSleep= 1;
+	private int currentSleep = normalSleep;
 	 
 	// Flight plan
-	iFlightDirector flightDirector = null; // Each drone can be assigned a single flight plan.
-	int targetAltitude=0;
+	private IFlightDirector flightDirector = null; // Each drone can be assigned a single flight plan.
+	private int targetAltitude=0;
 
 	/**
 	 * Constructs drone
-	 * @param drnName 
+	 * @param drone 
+	 * @param drnName
 	 */
-	public ManagedDrone(iDrone drone, String drnName) {
+	public ManagedDrone(IDrone drone, String drnName) {
 		this.drone = drone ;// specify 
 		droneState = new DroneFlightModeState();
 		droneSafetyState = new DroneSafetyModeState();
-		currentPosition = null; //new Coordinates(lat,lon,alt); // NEED TO SET CURRENT POSITION.
 		droneName = drnName;
 		drone.getDroneStatus().setStatus(droneState.getStatus());
 		this.flightDirector = new SoloDirector(this); // Don't really want to create it here.
@@ -53,7 +52,7 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	 * Assigns a flight directive to the managed drone
 	 * @param flightDirective
 	 */
-	public void assignFlight(iFlightDirector flightDirective){
+	public void assignFlight(IFlightDirector flightDirective){
 		this.flightDirector = flightDirective;
 		this.flightDirector.addWayPoint(getBaseCoordinates()); // Currently must always return home.
 	}
@@ -240,7 +239,7 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	 * 
 	 * @return current flight directive assigned to the managed drone
 	 */
-	public iFlightDirector getFlightDirective(){
+	public IFlightDirector getFlightDirective(){
 		return flightDirector;
 	}
 	
@@ -263,7 +262,7 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	
 	/**
 	 * Temporarily Halt
-	 * @param halt time in seconds
+	 * @param seconds 
 	 */
 	public void haltInPlace(int seconds) {
 		currentSleep = seconds*1000;
@@ -284,12 +283,12 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 	 */
 	public void setBaseCoordinates(Coordinates basePosition) {
 		this.basePosition = new Coordinates(basePosition.getLatitude(), basePosition.getLongitude(), basePosition.getAltitude());
-		currentPosition = new Coordinates(basePosition.getLatitude(), basePosition.getLongitude(), basePosition.getAltitude());		
 	}
 
 	/**
 	 * 
 	 * return current flight mode state
+	 * @return droneState
 	 */
 	public DroneFlightModeState getFlightModeState() {
 		return droneState;
@@ -326,11 +325,7 @@ public class ManagedDrone extends Observable implements Runnable, Observer{
 		return drone.getBatteryStatus();
 	}
 
-	@Override
-	public void update(Observable arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	
 }

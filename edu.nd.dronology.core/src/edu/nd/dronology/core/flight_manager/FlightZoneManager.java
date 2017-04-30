@@ -11,18 +11,15 @@ import model.flights.xml.LoadXMLFlight;
 
 public class FlightZoneManager implements Runnable{
 	
-	Flights flights;	
-    int currentDronesInFlight = 0;	
-    DroneSeparationMonitor safetyMgr;
-    DroneFleet droneFleet;
-	//DronologyRunner fzView;
+	private Flights flights;	
+    private DroneSeparationMonitor safetyMgr;
+    private DroneFleet droneFleet;
+
 	/**
 	 * Constructs a new FlightZoneManager.
-	 * @param fzView
 	 * @throws InterruptedException
 	 */
 	public FlightZoneManager() throws InterruptedException{
-	//	this.fzView = fzView;
 		droneFleet = DroneFleet.getInstance();
 		safetyMgr = new DroneSeparationMonitor();
 		flights = new Flights(safetyMgr);
@@ -72,7 +69,7 @@ public class FlightZoneManager implements Runnable{
 				safetyMgr.attachDrone(drone);
 				FlightPlan flightPlan = flights.getNextFlightPlan();
 				System.out.println(flightPlan.getFlightID());
-				iFlightDirector flightDirectives = new SoloDirector(drone);
+				IFlightDirector flightDirectives = new SoloDirector(drone);
 				flightDirectives.setWayPoints(flightPlan.getWayPoints());
 				drone.assignFlight(flightDirectives);
 				flightDirectives.flyToNextPoint();
@@ -81,7 +78,6 @@ public class FlightZoneManager implements Runnable{
 			}
 		}
 	}
-
 
 	/**
 	 * Main run routine -- called internally.  Launches a new flight if viable, and checks for flights which have landed.

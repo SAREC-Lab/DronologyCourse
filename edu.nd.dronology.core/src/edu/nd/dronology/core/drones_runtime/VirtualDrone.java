@@ -12,16 +12,16 @@ import edu.nd.dronology.core.virtual_drone_simulator.FlightSimulator;
  * @author Jane Cleland-Huang
  * @version 0.01
  */
-public class VirtualDrone implements iDrone{
+public class VirtualDrone implements IDrone{
 
 	// Drone characteristics
-	Coordinates currentPosition;
-	String droneName;
-	DroneStatus droneStatus;  //PHYS
+	private Coordinates currentPosition;
+	private String droneName;
+	private DroneStatus droneStatus;  //PHYS
 	
 	// Virtual drone requires simulators
-	DroneVoltageSimulator voltageSimulator;
-	FlightSimulator sim; 
+	private DroneVoltageSimulator voltageSimulator;
+	private FlightSimulator sim; 
 
 	/**
 	 * Constructs drone without specifying its current position.  This will be used by the physical drone (later)
@@ -82,6 +82,7 @@ public class VirtualDrone implements iDrone{
 	}
 
 
+	@Override
 	public String getDroneName() {
 		return droneName;
 	}

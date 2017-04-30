@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import edu.nd.dronology.core.utilities.Coordinates;
 
-public interface iFlightDirector {
+public interface IFlightDirector {
 	
 	public void returnHome(Coordinates home);
 	
@@ -36,7 +36,7 @@ public interface iFlightDirector {
 
 	/**
 	 * Specifies if flight is currently under a safety directive.
-	 * @return
+	 * @return isUnderSafetyDirectives
 	 */
 	boolean isUnderSafetyDirectives();
 

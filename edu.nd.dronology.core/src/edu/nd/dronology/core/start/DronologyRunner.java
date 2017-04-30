@@ -16,9 +16,8 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  */
 public class DronologyRunner{
 		
-	FlightZoneManager flightManager;
-
-	Flights flights;
+	private FlightZoneManager flightManager;
+	private Flights flights;
 		
 	public static void main(String[] args) throws InterruptedException, FlightZoneException {		
 		new DronologyRunner(args);

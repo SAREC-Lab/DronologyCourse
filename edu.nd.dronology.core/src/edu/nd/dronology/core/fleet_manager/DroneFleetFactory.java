@@ -8,9 +8,7 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
  *
  */
 public abstract class DroneFleetFactory {
-	private final ArrayList<ManagedDrone> drones = new ArrayList<ManagedDrone>();
-	int uniqDroneID = 0;
-	
+	private final ArrayList<ManagedDrone> drones = new ArrayList<>();
 	public DroneFleetFactory(){}
 	
 	protected String createDroneID(String droneID){

@@ -5,8 +5,7 @@ import java.util.Map;
 
 //Singleton class
 public class DroneCollectionStatus {
-	Map<String,DroneStatus> drones;
-	
+	private Map<String,DroneStatus> drones;	
 	private static DroneCollectionStatus instance = null;
 	  
 	public static DroneCollectionStatus getInstance() {
@@ -28,11 +27,11 @@ public class DroneCollectionStatus {
 	}
 
 	protected DroneCollectionStatus(){
-		drones = new HashMap<String,DroneStatus>();
+		drones = new HashMap<>();
 	}
 	
 	public void addDrone(DroneStatus drone){
-		drones.put(drone.ID, drone);
+		drones.put(drone.getID(), drone);
 	}
 	
 	public void removeDrone(String droneID){
@@ -41,8 +40,8 @@ public class DroneCollectionStatus {
 	}
 	
 	public void removeDrone(DroneStatus drone){
-		if(drones.containsKey(drone.ID))
-			drones.remove(drone.ID);
+		if(drones.containsKey(drone.getID()))
+			drones.remove(drone.getID());
 	}
 	
 	public DroneStatus getDrone(String droneID){

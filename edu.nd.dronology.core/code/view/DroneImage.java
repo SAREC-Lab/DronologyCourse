@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.util.Random;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.iDrone;
+import edu.nd.dronology.core.drones_runtime.IDrone;
 import edu.nd.dronology.core.start.DronologyRunner;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.utilities.DecimalDegreesToXYConverter;

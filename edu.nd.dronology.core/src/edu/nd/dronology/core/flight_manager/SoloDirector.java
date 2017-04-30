@@ -1,9 +1,7 @@
 package edu.nd.dronology.core.flight_manager;
 
 import java.util.ArrayList;
-
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.iDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
 
 /** 
@@ -12,15 +10,13 @@ import edu.nd.dronology.core.utilities.Coordinates;
  * @version 0.1
  *
  */
-public class SoloDirector implements iFlightDirector{
+public class SoloDirector implements IFlightDirector{
 	
-	ManagedDrone drone;
-	boolean safetyDiversion = false;
-	boolean landed = false;
-
-	Coordinates targetPosition = null;
-	ArrayList<Coordinates> wayPoints = new ArrayList<Coordinates>();
-	ArrayList<Coordinates> roundaboutPath = new ArrayList<Coordinates>();	
+	private ManagedDrone drone;
+	private boolean safetyDiversion = false;
+	private Coordinates targetPosition = null;
+	private ArrayList<Coordinates> wayPoints = new ArrayList<>();
+	private ArrayList<Coordinates> roundaboutPath = new ArrayList<>();	
 	
 	@Override
 	public Coordinates flyToNextPoint()
@@ -145,7 +141,7 @@ public class SoloDirector implements iFlightDirector{
 	@Override
 	public void returnHome(Coordinates home) {
 		addWayPoint(home);
-		ArrayList<Coordinates> tempWayPoints = (ArrayList<Coordinates>) wayPoints.clone();
+		ArrayList<Coordinates> tempWayPoints = (ArrayList<Coordinates>) wayPoints.clone();  // Michael hates clones
 	
 		for(Coordinates wayPoint: tempWayPoints){
 			if(!wayPoint.equals(home)){

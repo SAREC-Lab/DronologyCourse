@@ -13,8 +13,8 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  *
  */
 public class RuntimeDroneTypes{
-	public enum Mode {SIMULATION, PHYSICAL};
-    Mode currentMode;
+	public enum Mode {SIMULATION, PHYSICAL}
+    private Mode currentMode;
 	private static RuntimeDroneTypes instance = null;
 	protected RuntimeDroneTypes() {}
 	public static RuntimeDroneTypes getInstance() {

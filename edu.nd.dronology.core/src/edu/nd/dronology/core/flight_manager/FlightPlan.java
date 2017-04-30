@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.iDrone;
+import edu.nd.dronology.core.drones_runtime.IDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 
@@ -17,16 +17,16 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  *
  */
 public class FlightPlan {
-	static int flightNumber = 0; 
-	String flightID;
+	private static int flightNumber = 0; 
+	private String flightID;
 	
-	ArrayList<Coordinates> wayPoints;
-	Coordinates startLocation;
-	Coordinates endLocation;
+	private ArrayList<Coordinates> wayPoints;
+	private Coordinates startLocation;
+	private Coordinates endLocation;
 	
-	private enum Status {Planned, Flying, Completed };
-	Status status;
-	ManagedDrone drone = null;
+	private enum Status {Planned, Flying, Completed }
+	private Status status;
+	private ManagedDrone drone = null;
 	
 	public Date startTime;
 	public Date endTime;
@@ -88,7 +88,7 @@ public class FlightPlan {
 	
 	/**
 	 * 
-	 * @param iDrone  
+	 * @param drone  
 	 * @return true if drone is currently flying, false otherwise.
 	 * @throws FlightZoneException
 	 */
@@ -104,21 +104,21 @@ public class FlightPlan {
 	
 	/**
 	 * Sets flightplan status to completed when called.	
-	 * @return
+	 * @return true
 	 * @throws FlightZoneException
 	 */
 	public boolean setStatusToCompleted() throws FlightZoneException{
 		if (status == Status.Flying){
 			status = Status.Completed;
 			endTime = new Date();
-			return true; // success
+			return true; // success  (may add real check here later)
 		}
 		else throw new FlightZoneException("Only currently flying flights can have their status changed to completed");
 	}
 	
 	/**
 	 * Returns current flightplan status (Planned, Flying, Completed)
-	 * @return
+	 * @return status
 	 */
 	public String getStatus(){
 		switch(status) {
@@ -133,6 +133,7 @@ public class FlightPlan {
 		}		
 	}
 	
+	@Override
 	public String toString(){
 		return flightID + "\n" + getStartLocation() + " - " + getEndLocation() + "\n" + getStatus();
 	}

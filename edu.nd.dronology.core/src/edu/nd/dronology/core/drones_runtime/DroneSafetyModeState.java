@@ -9,8 +9,8 @@ package edu.nd.dronology.core.drones_runtime;
  */
 public class DroneSafetyModeState {
 		    
-	    public enum SafetyMode {Diverted, Halted, Normal};
-	    SafetyMode safetyMode; 
+	    public enum SafetyMode {Diverted, Halted, Normal}
+	    private SafetyMode safetyMode; 
 	    
 	    /**
 	     * Constructor

@@ -9,15 +9,14 @@ public class DroneStatus implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -3319827887969940655L;
-	//public enum flightStatus {Unknown, OnGround, AwaitingTakeOffClearance, TakingOff, Flying, Landing};
-	long latitude;
-	long longitude;
-	int altitude;
-	String ID;
-	double batteryLevel;
-	double velocity;
-	Map<String,String> info;
-	String status;
+	private long latitude;
+	private long longitude;
+	private int altitude;
+	private String ID;
+	private double batteryLevel;
+	private double velocity;
+	private Map<String,String> info;
+	private String status;
 
 	public DroneStatus(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity){
 		this.ID = ID;
@@ -26,7 +25,7 @@ public class DroneStatus implements Serializable{
 		this.altitude = altitude;
 		this.batteryLevel = batteryLevel;
 		this.velocity = velocity;
-		info = new HashMap<String,String>();
+		info = new HashMap<>();
 		status = "UNKNOWN";
 	}
 	
@@ -39,6 +38,9 @@ public class DroneStatus implements Serializable{
 			info.remove(infoID);
 	}
 	
+	public String getID(){
+		return ID;
+	}
 	public void setStatus(String status){
 		this.status = status;
 	}

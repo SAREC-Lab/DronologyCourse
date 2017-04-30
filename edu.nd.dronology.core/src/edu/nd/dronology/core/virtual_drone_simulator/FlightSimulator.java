@@ -11,18 +11,16 @@ import edu.nd.dronology.core.utilities.Coordinates;
  * @version 0.1
  */
 public class FlightSimulator {
-	Coordinates currentPosition;
-	Coordinates targetPosition;
-	double theta;
-	VirtualDrone drone;
-	Long previousDistance = 0L;
+	private Coordinates currentPosition;
+	private Coordinates targetPosition;
+	private double theta;
+	private Long previousDistance = 0L;
 	
 	/**
 	 * Creates a flight simulator object for a single virtual drone
 	 * @param virtualDrone
 	 */
-	public FlightSimulator(VirtualDrone virtualDrone){		
-		this.drone = virtualDrone;
+	public FlightSimulator(VirtualDrone virtualDrone){
 	}
 	
 	/**
@@ -74,6 +72,7 @@ public class FlightSimulator {
 	/**
 	 * Computes the position of the drone following one step.  Checks if destination has been reached.
 	 * @param step : Distance in degree points to move per iteration
+	 * @return isStillMoving?
 	 */
 	public boolean move(long step){
 		// First determine which relative quadrant the target is in -- in relation to current position at the origin of X,Y axes
@@ -94,7 +93,7 @@ public class FlightSimulator {
 		else
 			currentPosition.setLongitude(currentPosition.getLongitude()-widthIncrement); // Drone is to the right/east of target
 		
-		double distanceMoved = Math.sqrt(Math.pow(heightIncrement,2)+Math.pow(widthIncrement,2));
+		//double distanceMoved = Math.sqrt(Math.pow(heightIncrement,2)+Math.pow(widthIncrement,2));
 		
 		if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200){
 			previousDistance = getRemainingDistance();

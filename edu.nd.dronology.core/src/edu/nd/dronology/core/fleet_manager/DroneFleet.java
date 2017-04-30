@@ -9,8 +9,8 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
  *
  */
 public class DroneFleet {
-	ArrayList<ManagedDrone> availableDrones;
-	ArrayList<ManagedDrone> busyDrones;
+	private ArrayList<ManagedDrone> availableDrones;
+	private ArrayList<ManagedDrone> busyDrones;
 	private static DroneFleet instance = null;
 	
 	public static DroneFleet getInstance() {

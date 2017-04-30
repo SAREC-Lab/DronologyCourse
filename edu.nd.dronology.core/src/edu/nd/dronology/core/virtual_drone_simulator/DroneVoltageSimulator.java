@@ -7,17 +7,15 @@ package edu.nd.dronology.core.virtual_drone_simulator;
  */
 public class DroneVoltageSimulator {
 	
-	double voltage;
-	long totalFlyingTime;
-	public enum BatteryState {charging, depleting, stable};
-	BatteryState batteryState = BatteryState.stable;
-	final double voltsDrainedPerMinute = 0.25;
+	private double voltage;
+	public enum BatteryState {charging, depleting, stable}
+	private BatteryState batteryState = BatteryState.stable;
+	private final double voltsDrainedPerMinute = 0.25;
    
-	long checkPointTime;
+	private long checkPointTime;
 	
 	public DroneVoltageSimulator(){
 		voltage = 15.0;
-		totalFlyingTime = 0;
 		checkPointTime = 0;
 	}
 	
