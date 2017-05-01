@@ -14,7 +14,7 @@ import net.mv.logging.LoggerProvider;
 public class DronologyServiceRunner {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DronologyServiceRunner.class);
-
+ 
 	public static void main(String[] args) {
 		try {
 			RemoteService.getInstance().startService();
