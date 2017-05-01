@@ -25,7 +25,7 @@ public interface IRemoteManager extends IRemotable {
 	 *          The Service to retrieve.
 	 * @return The requested Service.
 	 * @throws RemoteException
-	 * @throws DistributionException
+	 * @throws DronologyServiceException
 	 */
 	public Object getService(Class<?> service) throws RemoteException, DronologyServiceException;
 
@@ -33,7 +33,7 @@ public interface IRemoteManager extends IRemotable {
 	/**
 	 * @return A list of all registered Services.
 	 * @throws RemoteException
-	 * @throws DistributionException
+	 * @throws DronologyServiceException
 	 */
 	public List<ServiceInfo> getServices() throws RemoteException, DronologyServiceException;
 
@@ -62,13 +62,11 @@ public interface IRemoteManager extends IRemotable {
 	/**
 	 * @return
 	 * @throws RemoteException
-	 * @throws DistributionException
+	 * @throws DronologyServiceException
 	 */
 
 	List<ServiceInfo> getCoreServices() throws RemoteException, DronologyServiceException;
 
-
-	//void performServiceCleanup() throws RemoteException;
 
 	public List<ServiceInfo> getFileServices() throws RemoteException, DronologyServiceException;
 
