@@ -26,6 +26,11 @@
 	<target name="-copy-logger">
 		<copy file="${publish.dir}/${jar.logger}" tofile="${build.dir}/lib/${jar.logger}" overwrite="true" />
 	</target>
+	
+	<target name="-copy-util">
+		<copy file="${publish.dir}/${jar.util}" tofile="${build.dir}/lib/${jar.util}" overwrite="true" />
+	</target>
+
 
 
 	<target name="check-preconditions">

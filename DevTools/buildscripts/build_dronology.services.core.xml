@@ -3,15 +3,21 @@
 
 
 	<target name="dronology-core">
-		<property name="result.filename" value="${jar.core}" />
+		<property name="result.filename" value="${jar.services.core}" />
 		<property name="build.dir" value="${tmp.dir}/build" />
 		<echo>Output set to: ${tmp.dir}</echo>
 		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
 
 		<antcall target="check-preconditions" inheritall="true" />
 		<antcall target="prepare" inheritall="true" />
-		<antcall target="copy-source" inheritall="true" />
 		
+		<antcall target="copy-libs" inheritall="true" />
+			
+			<antcall target="-copy-logger" inheritall="true" />
+				<antcall target="-copy-util" inheritall="true" />
+					
+		
+		<antcall target="copy-source" inheritall="true" />
 		<antcall target="compile" inheritall="true" />
 		<antcall target="pack" inheritall="true" />
 		<antcall target="publish-jar" inheritall="true" />
@@ -36,9 +42,7 @@
 
 
 		<copy todir="${build.dir}/src">
-			<fileset dir="${src.dir}/../edu.nd.dronology.core/src" />
-			<fileset dir="${src.dir}/../edu.nd.dronology.core/code" />
-			<fileset dir="${src.dir}/../edu.nd.dronology.core/gui" />
+			<fileset dir="${src.dir}/../edu.nd.dronology.services.core/src" />
 		</copy>
 
 
@@ -52,12 +56,8 @@
 		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
 			<compilerarg line="-g" />
 
-			<include name="edu/nd/dronology/core/**/*.java" />
-			<include name="model/**/*.java" />
-			<include name="view/**/*.java" />
-			<include name="virtual_drone_simulator/**/*.java" />
-
-			<exclude name="edu/nd/dronology/core/test/controller/CoordinateTransformationTest.java" />
+			<include name="edu/nd/dronology/services/core/**/*.java" />
+			
 
 
 		</javac>
