@@ -17,21 +17,26 @@ import edu.nd.dronology.core.utilities.Coordinates;
  */
 public class XMLFlightPlanImportHandler extends DefaultHandler {
 
-	   boolean bFlight = false;
-	   boolean bLat = false;
-	   boolean bLong = false;
-	   boolean bAlt = false;
-	   FlightZoneManager fzm;
+	   private boolean bFlight = false;
+	   private boolean bLat = false;
+	   private boolean bLong = false;
+	   private boolean bAlt = false;
+	   private WayPointCollection wayPointCollection = null;
+	 	   
+	   private ArrayList<Coordinates> wayPoints = null;
+	   private Long lat, lon;
+	   private int alt;
 	   
-	   ArrayList<Coordinates> wayPoints = null;
-	   Long lat, lon;
-	   int alt;
+	   public XMLFlightPlanImportHandler(){
+		   wayPointCollection = new WayPointCollection();
+	   }
+		  
 	   
-	   public XMLFlightPlanImportHandler(FlightZoneManager fzm){
-		   this.fzm = fzm;
+	   public WayPointCollection getAllWayPoints(){
+		   return wayPointCollection;
 	   }
 	 
-	   @Override
+  	@Override
 	   public void startElement(String uri, 
 	      String localName, String qName, Attributes attributes)
 	         throws SAXException {
@@ -53,7 +58,7 @@ public class XMLFlightPlanImportHandler extends DefaultHandler {
 	      if (qName.equalsIgnoreCase("flight")) {
 	         System.out.println("End Element :" + qName);
 	         System.out.println("Adding all waypoints: " + wayPoints.size());
-	         fzm.planFlight(wayPoints.get(0), wayPoints);
+	         wayPointCollection.addNewSetOfWayPoints(wayPoints);
 	      }
 	   }
 

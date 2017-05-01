@@ -125,8 +125,8 @@ public class FlightZoneManager implements Runnable{
 //	 * Given a complete filepath to a well structured XML file, loads one flight.
 //	 * @param fileName
 //	 */
-	public void loadFlightFromXML(){
-		new LoadXMLFlight(this);
-	}
+//	public void loadFlightFromXML(){
+//		new LoadXMLFlight(this);
+//	}
 	
 }
