@@ -7,8 +7,12 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 public class FlightZoneManager implements Runnable {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightZoneManager.class);
 
 	private Flights flights;
 	private DroneSeparationMonitor safetyMgr;
@@ -70,7 +74,7 @@ public class FlightZoneManager implements Runnable {
 			if (drone != null) {
 				safetyMgr.attachDrone(drone);
 				FlightPlan flightPlan = flights.getNextFlightPlan();
-				System.out.println(flightPlan.getFlightID());
+				LOGGER.info(flightPlan.getFlightID());
 				IFlightDirector flightDirectives = new SoloDirector(drone);
 				flightDirectives.setWayPoints(flightPlan.getWayPoints());
 				drone.assignFlight(flightDirectives);
@@ -102,14 +106,13 @@ public class FlightZoneManager implements Runnable {
 				try {
 					flights.checkForTakeOffReadiness(droneFleet);
 				} catch (FlightZoneException e1) {
-					System.out.println("Failed Check for takeoff readiness.");
-					e1.printStackTrace();
+					LOGGER.error("Failed Check for takeoff readiness.", e1);
 				}
 			safetyMgr.checkForViolations(); // Used to run on its own thread!
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				LOGGER.error(e);
 			}
 		}
 	}

@@ -5,6 +5,8 @@ import java.util.List;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Directions for one flight containing multiple waypoints.
@@ -15,6 +17,10 @@ import edu.nd.dronology.core.utilities.Coordinates;
  */
 public class SoloDirector implements IFlightDirector {
 
+	
+	private static final ILogger LOGGER = LoggerProvider.getLogger(SoloDirector.class);
+
+	
 	private ManagedDrone drone;
 	private boolean safetyDiversion = false;
 	private Coordinates targetPosition = null;
@@ -70,10 +76,7 @@ public class SoloDirector implements IFlightDirector {
 	 */
 	@Override
 	public boolean hasMoreWayPoints() {
-		if (wayPoints.isEmpty())
-			return false;
-		else
-			return true;
+		return !wayPoints.isEmpty();
 	}
 
 	private Coordinates flyToNextWayPoint() {

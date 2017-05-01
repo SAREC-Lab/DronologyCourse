@@ -4,6 +4,8 @@ import java.awt.Point;
 
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import edu.nd.dronology.core.zone_manager.ZoneBounds;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Given the window coordinates for the flight simulation, and the area of the map that is to be covered by the simulation, this class computes the scaling factor and transforms GPS coordinates into
@@ -13,6 +15,9 @@ import edu.nd.dronology.core.zone_manager.ZoneBounds;
  * @version 0.1 Modification: Changing to singleton as it is called in multiple places.
  */
 public class DecimalDegreesToXYConverter {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DecimalDegreesToXYConverter.class);
+
 	ZoneBounds zoneBounds;
 	private long xRange = 0; // X coordinates in range of 0 to x
 	private long yRange = 0; // Y coordinates in range of 0 to y
@@ -36,7 +41,6 @@ public class DecimalDegreesToXYConverter {
 	 * @return
 	 */
 	public static DecimalDegreesToXYConverter getInstance() {
-
 		if (INSTANCE == null) {
 			synchronized (DecimalDegreesToXYConverter.class) {
 				if (INSTANCE == null) {
@@ -82,17 +86,17 @@ public class DecimalDegreesToXYConverter {
 	 * @throws FlightZoneException
 	 */
 	public long ConvertXCoordsToDecimalDegrees(int X) throws FlightZoneException {
-		System.out.println("Start Convert X: ");
-		System.out.println("West Long: " + ZoneBounds.getInstance().getWestLongitude());
-		System.out.println("Eash Long: " + ZoneBounds.getInstance().getEastLongitude());
+		LOGGER.info("Start Convert X: ");
+		LOGGER.info("West Long: " + ZoneBounds.getInstance().getWestLongitude());
+		LOGGER.info("Eash Long: " + ZoneBounds.getInstance().getEastLongitude());
 
-		System.out.println("XScale: " + xScale);
-		System.out.println("X: " + X);
+		LOGGER.info("XScale: " + xScale);
+		LOGGER.info("X: " + X);
 		// System.out.println("XScale: " + ZoneBounds.getInstance().);
 		if (passSetUpCheck()) {
 			long delta = (long) (((double) X - reservedLeftHandSpace) / xScale);// + longitudeOffset
-			System.out.println("Delta: " + delta);
-			System.out.println(zoneBounds.getWestLongitude() + delta);
+			LOGGER.info("Delta: " + delta);
+			LOGGER.info(zoneBounds.getWestLongitude() + delta);
 			return zoneBounds.getWestLongitude() + delta;
 
 		} else
@@ -107,16 +111,16 @@ public class DecimalDegreesToXYConverter {
 	 * @throws FlightZoneException
 	 */
 	public long ConvertYCoordsToDecimalDegrees(int Y) throws FlightZoneException {
-		System.out.println("Start Convert Y: ");
-		System.out.println("North Latitude: " + ZoneBounds.getInstance().getNorthLatitude());
+		LOGGER.info("Start Convert Y: ");
+		LOGGER.info("North Latitude: " + ZoneBounds.getInstance().getNorthLatitude());
 		System.out.println("SOuth lat: " + ZoneBounds.getInstance().getSouthLatitude());
 
-		System.out.println("YScale: " + yScale);
-		System.out.println("Y: " + Y);
+		LOGGER.info("YScale: " + yScale);
+		LOGGER.info("Y: " + Y);
 		if (passSetUpCheck()) {
 			long delta = (long) (Y / yScale); // latitudeOffset + (long)((double)Y/yScale);
-			System.out.println("Delta Y: " + delta);
-			System.out.println(zoneBounds.getNorthLatitude() - delta);
+			LOGGER.info("Delta Y: " + delta);
+			LOGGER.info(zoneBounds.getNorthLatitude() - delta);
 			return zoneBounds.getNorthLatitude() - delta;
 		}
 

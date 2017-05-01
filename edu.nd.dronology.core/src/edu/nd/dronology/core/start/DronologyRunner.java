@@ -6,10 +6,13 @@ import java.util.List;
 
 import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
 import edu.nd.dronology.core.flight_manager.FlightZoneManager;
+import edu.nd.dronology.core.flight_manager.SoloDirector;
 import edu.nd.dronology.core.gui.JavaFXGUILauncher;
 import edu.nd.dronology.core.gui_middleware.DronologySetupDronesAccessPoint;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Starts up the Dronology System
@@ -19,6 +22,9 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  */
 public class DronologyRunner{
 		
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DronologyRunner.class);
+
+	
 	private FlightZoneManager flightManager;
 	
 	public static void main(String[] args) throws InterruptedException, FlightZoneException {		
@@ -69,7 +75,7 @@ public class DronologyRunner{
 		flightManager.planFlight(flight.get(0),flight);
 		
 		
-		System.out.println("Running Dronology Test 2.1.");
+	LOGGER.info("Running Dronology Test 2.1.");
 	}
 	
 	/**

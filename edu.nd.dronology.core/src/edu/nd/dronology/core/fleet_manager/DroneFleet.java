@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Holds a fleet of virtual or physical drones.
@@ -12,9 +14,12 @@ import edu.nd.dronology.core.drones_runtime.ManagedDrone;
  *
  */
 public class DroneFleet {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneFleet.class);
+	private static volatile DroneFleet INSTANCE = null;
+
 	private List<ManagedDrone> availableDrones;
 	private List<ManagedDrone> busyDrones;
-	private static volatile DroneFleet INSTANCE = null;
 
 	public static DroneFleet getInstance() {
 
@@ -46,7 +51,7 @@ public class DroneFleet {
 	 * @return true if drone is available, false if it is not.
 	 */
 	public boolean hasAvailableDrone() {
-		System.out.println("Drones available: " + availableDrones.size());
+		LOGGER.info("Drones available: " + availableDrones.size());
 		return availableDrones.size() > 0;
 
 	}

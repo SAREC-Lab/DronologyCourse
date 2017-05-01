@@ -4,8 +4,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.nd.dronology.core.flight_manager.SoloDirector;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
+
 // Singleton class
 public class DroneCollectionStatus {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneCollectionStatus.class);
+
 	private Map<String, DroneStatus> drones;
 	private static volatile DroneCollectionStatus INSTANCE = null;
 
@@ -25,9 +32,9 @@ public class DroneCollectionStatus {
 	}
 
 	public void testStatus() {
-		System.out.println("Print current drone dump");
+		LOGGER.info("Print current drone dump");
 		for (DroneStatus droneStatus : drones.values()) {
-			System.out.println(droneStatus.toString());
+			LOGGER.info(droneStatus.toString());
 		}
 	}
 
