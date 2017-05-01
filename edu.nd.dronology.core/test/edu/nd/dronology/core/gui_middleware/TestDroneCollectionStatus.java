@@ -56,6 +56,7 @@ public class TestDroneCollectionStatus {
 
 		Thread t1 = new Thread() {
 
+			@Override
 			public void run() {
 				try {
 					gate.await();
@@ -66,6 +67,7 @@ public class TestDroneCollectionStatus {
 			}
 		};
 		Thread t2 = new Thread() {
+			@Override
 			public void run() {
 				try {
 					gate.await();
