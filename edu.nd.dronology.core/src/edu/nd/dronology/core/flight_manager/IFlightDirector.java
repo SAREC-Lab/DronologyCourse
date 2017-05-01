@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.flight_manager;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import edu.nd.dronology.core.utilities.Coordinates;
 
@@ -15,7 +15,7 @@ public interface IFlightDirector {
 	 * Set a series of waypoints.
 	 * @param wayPoints
 	 */
-	void setWayPoints(ArrayList<Coordinates> wayPoints);
+	void setWayPoints(List<Coordinates> wayPoints);
 
 	/**
 	 * Clear all waypoints
@@ -26,7 +26,7 @@ public interface IFlightDirector {
 	 * Creates a roundabout as a diversion
 	 * @param roundAboutPoints
 	 */
-	void setRoundabout(ArrayList<Coordinates> roundAboutPoints);
+	void setRoundabout(List<Coordinates> roundAboutPoints);
 	
 	/** 
 	 * Check if more waypoints exist

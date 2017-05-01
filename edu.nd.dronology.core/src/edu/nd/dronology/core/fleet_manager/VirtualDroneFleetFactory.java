@@ -5,32 +5,35 @@ import edu.nd.dronology.core.drones_runtime.VirtualDrone;
 import edu.nd.dronology.core.drones_runtime.IDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
 
-public class VirtualDroneFleetFactory extends DroneFleetFactory{
-		
+public class VirtualDroneFleetFactory extends DroneFleetFactory {
+
 	protected VirtualDroneFleetFactory() {
-		
+
 	}
-	
-	private static VirtualDroneFleetFactory instance = null;
-	
+
+	private static volatile VirtualDroneFleetFactory INSTANCE = null;
+
 	public static VirtualDroneFleetFactory getInstance() {
-		if(instance == null) {
-			instance = new VirtualDroneFleetFactory();
+		if (INSTANCE == null) {
+			synchronized (VirtualDroneFleetFactory.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new VirtualDroneFleetFactory();
+				}
+			}
 		}
-		return instance;
+		return INSTANCE;
 	}
-	
+
 	@Override
-	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude){
+	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude) {
 		IDrone drone = new VirtualDrone(createDroneID(droneID));
-		ManagedDrone managedDrone = new ManagedDrone(drone,droneID);
-		Coordinates currentPosition = new Coordinates(latitude, longitude,altitude);
+		ManagedDrone managedDrone = new ManagedDrone(drone, droneID);
+		Coordinates currentPosition = new Coordinates(latitude, longitude, altitude);
 		managedDrone.setBaseCoordinates(currentPosition);
 		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		managedDrone.startThread();
 		DroneFleet.getInstance().setAvailableDrone(managedDrone);
 		return managedDrone;
 	}
-	
-}
 
+}

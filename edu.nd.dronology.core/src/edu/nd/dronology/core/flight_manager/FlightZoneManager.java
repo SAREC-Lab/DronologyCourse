@@ -8,62 +8,65 @@ import edu.nd.dronology.core.fleet_manager.DroneFleet;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 
-public class FlightZoneManager implements Runnable{
-	
-	private Flights flights;	
-    private DroneSeparationMonitor safetyMgr;
-    private DroneFleet droneFleet;
+public class FlightZoneManager implements Runnable {
+
+	private Flights flights;
+	private DroneSeparationMonitor safetyMgr;
+	private DroneFleet droneFleet;
 
 	/**
 	 * Constructs a new FlightZoneManager.
+	 * 
 	 * @throws InterruptedException
 	 */
-	public FlightZoneManager() throws InterruptedException{
+	public FlightZoneManager() throws InterruptedException {
 		droneFleet = DroneFleet.getInstance();
 		safetyMgr = new DroneSeparationMonitor();
 		flights = new Flights(safetyMgr);
 	}
-	
-	public DroneFleet getDroneFleet(){
-		return droneFleet;  // replace with iterator later.
+
+	public DroneFleet getDroneFleet() {
+		return droneFleet; // replace with iterator later.
 	}
-	
+
 	/**
 	 * Runs on an independent thread
 	 */
-	public void startThread(){
-		(new Thread(this)).start();	
+	public void startThread() {
+		(new Thread(this)).start();
 	}
-	
+
 	/**
 	 * Creates a new flight plan
+	 * 
 	 * @param start
 	 * @param wayPoints
 	 */
-	public void planFlight(Coordinates start, ArrayList<Coordinates> wayPoints){
-		FlightPlan flightPlan = new FlightPlan(start,wayPoints);
+	public void planFlight(Coordinates start, ArrayList<Coordinates> wayPoints) {
+		FlightPlan flightPlan = new FlightPlan(start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}
-	
+
 	/**
 	 * 
 	 * @return all current flights.
 	 */
-	public Flights getFlights(){
+	public Flights getFlights() {
 		return flights;
 	}
-	
+
 	/**
 	 * Launches a single drone to its currently defined waypoints.
+	 * 
 	 * @param strDroneID
 	 * @param startingLocation
 	 * @param wayPoints
-	 * @throws FlightZoneException 
+	 * @throws FlightZoneException
 	 */
-	private void launchSingleDroneToWayPoints() throws FlightZoneException{
+	private void launchSingleDroneToWayPoints() throws FlightZoneException {
 		// Check to make sure that there is a pending flight plan and available drone.
-		if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()){
-			ManagedDrone drone = droneFleet.getAvailableDrone(); 
+		if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()) {
+			ManagedDrone drone = droneFleet.getAvailableDrone();
 			if (drone != null) {
 				safetyMgr.attachDrone(drone);
 				FlightPlan flightPlan = flights.getNextFlightPlan();
@@ -73,27 +76,26 @@ public class FlightZoneManager implements Runnable{
 				drone.assignFlight(flightDirectives);
 				flightDirectives.flyToNextPoint();
 				drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
-				flightPlan.setStatusToFlying(drone);	
+				flightPlan.setStatusToFlying(drone);
 			}
 		}
 	}
 
 	/**
-	 * Main run routine -- called internally.  Launches a new flight if viable, and checks for flights which have landed.
-	 * Launched flights run autonomously at one thread per drone.
+	 * Main run routine -- called internally. Launches a new flight if viable, and checks for flights which have landed. Launched flights run autonomously at one thread per drone.
 	 */
 	@Override
 	public void run() {
-		while (true){
+		while (true) {
 			// Launch new flight if feasible
 			int NumberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
-			if (flights.hasPendingFlight() && NumberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()){
+			if (flights.hasPendingFlight() && NumberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
 				try {
 					launchSingleDroneToWayPoints();
 				} catch (FlightZoneException e) {
 					e.printStackTrace();
 				}
-			}			
+			}
 			// Check if any flights have landed
 			flights.checkForLandedFlights(droneFleet, safetyMgr);
 			if (flights.hasAwaitingTakeOff())
@@ -103,7 +105,7 @@ public class FlightZoneManager implements Runnable{
 					System.out.println("Failed Check for takeoff readiness.");
 					e1.printStackTrace();
 				}
-			safetyMgr.checkForViolations();  // Used to run on its own thread!
+			safetyMgr.checkForViolations(); // Used to run on its own thread!
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
@@ -111,5 +113,5 @@ public class FlightZoneManager implements Runnable{
 			}
 		}
 	}
-		
+
 }

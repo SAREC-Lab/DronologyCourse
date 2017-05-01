@@ -1,61 +1,56 @@
 package edu.nd.dronology.core.drones_runtime;
 
 /**
- * Associates a drone safety state object with a drone.
- * ONLY set this in the drone constructor.  NEVER interchange at runtime - otherwise drone state will be incorrectly changed.
+ * Associates a drone safety state object with a drone. ONLY set this in the drone constructor. NEVER interchange at runtime - otherwise drone state will be incorrectly changed.
+ * 
  * @author Jane Cleland-Huang
  * @version 0.01
  *
  */
 public class DroneSafetyModeState {
-		    
-	    public enum SafetyMode {Diverted, Halted, Normal}
-	    private SafetyMode safetyMode; 
-	    
-	    /**
-	     * Constructor
-	     * States for both FlightMode and SafetyMode set to initial state
-	     */
-	    public DroneSafetyModeState(){
-	    	safetyMode = SafetyMode.Normal;
-	    }
-	    
-	    // Setters
-	    public void setSafetyModeToNormal(){
-	    	safetyMode = SafetyMode.Normal;
-	    }
-	    
-	    public void setSafetyModeToDiverted(){
-	    	safetyMode = SafetyMode.Diverted;
-	    }
-	    
-	    public void setSafetyModeToHalted(){
-	    	safetyMode = SafetyMode.Halted;
-	    }
-	    	    
-	    public boolean isSafetyModeNormal(){
-	    	if (safetyMode == SafetyMode.Normal)
-	    		return true;
-	    	else
-	    		return false;
-	    }
-	    
-	    public boolean isSafetyModeDiverted(){
-	    	if (safetyMode == SafetyMode.Diverted)
-	    		return true;
-	    	else
-	    		return false;
-	    }	    	    
-	   
-	    public boolean isSafetyModeHalted(){
-	    	if (safetyMode == SafetyMode.Halted)
-	    		return true;
-	    	else
-	    		return false;
-	    }		
 
-	    public String getSafetyStatus() {
-			return safetyMode.toString();
-		}
+	private enum SafetyMode {
+		DIVERTED, HALTED, NORMAL
+	}
+
+	private SafetyMode safetyMode;
+
+	/**
+	 * Constructor States for both FlightMode and SafetyMode set to initial state
+	 */
+	public DroneSafetyModeState() {
+		safetyMode = SafetyMode.NORMAL;
+	}
+
+	// Setters
+	public void setSafetyModeToNormal() {
+		safetyMode = SafetyMode.NORMAL;
+	}
+
+	public void setSafetyModeToDiverted() {
+		safetyMode = SafetyMode.DIVERTED;
+	}
+
+	public void setSafetyModeToHalted() {
+		safetyMode = SafetyMode.HALTED;
+	}
+
+	public boolean isSafetyModeNormal() {
+		return safetyMode == SafetyMode.NORMAL;
+	}
+
+	public boolean isSafetyModeDiverted() {
+		return safetyMode == SafetyMode.DIVERTED;
+
+	}
+
+	public boolean isSafetyModeHalted() {
+		return safetyMode == SafetyMode.HALTED;
+
+	}
+
+	public String getSafetyStatus() {
+		return safetyMode.toString();
+	}
 
 }

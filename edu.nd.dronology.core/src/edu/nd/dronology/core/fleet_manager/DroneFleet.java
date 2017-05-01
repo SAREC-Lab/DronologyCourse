@@ -1,80 +1,85 @@
 package edu.nd.dronology.core.fleet_manager;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 
 /**
  * Holds a fleet of virtual or physical drones.
+ * 
  * @author Jane
  *
  */
 public class DroneFleet {
-	private ArrayList<ManagedDrone> availableDrones;
-	private ArrayList<ManagedDrone> busyDrones;
-	private static DroneFleet instance = null;
-	
+	private List<ManagedDrone> availableDrones;
+	private List<ManagedDrone> busyDrones;
+	private static volatile DroneFleet INSTANCE = null;
+
 	public static DroneFleet getInstance() {
-		if(instance == null) {
-			instance = new DroneFleet();
+
+		if (INSTANCE == null) {
+			synchronized (DroneFleet.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new DroneFleet();
+				}
+			}
 		}
-		return instance;
+		return INSTANCE;
 	}
-	
+
 	/**
-	 * Specifies whether virtual or physical drones will be created according to the previously specified
-	 * runtime drone type.  (See RuntimeDroneTypes.java)
+	 * Specifies whether virtual or physical drones will be created according to the previously specified runtime drone type. (See RuntimeDroneTypes.java)
 	 */
-	protected DroneFleet(){
+	protected DroneFleet() {
 		if (RuntimeDroneTypes.getInstance().isSimulation())
-			availableDrones = VirtualDroneFleetFactory.getInstance().getDrones(); 
+			availableDrones = VirtualDroneFleetFactory.getInstance().getDrones();
 		else
 			availableDrones = PhysicalDroneFleetFactory.getInstance().getDrones();
-		
-		busyDrones = new ArrayList<ManagedDrone>();
+
+		busyDrones = new ArrayList<>();
 	}
-	
+
 	/**
 	 * Checks for an available drone from the fleet.
+	 * 
 	 * @return true if drone is available, false if it is not.
 	 */
-	public boolean hasAvailableDrone(){
+	public boolean hasAvailableDrone() {
 		System.out.println("Drones available: " + availableDrones.size());
-		if (availableDrones.size() > 0)
-			return true;
-		else
-			return false;
+		return availableDrones.size() > 0;
+
 	}
-	
+
 	/**
-	 * Returns the next available drone.  Currently uses FIFO to recycle drones.
+	 * Returns the next available drone. Currently uses FIFO to recycle drones.
+	 * 
 	 * @return
 	 */
-	public ManagedDrone getAvailableDrone(){
-		if (!availableDrones.isEmpty()){
+	public ManagedDrone getAvailableDrone() {
+		if (!availableDrones.isEmpty()) {
 			ManagedDrone drone = availableDrones.get(0);
 			availableDrones.remove(drone);
 			busyDrones.add(drone);
 			return drone;
-		}	
-		else
+		} else
 			return null;
 	}
-	
-	public void setAvailableDrone(ManagedDrone managedDrone){
+
+	public void setAvailableDrone(ManagedDrone managedDrone) {
 		availableDrones.add(managedDrone);
 	}
-	
-		
+
 	/**
 	 * When a drone completes a mission, returns it to the pool of available drones.
+	 * 
 	 * @param drone
 	 */
-	public void returnDroneToAvailablePool(ManagedDrone drone){
-		if (busyDrones.contains(drone)){
+	public void returnDroneToAvailablePool(ManagedDrone drone) {
+		if (busyDrones.contains(drone)) {
 			busyDrones.remove(drone);
 			availableDrones.add(drone);
 		}
 	}
-	
-}
 
+}

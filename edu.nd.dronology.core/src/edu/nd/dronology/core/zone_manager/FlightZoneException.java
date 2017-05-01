@@ -7,7 +7,12 @@ package edu.nd.dronology.core.zone_manager;
  *
  */
 public class FlightZoneException extends Throwable{
-   public FlightZoneException(String msg){
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8522577350228262490L;
+
+	public FlightZoneException(String msg){
 	  super(msg);
    }
 }

@@ -1,6 +1,8 @@
 package edu.nd.dronology.core.flight_manager;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.fleet_manager.DroneFleet;
@@ -12,10 +14,10 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  *
  */
 public class Flights {
-	private ArrayList<FlightPlan> pendingFlights;
-	private ArrayList<FlightPlan> awaitingTakeOffFlights;
-	private ArrayList<FlightPlan> currentFlights;
-	private ArrayList<FlightPlan> completedFlights;
+	private List<FlightPlan> pendingFlights;
+	private List<FlightPlan> awaitingTakeOffFlights;
+	private List<FlightPlan> currentFlights;
+	private List<FlightPlan> completedFlights;
 	private static int maximumAllowedCurrentFlights = 2;
 	private DroneSeparationMonitor safetyMgr;  
 	private boolean grounded = false;
@@ -45,7 +47,7 @@ public class Flights {
 		
 		// Clear awaitingTakeOffFlights
 		// Deep copy
-		ArrayList<FlightPlan> tempList = (ArrayList<FlightPlan>) awaitingTakeOffFlights.clone();  //Michael can fix this as he doesn't like clones :-)
+		List<FlightPlan> tempList = new ArrayList<>(awaitingTakeOffFlights);
 		for(FlightPlan flightPlan: tempList){
 			ManagedDrone drone = flightPlan.getAssignedDrone();
 			if(awaitingTakeOffFlights.contains(drone)){
@@ -114,7 +116,7 @@ public class Flights {
 	 * 
 	 * @return list of pending flights
 	 */
-	public ArrayList<FlightPlan> getPendingFlights(){
+	public List<FlightPlan> getPendingFlights(){
 		return pendingFlights;
 	}
 	
@@ -122,7 +124,7 @@ public class Flights {
 	 * 
 	 * @return list of flights awaiting permission to takeoff
 	 */
-	public ArrayList<FlightPlan> getAwaitingTakeOffFlights(){
+	public List<FlightPlan> getAwaitingTakeOffFlights(){
 		return awaitingTakeOffFlights;
 	}
 	
@@ -130,7 +132,7 @@ public class Flights {
 	 * 
 	 * @return arraylist of currently flying flights
 	 */
-	public ArrayList<FlightPlan> getCurrentFlights(){
+	public List<FlightPlan> getCurrentFlights(){
 		return currentFlights;
 	}
 	
@@ -138,7 +140,7 @@ public class Flights {
 	 * 
 	 * @return arraylist of completed flights
 	 */
-	public ArrayList<FlightPlan> getCompletedFlights(){
+	public List<FlightPlan> getCompletedFlights(){
 		return completedFlights;
 	}
 	
