@@ -8,8 +8,6 @@ import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
 import edu.nd.dronology.core.flight_manager.FlightZoneManager;
 import edu.nd.dronology.core.gui.JavaFXGUILauncher;
 import edu.nd.dronology.core.gui_middleware.DronologySetupDronesAccessPoint;
-import edu.nd.dronology.core.gui_middleware.load_flights.LoadXMLFlight;
-import edu.nd.dronology.core.gui_middleware.load_flights.WayPointCollection;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 
