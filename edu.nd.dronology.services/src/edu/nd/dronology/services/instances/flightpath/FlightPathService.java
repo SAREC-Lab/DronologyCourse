@@ -1,7 +1,10 @@
 package edu.nd.dronology.services.instances.flightpath;
 
+import java.util.Collection;
+
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServerService;
-import edu.nd.dronology.services.info.FlightPathInfo;
+import edu.nd.dronology.services.core.info.FlightPathCategoryInfo;
+import edu.nd.dronology.services.core.info.FlightPathInfo;
 
 public class FlightPathService extends AbstractFileTransmitServerService<IFlightPathServiceInstance, FlightPathInfo> {
 
@@ -26,6 +29,10 @@ public class FlightPathService extends AbstractFileTransmitServerService<IFlight
 	@Override
 	protected IFlightPathServiceInstance initServiceInstance() {
 		return new FlightPathServiceInstance();
+	}
+
+	public Collection<FlightPathCategoryInfo> getFlightPathCategories() {
+		return serviceInstance.getFlightPathCategories();
 	}
 
 

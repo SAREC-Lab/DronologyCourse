@@ -1,6 +1,6 @@
 package edu.nd.dronology.services.persistence;
 
-import edu.nd.dronology.services.core.persistence.apache.AbstractItemPersistenceProvider;
+import edu.nd.dronology.services.core.persistence.AbstractItemPersistenceProvider;
 import edu.nd.dronology.services.instances.flightpath.IFlightPath;
 
 /**

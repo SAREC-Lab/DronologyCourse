@@ -6,6 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractServerService;
 import edu.nd.dronology.services.core.listener.IServiceListener;
+import edu.nd.dronology.services.core.remote.IRemoteableService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 
 /** 

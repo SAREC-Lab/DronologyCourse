@@ -16,9 +16,9 @@ import java.util.zip.GZIPOutputStream;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
-import edu.nd.dronology.services.core.persistence.apache.IPersistenceManager;
-import edu.nd.dronology.services.core.persistence.apache.DronologyPersistenceUtil;
-import edu.nd.dronology.services.core.persistence.apache.PersistenceException;
+import edu.nd.dronology.services.core.persistence.DronologyPersistenceUtil;
+import edu.nd.dronology.services.core.persistence.IPersistenceManager;
+import edu.nd.dronology.services.core.persistence.PersistenceException;
 import edu.nd.dronology.services.instances.flightpath.IFlightPath;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;

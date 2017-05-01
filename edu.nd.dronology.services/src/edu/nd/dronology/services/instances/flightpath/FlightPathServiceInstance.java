@@ -1,6 +1,9 @@
 package edu.nd.dronology.services.instances.flightpath;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -10,13 +13,15 @@ import java.util.Set;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
-import edu.nd.dronology.services.core.persistence.apache.PersistenceException;
-import edu.nd.dronology.services.core.util.DistributorConstants;
+import edu.nd.dronology.services.core.info.FlightPathCategoryInfo;
+import edu.nd.dronology.services.core.info.FlightPathInfo;
+import edu.nd.dronology.services.core.persistence.PersistenceException;
+import edu.nd.dronology.services.core.util.DronologyConstants;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.core.util.ServiceIds;
-import edu.nd.dronology.services.info.FlightPathInfo;
 import edu.nd.dronology.services.instances.DronologyElementFactory;
 import edu.nd.dronology.services.persistence.FlightPlanPersistenceProvider;
+import edu.nd.dronology.services.supervisor.SupervisorService;
 import edu.nd.dronology.util.FileUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -28,13 +33,17 @@ public class FlightPathServiceInstance extends AbstractFileTransmitServiceInstan
 
 	private static final int ORDER = 2;
 
-	public static final String EXTENSION = DistributorConstants.EXTENSION_FLIGHTPATH;
+	public static final String EXTENSION = DronologyConstants.EXTENSION_FLIGHTPATH;
 
 	private Map<String, FlightPathInfo> flightPaths = new Hashtable<>();
 
+	private Collection<FlightPathCategoryInfo> categories = new ArrayList<>();
+
 	public FlightPathServiceInstance() {
 		super(ServiceIds.SERVICE_ARTIFACTS, "FlightPath Management", EXTENSION);
-
+		
+		categories.add(new FlightPathCategoryInfo("South-Bend Area", "sba"));
+		categories.add(new FlightPathCategoryInfo("River", "river"));
 	}
 
 	@Override
@@ -86,8 +95,7 @@ public class FlightPathServiceInstance extends AbstractFileTransmitServiceInstan
 
 	@Override
 	protected String getPath() {
-		//String path = SupervisorService.getInstance().getArtifactModelsLocation();
-		String path ="flightpath";
+		String path = SupervisorService.getInstance().getFlightPathLocation();
 		return path;
 	}
 
@@ -133,5 +141,10 @@ public class FlightPathServiceInstance extends AbstractFileTransmitServiceInstan
 				}
 			}
 		}
+	}
+
+	@Override
+	public Collection<FlightPathCategoryInfo> getFlightPathCategories() {
+		return Collections.unmodifiableCollection(categories );
 	}
 }
