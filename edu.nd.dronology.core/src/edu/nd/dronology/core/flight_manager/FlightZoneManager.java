@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.flight_manager;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
@@ -46,7 +46,7 @@ public class FlightZoneManager implements Runnable {
 	 * @param start
 	 * @param wayPoints
 	 */
-	public void planFlight(Coordinates start, ArrayList<Coordinates> wayPoints) {
+	public void planFlight(Coordinates start, List<Coordinates> wayPoints) {
 		FlightPlan flightPlan = new FlightPlan(start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}
@@ -92,12 +92,12 @@ public class FlightZoneManager implements Runnable {
 	public void run() {
 		while (true) {
 			// Launch new flight if feasible
-			int NumberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
-			if (flights.hasPendingFlight() && NumberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
+			int numberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
+			if (flights.hasPendingFlight() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
 				try {
 					launchSingleDroneToWayPoints();
 				} catch (FlightZoneException e) {
-					e.printStackTrace();
+				LOGGER.error(e);
 				}
 			}
 			// Check if any flights have landed

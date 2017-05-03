@@ -11,7 +11,13 @@
 
 package edu.nd.dronology.core.utilities;
 
-public class Coordinates {
+import java.io.Serializable;
+
+public class Coordinates implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -959426816303585777L;
 	private int altitude; 		// height
 	private long latitude; 		// North/South
 	private long longitude; 	// West/East

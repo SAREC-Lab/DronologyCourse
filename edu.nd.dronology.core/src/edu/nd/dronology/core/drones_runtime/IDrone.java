@@ -76,6 +76,6 @@ public interface IDrone {
 
 	public void setVoltageCheckPoint();
 
-	public boolean isDestinationReached(int i);
+	public boolean isDestinationReached(int distanceMovedPerTimeStep);
 
 }

@@ -113,7 +113,7 @@ public class DecimalDegreesToXYConverter {
 	public long ConvertYCoordsToDecimalDegrees(int Y) throws FlightZoneException {
 		LOGGER.info("Start Convert Y: ");
 		LOGGER.info("North Latitude: " + ZoneBounds.getInstance().getNorthLatitude());
-		System.out.println("SOuth lat: " + ZoneBounds.getInstance().getSouthLatitude());
+		LOGGER.info("SOuth lat: " + ZoneBounds.getInstance().getSouthLatitude());
 
 		LOGGER.info("YScale: " + yScale);
 		LOGGER.info("Y: " + Y);
@@ -124,8 +124,7 @@ public class DecimalDegreesToXYConverter {
 			return zoneBounds.getNorthLatitude() - delta;
 		}
 
-		else
-			return 0L; // unreachable
+		return 0L; // unreachable
 	}
 
 	/**

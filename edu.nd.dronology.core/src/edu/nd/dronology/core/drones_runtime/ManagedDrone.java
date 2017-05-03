@@ -161,7 +161,7 @@ public class ManagedDrone extends Observable implements Runnable {
 				if (droneSafetyState.isSafetyModeHalted())
 					droneSafetyState.setSafetyModeToNormal();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				LOGGER.error(e);
 			}
 
 			// Drone currently is assigned a flight directive.

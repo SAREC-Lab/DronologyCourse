@@ -76,7 +76,6 @@
    <rule ref="rulesets/java/controversial.xml/AvoidUsingNativeCode"/>
    <rule ref="rulesets/java/basic.xml/AvoidUsingOctalValues"/>
    <rule ref="rulesets/java/controversial.xml/AvoidUsingShortType"/>
-   <rule ref="rulesets/java/controversial.xml/AvoidUsingVolatile"/>
    <rule ref="rulesets/java/design.xml/BadComparison"/>
    <rule ref="rulesets/java/basic.xml/BigIntegerInstantiation"/>
    <rule ref="rulesets/java/naming.xml/BooleanGetMethodName"/>
@@ -181,9 +180,6 @@
    <rule ref="rulesets/java/naming.xml/GenericsNaming"/>
    <rule ref="rulesets/ecmascript/basic.xml/GlobalVariable"/>
    <rule ref="rulesets/java/design.xml/GodClass"/>
-   <rule ref="rulesets/java/logging-jakarta-commons.xml/GuardDebugLogging"/>
-   <rule ref="rulesets/java/logging-jakarta-commons.xml/GuardLogStatement"/>
-   <rule ref="rulesets/java/logging-java.xml/GuardLogStatementJavaUtil"/>
    <rule ref="rulesets/java/design.xml/IdempotentOperations"/>
    <rule ref="rulesets/ecmascript/braces.xml/IfElseStmtsMustUseBraces"/>
    <rule ref="rulesets/java/braces.xml/IfElseStmtsMustUseBraces"/>
@@ -223,7 +219,6 @@
    <rule ref="rulesets/java/coupling.xml/LooseCoupling"/>
    <rule ref="rulesets/java/coupling.xml/LoosePackageCoupling"/>
    <rule ref="rulesets/java/j2ee.xml/MDBAndSessionBeanNamingConvention"/>
- 
    <rule ref="rulesets/apex/style.xml/MethodNamingConventions"/>
    <rule ref="rulesets/java/naming.xml/MethodNamingConventions"/>
    <rule ref="rulesets/java/sunsecure.xml/MethodReturnsInternalArray"/>

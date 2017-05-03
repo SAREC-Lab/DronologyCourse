@@ -27,7 +27,7 @@ public class PhysicalDroneFleetFactory extends DroneFleetFactory {
 	}
 
 	@Override
-	public ManagedDrone initializeDrone(String DroneID, String DroneType, long latitude, long longitude, int altitude) {
+	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude) {
 
 		return null;
 	}

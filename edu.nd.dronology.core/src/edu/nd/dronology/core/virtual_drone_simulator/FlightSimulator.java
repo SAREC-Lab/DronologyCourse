@@ -48,7 +48,7 @@ public class FlightSimulator {
 	 * @return distance remaining in degree points.
 	 */
 	public long getRemainingDistance() {
-		return (long) Math.sqrt((Math.pow(computeLongitudeDelta(), 2)) + (Math.pow(computeLatitudeDelta(), 2)));
+		return (long) Math.sqrt((Math.pow(computeLongitudeDelta(), 2)) + Math.pow(computeLatitudeDelta(), 2));
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class FlightSimulator {
 	 * Computes the angle at which a drone is flying with respect to the vertical
 	 */
 	private void computeAngle() {
-		double height = (computeLatitudeDelta()); // opposite
+		double height = computeLatitudeDelta(); // opposite
 		// double width = (computeLongitudeDelta());
 		double hypotenuse = getRemainingDistance();
 		double sinTheta = height / hypotenuse;
@@ -95,17 +95,17 @@ public class FlightSimulator {
 		long widthIncrement = Math.abs((long) (Math.cos(theta) * step));
 
 		// Latitude delta
-		if (currentPosition.getLatitude() < targetPosition.getLatitude())
+		if (currentPosition.getLatitude() < targetPosition.getLatitude()) {
 			currentPosition.setLatitude(currentPosition.getLatitude() + heightIncrement); // Drone is south of Target
-		else
+		} else {
 			currentPosition.setLatitude(currentPosition.getLatitude() - heightIncrement); // Drone is North (or same) as target
-
+		}
 		// Longitude delta
-		if (currentPosition.getLongitude() < targetPosition.getLongitude())
+		if (currentPosition.getLongitude() < targetPosition.getLongitude()) {
 			currentPosition.setLongitude(currentPosition.getLongitude() + widthIncrement); // Drone is to the left/west of target
-		else
+		} else {
 			currentPosition.setLongitude(currentPosition.getLongitude() - widthIncrement); // Drone is to the right/east of target
-
+		}
 		// double distanceMoved = Math.sqrt(Math.pow(heightIncrement,2)+Math.pow(widthIncrement,2));
 
 		if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200) {
@@ -129,10 +129,7 @@ public class FlightSimulator {
 	public boolean isDestinationReached(long distanceMovedPerTimeStep) {
 		long latDistance = Math.abs(currentPosition.getLatitude() - targetPosition.getLatitude());
 		long lonDistance = Math.abs(currentPosition.getLongitude() - targetPosition.getLongitude());
-		if (lonDistance <= distanceMovedPerTimeStep && latDistance <= distanceMovedPerTimeStep)
-			return true;
-		else
-			return false;
+		return lonDistance <= distanceMovedPerTimeStep && latDistance <= distanceMovedPerTimeStep;
 	}
 
 }

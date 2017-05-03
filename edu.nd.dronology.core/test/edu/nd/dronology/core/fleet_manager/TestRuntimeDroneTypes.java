@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import edu.nd.dronology.core.flight_manager.SoloDirector;
-import edu.nd.dronology.core.gui_middleware.DroneCollectionStatus;
 @RunWith(Parameterized.class)
 public class TestRuntimeDroneTypes {
 

@@ -1,10 +1,5 @@
 package edu.nd.dronology.core.flight_manager;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,8 +1,8 @@
 package edu.nd.dronology.core.fleet_manager;
 
+import edu.nd.dronology.core.drones_runtime.IDrone;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.drones_runtime.VirtualDrone;
-import edu.nd.dronology.core.drones_runtime.IDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
 
 public class VirtualDroneFleetFactory extends DroneFleetFactory {

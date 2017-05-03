@@ -17,10 +17,8 @@ import net.mv.logging.LoggerProvider;
  */
 public class SoloDirector implements IFlightDirector {
 
-	
 	private static final ILogger LOGGER = LoggerProvider.getLogger(SoloDirector.class);
 
-	
 	private ManagedDrone drone;
 	private boolean safetyDiversion = false;
 	private Coordinates targetPosition = null;
@@ -31,12 +29,12 @@ public class SoloDirector implements IFlightDirector {
 	public Coordinates flyToNextPoint() {
 		// targetCoordinates = flightDirector.flyToNextPoint();// Case: Drone is under safety directives and on a roundabout.
 
-		if (onRoundabout())
+		if (onRoundabout()) {
 			targetPosition = flyRoundAbout();
-		else
+		} else {
 			targetPosition = flyToNextWayPoint();
-		// System.out.println(drone.getCoordinates().toString() + " to " + targetPosition.toString());
-
+			// System.out.println(drone.getCoordinates().toString() + " to " + targetPosition.toString());
+		}
 		return targetPosition;
 	}
 
@@ -99,10 +97,9 @@ public class SoloDirector implements IFlightDirector {
 	}
 
 	public boolean onRoundabout() {
-		if (roundaboutPath.isEmpty())
-			return false;
-		else
-			return true;
+
+		return !roundaboutPath.isEmpty();
+
 	}
 
 	@Override
@@ -115,12 +112,14 @@ public class SoloDirector implements IFlightDirector {
 		if (isUnderSafetyDirectives()) {
 			if (!roundaboutPath.isEmpty()) {
 				roundaboutPath.remove(0);
-				if (roundaboutPath.isEmpty())
+				if (roundaboutPath.isEmpty()) {
 					safetyDiversion = false;
+				}
 			}
 		} else {
-			if (!wayPoints.isEmpty())
+			if (!wayPoints.isEmpty()) {
 				wayPoints.remove(0);
+			}
 		}
 	}
 
@@ -164,15 +163,21 @@ public class SoloDirector implements IFlightDirector {
 
 	@Override
 	public boolean readyToLand() {
-		if (!(onRoundabout() || hasMoreWayPoints())) {
-			return false;
-		} else {
-			return true;
-		}
+
+		return onRoundabout() || hasMoreWayPoints();
+
+//		if (!(onRoundabout() || hasMoreWayPoints())) {
+//			return false;
+//		} else {
+//			return true;
+//		}
 	}
 
 	@Override
 	public boolean readyToTakeOff() {
+
+		// return !onRoundabout() && hasMoreWayPoints();
+
 		if (onRoundabout() || !hasMoreWayPoints()) {
 			return false;
 		} else {

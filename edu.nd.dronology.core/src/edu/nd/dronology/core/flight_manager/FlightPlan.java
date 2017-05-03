@@ -1,10 +1,6 @@
 package edu.nd.dronology.core.flight_manager;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
@@ -25,24 +21,21 @@ public class FlightPlan {
 	private List<Coordinates> wayPoints;
 	private Coordinates startLocation;
 	private Coordinates endLocation;
-
-	private enum Status {
-		PLANNED, FLYING, COMPLETED;
-		
-		@Override
-		public String toString() {
-      return name().charAt(0) + name().substring(1).toLowerCase();
-  }
-		
-		
-	}
-
 	private Status status;
 	private ManagedDrone drone = null;
 
-	public Date startTime;
-	public Date endTime;
-	DateFormat df = new SimpleDateFormat("HH:mm:ss");
+	private long startTime = -1;
+	private long endTime = -1;
+
+	private enum Status {
+		PLANNED, FLYING, COMPLETED;
+
+		@Override
+		public String toString() {
+			return name().charAt(0) + name().substring(1).toLowerCase();
+		}
+
+	}
 
 	/**
 	 * Loads flight information and assigns a flight ID. ID's are generated automatically and are unique in each run of the simulation.
@@ -51,7 +44,7 @@ public class FlightPlan {
 	 *          Starting coordinates
 	 * @param wayPoints
 	 */
-	public FlightPlan(Coordinates start, ArrayList<Coordinates> wayPoints) {
+	public FlightPlan(Coordinates start, List<Coordinates> wayPoints) {
 		this.wayPoints = wayPoints;
 		this.startLocation = start;
 		if (wayPoints.size() > 0) {
@@ -109,7 +102,7 @@ public class FlightPlan {
 	public boolean setStatusToFlying(ManagedDrone drone) throws FlightZoneException {
 		if (status == Status.PLANNED) {
 			status = Status.FLYING;
-			startTime = new Date();
+			startTime = System.currentTimeMillis();
 			this.drone = drone;
 			return true;
 		} else
@@ -125,7 +118,7 @@ public class FlightPlan {
 	public boolean setStatusToCompleted() throws FlightZoneException {
 		if (status == Status.FLYING) {
 			status = Status.COMPLETED;
-			endTime = new Date();
+			endTime = System.currentTimeMillis();
 			return true; // success (may add real check here later)
 		} else
 			throw new FlightZoneException("Only currently flying flights can have their status changed to completed");
@@ -170,7 +163,7 @@ public class FlightPlan {
 	 * 
 	 * @return date object
 	 */
-	public Date getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
 
@@ -179,7 +172,7 @@ public class FlightPlan {
 	 * 
 	 * @return date object
 	 */
-	public Date getEndTime() {
+	public long getEndTime() {
 		return endTime;
 	}
 }

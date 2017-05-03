@@ -71,8 +71,9 @@ public class Flights {
 		// Tell current Flights to return home
 		for (FlightPlan flightPlan : currentFlights) {
 			ManagedDrone drone = flightPlan.getAssignedDrone();
-			if (drone.getFlightModeState().isFlying())
+			if (drone.getFlightModeState().isFlying()) {
 				drone.returnToHome();
+			}
 		}
 	}
 
@@ -81,7 +82,7 @@ public class Flights {
 	 * @return true if any flights are currently in "awaiting take off" mode.
 	 */
 	public boolean hasAwaitingTakeOff() {
-		return awaitingTakeOffFlights.size() > 0;
+		return !awaitingTakeOffFlights.isEmpty();
 
 	}
 
@@ -90,7 +91,7 @@ public class Flights {
 	 * @return true if any flights are in "pending" mode
 	 */
 	public boolean hasPendingFlight() {
-		return pendingFlights.size() > 0;
+		return !pendingFlights.isEmpty();
 
 	}
 
@@ -99,10 +100,8 @@ public class Flights {
 	 * @return true if any flights are awaiting permission to launch
 	 */
 	public boolean permissionToLaunch() {
-		if (!grounded && (currentFlights.size() + awaitingTakeOffFlights.size()) < maximumAllowedCurrentFlights)
-			return true;
-		else
-			return false;
+		return !grounded && (currentFlights.size() + awaitingTakeOffFlights.size()) < maximumAllowedCurrentFlights;
+
 	}
 
 	/**
@@ -111,12 +110,12 @@ public class Flights {
 	 * @return the next available flight plan
 	 */
 	public FlightPlan getNextFlightPlan() {
-		if (pendingFlights.size() > 0) {
+		if (!pendingFlights.isEmpty()) {
 			FlightPlan flightPlan = pendingFlights.remove(0);
 			awaitingTakeOffFlights.add(flightPlan);
 			return flightPlan;
-		} else
-			return null;
+		}
+		return null;
 	}
 
 	/**
@@ -138,7 +137,7 @@ public class Flights {
 	/**
 	 * 
 	 * @return arraylist of currently flying flights
-	 */ 
+	 */
 	public List<FlightPlan> getCurrentFlights() {
 		return currentFlights;
 	}
@@ -170,7 +169,7 @@ public class Flights {
 	public void checkForTakeOffReadiness(DroneFleet droneFleet) throws FlightZoneException {
 		// Technical debt.
 		// Checks first waiting drone each time it is called.
-		if (awaitingTakeOffFlights.size() > 0) {
+		if (!awaitingTakeOffFlights.isEmpty()) {
 			FlightPlan awaitingFlightPlan = awaitingTakeOffFlights.get(0);
 			ManagedDrone drone = awaitingFlightPlan.getAssignedDrone();
 			if (safetyMgr.permittedToTakeOff(drone)) {

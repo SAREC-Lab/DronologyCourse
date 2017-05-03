@@ -9,11 +9,11 @@ import edu.nd.dronology.core.utilities.Coordinates;
  * @version 0.1
  */
 public class ZoneBounds {
-	long westLongitude = 0;
-	long eastLongitude = 0;
-	long northLatitude = 0;
-	long southLatitude = 0;
-	int maxAltitude = 0;
+	private long westLongitude = 0;
+	private long eastLongitude = 0;
+	private long northLatitude = 0;
+	private long southLatitude = 0;
+	private int maxAltitude = 0;
 
 	private static volatile ZoneBounds INSTANCE = null;
 
@@ -64,8 +64,8 @@ public class ZoneBounds {
 		if (westLongitude != 0 || eastLongitude != 0) { // Assume two longitude values must not both be zero if bounds are set.
 			// Check if in bounds
 			return true; // or false
-		} else
-			throw new FlightZoneException("Coordinate check has failed - because you have not set zone bounds yet.");
+		}
+		throw new FlightZoneException("Coordinate check has failed - because you have not set zone bounds yet.");
 	}
 
 	/**

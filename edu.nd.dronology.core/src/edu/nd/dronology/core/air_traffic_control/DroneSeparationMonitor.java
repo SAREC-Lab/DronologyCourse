@@ -48,9 +48,9 @@ public class DroneSeparationMonitor {
 	 * 
 	 * @return distance remaining in degree points.
 	 */
-	public long getDistance(ManagedDrone D1, ManagedDrone D2) {
-		long longDelta = Math.abs(D1.getLongitude() - D2.getLongitude());
-		long latDelta = Math.abs(D1.getLatitude() - D2.getLatitude());
+	public long getDistance(ManagedDrone drone1, ManagedDrone drone2) {
+		long longDelta = Math.abs(drone1.getLongitude() - drone2.getLongitude());
+		long latDelta = Math.abs(drone1.getLatitude() - drone2.getLatitude());
 		return (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
 	}
 

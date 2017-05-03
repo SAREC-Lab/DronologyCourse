@@ -12,11 +12,15 @@ public class DroneStatus implements Serializable{
 	private long latitude;
 	private long longitude;
 	private int altitude;
-	private String ID;
+	private final String ID;
 	private double batteryLevel;
 	private double velocity;
 	private Map<String,String> info;
 	private String status;
+
+	public String getStatus() {
+		return status;
+	}
 
 	public DroneStatus(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity){
 		this.ID = ID;
