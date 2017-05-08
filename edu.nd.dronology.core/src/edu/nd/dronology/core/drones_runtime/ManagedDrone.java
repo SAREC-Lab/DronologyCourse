@@ -1,12 +1,18 @@
 package edu.nd.dronology.core.drones_runtime;
 
 import java.util.Observable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import com.google.common.util.concurrent.RateLimiter;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.flight_manager.IFlightDirector;
 import edu.nd.dronology.core.flight_manager.SoloDirector;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import edu.nd.dronology.util.NamedThreadFactory;
+import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -20,22 +26,27 @@ public class ManagedDrone extends Observable implements Runnable {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(ManagedDrone.class);
 
-	private IDrone drone; // Controls primitive flight commands for drone
-	private String droneName;
+	private static final int MAX_DRONES = 20;
+
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(MAX_DRONES,
+			new NamedThreadFactory("ManagedDrone"));
+
+	private final IDrone drone; // Controls primitive flight commands for drone
 	private DroneSeparationMonitor safetyMgr;
-	private Coordinates basePosition; // In current version drones always return to base at the end of their flights.
+
 	private DroneFlightModeState droneState;
 	private DroneSafetyModeState droneSafetyState;
 	private boolean missionCompleted = false;
 	private Coordinates targetCoordinates = null;
 
-	private Thread thread;
-	private int normalSleep = 1;
-	private int currentSleep = normalSleep;
+	// private Thread thread;
+	private static final int NORMAL_SLEEP = 1;
+	private int currentSleep = NORMAL_SLEEP;
 
 	// Flight plan
 	private IFlightDirector flightDirector = null; // Each drone can be assigned a single flight plan.
 	private int targetAltitude = 0;
+	private RateLimiter LIMITER = RateLimiter.create(1000);
 
 	/**
 	 * Constructs drone
@@ -43,14 +54,14 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * @param drone
 	 * @param drnName
 	 */
-	public ManagedDrone(IDrone drone, String drnName) {
+	public ManagedDrone(IDrone drone) {
+		NullUtil.checkNull(drone);
 		this.drone = drone;// specify
 		droneState = new DroneFlightModeState();
 		droneSafetyState = new DroneSafetyModeState();
-		droneName = drnName;
 		drone.getDroneStatus().setStatus(droneState.getStatus());
 		this.flightDirector = new SoloDirector(this); // Don't really want to create it here.
-		thread = new Thread(this);
+		// thread = new Thread(this);
 	}
 
 	/**
@@ -60,7 +71,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 */
 	public void assignFlight(IFlightDirector flightDirective) {
 		this.flightDirector = flightDirective;
-		this.flightDirector.addWayPoint(getBaseCoordinates()); // Currently must always return home.
+		this.flightDirector.addWayPoint(drone.getBaseCoordinates()); // Currently must always return home.
 	}
 
 	/**
@@ -87,7 +98,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	}
 
 	public void returnToHome() {
-		flightDirector.returnHome(getBaseCoordinates());
+		flightDirector.returnHome(drone.getBaseCoordinates());
 		getFlightSafetyModeState().setSafetyModeToNormal();
 
 	}
@@ -119,7 +130,7 @@ public class ManagedDrone extends Observable implements Runnable {
 		if (targetAltitude == 0) {
 			throw new FlightZoneException("Target Altitude is 0");
 		}
-		LOGGER.info("TAKING OFF DRONE: " + getDroneName());
+		LOGGER.info(getDroneName() + " ==> Taking off");
 		droneState.setModeToTakingOff();
 		drone.getDroneStatus().setStatus(droneState.getStatus()); // A bit ugly, but this was added to keep state for GUI middleware updated.
 		drone.takeOff(targetAltitude);
@@ -145,34 +156,30 @@ public class ManagedDrone extends Observable implements Runnable {
 		return drone.getCoordinates();
 	}
 
-	public void startThread() {
-		thread.start();
+	public void start() {
+		// thread.start();
+		LOGGER.info("Starting Drone '" + drone.getDroneName() + "'");
+		EXECUTOR_SERVICE.submit(this);
 	}
 
 	@Override
 	public void run() {
 
 		while (true) {// && j < 500){
-
 			// Drone has been temporarily halted. Reset to normal mode once sleep is completed.
-			try {
-				Thread.sleep(currentSleep);
-				currentSleep = normalSleep;
-				if (droneSafetyState.isSafetyModeHalted())
-					droneSafetyState.setSafetyModeToNormal();
-			} catch (InterruptedException e) {
-				LOGGER.error(e);
+			LIMITER.acquire();
+			setSleep(NORMAL_SLEEP);
+			if (droneSafetyState.isSafetyModeHalted()) {
+				droneSafetyState.setSafetyModeToNormal();
 			}
 
 			// Drone currently is assigned a flight directive.
 			if (flightDirector != null && droneState.isFlying()) {
-
 				targetCoordinates = flightDirector.flyToNextPoint();
 
 				// Move the drone. Returns FALSE if it cannot move because it has reached destination
 				if (!drone.move(10))
 					flightDirector.clearCurrentWayPoint();
-
 				// Check for end of flight
 				checkForEndOfFlight();
 
@@ -183,6 +190,15 @@ public class ManagedDrone extends Observable implements Runnable {
 				drone.setVoltageCheckPoint();
 			}
 		}
+	}
+
+	private void setSleep(int normalSleep) {
+		if (currentSleep == NORMAL_SLEEP) {
+			return;
+		}
+		currentSleep = NORMAL_SLEEP;
+		LIMITER.setRate(currentSleep * 1000);
+		LOGGER.info("Permits set to " + (currentSleep * 1000));
 	}
 
 	// Check for end of flight. Land if conditions are satisfied
@@ -230,7 +246,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * @return unique drone ID
 	 */
 	public String getDroneName() {
-		return droneName;
+		return drone.getDroneName();
 	}
 
 	/**
@@ -271,27 +287,9 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * @param seconds
 	 */
 	public void haltInPlace(int seconds) {
-		currentSleep = seconds * 1000;
+		// currentSleep = seconds * 1000;
+		setSleep(seconds / 1000);
 		droneSafetyState.setSafetyModeToHalted();
-	}
-
-	/**
-	 * Get unique base coordinates for the drone
-	 * 
-	 * @return base coordinates
-	 */
-	public Coordinates getBaseCoordinates() {
-		return basePosition;
-	}
-
-	/**
-	 * Set base coordinates for the drone
-	 * 
-	 * @param basePosition
-	 */
-	public void setBaseCoordinates(Coordinates basePosition) {
-		this.basePosition = new Coordinates(basePosition.getLatitude(), basePosition.getLongitude(),
-				basePosition.getAltitude());
 	}
 
 	/**
@@ -334,6 +332,10 @@ public class ManagedDrone extends Observable implements Runnable {
 	 */
 	public double getBatteryStatus() {
 		return drone.getBatteryStatus();
+	}
+
+	public Coordinates getBaseCoordinates() {
+		return drone.getBaseCoordinates();
 	}
 
 }

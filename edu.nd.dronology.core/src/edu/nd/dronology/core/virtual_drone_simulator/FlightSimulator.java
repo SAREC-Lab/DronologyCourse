@@ -20,12 +20,15 @@ public class FlightSimulator {
 	private double theta;
 	private Long previousDistance = 0L;
 
+	private VirtualDrone drone;
+
 	/**
 	 * Creates a flight simulator object for a single virtual drone
 	 * 
 	 * @param virtualDrone
 	 */
-	public FlightSimulator(VirtualDrone virtualDrone) {
+	public FlightSimulator(VirtualDrone drone) {
+		this.drone = drone;
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class FlightSimulator {
 
 		if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200) {
 			previousDistance = getRemainingDistance();
-			LOGGER.info("Waypoint reached");
+			LOGGER.info(drone.getDroneName() + " ==> Waypoint reached");
 			return false;
 		} else {
 			previousDistance = getRemainingDistance();

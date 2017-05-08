@@ -4,6 +4,7 @@ import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.virtual_drone_simulator.DroneVoltageSimulator;
 import edu.nd.dronology.core.virtual_drone_simulator.FlightSimulator;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -24,7 +25,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	 * 
 	 * @param drnName
 	 */
-	public VirtualDrone(String drnName) {
+	protected VirtualDrone(String drnName) {
 		super(drnName);
 		voltageSimulator = new DroneVoltageSimulator();
 		flightSimulator = new FlightSimulator(this);
@@ -43,6 +44,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 
 	@Override
 	public void flyTo(Coordinates targetCoordinates) {
+		NullUtil.checkNull(targetCoordinates);
 		flightSimulator.setFlightPath(currentPosition, targetCoordinates);
 	}
 

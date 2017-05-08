@@ -78,4 +78,10 @@ public interface IDrone {
 
 	public boolean isDestinationReached(int distanceMovedPerTimeStep);
 
+	void setBaseCoordinates(Coordinates basePosition);
+
+	public Coordinates getBaseCoordinates();
+	
+	
+
 }

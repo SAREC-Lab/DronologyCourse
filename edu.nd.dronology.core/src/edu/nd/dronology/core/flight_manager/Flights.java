@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.drones_runtime.DroneFleet;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.fleet_manager.DroneFleet;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -173,7 +173,7 @@ public class Flights {
 			FlightPlan awaitingFlightPlan = awaitingTakeOffFlights.get(0);
 			ManagedDrone drone = awaitingFlightPlan.getAssignedDrone();
 			if (safetyMgr.permittedToTakeOff(drone)) {
-				LOGGER.info(drone.getDroneName() + " taking off");
+				// LOGGER.info(drone.getDroneName() + " taking off");
 				drone.setTargetAltitude(awaitingFlightPlan.getStartLocation().getAltitude());
 				drone.takeOff();
 				moveAwaitingToCurrent(awaitingFlightPlan);
@@ -195,7 +195,7 @@ public class Flights {
 				if (drone.getFlightModeState().isOnGround()) {
 					safetyMgr.detachDrone(drone);
 					justLanded.add(flightPlan);
-					LOGGER.info("Drone " + drone.getDroneName() + " has landed.");
+					LOGGER.info(drone.getDroneName() + " ==>  has landed.");
 				}
 			}
 		}

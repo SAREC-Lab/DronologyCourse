@@ -2,9 +2,9 @@ package edu.nd.dronology.core.gui_middleware;
 
 import java.util.List;
 
+import edu.nd.dronology.core.drones_runtime.PhysicalDroneFleetFactory;
+import edu.nd.dronology.core.drones_runtime.VirtualDroneFleetFactory;
 import edu.nd.dronology.core.fleet_manager.DroneFleetFactory;
-import edu.nd.dronology.core.fleet_manager.PhysicalDroneFleetFactory;
-import edu.nd.dronology.core.fleet_manager.VirtualDroneFleetFactory;
 
 public class DronologySetupDronesAccessPoint {
 

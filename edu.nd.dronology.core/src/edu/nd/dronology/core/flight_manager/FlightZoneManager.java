@@ -3,8 +3,8 @@ package edu.nd.dronology.core.flight_manager;
 import java.util.List;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.drones_runtime.DroneFleet;
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.fleet_manager.DroneFleet;
 import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.core.zone_manager.FlightZoneException;
 import net.mv.logging.ILogger;

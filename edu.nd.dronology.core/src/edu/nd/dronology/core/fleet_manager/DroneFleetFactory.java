@@ -1,6 +1,7 @@
 package edu.nd.dronology.core.fleet_manager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.nd.dronology.core.drones_runtime.ManagedDrone;
 import edu.nd.dronology.core.utilities.Coordinates;
@@ -12,7 +13,7 @@ import edu.nd.dronology.core.utilities.Coordinates;
  *
  */
 public abstract class DroneFleetFactory {
-	private final ArrayList<ManagedDrone> drones = new ArrayList<>();
+	private final List<ManagedDrone> drones = new ArrayList<>();
 
 	public DroneFleetFactory() {
 	}
@@ -26,7 +27,7 @@ public abstract class DroneFleetFactory {
 	 * 
 	 * @return array list of iDrones
 	 */
-	public ArrayList<ManagedDrone> getDrones() {
+	public List<ManagedDrone> getDrones() {
 		return drones;
 	}
 
@@ -35,7 +36,7 @@ public abstract class DroneFleetFactory {
 			int altitude);
 
 	public void initializeDrone(String id, String type, Coordinates initialLocation) {
-		initializeDrone(id, type, initialLocation.getLatitude(), initialLocation.getLatitude(),
+		initializeDrone(id, type, initialLocation.getLatitude(), initialLocation.getLongitude(),
 				initialLocation.getAltitude());
 
 	}

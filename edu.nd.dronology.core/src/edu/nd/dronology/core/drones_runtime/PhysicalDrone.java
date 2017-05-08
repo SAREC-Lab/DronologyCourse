@@ -11,7 +11,7 @@ import edu.nd.dronology.core.zone_manager.FlightZoneException;
  */
 public class PhysicalDrone extends AbstractDrone implements IDrone, Runnable {
 
-	public PhysicalDrone(String drnName) {
+	protected PhysicalDrone(String drnName) {
 		super(drnName);
 	}
 
