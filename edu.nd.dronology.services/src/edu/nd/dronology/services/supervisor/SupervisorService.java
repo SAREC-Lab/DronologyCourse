@@ -42,6 +42,9 @@ public class SupervisorService extends AbstractServerService<ISupervisorServiceI
 		return serviceInstance.getFlightPathLocation();
 	}
 	
+	public String getDroneEquipmentLocation() {
+		return serviceInstance.getDroneEquipmentLocation();
+	}
 	
 
 	public String getWorkspaceLocation() {

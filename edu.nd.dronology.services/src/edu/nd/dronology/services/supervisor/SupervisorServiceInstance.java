@@ -96,6 +96,11 @@ public class SupervisorServiceInstance extends AbstractServiceInstance implement
 		return false;
 	}
 
+	@Override
+	public String getDroneEquipmentLocation() {
+		return WorkspaceInitializer.getInstance().getDroneEquipmentLocation();
+	}
+
 
 
 }

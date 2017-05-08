@@ -7,12 +7,18 @@ import java.util.List;
 
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractServerService;
+import edu.nd.dronology.services.core.remote.IDroneEquipmentRemoteService;
+import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightPathRemoteService;
 import edu.nd.dronology.services.core.remote.IRemoteManager;
 import edu.nd.dronology.services.core.remote.IRemoteServiceListener;
 import edu.nd.dronology.services.core.remote.IRemoteableService;
 import edu.nd.dronology.services.core.remote.RemoteInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.services.facades.DroneEquipmentServiceRemoteFacade;
+import edu.nd.dronology.services.facades.DroneSetupServiceRemoteFacade;
+import edu.nd.dronology.services.facades.FlightManagerServiceRemoteFacade;
 import edu.nd.dronology.services.facades.FlightPathServiceRemoteFacade;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -49,6 +55,21 @@ public class RemoteManager implements IRemoteManager {
 		if (service.equals(IFlightPathRemoteService.class)) {
 			return FlightPathServiceRemoteFacade.getInstance();
 		}
+		
+		
+		if (service.equals(IFlightManagerRemoteService.class)) {
+			return FlightManagerServiceRemoteFacade.getInstance();
+		}
+		
+		if (service.equals(IDroneSetupRemoteService.class)) {
+			return DroneSetupServiceRemoteFacade.getInstance();
+		}
+		
+		if (service.equals(IDroneEquipmentRemoteService.class)) {
+			return DroneEquipmentServiceRemoteFacade.getInstance();
+		}
+		
+		
 
 		throw new DronologyServiceException("Service" + service.getCanonicalName() + " not found!");
 

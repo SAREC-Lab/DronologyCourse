@@ -10,17 +10,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import edu.nd.dronology.core.utilities.Coordinates;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
 import edu.nd.dronology.services.core.info.FlightPathCategoryInfo;
 import edu.nd.dronology.services.core.info.FlightPathInfo;
+import edu.nd.dronology.services.core.items.IFlightPath;
+import edu.nd.dronology.services.core.persistence.FlightPathPersistenceProvider;
 import edu.nd.dronology.services.core.persistence.PersistenceException;
 import edu.nd.dronology.services.core.util.DronologyConstants;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.core.util.ServiceIds;
 import edu.nd.dronology.services.instances.DronologyElementFactory;
-import edu.nd.dronology.services.persistence.FlightPlanPersistenceProvider;
 import edu.nd.dronology.services.supervisor.SupervisorService;
 import edu.nd.dronology.util.FileUtil;
 import net.mv.logging.ILogger;
@@ -40,10 +42,11 @@ public class FlightPathServiceInstance extends AbstractFileTransmitServiceInstan
 	private Collection<FlightPathCategoryInfo> categories = new ArrayList<>();
 
 	public FlightPathServiceInstance() {
-		super(ServiceIds.SERVICE_ARTIFACTS, "FlightPath Management", EXTENSION);
+		super(ServiceIds.SERVICE_FLIGHTPATH, "FlightPath Management", EXTENSION);
 		
 		categories.add(new FlightPathCategoryInfo("South-Bend Area", "sba"));
 		categories.add(new FlightPathCategoryInfo("River", "river"));
+		categories.add(new FlightPathCategoryInfo("Default", "Default"));
 	}
 
 	@Override
@@ -80,7 +83,7 @@ public class FlightPathServiceInstance extends AbstractFileTransmitServiceInstan
 
 	@Override
 	public FlightPathInfo createItem() throws DronologyServiceException {
-		FlightPlanPersistenceProvider persistor = FlightPlanPersistenceProvider.getInstance();
+		FlightPathPersistenceProvider persistor = FlightPathPersistenceProvider.getInstance();
 		IFlightPath flightPath = DronologyElementFactory.createNewFlightPath();
 		flightPath.setName("New-FlightPath");
 		String savePath = FileUtil.concat(storagePath, flightPath.getId(), EXTENSION);
@@ -101,9 +104,13 @@ public class FlightPathServiceInstance extends AbstractFileTransmitServiceInstan
 
 	@Override
 	protected FlightPathInfo fromFile(String id, File file) throws Throwable {
-		IFlightPath atm = FlightPlanPersistenceProvider.getInstance().loadItem(file.toURI().toURL());
+		IFlightPath atm = FlightPathPersistenceProvider.getInstance().loadItem(file.toURI().toURL());
 		FlightPathInfo info = new FlightPathInfo(atm.getName(), id);
-
+		info.setCategory(atm.getCategory());
+		for(Coordinates c: atm.getCoordinates()){
+			info.addCoordinate(c);
+		}
+		
 //		Set<String> elementids = new HashSet<>();
 //		for (ISAMArtifactMapping mapping : atm.getArtifactMappings()) {
 //			for (IMappedItem itm : mapping.getMappedItems()) {
