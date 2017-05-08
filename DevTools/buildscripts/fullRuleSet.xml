@@ -45,7 +45,6 @@
    <rule ref="rulesets/java/design.xml/AvoidDeeplyNestedIfStmts"/>
    <rule ref="rulesets/apex/performance.xml/AvoidDmlStatementsInLoops"/>
    <rule ref="rulesets/java/naming.xml/AvoidDollarSigns"/>
-   <rule ref="rulesets/java/strings.xml/AvoidDuplicateLiterals"/>
    <rule ref="rulesets/java/migrating.xml/AvoidEnumAsIdentifier"/>
    <rule ref="rulesets/java/naming.xml/AvoidFieldNameMatchingMethodName"/>
    <rule ref="rulesets/java/naming.xml/AvoidFieldNameMatchingTypeName"/>
@@ -169,7 +168,6 @@
    <rule ref="rulesets/plsql/codesize.xml/ExcessiveTypeLength"/>
    <rule ref="rulesets/java/basic.xml/ExtendsObject"/>
    <rule ref="rulesets/java/design.xml/FieldDeclarationsShouldBeAtStartOfClass"/>
-   <rule ref="rulesets/java/design.xml/FinalFieldCouldBeStatic"/>
    <rule ref="rulesets/java/finalizers.xml/FinalizeDoesNotCallSuperFinalize"/>
    <rule ref="rulesets/java/finalizers.xml/FinalizeOnlyCallsSuperFinalize"/>
    <rule ref="rulesets/java/finalizers.xml/FinalizeOverloaded"/>
@@ -196,11 +194,6 @@
    <rule ref="rulesets/java/migrating.xml/IntegerInstantiation"/>
    <rule ref="rulesets/pom/basic.xml/InvalidDependencyTypes"/>
    <rule ref="rulesets/java/logging-java.xml/InvalidSlf4jMessageFormat"/>
-   <rule ref="rulesets/java/migrating.xml/JUnit4SuitesShouldUseSuiteAnnotation"/>
-   <rule ref="rulesets/java/migrating.xml/JUnit4TestShouldUseAfterAnnotation"/>
-   <rule ref="rulesets/java/migrating.xml/JUnit4TestShouldUseBeforeAnnotation"/>
-   <rule ref="rulesets/java/migrating.xml/JUnit4TestShouldUseTestAnnotation"/>
-   <rule ref="rulesets/java/junit.xml/JUnitAssertionsShouldIncludeMessage"/>
    <rule ref="rulesets/java/junit.xml/JUnitSpelling"/>
    <rule ref="rulesets/java/junit.xml/JUnitStaticSuite"/>
    <rule ref="rulesets/java/junit.xml/JUnitTestContainsTooManyAsserts"/>
@@ -258,7 +251,6 @@
    <rule ref="rulesets/java/design.xml/NonCaseLabelInSwitchStatement"/>
    <rule ref="rulesets/java/design.xml/NonStaticInitializer"/>
    <rule ref="rulesets/java/design.xml/NonThreadSafeSingleton"/>
-   <rule ref="rulesets/java/controversial.xml/NullAssignment"/>
    <rule ref="rulesets/java/controversial.xml/OneDeclarationPerLine"/>
    <!-- <rule ref="rulesets/java/controversial.xml/OnlyOneReturn"/>-->
    <rule ref="rulesets/java/design.xml/OptimizableToArrayCall"/>
@@ -301,7 +293,6 @@
    <rule ref="rulesets/java/strings.xml/StringBufferInstantiationWithChar"/>
    <rule ref="rulesets/java/strings.xml/StringInstantiation"/>
    <rule ref="rulesets/java/strings.xml/StringToString"/>
-   <rule ref="rulesets/java/naming.xml/SuspiciousConstantFieldName"/>
    <rule ref="rulesets/java/naming.xml/SuspiciousEqualsMethodName"/>
    <rule ref="rulesets/java/naming.xml/SuspiciousHashcodeMethodName"/>
    <rule ref="rulesets/java/controversial.xml/SuspiciousOctalEscape"/>

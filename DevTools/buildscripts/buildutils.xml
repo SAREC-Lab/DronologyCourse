@@ -16,6 +16,8 @@
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/xstream/xstream-1.4.9.jar"   todir="${build.dir}/lib" />
 
 
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/google/guava-20.0.jar"   todir="${build.dir}/lib" />
+
 
 
 	</target>
@@ -26,7 +28,11 @@
 	<target name="-copy-logger">
 		<copy file="${publish.dir}/${jar.logger}" tofile="${build.dir}/lib/${jar.logger}" overwrite="true" />
 	</target>
-	
+
+	<target name="-copy-core">
+		<copy file="${publish.dir}/${jar.core}" tofile="${build.dir}/lib/${jar.core}" overwrite="true" />
+	</target>
+
 	<target name="-copy-util">
 		<copy file="${publish.dir}/${jar.util}" tofile="${build.dir}/lib/${jar.util}" overwrite="true" />
 	</target>
