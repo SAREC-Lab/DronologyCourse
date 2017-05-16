@@ -1,10 +1,11 @@
 package edu.nd.dronology.services.core.persistence;
 
 import edu.nd.dronology.services.core.items.IDroneEquipment;
+import edu.nd.dronology.services.core.persistence.internal.DroneEquipmentXStreamPersistor;
 
 
 /**
- * Provider implementation for {@link IFlightPath}.<br>
+ * Provider implementation for {@link IFlightRoute}.<br>
  * Details see {@link AbstractItemPersistenceProvider}
  * 
  * @author Michael Vierhauser

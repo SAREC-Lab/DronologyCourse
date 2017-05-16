@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.dronology.core.gui_middleware.DroneStatus;
+import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.listener.IDroneStatusChangeListener;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -17,7 +17,7 @@ import edu.nd.dronology.services.core.util.DronologyServiceException;
 public interface IDroneSetupRemoteService extends IRemoteableService {
 
 	@Deprecated
-	void initializeDrones(List<String[]> newDrones, boolean b) throws RemoteException;
+	void initializeDrones(List<String[]> newDrones, boolean b) throws RemoteException, DronologyServiceException;
 
 	@Deprecated
 	Map<String, DroneStatus> getDrones() throws RemoteException;

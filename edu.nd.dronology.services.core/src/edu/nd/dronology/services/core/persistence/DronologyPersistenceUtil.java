@@ -2,18 +2,16 @@ package edu.nd.dronology.services.core.persistence;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.nd.dronology.services.core.items.IFlightRoute;
+
 public class DronologyPersistenceUtil {
 
-	private static final String PAIR_ALIAS = "Pair";
+	private static final String ROUTE_ALIAS = "FlightRoute";
 
-	
-	private static final String DR_FLIGHT_PLAN_ALIAS = "FlightPlan";
 
 	public static void preprocessStream(XStream xstream) {
 
-		//xstream.alias(PAIR_ALIAS, Pair.class);
-
-
+		xstream.alias(ROUTE_ALIAS, IFlightRoute.class);
 
 	}
 

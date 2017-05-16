@@ -3,7 +3,7 @@ package edu.nd.dronology.services.core.remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import edu.nd.dronology.core.utilities.Coordinates;
+import edu.nd.dronology.core.util.Coordinates;
 import edu.nd.dronology.services.core.info.FlightInfo;
 
 /**
