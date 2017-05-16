@@ -13,15 +13,15 @@ import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
 import edu.nd.dronology.services.core.info.DroneEquipmentInfo;
 import edu.nd.dronology.services.core.info.EquipmentTypeInfo;
 import edu.nd.dronology.services.core.items.IDroneEquipment;
-import edu.nd.dronology.services.core.items.IFlightPath;
+import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.services.core.persistence.DroneEquipmentPersistenceProvider;
-import edu.nd.dronology.services.core.persistence.FlightPathPersistenceProvider;
+import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
 import edu.nd.dronology.services.core.persistence.PersistenceException;
 import edu.nd.dronology.services.core.util.DronologyConstants;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.core.util.ServiceIds;
 import edu.nd.dronology.services.instances.DronologyElementFactory;
-import edu.nd.dronology.services.instances.flightpath.FlightPathService;
+import edu.nd.dronology.services.instances.flightroute.FlightRouteplanningService;
 import edu.nd.dronology.services.supervisor.SupervisorService;
 import edu.nd.dronology.util.FileUtil;
 import net.mv.logging.ILogger;
@@ -49,7 +49,7 @@ public class DronEquipmentServiceInstance extends AbstractFileTransmitServiceIns
 
 	@Override
 	protected Class<?> getServiceClass() {
-		return FlightPathService.class;
+		return FlightRouteplanningService.class;
 	}
 
 	@Override

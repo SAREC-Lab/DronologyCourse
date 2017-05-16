@@ -97,7 +97,11 @@ public class WorkspaceInitializer {
 	}
 
 	String getFlightPathLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_FLIGHTPATHS;
+		return root + "\\" + DronologyConstants.FOLDER_FLIGHTROUTE;
+	}
+	
+	public String getSimScenarioLocation() {
+		return root + "\\" + DronologyConstants.FOLDERN_SIM_SCENARIO;
 	}
 	
 	public String getDroneEquipmentLocation() {
@@ -116,7 +120,7 @@ public class WorkspaceInitializer {
 			return false;
 		}
 		switch (ext) {
-		case DronologyConstants.EXTENSION_FLIGHTPATH:
+		case DronologyConstants.EXTENSION_FLIGHTROUTE:
 			return importFlightPath(fileName, byteArray, overwrite);
 		default:
 			LOGGER.warn("File with extension '" + FileUtil.getExtension(fileName) + "' not processable");
@@ -138,6 +142,8 @@ public class WorkspaceInitializer {
 		}
 		return FileUtil.saveByteArrayToFile(f, content);
 	}
+
+
 
 
 }

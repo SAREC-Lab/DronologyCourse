@@ -3,7 +3,7 @@ package edu.nd.dronology.services.dronesetup;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.dronology.core.gui_middleware.DroneStatus;
+import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.services.core.base.AbstractServerService;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.listener.IDroneStatusChangeListener;
@@ -33,7 +33,7 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 		return new DroneSetupServiceInstance();
 	}
 
-	public void initializeDrones(List<String[]> newDrones, boolean b) {
+	public void initializeDrones(List<String[]> newDrones, boolean b) throws DronologyServiceException {
 		serviceInstance.initializeDrones(newDrones, b);
 
 	}
@@ -43,7 +43,7 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 
 	}
 
-	public void initializeDrones(DroneInitializationInfo[] info) throws DronologyServiceException {
+	public void initializeDrones(DroneInitializationInfo... info) throws DronologyServiceException {
 		serviceInstance.initializeDrones(info);
 	}
 

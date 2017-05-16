@@ -2,9 +2,9 @@ package edu.nd.dronology.services.info;
 
 import java.util.List;
 
-import edu.nd.dronology.core.flight_manager.FlightPlan;
 import edu.nd.dronology.core.flight_manager.Flights;
-import edu.nd.dronology.core.utilities.Coordinates;
+import edu.nd.dronology.core.flight_manager.IFlightPlan;
+import edu.nd.dronology.core.util.Coordinates;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
 
@@ -14,23 +14,23 @@ public class RemoteInfoFactory {
 
 		FlightInfo info = new FlightInfo("FlightInfo", "FlightInfo");
 
-		for (FlightPlan flt : flights.getCurrentFlights()) {
+		for (IFlightPlan flt : flights.getCurrentFlights()) {
 			FlightPlanInfo fpl = createPlanInfo(flt);
 			info.addCurrentFlight(fpl);
 
 		}
 
-		for (FlightPlan flt : flights.getAwaitingTakeOffFlights()) {
+		for (IFlightPlan flt : flights.getAwaitingTakeOffFlights()) {
 			FlightPlanInfo fpl = createPlanInfo(flt);
 			info.addAwaitingTakeoff(fpl);
 		}
 
-		for (FlightPlan flt : flights.getCompletedFlights()) {
+		for (IFlightPlan flt : flights.getCompletedFlights()) {
 			FlightPlanInfo fpl = createPlanInfo(flt);
 			info.addCompleted(fpl);
 		}
 
-		for (FlightPlan flt : flights.getPendingFlights()) {
+		for (IFlightPlan flt : flights.getPendingFlights()) {
 			FlightPlanInfo fpl = createPlanInfo(flt);
 			info.addPending(fpl);
 		}
@@ -39,7 +39,7 @@ public class RemoteInfoFactory {
 
 	}
 
-	private static FlightPlanInfo createPlanInfo(FlightPlan flt) {
+	private static FlightPlanInfo createPlanInfo(IFlightPlan flt) {
 		FlightPlanInfo flightPlanInfo = new FlightPlanInfo(flt.getFlightID(), flt.getFlightID());
 		String droneId = flt.getAssignedDrone() != null ? flt.getAssignedDrone().getDroneName() : "--";
 		List<Coordinates> waypoints = flt.getWayPoints();

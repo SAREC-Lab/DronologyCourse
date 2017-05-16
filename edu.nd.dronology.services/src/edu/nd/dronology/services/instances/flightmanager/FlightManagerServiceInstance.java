@@ -3,7 +3,7 @@ package edu.nd.dronology.services.instances.flightmanager;
 import java.util.List;
 
 import edu.nd.dronology.core.flight_manager.FlightZoneManager;
-import edu.nd.dronology.core.utilities.Coordinates;
+import edu.nd.dronology.core.util.Coordinates;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.util.FileManager;
