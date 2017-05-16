@@ -10,6 +10,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.nd.dronology.core.util.Coordinates;
+
 public class TestCoordinates {
 	
 	

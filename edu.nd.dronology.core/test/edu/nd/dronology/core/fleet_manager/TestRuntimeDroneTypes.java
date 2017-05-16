@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import edu.nd.dronology.core.flight_manager.SoloDirector;
+import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
 @RunWith(Parameterized.class)
 public class TestRuntimeDroneTypes {
 

@@ -3,8 +3,8 @@ package edu.nd.dronology.core.air_traffic_control;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.utilities.PointDelta;
+import edu.nd.dronology.core.util.PointDelta;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**
  * Safety manager is responsible for monitoring drone positions to ensure minimum safety distance is not violated

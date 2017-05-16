@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.fleet_manager;
 
-import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import edu.nd.dronology.core.exceptions.FlightZoneException;
 
 /**
  * This is a SINGLETON class. To get an instance call getInstance() Sets the runtime mode of FlightZone either as SIMULATION or PHYSICAL The mode may only be set one time during execution. Simulation

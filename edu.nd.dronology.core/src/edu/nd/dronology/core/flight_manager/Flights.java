@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
-import edu.nd.dronology.core.drones_runtime.DroneFleet;
-import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import edu.nd.dronology.core.exceptions.FlightZoneException;
+import edu.nd.dronology.core.fleet_manager.DroneFleetManager;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -20,10 +20,10 @@ public class Flights {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(Flights.class);
 
-	private List<FlightPlan> pendingFlights;
-	private List<FlightPlan> awaitingTakeOffFlights;
-	private List<FlightPlan> currentFlights;
-	private List<FlightPlan> completedFlights;
+	private List<IFlightPlan> pendingFlights;
+	private List<IFlightPlan> awaitingTakeOffFlights;
+	private List<IFlightPlan> currentFlights;
+	private List<IFlightPlan> completedFlights;
 	private static int maximumAllowedCurrentFlights = 2;
 	private DroneSeparationMonitor safetyMgr;
 	private boolean grounded = false;
@@ -57,8 +57,8 @@ public class Flights {
 
 		// Clear awaitingTakeOffFlights
 		// Deep copy
-		List<FlightPlan> tempList = new ArrayList<>(awaitingTakeOffFlights);
-		for (FlightPlan flightPlan : tempList) {
+		List<IFlightPlan> tempList = new ArrayList<>(awaitingTakeOffFlights);
+		for (IFlightPlan flightPlan : tempList) {
 			ManagedDrone drone = flightPlan.getAssignedDrone();
 			if (awaitingTakeOffFlights.contains(drone)) {
 				drone.unassignFlight();
@@ -69,7 +69,7 @@ public class Flights {
 		}
 
 		// Tell current Flights to return home
-		for (FlightPlan flightPlan : currentFlights) {
+		for (IFlightPlan flightPlan : currentFlights) {
 			ManagedDrone drone = flightPlan.getAssignedDrone();
 			if (drone.getFlightModeState().isFlying()) {
 				drone.returnToHome();
@@ -109,9 +109,9 @@ public class Flights {
 	 * 
 	 * @return the next available flight plan
 	 */
-	public FlightPlan getNextFlightPlan() {
+	public IFlightPlan getNextFlightPlan() {
 		if (!pendingFlights.isEmpty()) {
-			FlightPlan flightPlan = pendingFlights.remove(0);
+			IFlightPlan flightPlan = pendingFlights.remove(0);
 			awaitingTakeOffFlights.add(flightPlan);
 			return flightPlan;
 		}
@@ -122,7 +122,7 @@ public class Flights {
 	 * 
 	 * @return list of pending flights
 	 */
-	public List<FlightPlan> getPendingFlights() {
+	public List<IFlightPlan> getPendingFlights() {
 		return pendingFlights;
 	}
 
@@ -130,7 +130,7 @@ public class Flights {
 	 * 
 	 * @return list of flights awaiting permission to takeoff
 	 */
-	public List<FlightPlan> getAwaitingTakeOffFlights() {
+	public List<IFlightPlan> getAwaitingTakeOffFlights() {
 		return awaitingTakeOffFlights;
 	}
 
@@ -138,7 +138,7 @@ public class Flights {
 	 * 
 	 * @return arraylist of currently flying flights
 	 */
-	public List<FlightPlan> getCurrentFlights() {
+	public List<IFlightPlan> getCurrentFlights() {
 		return currentFlights;
 	}
 
@@ -146,7 +146,7 @@ public class Flights {
 	 * 
 	 * @return arraylist of completed flights
 	 */
-	public List<FlightPlan> getCompletedFlights() {
+	public List<IFlightPlan> getCompletedFlights() {
 		return completedFlights;
 	}
 
@@ -156,7 +156,7 @@ public class Flights {
 	 * @param flightPlan
 	 *          Flight plan to be added to pending flights
 	 */
-	public void addNewFlight(FlightPlan flightPlan) {
+	public void addNewFlight(IFlightPlan flightPlan) {
 		pendingFlights.add(flightPlan);
 	}
 
@@ -166,11 +166,11 @@ public class Flights {
 	 * @param droneFleet
 	 * @throws FlightZoneException
 	 */
-	public void checkForTakeOffReadiness(DroneFleet droneFleet) throws FlightZoneException {
+	public void checkForTakeOffReadiness(DroneFleetManager droneFleet) throws FlightZoneException {
 		// Technical debt.
 		// Checks first waiting drone each time it is called.
 		if (!awaitingTakeOffFlights.isEmpty()) {
-			FlightPlan awaitingFlightPlan = awaitingTakeOffFlights.get(0);
+			IFlightPlan awaitingFlightPlan = awaitingTakeOffFlights.get(0);
 			ManagedDrone drone = awaitingFlightPlan.getAssignedDrone();
 			if (safetyMgr.permittedToTakeOff(drone)) {
 				// LOGGER.info(drone.getDroneName() + " taking off");
@@ -187,9 +187,9 @@ public class Flights {
 	 * @param droneFleet
 	 * @param safetyMgr
 	 */
-	public void checkForLandedFlights(DroneFleet droneFleet, DroneSeparationMonitor safetyMgr) {
-		ArrayList<FlightPlan> justLanded = new ArrayList<>();
-		for (FlightPlan flightPlan : currentFlights) {
+	public void checkForLandedFlights(DroneFleetManager droneFleet, DroneSeparationMonitor safetyMgr) {
+		ArrayList<IFlightPlan> justLanded = new ArrayList<>();
+		for (IFlightPlan flightPlan : currentFlights) {
 			if (flightPlan.getAssignedDrone() != null) {
 				ManagedDrone drone = flightPlan.getAssignedDrone();
 				if (drone.getFlightModeState().isOnGround()) {
@@ -199,7 +199,7 @@ public class Flights {
 				}
 			}
 		}
-		for (FlightPlan flightPlan : justLanded) {
+		for (IFlightPlan flightPlan : justLanded) {
 			moveCurrentToCompleted(flightPlan);
 			ManagedDrone drone = flightPlan.getAssignedDrone();
 			droneFleet.returnDroneToAvailablePool(drone);
@@ -220,7 +220,7 @@ public class Flights {
 	 * @param flightPlan
 	 *          associated with the flight
 	 */
-	public void moveCurrentToCompleted(FlightPlan flightPlan) {
+	public void moveCurrentToCompleted(IFlightPlan flightPlan) {
 		if (currentFlights.contains(flightPlan)) {
 			currentFlights.remove(flightPlan);
 			completedFlights.add(flightPlan);
@@ -238,7 +238,7 @@ public class Flights {
 	 * @param flightPlan
 	 *          associated with flight
 	 */
-	public void moveAwaitingToCurrent(FlightPlan flightPlan) {
+	public void moveAwaitingToCurrent(IFlightPlan flightPlan) {
 		if (awaitingTakeOffFlights.contains(flightPlan)) {
 			awaitingTakeOffFlights.remove(flightPlan);
 			currentFlights.add(flightPlan);
@@ -251,7 +251,7 @@ public class Flights {
 	 * @param flightPlan
 	 *          associated with flight
 	 */
-	public void movePendingToAwaiting(FlightPlan flightPlan) {
+	public void movePendingToAwaiting(IFlightPlan flightPlan) {
 		if (pendingFlights.contains(flightPlan)) {
 			pendingFlights.remove(flightPlan);
 			awaitingTakeOffFlights.add(flightPlan);

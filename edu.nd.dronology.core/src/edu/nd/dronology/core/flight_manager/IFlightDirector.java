@@ -2,7 +2,7 @@ package edu.nd.dronology.core.flight_manager;
 
 import java.util.List;
 
-import edu.nd.dronology.core.utilities.Coordinates;
+import edu.nd.dronology.core.util.Coordinates;
 
 public interface IFlightDirector {
 	

@@ -2,11 +2,13 @@ package edu.nd.dronology.core.flight_manager;
 
 import java.util.List;
 
+import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
-import edu.nd.dronology.core.drones_runtime.DroneFleet;
-import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.utilities.Coordinates;
-import edu.nd.dronology.core.zone_manager.FlightZoneException;
+import edu.nd.dronology.core.exceptions.FlightZoneException;
+import edu.nd.dronology.core.fleet_manager.DroneFleetManager;
+import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
+import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -16,7 +18,7 @@ public class FlightZoneManager implements Runnable {
 
 	private Flights flights;
 	private DroneSeparationMonitor safetyMgr;
-	private DroneFleet droneFleet;
+	private DroneFleetManager droneFleet;
 
 	/**
 	 * Constructs a new FlightZoneManager.
@@ -24,12 +26,12 @@ public class FlightZoneManager implements Runnable {
 	 * @throws InterruptedException
 	 */
 	public FlightZoneManager() throws InterruptedException {
-		droneFleet = DroneFleet.getInstance();
+		droneFleet = DroneFleetManager.getInstance();
 		safetyMgr = new DroneSeparationMonitor();
 		flights = new Flights(safetyMgr);
 	}
 
-	public DroneFleet getDroneFleet() {
+	public DroneFleetManager getDroneFleet() {
 		return droneFleet; // replace with iterator later.
 	}
 
@@ -47,7 +49,7 @@ public class FlightZoneManager implements Runnable {
 	 * @param wayPoints
 	 */
 	public void planFlight(Coordinates start, List<Coordinates> wayPoints) {
-		FlightPlan flightPlan = new FlightPlan(start, wayPoints);
+		IFlightPlan flightPlan = FlightPlanFactory.create(start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}
 
@@ -73,7 +75,7 @@ public class FlightZoneManager implements Runnable {
 			ManagedDrone drone = droneFleet.getAvailableDrone();
 			if (drone != null) {
 				safetyMgr.attachDrone(drone);
-				FlightPlan flightPlan = flights.getNextFlightPlan();
+				IFlightPlan flightPlan = flights.getNextFlightPlan();
 				LOGGER.info(flightPlan.getFlightID());
 				IFlightDirector flightDirectives = new SoloDirector(drone);
 				flightDirectives.setWayPoints(flightPlan.getWayPoints());
@@ -89,6 +91,7 @@ public class FlightZoneManager implements Runnable {
 	 * Main run routine -- called internally. Launches a new flight if viable, and checks for flights which have landed. Launched flights run autonomously at one thread per drone.
 	 */
 	@Override
+	@Discuss(discuss="change from thread to listener based")
 	public void run() {
 		while (true) {
 			// Launch new flight if feasible

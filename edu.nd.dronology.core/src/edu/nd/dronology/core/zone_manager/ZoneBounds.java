@@ -1,6 +1,7 @@
 package edu.nd.dronology.core.zone_manager;
 
-import edu.nd.dronology.core.utilities.Coordinates;
+import edu.nd.dronology.core.exceptions.FlightZoneException;
+import edu.nd.dronology.core.util.Coordinates;
 
 /**
  * Establishes geographical zone for the simulation Singleton

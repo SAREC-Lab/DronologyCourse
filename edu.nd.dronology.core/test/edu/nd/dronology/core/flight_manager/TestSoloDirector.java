@@ -3,9 +3,10 @@ package edu.nd.dronology.core.flight_manager;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.drones_runtime.VirtualDrone;
-import edu.nd.dronology.core.utilities.Coordinates;
+import edu.nd.dronology.core.drones_runtime.internal.VirtualDrone;
+import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
+import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 public class TestSoloDirector {
 
