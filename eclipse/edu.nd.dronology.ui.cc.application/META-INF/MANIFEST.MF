@@ -19,7 +19,7 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.core.commands,
  edu.nd.dronology.ui.cc.images;bundle-version="0.1.0",
  net.mv.logging;bundle-version="0.1.0",
- edu.nd.dronology.ui.cc.lib;bundle-version="0.1.0",
+ edu.nd.dronology.ui.cc.libs;bundle-version="0.1.0",
  org.eclipse.e4.ui.css.swt.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: javax.annotation;version="1.0.0";resolution:=optional,
