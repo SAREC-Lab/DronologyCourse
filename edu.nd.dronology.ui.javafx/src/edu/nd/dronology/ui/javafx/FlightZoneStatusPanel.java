@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import edu.nd.dronology.core.flight_manager.internal.FlightPlan;
+import edu.nd.dronology.core.flight.internal.FlightPlan;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;

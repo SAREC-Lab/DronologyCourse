@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
+import edu.nd.dronology.core.flightzone.ZoneBounds;
 import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.DecimalDegreesToXYConverter;
 import edu.nd.dronology.core.util.DegreesFormatter;
-import edu.nd.dronology.core.zone_manager.ZoneBounds;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.ui.javafx.start.DronologyFXUIRunner;
 import javafx.animation.AnimationTimer;

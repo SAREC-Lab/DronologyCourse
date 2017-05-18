@@ -3,7 +3,7 @@ package edu.nd.dronology.ui.javafx.start;
 import java.util.ArrayList;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
@@ -60,7 +60,7 @@ public class DronologyFXUIRunner {
 		// This example shows three flight plans loading.
 		// We need a middleware class that listens for a GUI to submit a new flight -- and then makes a call onto FlightManager
 		// to load it. (Here I assume I have THE single flightManager instance.
-		ArrayList<Coordinates> flight = guiProxyLoadOneFlight();
+		ArrayList<Coordinate> flight = guiProxyLoadOneFlight();
 
 		IFlightRouteplanningRemoteService service;
 
@@ -89,27 +89,27 @@ public class DronologyFXUIRunner {
 	}
 
 	// Test load a flight
-	public ArrayList<Coordinates> guiProxyLoadOneFlight() {
-		ArrayList<Coordinates> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinates(42270485, -86200000, 10));
-		wayPoints.add(new Coordinates(42500000, -86150000, 10));
+	public ArrayList<Coordinate> guiProxyLoadOneFlight() {
+		ArrayList<Coordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new Coordinate(42270485, -86200000, 10));
+		wayPoints.add(new Coordinate(42500000, -86150000, 10));
 		return wayPoints;
 	}
 
 	// Test load a flight
-	public ArrayList<Coordinates> guiProxyLoadOneFlight2() {
-		ArrayList<Coordinates> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinates(41750881, -86180000, 10));
-		wayPoints.add(new Coordinates(42700000, -86200000, 10));
-		wayPoints.add(new Coordinates(42400000, -86165000, 10));
+	public ArrayList<Coordinate> guiProxyLoadOneFlight2() {
+		ArrayList<Coordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new Coordinate(41750881, -86180000, 10));
+		wayPoints.add(new Coordinate(42700000, -86200000, 10));
+		wayPoints.add(new Coordinate(42400000, -86165000, 10));
 		return wayPoints;
 	}
 
-	public ArrayList<Coordinates> guiProxyLoadOneFlight3() {
-		ArrayList<Coordinates> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinates(41730893, -86172481, 10));
-		wayPoints.add(new Coordinates(41731316, -86242201, 15));
-		wayPoints.add(new Coordinates(41730893, -86172587, 20));
+	public ArrayList<Coordinate> guiProxyLoadOneFlight3() {
+		ArrayList<Coordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new Coordinate(41730893, -86172481, 10));
+		wayPoints.add(new Coordinate(41731316, -86242201, 15));
+		wayPoints.add(new Coordinate(41730893, -86172587, 20));
 		return wayPoints;
 	}
 
