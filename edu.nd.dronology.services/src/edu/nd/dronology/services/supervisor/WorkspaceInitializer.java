@@ -76,7 +76,7 @@ public class WorkspaceInitializer {
 	}
 
 	private void prepareFlightPathWorkspace() {
-		String folderPath = getFlightPathLocation();
+		String folderPath = getFlightRouteLocation();
 		File f = new File(folderPath);
 		if (!f.exists()) {
 			f.mkdirs();
@@ -96,7 +96,7 @@ public class WorkspaceInitializer {
 		return root;
 	}
 
-	String getFlightPathLocation() {
+	String getFlightRouteLocation() {
 		return root + "\\" + DronologyConstants.FOLDER_FLIGHTROUTE;
 	}
 	
@@ -129,7 +129,7 @@ public class WorkspaceInitializer {
 	}
 
 	private boolean importFlightPath(String fileName, byte[] content, boolean overwrite) {
-		String location = getFlightPathLocation();
+		String location = getFlightRouteLocation();
 		String fName = location + "\\" + fileName;
 		return importFile(fName, content, overwrite);
 

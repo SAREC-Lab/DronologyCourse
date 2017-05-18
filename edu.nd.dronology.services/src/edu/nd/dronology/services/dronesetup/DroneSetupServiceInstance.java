@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.fleet_manager.AbstractDroneFleetFactory;
-import edu.nd.dronology.core.fleet_manager.PhysicalDroneFleetFactory;
-import edu.nd.dronology.core.fleet_manager.VirtualDroneFleetFactory;
-import edu.nd.dronology.core.flight_manager.FlightZoneManager;
+import edu.nd.dronology.core.fleet.AbstractDroneFleetFactory;
+import edu.nd.dronology.core.fleet.PhysicalDroneFleetFactory;
+import edu.nd.dronology.core.fleet.VirtualDroneFleetFactory;
+import edu.nd.dronology.core.flightzone.FlightZoneManager;
 import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;

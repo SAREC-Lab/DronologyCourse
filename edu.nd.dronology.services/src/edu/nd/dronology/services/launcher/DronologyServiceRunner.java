@@ -1,9 +1,9 @@
 package edu.nd.dronology.services.launcher;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
-import edu.nd.dronology.core.flight_manager.FlightZoneManager;
-import edu.nd.dronology.core.flight_manager.Flights;
+import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
+import edu.nd.dronology.core.flight.Flights;
+import edu.nd.dronology.core.flightzone.FlightZoneManager;
 import edu.nd.dronology.services.core.info.DroneEquipmentInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.dronesetup.DroneSetupService;

@@ -19,7 +19,7 @@ public class DroneSimulatorServiceRemoteFacade extends AbstractRemoteFacade impl
 	 */
 	private static final long serialVersionUID = -4580658378477037955L;
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSimulatorServiceRemoteFacade.class);
-	private static DroneSimulatorServiceRemoteFacade INSTANCE;
+	private static volatile DroneSimulatorServiceRemoteFacade INSTANCE;
 
 	protected DroneSimulatorServiceRemoteFacade() throws RemoteException {
 		super(DroneSimulatorService.getInstance());

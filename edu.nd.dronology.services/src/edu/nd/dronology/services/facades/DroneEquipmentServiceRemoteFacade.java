@@ -21,7 +21,7 @@ public class DroneEquipmentServiceRemoteFacade extends AbstractRemoteFacade impl
 	 */
 	private static final long serialVersionUID = -4580658378477037955L;
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneEquipmentServiceRemoteFacade.class);
-	private static DroneEquipmentServiceRemoteFacade INSTANCE;
+	private static volatile DroneEquipmentServiceRemoteFacade INSTANCE;
 
 	protected DroneEquipmentServiceRemoteFacade() throws RemoteException {
 		super(DroneEquipmentService.getInstance());
@@ -30,7 +30,11 @@ public class DroneEquipmentServiceRemoteFacade extends AbstractRemoteFacade impl
 	public static IDroneEquipmentRemoteService getInstance() throws RemoteException {
 		if (INSTANCE == null) {
 			try {
-				INSTANCE = new DroneEquipmentServiceRemoteFacade();
+				synchronized (DroneEquipmentServiceRemoteFacade.class) {
+					if (INSTANCE == null) {
+						INSTANCE = new DroneEquipmentServiceRemoteFacade();
+					}
+				}
 			} catch (RemoteException e) {
 				LOGGER.error(e);
 			}

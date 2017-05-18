@@ -70,7 +70,7 @@ public class SupervisorServiceInstance extends AbstractServiceInstance implement
 
 	@Override
 	public String getFlightPathLocation() {
-		return WorkspaceInitializer.getInstance().getFlightPathLocation();
+		return WorkspaceInitializer.getInstance().getFlightRouteLocation();
 	}
 
 

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
@@ -48,7 +48,7 @@ public class DroneSimulatorServiceInstance extends AbstractFileTransmitServiceIn
 	private Map<String, ISimulatorScenario> scenarios = new HashMap<>();
 
 	public DroneSimulatorServiceInstance() {
-		super(ServiceIds.SERVICE_FLIGHTPATH, "DroneSimulator Management", EXTENSION);
+		super(ServiceIds.SERVICE_SIMULATOR, "DroneSimulator Management", EXTENSION);
 
 		categories.add(new SimulatorScenarioCategoryInfo("Default", "Default"));
 
@@ -147,8 +147,8 @@ public class DroneSimulatorServiceInstance extends AbstractFileTransmitServiceIn
 
 			FlightRouteInfo info = FlightRouteplanningService.getInstance().getItem(path);
 
-			List<Coordinates> coordds = new ArrayList<>(info.getCoordinates());
-			Coordinates initPoint = coordds.remove(0);
+			List<Coordinate> coordds = new ArrayList<>(info.getCoordinates());
+			Coordinate initPoint = coordds.remove(0);
 			FlightManagerService.getInstance().planFlight(initPoint, coordds);
 		}
 

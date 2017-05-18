@@ -21,7 +21,7 @@ public class DroneSetupServiceRemoteFacade extends AbstractRemoteFacade implemen
 	 */
 	private static final long serialVersionUID = -4580658378477037955L;
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSetupServiceRemoteFacade.class);
-	private static DroneSetupServiceRemoteFacade INSTANCE;
+	private static volatile DroneSetupServiceRemoteFacade INSTANCE;
 
 	protected DroneSetupServiceRemoteFacade() throws RemoteException {
 		super(DroneSetupService.getInstance());
@@ -30,12 +30,17 @@ public class DroneSetupServiceRemoteFacade extends AbstractRemoteFacade implemen
 	public static IDroneSetupRemoteService getInstance() throws RemoteException {
 		if (INSTANCE == null) {
 			try {
-				INSTANCE = new DroneSetupServiceRemoteFacade();
+				synchronized (DroneSetupServiceRemoteFacade.class) {
+					if (INSTANCE == null) {
+						INSTANCE = new DroneSetupServiceRemoteFacade();
+					}
+				}
 			} catch (RemoteException e) {
 				LOGGER.error(e);
 			}
 		}
 		return INSTANCE;
+
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class DroneSetupServiceRemoteFacade extends AbstractRemoteFacade implemen
 	@Override
 	public void removeDroneStatusChangeListener(IDroneStatusChangeListener listener) {
 		DroneSetupService.getInstance().removeDroneStatusChangeListener(listener);
-		
+
 	}
 
 }

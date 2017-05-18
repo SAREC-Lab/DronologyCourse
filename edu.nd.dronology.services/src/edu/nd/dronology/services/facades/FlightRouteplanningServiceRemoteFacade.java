@@ -13,13 +13,14 @@ import edu.nd.dronology.services.remote.AbstractRemoteFacade;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class FlightRouteplanningServiceRemoteFacade extends AbstractRemoteFacade implements IFlightRouteplanningRemoteService {
+public class FlightRouteplanningServiceRemoteFacade extends AbstractRemoteFacade
+		implements IFlightRouteplanningRemoteService {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4580658378477037955L;
 	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightRouteplanningServiceRemoteFacade.class);
-	private static FlightRouteplanningServiceRemoteFacade INSTANCE;
+	private static volatile FlightRouteplanningServiceRemoteFacade INSTANCE;
 
 	protected FlightRouteplanningServiceRemoteFacade() throws RemoteException {
 		super(FlightRouteplanningService.getInstance());
@@ -28,7 +29,11 @@ public class FlightRouteplanningServiceRemoteFacade extends AbstractRemoteFacade
 	public static IFlightRouteplanningRemoteService getInstance() throws RemoteException {
 		if (INSTANCE == null) {
 			try {
-				INSTANCE = new FlightRouteplanningServiceRemoteFacade();
+				synchronized (FlightRouteplanningServiceRemoteFacade.class) {
+					if (INSTANCE == null) {
+						INSTANCE = new FlightRouteplanningServiceRemoteFacade();
+					}
+				}
 			} catch (RemoteException e) {
 				LOGGER.error(e);
 			}
@@ -43,7 +48,7 @@ public class FlightRouteplanningServiceRemoteFacade extends AbstractRemoteFacade
 
 	@Override
 	public void transmitToServer(String id, byte[] content) throws RemoteException, DronologyServiceException {
-		FlightRouteplanningService.getInstance().transmitToServer(id,content);
+		FlightRouteplanningService.getInstance().transmitToServer(id, content);
 
 	}
 

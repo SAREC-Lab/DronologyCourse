@@ -2,11 +2,12 @@ package edu.nd.dronology.services.instances.flightmanager;
 
 import java.util.List;
 
-import edu.nd.dronology.core.flight_manager.FlightZoneManager;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.flightzone.FlightZoneManager;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.util.FileManager;
+import edu.nd.dronology.services.core.util.ServiceIds;
 import edu.nd.dronology.services.info.RemoteInfoFactory;
 
 public class FlightManagerServiceInstance extends AbstractServiceInstance implements IFlightManagerServiceInstance {
@@ -14,7 +15,7 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	private FlightZoneManager flightManager;
 
 	public FlightManagerServiceInstance() {
-		super("FLIGHTMANAGER");
+		super(ServiceIds.SERVICE_FLIGHTMANAGER,"Flight Management");
 	}
 
 	@Override
@@ -48,7 +49,7 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	}
 
 	@Override
-	public void planFlight(Coordinates coordinates, List<Coordinates> flight) {
+	public void planFlight(Coordinate coordinates, List<Coordinate> flight) {
 		flightManager.planFlight(coordinates, flight);
 
 	}
