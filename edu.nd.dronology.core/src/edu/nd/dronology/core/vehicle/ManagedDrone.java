@@ -9,10 +9,10 @@ import com.google.common.util.concurrent.RateLimiter;
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.flight_manager.FlightDirectorFactory;
-import edu.nd.dronology.core.flight_manager.IFlightDirector;
-import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.flight.FlightDirectorFactory;
+import edu.nd.dronology.core.flight.IFlightDirector;
+import edu.nd.dronology.core.flight.internal.SoloDirector;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.util.NamedThreadFactory;
 import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
@@ -37,16 +37,18 @@ public class ManagedDrone extends Observable implements Runnable {
 			new NamedThreadFactory("ManagedDrone"));
 
 	private final IDrone drone; // Controls primitive flight commands for drone
+	
+	@Discuss(discuss="why does each drone has his on instance of that?")
 	private DroneSeparationMonitor safetyMgr;
-
-	private DroneFlightModeState droneState;
-	private DroneSafetyModeState droneSafetyState;
+	
+	private DroneFlightStateManager droneState;
+	private DroneSafetyStateManager droneSafetyState;
 
 	@Discuss(discuss = "do we need this here?")
 	private boolean missionCompleted = false;
 
 	@Discuss(discuss = "do we need this here?")
-	private Coordinates targetCoordinates = null;
+	private Coordinate targetCoordinates = null;
 
 	@Discuss(discuss = "should this be configurable?")
 	private static final int NORMAL_SLEEP = 1;
@@ -68,8 +70,8 @@ public class ManagedDrone extends Observable implements Runnable {
 	public ManagedDrone(IDrone drone) {
 		NullUtil.checkNull(drone);
 		this.drone = drone;// specify
-		droneState = new DroneFlightModeState();
-		droneSafetyState = new DroneSafetyModeState();
+		droneState = new DroneFlightStateManager();
+		droneSafetyState = new DroneSafetyStateManager();
 		drone.getDroneStatus().setStatus(droneState.getStatus());
 		this.flightDirector = FlightDirectorFactory.getFlightDirector(this); // Don't really want to create it here.
 	}
@@ -153,7 +155,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * 
 	 * @param targetCoordinates
 	 */
-	public void flyTo(Coordinates targetCoordinates) {
+	public void flyTo(Coordinate targetCoordinates) {
 		drone.flyTo(targetCoordinates);
 	}
 
@@ -162,7 +164,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * 
 	 * @return current coordinates
 	 */
-	public Coordinates getCoordinates() {
+	public Coordinate getCoordinates() {
 		return drone.getCoordinates();
 	}
 
@@ -263,7 +265,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * 
 	 * @return target coordinates
 	 */
-	public Coordinates getTargetCoordinates() {
+	public Coordinate getTargetCoordinates() {
 		return targetCoordinates;
 	}
 
@@ -308,7 +310,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * 
 	 * @return droneState
 	 */
-	public DroneFlightModeState getFlightModeState() {
+	public DroneFlightStateManager getFlightModeState() {
 		return droneState;
 	}
 
@@ -316,7 +318,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * 
 	 * @return current safety mode state
 	 */
-	public DroneSafetyModeState getFlightSafetyModeState() {
+	public DroneSafetyStateManager getFlightSafetyModeState() {
 		return droneSafetyState;
 	}
 
@@ -344,7 +346,7 @@ public class ManagedDrone extends Observable implements Runnable {
 		return drone.getBatteryStatus();
 	}
 
-	public Coordinates getBaseCoordinates() {
+	public Coordinate getBaseCoordinates() {
 		return drone.getBaseCoordinates();
 	}
 

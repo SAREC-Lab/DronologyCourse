@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.fleet_manager;
+package edu.nd.dronology.core.fleet;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 

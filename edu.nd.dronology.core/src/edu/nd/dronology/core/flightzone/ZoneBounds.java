@@ -1,7 +1,7 @@
-package edu.nd.dronology.core.zone_manager;
+package edu.nd.dronology.core.flightzone;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 /**
  * Establishes geographical zone for the simulation Singleton
@@ -61,7 +61,7 @@ public class ZoneBounds {
 	 * @return
 	 * @throws FlightZoneException
 	 */
-	public boolean inBounds(Coordinates coords) throws FlightZoneException {
+	public boolean inBounds(Coordinate coords) throws FlightZoneException {
 		if (westLongitude != 0 || eastLongitude != 0) { // Assume two longitude values must not both be zero if bounds are set.
 			// Check if in bounds
 			return true; // or false
@@ -110,8 +110,8 @@ public class ZoneBounds {
 	 * 
 	 * @return Coordinates representing the top left position
 	 */
-	public Coordinates getTopLeft() {
-		return new Coordinates(northLatitude, westLongitude, maxAltitude);
+	public Coordinate getTopLeft() {
+		return new Coordinate(northLatitude, westLongitude, maxAltitude);
 	}
 
 	/**

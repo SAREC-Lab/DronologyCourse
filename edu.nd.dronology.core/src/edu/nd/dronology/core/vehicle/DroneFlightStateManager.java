@@ -1,5 +1,6 @@
 package edu.nd.dronology.core.vehicle;
 
+import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 
 /**
@@ -10,10 +11,11 @@ import edu.nd.dronology.core.exceptions.FlightZoneException;
  * @version 0.01
  *
  */
-public class DroneFlightModeState {
-	// Status
+public class DroneFlightStateManager {
+
+@Discuss(discuss="in air_air mode not considered so far..needs to be included!")
 	private enum FlightMode {
-		ON_GROUND, AWAITING_TAKEOFF_CLEARANCE, TAKING_OFF, FLYING, LANDING
+		ON_GROUND, AWAITING_TAKEOFF_CLEARANCE, TAKING_OFF, FLYING,IN_AIR, LANDING
 	}
 
 	private FlightMode currentFlightMode = FlightMode.ON_GROUND;
@@ -21,13 +23,10 @@ public class DroneFlightModeState {
 	/**
 	 * Constructor States for both FlightMode and SafetyMode set to initial state
 	 */
-	public DroneFlightModeState() {
+	public DroneFlightStateManager() {
 		currentFlightMode = FlightMode.ON_GROUND;
 	}
 
-	/////////////////////
-	// Setters
-	/////////////////////
 	/**
 	 * Set Flight Mode to OnGround
 	 * 

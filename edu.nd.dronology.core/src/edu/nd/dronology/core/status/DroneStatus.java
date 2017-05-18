@@ -18,9 +18,6 @@ public class DroneStatus implements Serializable{
 	private Map<String,String> info;
 	private String status;
 
-	public String getStatus() {
-		return status;
-	}
 
 	public DroneStatus(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity){
 		this.ID = ID;
@@ -47,6 +44,10 @@ public class DroneStatus implements Serializable{
 	}
 	public void setStatus(String status){
 		this.status = status;
+	}
+	
+	public String getStatus() {
+		return status;
 	}
 	
 	public void updateCoordinates(long latitude, long longitude, int altitude){

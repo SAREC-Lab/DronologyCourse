@@ -7,7 +7,7 @@ package edu.nd.dronology.core.vehicle;
  * @version 0.01
  *
  */
-public class DroneSafetyModeState {
+public class DroneSafetyStateManager {
 
 	private enum SafetyMode {
 		DIVERTED, HALTED, NORMAL
@@ -18,7 +18,7 @@ public class DroneSafetyModeState {
 	/**
 	 * Constructor States for both FlightMode and SafetyMode set to initial state
 	 */
-	public DroneSafetyModeState() {
+	public DroneSafetyStateManager() {
 		safetyMode = SafetyMode.NORMAL;
 	}
 

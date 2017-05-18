@@ -1,10 +1,10 @@
-package edu.nd.dronology.core.fleet_manager;
+package edu.nd.dronology.core.fleet;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractDroneFleetFactory {
 	abstract public ManagedDrone initializeDrone(String DroneID, String DroneType, long latitude, long longitude,
 			int altitude) throws DroneException;
 
-	public void initializeDrone(String id, String type, Coordinates initialLocation) throws DroneException {
+	public void initializeDrone(String id, String type, Coordinate initialLocation) throws DroneException {
 		initializeDrone(id, type, initialLocation.getLatitude(), initialLocation.getLongitude(),
 				initialLocation.getAltitude());
 

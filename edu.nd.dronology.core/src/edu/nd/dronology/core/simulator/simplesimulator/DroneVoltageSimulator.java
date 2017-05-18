@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.simplesimulator;
+package edu.nd.dronology.core.simulator.simplesimulator;
 
 /**
  * Voltage simulator.  For every minute of flight, the battery decreases by 0.25 volts.
@@ -8,35 +8,35 @@ package edu.nd.dronology.core.simplesimulator;
 public class DroneVoltageSimulator {
 	
 	private double voltage;
-	private enum BatteryState {charging, depleting, stable}
-	private BatteryState batteryState = BatteryState.stable;
+	private enum BatteryState {CHARGING, DEPLETING, STABLE}
+	private BatteryState batteryState = BatteryState.STABLE;
 	private final double voltsDrainedPerMinute = 0.25;
    
 	private long checkPointTime;
 	
-	public DroneVoltageSimulator(){
+	protected DroneVoltageSimulator(){
 		voltage = 15.0;
 		checkPointTime = 0;
 	}
 	
 	public void rechargeBattery(){
-		batteryState = BatteryState.charging;
+		batteryState = BatteryState.CHARGING;
 		voltage = 15.0;
-		batteryState = BatteryState.stable;
+		batteryState = BatteryState.STABLE;
 	}
 	
 	public void startBatteryDrain(){
-		batteryState = BatteryState.depleting;
+		batteryState = BatteryState.DEPLETING;
 		checkPointTime = System.currentTimeMillis();
 	}
 	
 	public void stopBatteryDrain(){
 		checkPoint();
-		batteryState = BatteryState.stable;		
+		batteryState = BatteryState.STABLE;		
 	}
 	
 	public void checkPoint(){
-		if(batteryState == BatteryState.depleting){
+		if(batteryState == BatteryState.DEPLETING){
 			long timeSinceLastCheckPoint = System.currentTimeMillis() - checkPointTime;
 			if (timeSinceLastCheckPoint > 5000) {
 				checkPointTime = System.currentTimeMillis(); // Reset checkPoint time

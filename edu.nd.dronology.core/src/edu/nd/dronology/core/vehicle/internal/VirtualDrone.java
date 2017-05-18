@@ -1,9 +1,11 @@
-package edu.nd.dronology.core.drones_runtime.internal;
+package edu.nd.dronology.core.vehicle.internal;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.simplesimulator.DroneVoltageSimulator;
-import edu.nd.dronology.core.simplesimulator.FlightSimulator;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.simulator.IFlightSimulator;
+import edu.nd.dronology.core.simulator.SimulatorFactory;
+import edu.nd.dronology.core.simulator.simplesimulator.DroneVoltageSimulator;
+import edu.nd.dronology.core.simulator.simplesimulator.FlightSimulator;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.util.NullUtil;
@@ -19,8 +21,11 @@ import net.mv.logging.LoggerProvider;
 public class VirtualDrone extends AbstractDrone implements IDrone {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(VirtualDrone.class);
-	private DroneVoltageSimulator voltageSimulator;
-	private FlightSimulator flightSimulator;
+//	private DroneVoltageSimulator voltageSimulator;
+//	private FlightSimulator flightSimulator;
+	
+	IFlightSimulator simulator;
+	
 
 	/**
 	 * Constructs drone without specifying its current position. This will be used by the physical drone (later) where positioning status will be acquired from the drone.
@@ -29,14 +34,15 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	 */
 	public VirtualDrone(String drnName) {
 		super(drnName);
-		voltageSimulator = new DroneVoltageSimulator();
-		flightSimulator = new FlightSimulator(this);
+		simulator =SimulatorFactory.getSimulator();
+//		voltageSimulator = new DroneVoltageSimulator();
+//		flightSimulator = new FlightSimulator(this);
 	}
 
 	@Override
 	public void takeOff(int targetAltitude) throws FlightZoneException {
-		voltageSimulator.startBatteryDrain();
-		droneStatus.updateBatteryLevel(voltageSimulator.getVoltage()); // Need more incremental drain!!
+		simulator.startBatteryDrain();
+		droneStatus.updateBatteryLevel(simulator.getVoltage()); // Need more incremental drain!!
 		try {
 			Thread.sleep(targetAltitude * 100); // Simulates attaining height. Later move to simulator.
 		} catch (InterruptedException e) {
@@ -45,9 +51,9 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public void flyTo(Coordinates targetCoordinates) {
+	public void flyTo(Coordinate targetCoordinates) {
 		NullUtil.checkNull(targetCoordinates);
-		flightSimulator.setFlightPath(currentPosition, targetCoordinates);
+		simulator.setFlightPath(currentPosition, targetCoordinates);
 	}
 
 	@Override
@@ -57,21 +63,21 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 		} catch (InterruptedException e) {
 			LOGGER.error(e);
 		}
-		voltageSimulator.checkPoint();
-		voltageSimulator.stopBatteryDrain();
+		simulator.checkPoint();
+		simulator.stopBatteryDrain();
 	}
 
 	@Override
 	public double getBatteryStatus() {
-		droneStatus.updateBatteryLevel(voltageSimulator.getVoltage());
-		return voltageSimulator.getVoltage();
+		droneStatus.updateBatteryLevel(simulator.getVoltage());
+		return simulator.getVoltage();
 	}
 
 	@Override
 	public boolean move(int i) { // ALSO NEEDS THINKING ABOUT FOR non-VIRTUAL
 		// System.out.println("Trying to move: " + droneName);
 		getBatteryStatus();
-		boolean moveStatus = flightSimulator.move(10);
+		boolean moveStatus = simulator.move(10);
 		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());
 		// DroneCollectionStatus.getInstance().testStatus();
 		return moveStatus;
@@ -79,13 +85,13 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 
 	@Override
 	public void setVoltageCheckPoint() {
-		voltageSimulator.checkPoint();
+		simulator.checkPoint();
 
 	}
 
 	@Override
 	public boolean isDestinationReached(int distanceMovedPerTimeStep) {
-		return flightSimulator.isDestinationReached(distanceMovedPerTimeStep);
+		return simulator.isDestinationReached(distanceMovedPerTimeStep);
 	}
 
 }

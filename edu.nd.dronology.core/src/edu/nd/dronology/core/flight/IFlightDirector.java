@@ -1,21 +1,21 @@
-package edu.nd.dronology.core.flight_manager;
+package edu.nd.dronology.core.flight;
 
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 public interface IFlightDirector {
 	
-	public void returnHome(Coordinates home);
+	public void returnHome(Coordinate home);
 	
 		
-	public Coordinates flyToNextPoint();
+	public Coordinate flyToNextPoint();
 
 	/**
 	 * Set a series of waypoints.
 	 * @param wayPoints
 	 */
-	void setWayPoints(List<Coordinates> wayPoints);
+	void setWayPoints(List<Coordinate> wayPoints);
 
 	/**
 	 * Clear all waypoints
@@ -26,7 +26,7 @@ public interface IFlightDirector {
 	 * Creates a roundabout as a diversion
 	 * @param roundAboutPoints
 	 */
-	void setRoundabout(List<Coordinates> roundAboutPoints);
+	void setRoundabout(List<Coordinate> roundAboutPoints);
 	
 	/** 
 	 * Check if more waypoints exist
@@ -50,7 +50,7 @@ public interface IFlightDirector {
 	 * Add a waypoint to the flight directive.
 	 * @param wayPoint
 	 */
-	void addWayPoint(Coordinates wayPoint);
+	void addWayPoint(Coordinate wayPoint);
 
 	void flyHome();
 

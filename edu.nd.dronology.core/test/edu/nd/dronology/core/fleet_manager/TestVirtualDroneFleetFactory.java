@@ -7,9 +7,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.nd.dronology.core.drones_runtime.internal.VirtualDrone;
 import edu.nd.dronology.core.exceptions.DroneException;
+import edu.nd.dronology.core.fleet.VirtualDroneFleetFactory;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
+import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 
 public class TestVirtualDroneFleetFactory {
 

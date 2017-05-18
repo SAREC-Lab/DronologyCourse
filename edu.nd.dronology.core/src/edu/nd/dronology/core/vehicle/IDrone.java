@@ -2,7 +2,7 @@ package edu.nd.dronology.core.vehicle;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 /**
  * iDrone interface
@@ -36,13 +36,13 @@ public interface IDrone {
 	 * Fly drone to target coordinates
 	 * @param targetCoordinates
 	 */
-	public void flyTo(Coordinates targetCoordinates);
+	public void flyTo(Coordinate targetCoordinates);
 
 	/**
 	 * 
 	 * @return current coordinates
 	 */
-	public Coordinates getCoordinates();
+	public Coordinate getCoordinates();
 
 	/**
 	 * 
@@ -78,9 +78,9 @@ public interface IDrone {
 
 	public boolean isDestinationReached(int distanceMovedPerTimeStep);
 
-	void setBaseCoordinates(Coordinates basePosition);
+	void setBaseCoordinates(Coordinate basePosition);
 
-	public Coordinates getBaseCoordinates();
+	public Coordinate getBaseCoordinates();
 	
 	
 

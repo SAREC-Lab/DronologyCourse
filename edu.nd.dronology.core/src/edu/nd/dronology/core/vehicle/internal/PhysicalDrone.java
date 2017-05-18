@@ -1,7 +1,7 @@
-package edu.nd.dronology.core.drones_runtime.internal;
+package edu.nd.dronology.core.vehicle.internal;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 
@@ -24,7 +24,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, Runnable {
 	}
 
 	@Override
-	public void flyTo(Coordinates targetCoordinates) {
+	public void flyTo(Coordinate targetCoordinates) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -2,7 +2,7 @@ package edu.nd.dronology.core.vehicle;
 
 import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.util.NullUtil;
 
 /**
@@ -14,10 +14,8 @@ import edu.nd.dronology.util.NullUtil;
  */
 public abstract class AbstractDrone implements IDrone {
 
-	private Coordinates basePosition; // In current version drones always return to base at the end of their flights.
-
-	protected Coordinates currentPosition;
-
+	private Coordinate basePosition; // In current version drones always return to base at the end of their flights.
+	protected Coordinate currentPosition;
 	protected final String droneName;
 	protected DroneStatus droneStatus; // PHY
 
@@ -31,7 +29,7 @@ public abstract class AbstractDrone implements IDrone {
 
 	@Override
 	public void setCoordinates(long lat, long lon, int alt) { // For physical drone this must be set by reading position
-		currentPosition = new Coordinates(lat, lon, alt);
+		currentPosition = new Coordinate(lat, lon, alt);
 		droneStatus.updateCoordinates(lat, lon, alt);
 	}
 
@@ -51,7 +49,7 @@ public abstract class AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public Coordinates getCoordinates() {
+	public Coordinate getCoordinates() {
 		return currentPosition;
 	}
 
@@ -71,8 +69,8 @@ public abstract class AbstractDrone implements IDrone {
 	 * @param basePosition
 	 */
 	@Override
-	public void setBaseCoordinates(Coordinates basePosition) {
-		this.basePosition = new Coordinates(basePosition.getLatitude(), basePosition.getLongitude(),
+	public void setBaseCoordinates(Coordinate basePosition) {
+		this.basePosition = new Coordinate(basePosition.getLatitude(), basePosition.getLongitude(),
 				basePosition.getAltitude());
 	}
 
@@ -82,7 +80,7 @@ public abstract class AbstractDrone implements IDrone {
 	 * @return base coordinates
 	 */
 	@Override
-	public Coordinates getBaseCoordinates() {
+	public Coordinate getBaseCoordinates() {
 		return basePosition;
 	}
 

@@ -3,7 +3,6 @@ package edu.nd.dronology.core.air_traffic_control;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.util.PointDelta;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**

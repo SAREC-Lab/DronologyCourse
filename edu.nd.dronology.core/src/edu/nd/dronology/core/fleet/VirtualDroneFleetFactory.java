@@ -1,10 +1,10 @@
-package edu.nd.dronology.core.fleet_manager;
+package edu.nd.dronology.core.fleet;
 
-import edu.nd.dronology.core.drones_runtime.internal.VirtualDrone;
 import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
+import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 
 public class VirtualDroneFleetFactory extends AbstractDroneFleetFactory {
 
@@ -29,7 +29,7 @@ public class VirtualDroneFleetFactory extends AbstractDroneFleetFactory {
 	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude) throws DroneException {
 		IDrone drone = new VirtualDrone(createDroneID(droneID));
 		ManagedDrone managedDrone = new ManagedDrone(drone);
-		Coordinates currentPosition = new Coordinates(latitude, longitude, altitude);
+		Coordinate currentPosition = new Coordinate(latitude, longitude, altitude);
 		drone.setBaseCoordinates(currentPosition);
 		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		managedDrone.start();

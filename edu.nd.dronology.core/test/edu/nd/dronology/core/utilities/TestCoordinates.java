@@ -10,22 +10,22 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 public class TestCoordinates {
 	
 	
-	private Coordinates c1;
-	private Coordinates c2;
-	private Coordinates c4;
+	private Coordinate c1;
+	private Coordinate c2;
+	private Coordinate c4;
 
 
 
 	@Before
 	public void setUp() throws Exception {
-		c1 = new Coordinates(1, 2, 3);
-		c2	= new Coordinates(2, 3, 4);
-		c4 = new Coordinates(2, 3, 4);
+		c1 = new Coordinate(1, 2, 3);
+		c2	= new Coordinate(2, 3, 4);
+		c4 = new Coordinate(2, 3, 4);
 	}
 
 	
@@ -43,7 +43,7 @@ public class TestCoordinates {
 	
 	@Test
 	public void testEqualsInHashCollection() {
-		Set<Coordinates> cord = new HashSet<>();
+		Set<Coordinate> cord = new HashSet<>();
 		cord.add(c1);
 		cord.add(c2);
 		cord.add(c4);

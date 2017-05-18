@@ -1,11 +1,11 @@
-package edu.nd.dronology.core.flight_manager;
+package edu.nd.dronology.core.flight;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.fleet_manager.DroneFleetManager;
+import edu.nd.dronology.core.fleet.DroneFleetManager;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;

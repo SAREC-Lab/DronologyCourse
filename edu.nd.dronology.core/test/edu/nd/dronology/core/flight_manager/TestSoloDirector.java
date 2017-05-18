@@ -3,10 +3,10 @@ package edu.nd.dronology.core.flight_manager;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.nd.dronology.core.drones_runtime.internal.VirtualDrone;
-import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.flight.internal.SoloDirector;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
+import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 
 public class TestSoloDirector {
 
@@ -28,7 +28,7 @@ public class TestSoloDirector {
 	 */
 	@Test(expected = Exception.class)
 	public void testReturnHomeWithWrongCoordinates() {
-		testInstance.returnHome(new Coordinates(1, 2, 3));
+		testInstance.returnHome(new Coordinate(1, 2, 3));
 
 	}
 

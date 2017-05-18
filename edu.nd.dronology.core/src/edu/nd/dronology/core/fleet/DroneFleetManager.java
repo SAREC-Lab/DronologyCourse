@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.fleet_manager;
+package edu.nd.dronology.core.fleet;
 
 import java.util.ArrayList;
 import java.util.List;

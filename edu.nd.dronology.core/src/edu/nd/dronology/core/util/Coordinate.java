@@ -13,7 +13,7 @@ package edu.nd.dronology.core.util;
 
 import java.io.Serializable;
 
-public class Coordinates implements Serializable{
+public class Coordinate implements Serializable{
 	/**
 	 * 
 	 */
@@ -27,7 +27,7 @@ public class Coordinates implements Serializable{
 	 * @param lon Longitude in signed degrees format (DDD.ddd) Example: -86.226880
 	 * @param alt Altitude in meters.  Default is 0.  Altitude is always relative to launch altitude.
 	 */
-	public Coordinates(long lat, long lon, int alt){
+	public Coordinate(long lat, long lon, int alt){
 		setAltitude(alt);
 		setLatitude(lat);
 		setLongitude(lon);
@@ -100,12 +100,12 @@ public class Coordinates implements Serializable{
  
         /* Check if o is an instance of Coordinate or not
           "null instanceof [type]" also returns false */
-        if (!(o instanceof Coordinates)) {
+        if (!(o instanceof Coordinate)) {
             return false;
         }
          
         // typecast o to Coordinate so that we can compare data members 
-        Coordinates coord = (Coordinates) o; 
+        Coordinate coord = (Coordinate) o; 
         if(coord.altitude==this.altitude &&
         		coord.latitude== this.latitude &&
         		coord.longitude==this.longitude)

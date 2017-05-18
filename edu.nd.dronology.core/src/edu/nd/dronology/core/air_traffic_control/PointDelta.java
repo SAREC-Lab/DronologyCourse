@@ -1,4 +1,6 @@
-package edu.nd.dronology.core.util;
+package edu.nd.dronology.core.air_traffic_control;
+
+import edu.nd.dronology.core.util.Coordinate;
 
 /**
  * Performs basic drone trigonometry
@@ -8,11 +10,11 @@ package edu.nd.dronology.core.util;
  *
  */
 public class PointDelta {
-	private static long computeLatitudeDelta(Coordinates currentPosition, Coordinates targetPosition) {
+	private static long computeLatitudeDelta(Coordinate currentPosition, Coordinate targetPosition) {
 		return currentPosition.getLatitude() - targetPosition.getLatitude();
 	}
 
-	private static long computeLongitudeDelta(Coordinates currentPosition, Coordinates targetPosition) {
+	private static long computeLongitudeDelta(Coordinate currentPosition, Coordinate targetPosition) {
 		return currentPosition.getLongitude() - targetPosition.getLongitude();
 	}
 
@@ -22,7 +24,7 @@ public class PointDelta {
 	 * @param targetPosition
 	 * @return
 	 */
-	public static double computeAngle(Coordinates currentPosition, Coordinates targetPosition) {
+	public static double computeAngle(Coordinate currentPosition, Coordinate targetPosition) {
 		double height = (computeLatitudeDelta(currentPosition, targetPosition)); // opposite
 		double hypotenuse = getRemainingDistance(currentPosition, targetPosition);
 		double sinTheta = height / hypotenuse;
@@ -36,7 +38,7 @@ public class PointDelta {
 	 * @param targetPosition
 	 * @return
 	 */
-	public static long getRemainingDistance(Coordinates currentPosition, Coordinates targetPosition) {
+	public static long getRemainingDistance(Coordinate currentPosition, Coordinate targetPosition) {
 		return (long) Math.sqrt(Math.pow(computeLongitudeDelta(currentPosition, targetPosition), 2)
 				+ Math.pow(computeLatitudeDelta(currentPosition, targetPosition), 2));
 	}

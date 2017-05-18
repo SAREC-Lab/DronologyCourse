@@ -1,10 +1,10 @@
-package edu.nd.dronology.core.flight_manager.internal;
+package edu.nd.dronology.core.flight.internal;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.flight_manager.IFlightDirector;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.flight.IFlightDirector;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -22,12 +22,12 @@ public class SoloDirector implements IFlightDirector {
 
 	private ManagedDrone drone;
 	private boolean safetyDiversion = false;
-	private Coordinates targetPosition = null;
-	private List<Coordinates> wayPoints = new ArrayList<>();
-	private List<Coordinates> roundaboutPath = new ArrayList<>();
+	private Coordinate targetPosition = null;
+	private List<Coordinate> wayPoints = new ArrayList<>();
+	private List<Coordinate> roundaboutPath = new ArrayList<>();
 
 	@Override
-	public Coordinates flyToNextPoint() {
+	public Coordinate flyToNextPoint() {
 		// targetCoordinates = flightDirector.flyToNextPoint();// Case: Drone is under safety directives and on a roundabout.
 
 		if (onRoundabout()) {
@@ -54,7 +54,7 @@ public class SoloDirector implements IFlightDirector {
 	 * @see controller.movement.iFlightDirector#setWayPoints(java.util.ArrayList)
 	 */
 	@Override
-	public void setWayPoints(List<Coordinates> wayPoints) {
+	public void setWayPoints(List<Coordinate> wayPoints) {
 		this.wayPoints = new ArrayList<>(wayPoints);
 	}
 
@@ -78,19 +78,19 @@ public class SoloDirector implements IFlightDirector {
 		return !wayPoints.isEmpty();
 	}
 
-	private Coordinates flyToNextWayPoint() {
+	private Coordinate flyToNextWayPoint() {
 		// System.out.println("Trying to fly to next way point");
 		if (!wayPoints.isEmpty()) {
-			Coordinates nextWayPoint = wayPoints.get(0); // Always get the top one
+			Coordinate nextWayPoint = wayPoints.get(0); // Always get the top one
 			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points
 			return nextWayPoint;
 		}
 		return null;
 	}
 
-	private Coordinates flyRoundAbout() {
+	private Coordinate flyRoundAbout() {
 		if (!wayPoints.isEmpty()) {
-			Coordinates nextWayPoint = roundaboutPath.get(0); // Always get the top one
+			Coordinate nextWayPoint = roundaboutPath.get(0); // Always get the top one
 			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points
 			return nextWayPoint;
 		}
@@ -125,18 +125,18 @@ public class SoloDirector implements IFlightDirector {
 	}
 
 	@Override
-	public void addWayPoint(Coordinates wayPoint) {
+	public void addWayPoint(Coordinate wayPoint) {
 		wayPoints.add(wayPoint);
 	}
 
 	// NEED TO SPLIT THIS INTO A DIFFERENT INTERFACE!!! Roundabout Interface.
 	@Override
-	public void setRoundabout(List<Coordinates> roundAboutPoints) {
+	public void setRoundabout(List<Coordinate> roundAboutPoints) {
 		if (!isUnderSafetyDirectives()) {
 			safetyDiversion = true;
 			roundaboutPath = roundAboutPoints;
 			// Start the roundabout
-			Coordinates nextWayPoint = roundaboutPath.get(0); // Always get the top one
+			Coordinate nextWayPoint = roundaboutPath.get(0); // Always get the top one
 			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points
 
 		}
@@ -149,11 +149,11 @@ public class SoloDirector implements IFlightDirector {
 	}
 
 	@Override
-	public void returnHome(Coordinates home) {
+	public void returnHome(Coordinate home) {
 		addWayPoint(home);
-		ArrayList<Coordinates> tempWayPoints = new ArrayList<>(wayPoints);
+		ArrayList<Coordinate> tempWayPoints = new ArrayList<>(wayPoints);
 
-		for (Coordinates wayPoint : tempWayPoints) {
+		for (Coordinate wayPoint : tempWayPoints) {
 			if (!wayPoint.equals(home)) {
 				wayPoints.remove(wayPoint);
 			}

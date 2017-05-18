@@ -1,6 +1,6 @@
-package edu.nd.dronology.core.flight_manager;
+package edu.nd.dronology.core.flight;
 
-import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
+import edu.nd.dronology.core.flight.internal.SoloDirector;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 public class FlightDirectorFactory {

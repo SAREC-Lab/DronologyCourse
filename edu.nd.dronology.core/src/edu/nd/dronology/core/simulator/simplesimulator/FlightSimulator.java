@@ -1,7 +1,6 @@
-package edu.nd.dronology.core.simplesimulator;
+package edu.nd.dronology.core.simulator.simplesimulator;
 
-import edu.nd.dronology.core.drones_runtime.internal.VirtualDrone;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -11,24 +10,24 @@ import net.mv.logging.LoggerProvider;
  * @author Jane Cleland-Huang
  * @version 0.1
  */
-public class FlightSimulator {
+public class FlightSimulator  {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightSimulator.class);
 
-	private Coordinates currentPosition;
-	private Coordinates targetPosition;
+	private Coordinate currentPosition;
+	private Coordinate targetPosition;
 	private double theta;
 	private Long previousDistance = 0L;
 
-	private VirtualDrone drone;
+	//private VirtualDrone drone;
 
 	/**
 	 * Creates a flight simulator object for a single virtual drone
 	 * 
-	 * @param virtualDrone
+	 * @param drone
 	 */
-	public FlightSimulator(VirtualDrone drone) {
-		this.drone = drone;
+	protected FlightSimulator() {
+	//	this.drone = drone;
 	}
 
 	/**
@@ -39,7 +38,7 @@ public class FlightSimulator {
 	 * @param targetPos
 	 *          Coordinates of target position
 	 */
-	public void setFlightPath(Coordinates currentPos, Coordinates targetPos) {
+	public void setFlightPath(Coordinate currentPos, Coordinate targetPos) {
 		this.currentPosition = currentPos;
 		this.targetPosition = targetPos;
 		previousDistance = getRemainingDistance();
@@ -113,7 +112,7 @@ public class FlightSimulator {
 
 		if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200) {
 			previousDistance = getRemainingDistance();
-			LOGGER.info(drone.getDroneName() + " ==> Waypoint reached");
+			//LOGGER.info(drone.getDroneName() + " ==> Waypoint reached");
 			return false;
 		} else {
 			previousDistance = getRemainingDistance();

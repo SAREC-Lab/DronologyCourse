@@ -1,11 +1,11 @@
-package edu.nd.dronology.core.flight_manager.internal;
+package edu.nd.dronology.core.flight.internal;
 
 import java.util.Collections;
 import java.util.List;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.flight_manager.IFlightPlan;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.flight.IFlightPlan;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**
@@ -19,9 +19,9 @@ public class FlightPlan implements IFlightPlan{
 	private static int flightNumber = 0;
 	private String flightID;
 
-	private List<Coordinates> wayPoints;
-	private Coordinates startLocation;
-	private Coordinates endLocation;
+	private List<Coordinate> wayPoints;
+	private Coordinate startLocation;
+	private Coordinate endLocation;
 	private Status status;
 	private ManagedDrone drone = null;
 
@@ -45,7 +45,7 @@ public class FlightPlan implements IFlightPlan{
 	 *          Starting coordinates
 	 * @param wayPoints
 	 */
-	public FlightPlan(Coordinates start, List<Coordinates> wayPoints) {
+	public FlightPlan(Coordinate start, List<Coordinate> wayPoints) {
 		this.wayPoints = wayPoints;
 		this.startLocation = start;
 		if (wayPoints.size() > 0) {
@@ -71,7 +71,7 @@ public class FlightPlan implements IFlightPlan{
 	 * @return Starting Coordinates
 	 */
 	@Override
-	public Coordinates getStartLocation() {
+	public Coordinate getStartLocation() {
 		return startLocation;
 	}
 
@@ -80,7 +80,7 @@ public class FlightPlan implements IFlightPlan{
 	 * @return Ending Coordinates
 	 */
 	@Override
-	public Coordinates getEndLocation() {
+	public Coordinate getEndLocation() {
 		return endLocation;
 	}
 
@@ -154,7 +154,7 @@ public class FlightPlan implements IFlightPlan{
 	 * @return List<Coordinates>
 	 */
 	@Override
-	public List<Coordinates> getWayPoints() {
+	public List<Coordinate> getWayPoints() {
 		return Collections.unmodifiableList(wayPoints);
 	}
 

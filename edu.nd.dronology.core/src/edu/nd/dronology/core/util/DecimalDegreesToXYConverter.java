@@ -3,7 +3,7 @@ package edu.nd.dronology.core.util;
 import java.awt.Point;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.zone_manager.ZoneBounds;
+import edu.nd.dronology.core.flightzone.ZoneBounds;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 

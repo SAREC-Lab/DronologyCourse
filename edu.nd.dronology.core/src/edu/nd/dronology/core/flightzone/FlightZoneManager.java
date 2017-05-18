@@ -1,13 +1,17 @@
-package edu.nd.dronology.core.flight_manager;
+package edu.nd.dronology.core.flightzone;
 
 import java.util.List;
 
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.fleet_manager.DroneFleetManager;
-import edu.nd.dronology.core.flight_manager.internal.SoloDirector;
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.fleet.DroneFleetManager;
+import edu.nd.dronology.core.flight.FlightPlanFactory;
+import edu.nd.dronology.core.flight.Flights;
+import edu.nd.dronology.core.flight.IFlightDirector;
+import edu.nd.dronology.core.flight.IFlightPlan;
+import edu.nd.dronology.core.flight.internal.SoloDirector;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -48,7 +52,7 @@ public class FlightZoneManager implements Runnable {
 	 * @param start
 	 * @param wayPoints
 	 */
-	public void planFlight(Coordinates start, List<Coordinates> wayPoints) {
+	public void planFlight(Coordinate start, List<Coordinate> wayPoints) {
 		IFlightPlan flightPlan = FlightPlanFactory.create(start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}
