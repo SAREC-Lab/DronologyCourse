@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmi:id="_c3AF0MjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.application" bindingContexts="_c3AF2cjYEeSyMNYR5xypkQ">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_c3AF0cjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.window.main" label="Dronology Control Center" width="1200" height="800">
+    <children xsi:type="advanced:PerspectiveStack" xmi:id="_QTYH8BrxEeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.application.perspectivestack.0" selectedElement="_Q1FG0BrxEeeP3sS9Ejp5Aw">
+      <children xsi:type="advanced:Perspective" xmi:id="_Q1FG0BrxEeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.perspective.launch">
+        <children xsi:type="basic:Part" xmi:id="_T5BY8BrxEeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.part.launcher" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.LauncherPart"/>
+      </children>
+      <children xsi:type="advanced:Perspective" xmi:id="_o7-uABr0EeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.perspective.routeplanning">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_7H-_MC0uEeebcacJt5l5fA" elementId="edu.nd.dronology.ui.cc.application.partsashcontainer.0" containerData="" selectedElement="_D60t0C0vEeebcacJt5l5fA" horizontal="true">
+          <children xsi:type="basic:Part" xmi:id="_D60t0C0vEeebcacJt5l5fA" elementId="edu.nd.dronology.ui.cc.application.part.flightplansidepart" containerData="25" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.FlightRoutePlanningSidePart" label="RoutePlanning Side Part"/>
+          <children xsi:type="basic:Part" xmi:id="_sJ5bgBr0EeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.part.flightplan" containerData="75" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.FlightRoutePlanningPart" label="RoutePlanning Details"/>
+        </children>
+      </children>
+      <children xsi:type="advanced:Perspective" xmi:id="_Gors0C6QEeeafewPHwgl8A" elementId="edu.nd.dronology.ui.cc.perspective.monitor">
+        <children xsi:type="basic:Part" xmi:id="_JiqKoC6QEeeafewPHwgl8A" elementId="edu.nd.dronology.ui.cc.part.monitoring" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.MonitoringPart"/>
+      </children>
+      <children xsi:type="advanced:Perspective" xmi:id="_rvTQwC6pEeeafewPHwgl8A" elementId="edu.nd.dronology.ui.cc.perspective.simulator">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_v4bCQC6pEeeafewPHwgl8A" elementId="edu.nd.dronology.ui.cc.application.partsashcontainer.1" horizontal="true">
+          <children xsi:type="basic:Part" xmi:id="_wm5R0C6pEeeafewPHwgl8A" elementId="edu.nd.dronology.ui.cc.application.part.0" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SimulatorPart"/>
+        </children>
+      </children>
+      <children xsi:type="advanced:Perspective" xmi:id="_Jg0AkC-NEeej4Ik7mKzDUA" elementId="edu.nd.dronology.ui.cc.perspective.specification">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_MFPsMC-NEeej4Ik7mKzDUA" elementId="edu.nd.dronology.ui.cc.application.partsashcontainer.2" horizontal="true">
+          <children xsi:type="basic:Part" xmi:id="_Q47doC-NEeej4Ik7mKzDUA" elementId="edu.nd.dronology.ui.cc.application.part.1" containerData="25" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SpecificationSidePart"/>
+          <children xsi:type="basic:Part" xmi:id="_RhD0oC-NEeej4Ik7mKzDUA" elementId="edu.nd.dronology.ui.cc.application.part.2" containerData="75" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SpecificationPart"/>
+        </children>
+      </children>
+      <children xsi:type="advanced:Perspective" xmi:id="_pAHGMDZ2Eee3OMsv3wZldQ" elementId="edu.nd.dronology.ui.cc.perspective.simulatorscenario">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_tb6jIDZ2Eee3OMsv3wZldQ" elementId="edu.nd.dronology.ui.cc.application.partsashcontainer.3" horizontal="true">
+          <children xsi:type="basic:Part" xmi:id="_ucE_oDZ2Eee3OMsv3wZldQ" elementId="edu.nd.dronology.ui.cc.application.part.simulatorscenariosidepart" containerData="25" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SimulatorScenarioSidePart" label="Simulator Scenario Side Part"/>
+          <children xsi:type="basic:Part" xmi:id="_u410IDZ2Eee3OMsv3wZldQ" elementId="edu.nd.dronology.ui.cc.application.part.simulatorscenariopart" containerData="75" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SimulatorScenarioPart" label="Simulator Scenario Part"/>
+        </children>
+      </children>
+    </children>
+  </children>
+  <handlers xmi:id="_0AI3wCz3EeebcacJt5l5fA" elementId="edu.nd.dronology.ui.cc.application.handler.1" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.handler.ShowSettingsHandler" command="_jaaboCz3EeebcacJt5l5fA"/>
+  <rootContext xmi:id="_c3AF2cjYEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
+    <children xmi:id="_c3AF2sjYEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
+    <children xmi:id="_c3AF28jYEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
+  </rootContext>
+  <commands xmi:id="_BYRdwBr1EeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.commands.switchperspective" commandName="Switch Perspective">
+    <parameters xmi:id="_Fie0YBr1EeeP3sS9Ejp5Aw" elementId="id" name="id" optional="false"/>
+  </commands>
+  <commands xmi:id="_jaaboCz3EeebcacJt5l5fA" elementId="edu.nd.dronology.commands.settings" commandName="Settings"/>
+  <commands xmi:id="_TyHR8DDlEeevjLuYo62vmA" elementId="edu.nd.dronology.commands.transmit" commandName="Transmit">
+    <parameters xmi:id="_UvXkYDDlEeevjLuYo62vmA" elementId="id" name="id" optional="false"/>
+  </commands>
+  <addons xmi:id="_c3AF0sjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
+  <addons xmi:id="_c3AF08jYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
+  <addons xmi:id="_c3AF1MjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
+  <addons xmi:id="_c3AF1cjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.commands.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.CommandProcessingAddon"/>
+  <addons xmi:id="_c3AF1sjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
+  <addons xmi:id="_c3AF18jYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
+  <addons xmi:id="_c3AF2MjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
+</application:Application>

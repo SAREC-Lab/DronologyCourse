@@ -1,0 +1,210 @@
+@import url("platform:/plugin/edu.nd.dronology.ui.cc.application/css/dialog.css");
+@import url("platform:/plugin/edu.nd.dronology.ui.cc.application/css/default/defaultStyles.css");
+@import url("platform:/plugin/edu.nd.dronology.ui.cc.application/css/themeyellow/pubDetails.css");
+@import url("platform:/plugin/edu.nd.dronology.ui.cc.application/css/themeyellow/mainui.css");
+#ItemPanel{
+         background-color:#ffd65e #febf04;
+}
+
+#ItemPanel Label{
+         background-color: #ffd65e #febf04;
+
+}
+#ItemPanel Composite{
+         background-color: #ffd65e #febf04;
+}
+#ItemPanel Link{
+         background-color: #ffd65e #febf04;
+}
+
+
+#ItemPanel noskin{
+           background-color: #ffd65e #febf04;
+}
+#CCDialogTitle {
+            background-color: #ffd65e #febf04;
+}
+#CCDialogTitle Label{
+            background-color: #ffd65e #febf04;
+            }
+
+#CCDialog {
+           background-color: #b5bdc8 0% #828c95 82%;
+}
+
+
+#CCDialog Composite Label {
+            background-color: #b5bdc8 0% #828c95 82%;
+}
+
+#CCDialog Composite {
+            background-color: #b5bdc8 0% #828c95 82%;
+}
+
+#CCDialog Label {
+            background-color: #b5bdc8 0% #828c95 82%;
+}
+
+#noskin Composite{
+         background-color: white;
+}
+#noskin Text{
+         background-color: white;
+}
+/*#noskin Label{
+         background-color: white;
+}*/
+
+.TreeViewer{
+    
+}
+
+
+
+#Wizard{
+         background-color: #ccd2dd;
+}
+#Wizard Label{
+         background-color: #ccd2dd;
+}
+#Wizard Text{
+         background-color: #ccd2dd;
+}
+#Wizard Button{
+         background-color: #ccd2dd;
+}
+#Wizard Composite{
+          background-color: #ccd2dd;
+}
+#Wizard #noskin{
+          background-color: white;
+}
+#Wizard #disabled{
+          background-color: #ebeef4;
+}
+ #noskin Label{
+          background-color: white;
+}
+
+#consistent{
+          background-color: #ce245b;
+}
+
+#inconsistent{
+          background-color: #FDD0A2;
+}
+#disabled{
+          background-color: #ebeef4;
+}
+
+
+#PubDetailsDUP{
+         background-color:  #febbbb 0% #fe9090 37% #ff5c5c 100%
+}
+#PubDetailsOK{
+          background-color: #f8ffe8 0% #e3f5ab 33% #b7df2d 100%;
+}
+
+
+
+
+#PubDetailsOK Label{
+           background-color: inherit;
+}
+
+#PubDetailsOK Composite{
+           background-color: inherit;
+}
+
+
+
+
+#MainMenu{
+         background-color: #828c95 #28343b;
+}
+
+
+
+.PushabledAdd{
+         background-color:  #ffaf4b 0% #ff920a 100%;  
+}
+
+
+
+#ViewerHeader{
+         background-color: #f8ffe8 0% #e3f5ab 33% #b7df2d 100%;
+}
+
+
+
+#IntroToolTip{
+          background-color:#ffd65e #febf04;
+}
+#IntroToolTip Label{
+          background-color:#ffd65e #febf04;
+}
+
+#IntroContent {
+          background-color: #f7f7f7 0 #dbdbdb 100%;
+}
+
+.MTrimBar {
+        background-color: #e3efff #c1d5ef;
+        color: white;
+        font: Verdana 8px;
+}
+
+
+#ProgressDialog {
+       background-color: #ffd65e;
+}
+#ProgressDialog Label {
+        background-color: #ffd65e;
+}
+#ProgressDialog Composite {
+        background-color: #ffd65e;
+}
+
+ #Menu {
+           background-color: #e3efff #c1d5ef;
+        color: white;
+        font: Verdana 20px;
+}
+
+
+
+#SearchPanel { 
+         background-color: #ffd65e #febf04;
+}
+
+#SearchPanel Composite {
+         background-color: #ffd65e #febf04;
+}
+#SearchPanel Button {
+      background-color: #ffd65e #febf04;
+}
+
+
+#SearchPanel #white {
+      background-color: #white;
+}
+#SearchPanel #red {
+      background-color: #red;
+}
+
+#About Composite{
+         background-color:#febf04;
+}
+#About Label{
+         background-color: #febf04;
+}
+#About Link{
+         background-color: #febf04;
+}
+#About {
+         background-color: #febf04;
+}
+
+/* Shell {
+        background-color: #e3efff #c1d5ef 60%;
+}*/

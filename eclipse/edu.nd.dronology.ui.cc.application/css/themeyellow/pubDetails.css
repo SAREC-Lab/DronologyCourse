@@ -1,0 +1,18 @@
+
+#PubDetails Label{
+       /*  background-color:#e3efff #c1d5ef;*/
+         background-color:inherit;
+}
+#PubDetails Text{
+         background-color: white;
+}
+
+#PubDetails StyledText{
+         background-color: white;
+}
+#PubDetails{
+         background-color: #ffd65e;
+}
+#PubDetails Composite{
+         background-color: inherit;
+}
