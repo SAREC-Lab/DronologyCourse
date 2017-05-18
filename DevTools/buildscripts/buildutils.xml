@@ -80,10 +80,6 @@
 					<zipfileset src="${result.dirname}/build/lib/json-20110217.jar" />
 					<zipfileset src="${result.dirname}/build/lib/commons-collections-3.2.1.jar" /> -->
 
-
-			<!--	<manifest>
-						<attribute name="Main-Class" value="at.jku.mevss.java.publisher.Publisher" />
-					</manifest> -->
 		</jar>
 	</target>
 
