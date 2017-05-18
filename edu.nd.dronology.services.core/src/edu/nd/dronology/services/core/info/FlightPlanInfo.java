@@ -3,7 +3,7 @@ package edu.nd.dronology.services.core.info;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 public class FlightPlanInfo extends RemoteInfoObject {
 
@@ -12,8 +12,8 @@ public class FlightPlanInfo extends RemoteInfoObject {
 	 */
 	private static final long serialVersionUID = 256865471183839829L;
 	private String droneId;
-	private List<Coordinates> waypoints;
-	private Coordinates startLocation;
+	private List<Coordinate> waypoints;
+	private Coordinate startLocation;
 	private long startTime;
 	private long endTime;
 	
@@ -21,11 +21,11 @@ public class FlightPlanInfo extends RemoteInfoObject {
 		return droneId;
 	}
 
-	public List<Coordinates> getWaypoints() {
+	public List<Coordinate> getWaypoints() {
 		return waypoints;
 	}
 
-	public Coordinates getStartLocation() {
+	public Coordinate getStartLocation() {
 		return startLocation;
 	}
 
@@ -48,12 +48,12 @@ public class FlightPlanInfo extends RemoteInfoObject {
 		
 	}
 
-	public void setWaypoints(List<Coordinates> waypoints) {
+	public void setWaypoints(List<Coordinate> waypoints) {
 		this.waypoints = new ArrayList(waypoints);
 		
 	}
 
-	public void setStartLocation(Coordinates startLocation) {
+	public void setStartLocation(Coordinate startLocation) {
 	this.startLocation = startLocation;
 		
 	}

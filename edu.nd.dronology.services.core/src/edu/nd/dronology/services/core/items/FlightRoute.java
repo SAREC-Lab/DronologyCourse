@@ -5,20 +5,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 public class FlightRoute implements IFlightRoute {
 
 	private String name;
 	private String id;
 	private String category ="Default";
-	private List<Coordinates> coordinates ;
+	private List<Coordinate> coordinates ;
 
 	
 	public FlightRoute(){
 		id = UUID.randomUUID().toString();
 		coordinates = new ArrayList<>();
-		coordinates.add(new Coordinates(0, 0, 0));
+		coordinates.add(new Coordinate(0, 0, 0));
 		name =id;
 	}
 	
@@ -62,15 +62,15 @@ public class FlightRoute implements IFlightRoute {
 	}
 	
 	@Override
-	public List<Coordinates> getCoordinates() {
+	public List<Coordinate> getCoordinates() {
 		return Collections.unmodifiableList(coordinates);
 	}
 	@Override
-	public void addCoordinate(Coordinates coordinate) {
+	public void addCoordinate(Coordinate coordinate) {
 		coordinates .add(coordinate);
 	}
 	@Override
-	public void removeCoordinate(Coordinates coordinate) {
+	public void removeCoordinate(Coordinate coordinate) {
 		coordinates.remove(coordinate);
 	}
 

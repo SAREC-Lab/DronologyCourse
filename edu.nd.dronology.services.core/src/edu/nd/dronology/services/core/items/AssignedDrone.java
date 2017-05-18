@@ -1,18 +1,18 @@
 package edu.nd.dronology.services.core.items;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 public class AssignedDrone {
 
 	public final String droneName;
-	public Coordinates startCoordinate = new Coordinates(0, 0, 0);
+	public Coordinate startCoordinate = new Coordinate(0, 0, 0);
 
 	public AssignedDrone(String droneName) {
 		super();
 		this.droneName = droneName;
 	}
 
-	public Coordinates getStartCoordinate() {
+	public Coordinate getStartCoordinate() {
 		return startCoordinate;
 	}
 

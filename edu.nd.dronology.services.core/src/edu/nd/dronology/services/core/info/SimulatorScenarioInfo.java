@@ -1,12 +1,5 @@
 package edu.nd.dronology.services.core.info;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import edu.nd.dronology.core.util.Coordinates;
-
 public class SimulatorScenarioInfo extends RemoteInfoObject {
 
 	/**

@@ -2,7 +2,7 @@ package edu.nd.dronology.services.core.items;
 
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinates;
+import edu.nd.dronology.core.util.Coordinate;
 
 public interface IFlightRoute extends IPersistableItem {
 	String getDescription();
@@ -14,11 +14,11 @@ public interface IFlightRoute extends IPersistableItem {
 	
 	String getCategory();
 
-	void addCoordinate(Coordinates coordinate);
+	void addCoordinate(Coordinate coordinate);
 
-	List<Coordinates> getCoordinates();
+	List<Coordinate> getCoordinates();
 
-	void removeCoordinate(Coordinates coordinate);
+	void removeCoordinate(Coordinate coordinate);
 	
 	
 }

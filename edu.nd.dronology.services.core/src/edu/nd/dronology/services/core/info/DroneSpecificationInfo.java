@@ -1,6 +1,6 @@
 package edu.nd.dronology.services.core.info;
 
-public class DroneEquipmentInfo extends RemoteInfoObject {
+public class DroneSpecificationInfo extends RemoteInfoObject {
 
 	/**
 	 * 
@@ -8,7 +8,7 @@ public class DroneEquipmentInfo extends RemoteInfoObject {
 	private static final long serialVersionUID = 2844123024068335148L;
 	private String type = "Default";
 
-	public DroneEquipmentInfo(String name, String id) {
+	public DroneSpecificationInfo(String name, String id) {
 		super(name, id);
 	}
 

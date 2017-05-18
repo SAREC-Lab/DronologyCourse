@@ -2,14 +2,14 @@ package edu.nd.dronology.services.core.items;
 
 import java.util.UUID;
 
-public class DroneEquipment implements IDroneEquipment {
+public class DroneSpecification implements IDroneSpecification {
 
 	private String id;
 	private String name;
 	private String description;
 	private String type = "Default";
 
-	public DroneEquipment() {
+	public DroneSpecification() {
 		id = UUID.randomUUID().toString();
 	}
 

@@ -16,22 +16,22 @@ import java.util.zip.GZIPOutputStream;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
-import edu.nd.dronology.services.core.items.IDroneEquipment;
+import edu.nd.dronology.services.core.items.IDroneSpecification;
 import edu.nd.dronology.services.core.persistence.DronologyPersistenceUtil;
 import edu.nd.dronology.services.core.persistence.IPersistenceManager;
 import edu.nd.dronology.services.core.persistence.PersistenceException;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class DroneEquipmentXStreamPersistor implements IPersistenceManager<IDroneEquipment> {
+public class DroneSpecificationtXStreamPersistor implements IPersistenceManager<IDroneSpecification> {
 
 	private static final XStream xstream = new XStream(new XppDriver());
-	private static ILogger LOGGER = LoggerProvider.getLogger(DroneEquipmentXStreamPersistor.class);
+	private static ILogger LOGGER = LoggerProvider.getLogger(DroneSpecificationtXStreamPersistor.class);
 
 	static final boolean useCompression = false;
 
 	@Override
-	public IDroneEquipment open(InputStream fin) throws PersistenceException {
+	public IDroneSpecification open(InputStream fin) throws PersistenceException {
 		DronologyPersistenceUtil.preprocessStream(xstream);
 	//	 xstream.setMode(XStream.);
 		// xstream.addImplicitCollection(ImplMMEArtifactType.class, "children");
@@ -43,11 +43,11 @@ public class DroneEquipmentXStreamPersistor implements IPersistenceManager<IDron
 		}
 	}
 
-	private IDroneEquipment loadUncompressedStream(InputStream fin) throws PersistenceException {
+	private IDroneSpecification loadUncompressedStream(InputStream fin) throws PersistenceException {
 		try {
 			InputStreamReader reader = new InputStreamReader(new BufferedInputStream(fin), Charset.forName("UTF-8"));
 			Object model = xstream.fromXML(reader);
-			return (IDroneEquipment) model;
+			return (IDroneSpecification) model;
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		} finally {
@@ -61,13 +61,13 @@ public class DroneEquipmentXStreamPersistor implements IPersistenceManager<IDron
 		}
 	}
 
-	private IDroneEquipment loadedCompressedStream(InputStream fin) throws PersistenceException {
+	private IDroneSpecification loadedCompressedStream(InputStream fin) throws PersistenceException {
 		InputStream zIn = null;
 		try {
 			zIn = new GZIPInputStream(fin);
 			Object model = xstream.fromXML(new BufferedReader(new InputStreamReader(zIn, "UTF-8")));
 
-			return (IDroneEquipment) model;
+			return (IDroneSpecification) model;
 		} catch (IOException e) {
 			throw new PersistenceException(e);
 		} finally {
@@ -86,7 +86,7 @@ public class DroneEquipmentXStreamPersistor implements IPersistenceManager<IDron
 	}
  
 	@Override
-	public boolean save(IDroneEquipment o, OutputStream fout) throws PersistenceException {
+	public boolean save(IDroneSpecification o, OutputStream fout) throws PersistenceException {
 		DronologyPersistenceUtil.preprocessStream(xstream);
 		// xstream.setMode(XStream.ID_REFERENCES);
 		// xstream.addImplicitCollection(ImplMMEArtifactType.class, "children");
@@ -100,7 +100,7 @@ public class DroneEquipmentXStreamPersistor implements IPersistenceManager<IDron
 
 	}
 
-	private boolean saveUncompressedStream(IDroneEquipment o, OutputStream fout) throws PersistenceException {
+	private boolean saveUncompressedStream(IDroneSpecification o, OutputStream fout) throws PersistenceException {
 		OutputStreamWriter writer = null;
 		try {
 			writer = new OutputStreamWriter(new BufferedOutputStream(fout), Charset.forName("UTF-8"));
@@ -123,7 +123,7 @@ public class DroneEquipmentXStreamPersistor implements IPersistenceManager<IDron
 
 	}
 
-	private boolean saveCompressedStream(IDroneEquipment o, OutputStream fout) throws PersistenceException {
+	private boolean saveCompressedStream(IDroneSpecification o, OutputStream fout) throws PersistenceException {
 		try {
 			GZIPOutputStream zOut = new GZIPOutputStream(fout);
 			xstream.toXML(o, new BufferedWriter(new OutputStreamWriter(zOut, "UTF-8")));

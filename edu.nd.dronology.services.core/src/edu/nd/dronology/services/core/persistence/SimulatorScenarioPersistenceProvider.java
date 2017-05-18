@@ -1,11 +1,10 @@
 package edu.nd.dronology.services.core.persistence;
 
-import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.services.core.items.ISimulatorScenario;
 import edu.nd.dronology.services.core.persistence.internal.SimulatorScenarioXStreamPersistor;
 
 /**
- * Provider implementation for {@link IFlightRoute}.<br>
+ * Provider implementation for {@link ISimulatorScenario}.<br>
  * Details see {@link AbstractItemPersistenceProvider}
  * 
  * @author Michael Vierhauser

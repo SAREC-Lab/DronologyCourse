@@ -1,6 +1,6 @@
 package edu.nd.dronology.services.core.items;
 
-public interface IDroneEquipment extends IPersistableItem{
+public interface IDroneSpecification extends IPersistableItem{
 
 
 
