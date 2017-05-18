@@ -64,7 +64,7 @@ public class WorkspaceInitializer {
 		this.root = formatPath(workspace);
 		prepareRoot();
 		prepareFlightPathWorkspace();
-		prepareEquipmentWorkspace();
+		prepareSpecificationWorkspace();
 	}
 
 	private String formatPath(String workspace) {
@@ -82,8 +82,8 @@ public class WorkspaceInitializer {
 			f.mkdirs();
 		}
 	}
-	private void prepareEquipmentWorkspace() {
-		String folderPath = getDroneEquipmentLocation();
+	private void prepareSpecificationWorkspace() {
+		String folderPath = getDroneSpecificationLocation();
 		File f = new File(folderPath);
 		if (!f.exists()) {
 			f.mkdirs();
@@ -104,8 +104,8 @@ public class WorkspaceInitializer {
 		return root + "\\" + DronologyConstants.FOLDERN_SIM_SCENARIO;
 	}
 	
-	public String getDroneEquipmentLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_EQUIPMET;
+	public String getDroneSpecificationLocation() {
+		return root + "\\" + DronologyConstants.FOLDER_SPECIFICATION;
 	}
 
 

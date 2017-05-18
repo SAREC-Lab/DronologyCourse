@@ -97,8 +97,8 @@ public class SupervisorServiceInstance extends AbstractServiceInstance implement
 	}
 
 	@Override
-	public String getDroneEquipmentLocation() {
-		return WorkspaceInitializer.getInstance().getDroneEquipmentLocation();
+	public String getDroneSpecificationLocation() {
+		return WorkspaceInitializer.getInstance().getDroneSpecificationLocation();
 	}
 
 	@Override

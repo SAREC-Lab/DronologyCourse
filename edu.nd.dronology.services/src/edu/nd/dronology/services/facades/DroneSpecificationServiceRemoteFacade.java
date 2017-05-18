@@ -5,34 +5,34 @@ import java.util.Collection;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import edu.nd.dronology.services.core.info.DroneEquipmentInfo;
-import edu.nd.dronology.services.core.info.EquipmentTypeInfo;
+import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
+import edu.nd.dronology.services.core.info.TypeSpecificationInfo;
 import edu.nd.dronology.services.core.listener.IItemChangeListener;
-import edu.nd.dronology.services.core.remote.IDroneEquipmentRemoteService;
+import edu.nd.dronology.services.core.remote.IDroneSpecificationRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
-import edu.nd.dronology.services.equipment.DroneEquipmentService;
 import edu.nd.dronology.services.remote.AbstractRemoteFacade;
+import edu.nd.dronology.services.specification.DroneSpecificationService;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class DroneEquipmentServiceRemoteFacade extends AbstractRemoteFacade implements IDroneEquipmentRemoteService {
+public class DroneSpecificationServiceRemoteFacade extends AbstractRemoteFacade implements IDroneSpecificationRemoteService {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4580658378477037955L;
-	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneEquipmentServiceRemoteFacade.class);
-	private static volatile DroneEquipmentServiceRemoteFacade INSTANCE;
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSpecificationServiceRemoteFacade.class);
+	private static volatile DroneSpecificationServiceRemoteFacade INSTANCE;
 
-	protected DroneEquipmentServiceRemoteFacade() throws RemoteException {
-		super(DroneEquipmentService.getInstance());
+	protected DroneSpecificationServiceRemoteFacade() throws RemoteException {
+		super(DroneSpecificationService.getInstance());
 	}
 
-	public static IDroneEquipmentRemoteService getInstance() throws RemoteException {
+	public static IDroneSpecificationRemoteService getInstance() throws RemoteException {
 		if (INSTANCE == null) {
 			try {
-				synchronized (DroneEquipmentServiceRemoteFacade.class) {
+				synchronized (DroneSpecificationServiceRemoteFacade.class) {
 					if (INSTANCE == null) {
-						INSTANCE = new DroneEquipmentServiceRemoteFacade();
+						INSTANCE = new DroneSpecificationServiceRemoteFacade();
 					}
 				}
 			} catch (RemoteException e) {
@@ -44,12 +44,12 @@ public class DroneEquipmentServiceRemoteFacade extends AbstractRemoteFacade impl
 
 	@Override
 	public byte[] requestFromServer(String id) throws RemoteException, DronologyServiceException {
-		return DroneEquipmentService.getInstance().requestFromServer(id);
+		return DroneSpecificationService.getInstance().requestFromServer(id);
 	}
 
 	@Override
 	public void transmitToServer(String id, byte[] content) throws RemoteException, DronologyServiceException {
-		DroneEquipmentService.getInstance().transmitToServer(id, content);
+		DroneSpecificationService.getInstance().transmitToServer(id, content);
 
 	}
 
@@ -64,13 +64,13 @@ public class DroneEquipmentServiceRemoteFacade extends AbstractRemoteFacade impl
 	}
 
 	@Override
-	public Collection<DroneEquipmentInfo> getItems() throws RemoteException {
-		return DroneEquipmentService.getInstance().getItems();
+	public Collection<DroneSpecificationInfo> getItems() throws RemoteException {
+		return DroneSpecificationService.getInstance().getItems();
 	}
 
 	@Override
-	public DroneEquipmentInfo createItem() throws RemoteException, DronologyServiceException {
-		return DroneEquipmentService.getInstance().createItem();
+	public DroneSpecificationInfo createItem() throws RemoteException, DronologyServiceException {
+		return DroneSpecificationService.getInstance().createItem();
 	}
 
 	@Override
@@ -80,8 +80,8 @@ public class DroneEquipmentServiceRemoteFacade extends AbstractRemoteFacade impl
 	}
 
 	@Override
-	public Collection<EquipmentTypeInfo> getEquipmentTypes() throws RemoteException {
-		return DroneEquipmentService.getInstance().getEquipmentTypes();
+	public Collection<TypeSpecificationInfo> getTypeSpecifications() throws RemoteException {
+		return DroneSpecificationService.getInstance().getTypeSpecifications();
 	}
 
 }

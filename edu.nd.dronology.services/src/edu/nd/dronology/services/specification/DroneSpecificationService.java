@@ -1,38 +1,38 @@
-package edu.nd.dronology.services.equipment;
+package edu.nd.dronology.services.specification;
 
 import java.util.Collection;
 
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServerService;
-import edu.nd.dronology.services.core.info.DroneEquipmentInfo;
-import edu.nd.dronology.services.core.info.EquipmentTypeInfo;
+import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
+import edu.nd.dronology.services.core.info.TypeSpecificationInfo;
 
-public class DroneEquipmentService extends AbstractFileTransmitServerService<IDroneEquipmentServiceInstance, DroneEquipmentInfo> {
+public class DroneSpecificationService extends AbstractFileTransmitServerService<IDroneSpecificationServiceInstance, DroneSpecificationInfo> {
 
-	private static volatile DroneEquipmentService INSTANCE;
+	private static volatile DroneSpecificationService INSTANCE;
 
-	protected DroneEquipmentService() {
+	protected DroneSpecificationService() {
 		super();
 	}
 
 	/**
 	 * @return The singleton ConfigurationService instance
 	 */
-	public static DroneEquipmentService getInstance() {
+	public static DroneSpecificationService getInstance() {
 		if (INSTANCE == null) {
-			synchronized (DroneEquipmentService.class) {
-				INSTANCE = new DroneEquipmentService();
+			synchronized (DroneSpecificationService.class) {
+				INSTANCE = new DroneSpecificationService();
 			}
 		}
 		return INSTANCE;
 	}
 
 	@Override
-	protected IDroneEquipmentServiceInstance initServiceInstance() {
-		return new DronEquipmentServiceInstance();
+	protected IDroneSpecificationServiceInstance initServiceInstance() {
+		return new DronSpecificationServiceInstance();
 	}
 
-	public Collection<EquipmentTypeInfo> getEquipmentTypes() {
-		return serviceInstance.getEquipmentTypes();
+	public Collection<TypeSpecificationInfo> getTypeSpecifications() {
+		return serviceInstance.getTypeSpecifications();
 	}
 
 

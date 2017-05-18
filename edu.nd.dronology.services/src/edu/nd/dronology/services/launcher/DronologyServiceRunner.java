@@ -4,14 +4,14 @@ import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
 import edu.nd.dronology.core.flight.Flights;
 import edu.nd.dronology.core.flightzone.FlightZoneManager;
-import edu.nd.dronology.services.core.info.DroneEquipmentInfo;
+import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.dronesetup.DroneSetupService;
-import edu.nd.dronology.services.equipment.DroneEquipmentService;
 import edu.nd.dronology.services.instances.dronesimulator.DroneSimulatorService;
 import edu.nd.dronology.services.instances.flightmanager.FlightManagerService;
 import edu.nd.dronology.services.instances.flightroute.FlightRouteplanningService;
 import edu.nd.dronology.services.remote.RemoteService;
+import edu.nd.dronology.services.specification.DroneSpecificationService;
 import edu.nd.dronology.services.supervisor.SupervisorService;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -27,7 +27,7 @@ public class DronologyServiceRunner {
 			FlightRouteplanningService.getInstance().startService();
 			FlightManagerService.getInstance().startService();
 			DroneSetupService.getInstance().startService();
-			DroneEquipmentService.getInstance().startService();
+			DroneSpecificationService.getInstance().startService();
 			DroneSimulatorService.getInstance().startService();
 			RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 

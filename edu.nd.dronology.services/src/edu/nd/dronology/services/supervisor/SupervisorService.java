@@ -47,8 +47,8 @@ public class SupervisorService extends AbstractServerService<ISupervisorServiceI
 		return serviceInstance.getSimScenarioLocation();
 	}
 
-	public String getDroneEquipmentLocation() {
-		return serviceInstance.getDroneEquipmentLocation();
+	public String getDroneSpecificationLocation() {
+		return serviceInstance.getDroneSpecificationLocation();
 	}
 	
 

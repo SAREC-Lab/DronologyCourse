@@ -7,7 +7,7 @@ import java.util.List;
 
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractServerService;
-import edu.nd.dronology.services.core.remote.IDroneEquipmentRemoteService;
+import edu.nd.dronology.services.core.remote.IDroneSpecificationRemoteService;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IDroneSimulatorRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
@@ -17,7 +17,7 @@ import edu.nd.dronology.services.core.remote.IRemoteServiceListener;
 import edu.nd.dronology.services.core.remote.IRemoteableService;
 import edu.nd.dronology.services.core.remote.RemoteInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
-import edu.nd.dronology.services.facades.DroneEquipmentServiceRemoteFacade;
+import edu.nd.dronology.services.facades.DroneSpecificationServiceRemoteFacade;
 import edu.nd.dronology.services.facades.DroneSetupServiceRemoteFacade;
 import edu.nd.dronology.services.facades.DroneSimulatorServiceRemoteFacade;
 import edu.nd.dronology.services.facades.FlightManagerServiceRemoteFacade;
@@ -67,8 +67,8 @@ public class RemoteManager implements IRemoteManager {
 			return DroneSetupServiceRemoteFacade.getInstance();
 		}
 		
-		if (service.equals(IDroneEquipmentRemoteService.class)) {
-			return DroneEquipmentServiceRemoteFacade.getInstance();
+		if (service.equals(IDroneSpecificationRemoteService.class)) {
+			return DroneSpecificationServiceRemoteFacade.getInstance();
 		}
 		
 		if (service.equals(IDroneSimulatorRemoteService.class)) {
