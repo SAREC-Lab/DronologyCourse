@@ -17,10 +17,14 @@
 
 
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/google/guava-20.0.jar"   todir="${build.dir}/lib" />
+		
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/json/gson-2.2.4.jar"   todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/json/json-20110217.jar"   todir="${build.dir}/lib" />
 
-
-
-	</target>
+		
+		
+		
+	</target> 
 
 
 
