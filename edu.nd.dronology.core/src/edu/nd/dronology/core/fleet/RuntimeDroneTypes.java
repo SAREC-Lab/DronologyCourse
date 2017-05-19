@@ -1,6 +1,10 @@
 package edu.nd.dronology.core.fleet;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
+import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
+import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * This is a SINGLETON class. To get an instance call getInstance() Sets the runtime mode of FlightZone either as SIMULATION or PHYSICAL The mode may only be set one time during execution. Simulation
@@ -15,7 +19,10 @@ public class RuntimeDroneTypes {
 		SIMULATION, PHYSICAL
 	}
 
+	private static final ILogger LOGGER = LoggerProvider.getLogger(RuntimeDroneTypes.class);
+
 	private Mode currentMode;
+	private IDroneCommandHandler commandHandler;
 	private static volatile RuntimeDroneTypes INSTANCE = null;
 
 	protected RuntimeDroneTypes() {
@@ -76,5 +83,15 @@ public class RuntimeDroneTypes {
 	 */
 	public boolean isPhysical() {
 		return currentMode == Mode.PHYSICAL;
+	}
+
+	public void setCommandHandler(IDroneCommandHandler commandHandler) {
+		LOGGER.info("Drone command handler set: " + commandHandler.getClass());
+		this.commandHandler = commandHandler;
+
+	}
+
+	public IDroneCommandHandler getCommandHandler() {
+		return commandHandler;
 	}
 }
