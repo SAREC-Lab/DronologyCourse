@@ -1,0 +1,108 @@
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"gotoLocation",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 100
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"takeoff",
+		"data":{
+			"altitude": 100
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setGimbalRotation",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setGimbalTarget",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setHome",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setHeading",
+		"data":{
+			"heading": 0
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setAirspeed",
+		"data":{
+			"speed": 20
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setGroundspeed",
+		"data":{
+			"speed": 20
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setArmed",
+		"data":{
+			"armed": true
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
+		"command":"setMode",
+		"data":{
+			"mode": "land"
+		}
+	}
+}

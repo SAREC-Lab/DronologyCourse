@@ -1,0 +1,47 @@
+#! /bin/bash
+
+cd /mnt/c/Users/jdhus/Documents/Fall_2016/Fall_2016/cse40773/
+./install_SITL.sh
+
+sudo pip install twisted
+
+sudo apt-get install pkg-config
+sudo apt-get install gtk+-2.0
+sudo apt-get install gtk+-3.0
+
+sudo apt-get install freeglut3 freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev
+
+sudo apt-get install gstreamer1.0*
+sudo apt-get install gstreamer0.10*
+sudo apt-get install libgconf2-dev
+sudo apt-get install gstreamer-plugins*
+
+pip install --upgrade pip
+
+# sudo pip install wx
+
+sudo apt-get install python-wxgtk3.0
+
+
+
+
+
+
+# # run on "fresh" install (home Ubuntu install)
+# make sure pip is set-up
+sudo apt-get install python-requests python-pip
+# due to a problem with the existing pip package, I had to instead run:
+# $ sudo easy_install -U pip
+
+# install SITL and MAVProxy
+sudo pip install pymavlink MAVProxy
+sudo pip install dronekit-sitl
+
+# used in python when creating a SITL/MAVProxy instance
+sudo pip install subprocess
+# used in python for communication with the Java ground station
+sudo pip install twisted
+
+
+
+
