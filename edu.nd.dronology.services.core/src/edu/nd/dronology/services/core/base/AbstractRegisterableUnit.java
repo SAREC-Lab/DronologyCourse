@@ -5,12 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
 import edu.nd.dronology.services.core.util.UnitState;
 
 /**
  * Abstract class for registerable units that register at the server.<br>
- * (e.g. {@link at.jku.mevss.eventdistributor.core.registration.ProbeInfo} or<br>
- * {@link at.jku.mevss.eventdistributor.core.subscription.SubscriberInfo}).
  * 
  * @author Michael Vierhauser
  * 
@@ -30,11 +29,8 @@ public abstract class AbstractRegisterableUnit implements Serializable {
 	/** The current state of the unit **/
 	public static String STATE = "state";
 	protected final String ID;
-	public static String SCOPE_ID = "scopeid";
 	
-	public static final String SENDTIME = "sendtime";
-	public static final String RECEIVETIME = "receivetime";
-	public static final String RTT = "roundtriptime";
+
 	
 	public static final  String HAS_REMOTEOBJECT = "hasRemoteObject";
 	public static final String IS_MANAGED = "isManaged";

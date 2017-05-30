@@ -1,0 +1,29 @@
+<project name="BuildAll" basedir="." default="buildAll">
+	<target name="buildAll" depends="clean-resultdir">
+		
+		<ant antfile="build_logger.xml" target="logger" />
+		<ant antfile="build_dronology.util.xml" target="dronology-util" />
+		<ant antfile="build_dronology.core.xml" target="dronology-core" />
+		<ant antfile="build_dronology.services.core.xml" target="dronology-core" />
+		
+	  
+		<ant antfile="build-All.xml" target="copy-to-eclipselib" />
+		
+	</target>
+	
+	<target name="clean-resultdir">
+		<echo>Deleting jars from ${result.dirname} ...</echo>
+		<delete>
+			<fileset dir="${publish.dir}" includes="**/*.jar" />
+		</delete>
+		
+	</target>
+	
+
+	<target name="copy-to-eclipselib">
+		<echo>Copying files to ui plug-in ...</echo>
+		<copy file="../results/${jar.core}" tofile="$../../../../edu.nd.dronology.ui.cc.lib/lib/dronology/${jar.core}" overwrite="true" />
+		<copy file="../results/${jar.services.core}" tofile="$../../../../edu.nd.dronology.ui.cc.lib/lib/dronology/${jar.services.core}" overwrite="true" />
+		</target>
+
+</project>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            name="edu.nd.dronology.ui.cc.application"
+            application="org.eclipse.e4.ui.workbench.swt.E4Application">
+         <property
+               name="lifeCycleURI"
+               value="bundleclass://edu.nd.dronology.ui.cc.application/edu.nd.dronology.ui.cc.application.ControlCenterLifeCycle">
+         </property>
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/edu.nd.dronology.ui.cc.application/css/default.css">
+         </property>
+         <property
+               name="appName"
+               value="edu.nd.dronology.ui.cc.application">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.swt.theme">
+      <theme
+            basestylesheeturi="css/default.css"
+            id="edu.nd.dronology.ui.cc.theme"
+            label="edu.nd.dronology.ui.cc.theme">
+      </theme>
+   </extension>
+
+</plugin>

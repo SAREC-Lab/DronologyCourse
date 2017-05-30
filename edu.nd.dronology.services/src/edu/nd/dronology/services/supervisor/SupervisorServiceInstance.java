@@ -70,7 +70,7 @@ public class SupervisorServiceInstance extends AbstractServiceInstance implement
 
 	@Override
 	public String getFlightPathLocation() {
-		return WorkspaceInitializer.getInstance().getFlightPathLocation();
+		return WorkspaceInitializer.getInstance().getFlightRouteLocation();
 	}
 
 
@@ -94,6 +94,16 @@ public class SupervisorServiceInstance extends AbstractServiceInstance implement
 	@Override
 	protected boolean hasProperties() {
 		return false;
+	}
+
+	@Override
+	public String getDroneSpecificationLocation() {
+		return WorkspaceInitializer.getInstance().getDroneSpecificationLocation();
+	}
+
+	@Override
+	public String getSimScenarioLocation() {
+		return WorkspaceInitializer.getInstance().getSimScenarioLocation();
 	}
 
 

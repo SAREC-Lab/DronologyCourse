@@ -1,0 +1,102 @@
+This document lists all fonts, icons, and libraries used by CiteOMat
+
+************** Fonts and Icons **************
+
+Name:    Oxygen Icons
+Author:  Oxygen Team
+URL:     http://www.oxygen-icons.org
+License: GNU Lesser General Public License
+
+Name:    Book Icons, Folder Icons, Soft Scrap Icons, Sleek XP Basic Icons
+Author:  Hopstarter
+URL:     http://hopstarter.deviantart.com
+License: CC Attribution-Noncommercial-No Derivate 4.0
+
+Name:    Beautiful Flat Icons
+Author:  Elegantthemes
+URL:     http://www.elegantthemes.com
+License: GNU General Public License
+
+Name:    Social Balloons Icons
+Author:  Double-J Design
+URL:     http://www.doublejdesign.co.uk
+License: CC Attribution-Noncommercial-No Derivate 4.0
+
+Name:    Raider Crusader Font
+Author:  Iconian
+URL:     http://www.iconian.com
+
+
+Name:    Farm Fresh Icons
+Author:  Fatcow Web Hosting
+URL:     http://www.fatcow.com/free-icons
+License: CC Attribution 4.0
+**********************************************
+
+
+************** Libraries *********************
+
+Project: Apache Commons Logging
+URL:     http://commons.apache.org/logging
+License: Apache-2.0
+
+Project: Apache Commons Lang
+URL:     http://commons.apache.org/lang
+License: Apache 2.0
+
+Project: Apache Commons IO
+URL:     http://commons.apache.org/io
+License: Apache 2.0
+
+Project: Glazed Lists
+URL:     http://www.glazedlists.com
+License: GNU LGPL
+
+Project: Apache Log2j 2
+URL:     http://logging.apache.org/log4j
+License: Apache 2.0
+
+Project: JSoup
+URL:     https://github.com/jhy/jsoup
+License: MIT
+
+Project: Cermine
+URL:     https://github.com/CeON/CERMINE
+License: AGPL
+
+Project: Guava
+URL:     https://github.com/google/guava
+License: Apache 2.0
+
+Project: JavaBib
+URL:     http://mirror.unl.edu/ctan/biblio/bibtex/utils/JavaBib
+License: ?
+
+Project: JFreeChart
+URL:     www.jfree.org/jfreechart
+License: GNU LGPL
+
+Project: JSON
+URL:     http://www.json.org/
+License: JSON license
+
+Project: Gson
+URL:     https://github.com/google/gson
+License: Apache 2.0
+
+Project: NatTable
+URL:     https://www.eclipse.org/nattable
+License: EPL
+
+Project: Nebula
+URL:     https://www.eclipse.org/nebula
+License: EPL
+
+Project: Zest/Draw2D
+URL:     https://www.eclipse.org/gef
+License: EPL
+
+Project: Xstream
+URL:     http://x-stream.github.io
+License: BSD
+**********************************************

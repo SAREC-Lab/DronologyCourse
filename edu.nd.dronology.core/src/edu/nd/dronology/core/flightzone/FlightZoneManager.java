@@ -1,0 +1,127 @@
+package edu.nd.dronology.core.flightzone;
+
+import java.util.List;
+
+import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.exceptions.FlightZoneException;
+import edu.nd.dronology.core.fleet.DroneFleetManager;
+import edu.nd.dronology.core.flight.FlightPlanFactory;
+import edu.nd.dronology.core.flight.Flights;
+import edu.nd.dronology.core.flight.IFlightDirector;
+import edu.nd.dronology.core.flight.IFlightPlan;
+import edu.nd.dronology.core.flight.internal.SoloDirector;
+import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
+
+public class FlightZoneManager implements Runnable {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightZoneManager.class);
+
+	private Flights flights;
+	private DroneSeparationMonitor safetyMgr;
+	private DroneFleetManager droneFleet;
+
+	/**
+	 * Constructs a new FlightZoneManager.
+	 * 
+	 * @throws InterruptedException
+	 */
+	public FlightZoneManager() throws InterruptedException {
+		droneFleet = DroneFleetManager.getInstance();
+		safetyMgr = new DroneSeparationMonitor();
+		flights = new Flights(safetyMgr);
+	}
+
+	public DroneFleetManager getDroneFleet() {
+		return droneFleet; // replace with iterator later.
+	}
+
+	/**
+	 * Runs on an independent thread
+	 */
+	public void startThread() {
+		(new Thread(this)).start();
+	}
+
+	/**
+	 * Creates a new flight plan
+	 * 
+	 * @param start
+	 * @param wayPoints
+	 */
+	public void planFlight(Coordinate start, List<Coordinate> wayPoints) {
+		IFlightPlan flightPlan = FlightPlanFactory.create(start, wayPoints);
+		flights.addNewFlight(flightPlan);
+	}
+
+	/**
+	 * 
+	 * @return all current flights.
+	 */
+	public Flights getFlights() {
+		return flights;
+	}
+
+	/**
+	 * Launches a single drone to its currently defined waypoints.
+	 * 
+	 * @param strDroneID
+	 * @param startingLocation
+	 * @param wayPoints
+	 * @throws FlightZoneException
+	 */
+	private void launchSingleDroneToWayPoints() throws FlightZoneException {
+		// Check to make sure that there is a pending flight plan and available drone.
+		if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()) {
+			ManagedDrone drone = droneFleet.getAvailableDrone();
+			if (drone != null) {
+				safetyMgr.attachDrone(drone);
+				IFlightPlan flightPlan = flights.getNextFlightPlan();
+				LOGGER.info(flightPlan.getFlightID());
+				IFlightDirector flightDirectives = new SoloDirector(drone);
+				flightDirectives.setWayPoints(flightPlan.getWayPoints());
+				drone.assignFlight(flightDirectives);
+				flightDirectives.flyToNextPoint();
+				drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
+				flightPlan.setStatusToFlying(drone);
+			}
+		}
+	}
+
+	/**
+	 * Main run routine -- called internally. Launches a new flight if viable, and checks for flights which have landed. Launched flights run autonomously at one thread per drone.
+	 */
+	@Override
+	@Discuss(discuss="change from thread to listener based")
+	public void run() {
+		while (true) {
+			// Launch new flight if feasible
+			int numberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
+			if (flights.hasPendingFlight() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
+				try {
+					launchSingleDroneToWayPoints();
+				} catch (FlightZoneException e) {
+				LOGGER.error(e);
+				}
+			}
+			// Check if any flights have landed
+			flights.checkForLandedFlights(droneFleet, safetyMgr);
+			if (flights.hasAwaitingTakeOff())
+				try {
+					flights.checkForTakeOffReadiness(droneFleet);
+				} catch (FlightZoneException e1) {
+					LOGGER.error("Failed Check for takeoff readiness.", e1);
+				}
+			safetyMgr.checkForViolations(); // Used to run on its own thread!
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				LOGGER.error(e);
+			}
+		}
+	}
+
+}

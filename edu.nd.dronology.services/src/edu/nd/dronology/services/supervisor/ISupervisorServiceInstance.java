@@ -29,6 +29,10 @@ public interface ISupervisorServiceInstance extends IServiceInstance {
 
 	String getFlightPathLocation();
 
+	String getDroneSpecificationLocation();
+
+	String getSimScenarioLocation();
+
 
 
 }

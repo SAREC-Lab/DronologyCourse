@@ -1,0 +1,35 @@
+
+
+
+#STDDialog {
+          /* background-color: #b5bdc8 0% #828c95 82%;*/
+           background-color:  #b5bdc8;
+}
+
+#STDDialog Label {
+        background-color:  #b5bdc8;
+        }
+
+
+
+#WarnHeader {
+           background-color: ffff88 0% #ffff88 100%;
+}
+
+
+#WarnHeader Label, #WarnHeader Composite, #WarnHeader StyledText {
+          background-color: ffff88 0% #ffff88 100%;
+}
+#InfoHeader {
+           background-color:   #66b6fc;
+}
+#InfoHeader Label, #InfoHeader Composite, #InfoHeader StyledText{
+           background-color:inherit;
+
+#ErrorHeader {
+           background-color:#db9462 0% #d37661 100%;
+}
+
+#ErrorHeader Label,#ErrorHeader Composite,#ErrorHeader StyledText {
+          background-color:#db9462 0% #d37661 100%;
+}

@@ -13,8 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import edu.nd.dronology.core.fleet_manager.RuntimeDroneTypes;
-import edu.nd.dronology.core.flight_manager.SoloDirector;
+import edu.nd.dronology.core.flight.internal.SoloDirector;
+import edu.nd.dronology.core.status.DroneCollectionStatus;
 
 @RunWith(Parameterized.class)
 public class TestDroneCollectionStatus {

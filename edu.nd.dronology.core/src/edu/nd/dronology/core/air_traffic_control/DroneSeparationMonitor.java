@@ -3,8 +3,7 @@ package edu.nd.dronology.core.air_traffic_control;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.drones_runtime.ManagedDrone;
-import edu.nd.dronology.core.utilities.PointDelta;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**
  * Safety manager is responsible for monitoring drone positions to ensure minimum safety distance is not violated
@@ -48,9 +47,9 @@ public class DroneSeparationMonitor {
 	 * 
 	 * @return distance remaining in degree points.
 	 */
-	public long getDistance(ManagedDrone D1, ManagedDrone D2) {
-		long longDelta = Math.abs(D1.getLongitude() - D2.getLongitude());
-		long latDelta = Math.abs(D1.getLatitude() - D2.getLatitude());
+	public long getDistance(ManagedDrone drone1, ManagedDrone drone2) {
+		long longDelta = Math.abs(drone1.getLongitude() - drone2.getLongitude());
+		long latDelta = Math.abs(drone1.getLatitude() - drone2.getLatitude());
 		return (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
 	}
 

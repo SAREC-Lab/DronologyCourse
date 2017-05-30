@@ -12,6 +12,10 @@
 		<antcall target="prepare" inheritall="true" />
 		<antcall target="copy-source" inheritall="true" />
 		
+		<antcall target="copy-libs" inheritall="true" />
+		<antcall target="-copy-logger" inheritall="true" />
+		<antcall target="-copy-util" inheritall="true" />
+
 		<antcall target="compile" inheritall="true" />
 		<antcall target="pack" inheritall="true" />
 		<antcall target="publish-jar" inheritall="true" />
@@ -37,7 +41,7 @@
 
 		<copy todir="${build.dir}/src">
 			<fileset dir="${src.dir}/../edu.nd.dronology.core/src" />
-			<fileset dir="${src.dir}/../edu.nd.dronology.core/gui" />
+
 		</copy>
 
 

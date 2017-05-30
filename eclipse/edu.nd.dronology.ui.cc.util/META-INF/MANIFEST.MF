@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Util
+Bundle-SymbolicName: edu.nd.dronology.ui.cc.util
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: edu.nd.dronology.ui.cc.util.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.mv.logging,
+ edu.nd.dronology.ui.cc.images
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: edu.nd.dronology.ui.cc.util,
+ edu.nd.dronology.ui.cc.util.controls,
+ edu.nd.dronology.ui.cc.util.managedcontrol

@@ -10,13 +10,13 @@
 
 		<antcall target="check-preconditions" inheritall="true" />
 		<antcall target="prepare" inheritall="true" />
-		
+
 		<antcall target="copy-libs" inheritall="true" />
-			
-			<antcall target="-copy-logger" inheritall="true" />
-				<antcall target="-copy-util" inheritall="true" />
-					
-		
+
+		<antcall target="-copy-logger" inheritall="true" />
+		<antcall target="-copy-util" inheritall="true" />
+		<antcall target="-copy-core" inheritall="true" />
+
 		<antcall target="copy-source" inheritall="true" />
 		<antcall target="compile" inheritall="true" />
 		<antcall target="pack" inheritall="true" />
@@ -57,7 +57,7 @@
 			<compilerarg line="-g" />
 
 			<include name="edu/nd/dronology/services/core/**/*.java" />
-			
+
 
 
 		</javac>

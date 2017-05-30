@@ -10,7 +10,7 @@ import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 public abstract class AbstractFileTransmitServerService<S extends IFileTransmitServiceInstance<T>, T> extends
-		AbstractServerService<S> {
+		AbstractServerService<S> { 
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(AbstractFileTransmitServerService.class);
 

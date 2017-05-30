@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_Q9PngBr1EeeP3sS9Ejp5Aw">
+  <imports xsi:type="commands:Command" xmi:id="_R6i9QBr1EeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.commands.switchperspective"/>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_TkHjIBr1EeeP3sS9Ejp5Aw" featurename="handlers" parentElementId="org.eclipse.e4.application">
+    <elements xsi:type="commands:Handler" xmi:id="_a2Ps8Br1EeeP3sS9Ejp5Aw" elementId="edu.nd.dronology.ui.cc.main.handler.0" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.handler.SwitchPerspectiveHandler" command="_R6i9QBr1EeeP3sS9Ejp5Aw"/>
+  </fragments>
+</fragment:ModelFragments>

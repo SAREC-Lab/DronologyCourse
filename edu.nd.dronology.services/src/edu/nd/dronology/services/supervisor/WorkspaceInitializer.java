@@ -64,6 +64,7 @@ public class WorkspaceInitializer {
 		this.root = formatPath(workspace);
 		prepareRoot();
 		prepareFlightPathWorkspace();
+		prepareSpecificationWorkspace();
 	}
 
 	private String formatPath(String workspace) {
@@ -75,20 +76,38 @@ public class WorkspaceInitializer {
 	}
 
 	private void prepareFlightPathWorkspace() {
-		String folderPath = getFlightPathLocation();
+		String folderPath = getFlightRouteLocation();
 		File f = new File(folderPath);
 		if (!f.exists()) {
 			f.mkdirs();
 		}
 	}
+	private void prepareSpecificationWorkspace() {
+		String folderPath = getDroneSpecificationLocation();
+		File f = new File(folderPath);
+		if (!f.exists()) {
+			f.mkdirs();
+		}
+	}
+	
+	
 
 	String getWorkspaceLocation() {
 		return root;
 	}
 
-	String getFlightPathLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_FLIGHTPATHS;
+	String getFlightRouteLocation() {
+		return root + "\\" + DronologyConstants.FOLDER_FLIGHTROUTE;
 	}
+	
+	public String getSimScenarioLocation() {
+		return root + "\\" + DronologyConstants.FOLDERN_SIM_SCENARIO;
+	}
+	
+	public String getDroneSpecificationLocation() {
+		return root + "\\" + DronologyConstants.FOLDER_SPECIFICATION;
+	}
+
 
 	public static WorkspaceInitializer getInstance() {
 		return instance;
@@ -101,7 +120,7 @@ public class WorkspaceInitializer {
 			return false;
 		}
 		switch (ext) {
-		case DronologyConstants.EXTENSION_FLIGHTPATH:
+		case DronologyConstants.EXTENSION_FLIGHTROUTE:
 			return importFlightPath(fileName, byteArray, overwrite);
 		default:
 			LOGGER.warn("File with extension '" + FileUtil.getExtension(fileName) + "' not processable");
@@ -110,7 +129,7 @@ public class WorkspaceInitializer {
 	}
 
 	private boolean importFlightPath(String fileName, byte[] content, boolean overwrite) {
-		String location = getFlightPathLocation();
+		String location = getFlightRouteLocation();
 		String fName = location + "\\" + fileName;
 		return importFile(fName, content, overwrite);
 
@@ -123,5 +142,8 @@ public class WorkspaceInitializer {
 		}
 		return FileUtil.saveByteArrayToFile(f, content);
 	}
+
+
+
 
 }
