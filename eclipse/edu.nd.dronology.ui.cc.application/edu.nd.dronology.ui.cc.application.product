@@ -19,7 +19,7 @@
       <plugin id="com.ibm.icu"/>
       <plugin id="edu.nd.dronology.ui.cc.application"/>
       <plugin id="edu.nd.dronology.ui.cc.images"/>
-      <plugin id="edu.nd.dronology.ui.cc.lib"/>
+      <plugin id="edu.nd.dronology.ui.cc.libs"/>
       <plugin id="edu.nd.dronology.ui.cc.main"/>
       <plugin id="edu.nd.dronology.ui.cc.util"/>
       <plugin id="javax.annotation"/>
