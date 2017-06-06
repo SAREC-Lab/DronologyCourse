@@ -1,0 +1,7 @@
+To run the current version of Dronology. 
+Go to edu.nd.dronology.services.launcher and invoke DronologyServiceRunner.java
+This will start up the services (note that you'll currently see errors as it starts up the Ground Station middleware.
+(you can ignore this for now).
+
+There are several options for running a placeholder GUI.  The easiest one (with the least functionality too) can be invoked from:
+edu.nd.dronology.ui.javafx.start DronologyFXUIRunner.java
