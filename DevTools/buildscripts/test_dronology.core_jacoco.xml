@@ -26,6 +26,7 @@
 		<antcall target="check-preconditions" inheritall="true" />
 		<antcall target="prepare-test" inheritall="true" />
 		<antcall target="copy-source" inheritall="true" />
+			<antcall target="copy-libs" inheritall="true" />
 		<antcall target="-copy-logger" inheritall="true" />
 		<antcall target="-copy-util" inheritall="true" />
 		<antcall target="copy-tests" inheritall="true" />
