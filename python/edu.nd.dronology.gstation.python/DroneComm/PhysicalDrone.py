@@ -5,7 +5,10 @@ from Coordinate import *
 
 class PhysicalDrone(object):
 	def __init__(self,ConnectionData):
-		self.vehicle = connect(ConnectionData['ConnectionString'], wait_ready=True)
+		if 'BaudRate' in ConnectionData:
+			self.vehicle = connect(ConnectionData['ConnectionString'], wait_ready=True, baud=ConnectionData['BaudRate'])
+		else:
+			self.vehicle = connect(ConnectionData['ConnectionString'], wait_ready=True)
 	
 	def gotoLocation(self,location):
 		# TODO this doesn't belong here

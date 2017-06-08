@@ -2,7 +2,7 @@
 
 from DroneComm import *
 
-drones = [
+drone_info = [
 	{
 		'type':'SITL',
 		'ConnectionData':{
@@ -12,7 +12,7 @@ drones = [
 	},
 ]
 
-# drones = [
+# drone_info = [
 	# {
 		# 'type':'physical',
 		# 'ConnectionData':{
@@ -23,7 +23,7 @@ drones = [
 
 current_drone_id = 0
 drones = {}
-for drone in drones:
+for drone in drone_info:
 	new_drone = DroneComm(drone['type'],drone['ConnectionData'])
 	drones[current_drone_id] = new_drone
 	current_drone_id = current_drone_id + 1
