@@ -1,17 +1,19 @@
 #! /bin/bash
 
 # make sure pip is set-up
-sudo apt-get install python-requests python-pip
+sudo apt-get install -y python-requests python-pip
 sudo pip install --upgrade pip
 # due to a problem with the existing pip package, I had to instead run:
 # $ sudo easy_install -U pip
+
+sudo apt-get install -y python-dev
 
 # install SITL and MAVProxy
 sudo pip install pymavlink MAVProxy
 sudo pip install dronekit-sitl
 
 # used by startSITL.sh
-sudo apt-get install screen
+sudo apt-get install -y screen
 # used in python for communication with the Java ground station
 sudo pip install twisted
 sudo pip install service_identity
@@ -19,22 +21,22 @@ sudo pip install service_identity
 sudo pip install console
 sudo pip install map
 sudo pip install numpy
-sudo apt-get install gtk+-3.0
-sudo apt-get install libgtk2.0-dev
-sudo apt-get install libglw1-mesa libglw1-mesa-dev
-sudo apt-get install freeglut3 freeglut3-dev
-sudo apt-get install libgconf2-dev
-sudo apt-get install libgstreamer1.0-dev
-sudo apt-get install libgstreamer1.0
-sudo apt-get install libgstreamer0.10
-sudo apt-get install gstreamer0.10
-sudo apt-get install dpkg-dev
-sudo apt-get install libwebkitgtk-dev
-sudo apt-get install libjpeg-dev
-sudo apt-get install libtiff-dev
-sudo apt-get install libsdl1.2-dev
-sudo apt-get install libgstreamer-plugins-base0.10-dev
-sudo pip install wxpython
+sudo apt-get install -y gtk+-3.0
+sudo apt-get install -y libgtk2.0-dev
+sudo apt-get install -y libglw1-mesa libglw1-mesa-dev
+sudo apt-get install -y freeglut3 freeglut3-dev
+sudo apt-get install -y libgconf2-dev
+sudo apt-get install -y libgstreamer1.0-dev
+sudo apt-get install -y libgstreamer1.0
+sudo apt-get install -y libgstreamer0.10
+sudo apt-get install -y gstreamer0.10
+sudo apt-get install -y dpkg-dev
+sudo apt-get install -y libwebkitgtk-dev
+sudo apt-get install -y libjpeg-dev
+sudo apt-get install -y libtiff-dev
+sudo apt-get install -y libsdl1.2-dev
+sudo apt-get install -y libgstreamer-plugins-base0.10-dev
+sudo pip install -v wxpython
 
 
 # install ardupilot
