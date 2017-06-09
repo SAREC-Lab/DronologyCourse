@@ -16,6 +16,8 @@ import edu.nd.dronology.ui.vaadin.activeflights.AFMainLayout;
  * <p>
  * The UI is initialized using {@link #init(VaadinRequest)}. This method is intended to be 
  * overridden to add component to the user interface and initialize non-component functionality.
+ * 
+ * @author Jinghui Cheng
  */
 @Theme("mytheme")
 public class MyUI extends UI {

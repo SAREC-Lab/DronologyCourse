@@ -1,18 +1,18 @@
-package edu.nd.dronology.ui.vaadin.activeflights;
+package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
 /**
- * This is the control panel framework for the Activated Flights UI
+ * This is the control panel framework for the Flight Routes UI
  * 
  * @author Jinghui Cheng
  */
-public class AFControlsComponent extends CustomComponent {
+public class FRControlsComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	
-	public AFControlsComponent() {
+	public FRControlsComponent() {
 		this.setWidth("100%");
 		addStyleName("af_controls_component");
 		

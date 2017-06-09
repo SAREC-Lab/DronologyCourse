@@ -1,4 +1,4 @@
-package edu.nd.dronology.ui.vaadin.activeflights;
+package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
@@ -7,16 +7,16 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
 /**
- * This is the map component for the Active Flights UI
+ * This is the map component for the Flight Routes UI
  * 
  * @author Jinghui Cheng
  */
-public class AFMapComponent extends CustomComponent {
+public class FRMapComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	
 	private LMap leafletMap;
 
-	public AFMapComponent(String tileDataURL, String name) {
+	public FRMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
 		addStyleName("af_map_component");
 		

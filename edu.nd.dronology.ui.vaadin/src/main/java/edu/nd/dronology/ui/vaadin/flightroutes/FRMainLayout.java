@@ -1,25 +1,25 @@
-package edu.nd.dronology.ui.vaadin.activeflights;
+package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.CssLayout;
 
 /**
- * This is the main layout for the Active Flights UI
+ * This is the main layout for the Flight Routes UI
  * 
  * @author Jinghui Cheng
  */
-public class AFMainLayout extends CustomComponent {
+public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	
-	public AFMainLayout() {
+	public FRMainLayout() {
 		addStyleName("af_main_layout");
 		
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 		
-		AFControlsComponent controls = new AFControlsComponent();
+		FRControlsComponent controls = new FRControlsComponent();
         
-        AFMapComponent map = new AFMapComponent(
+		FRMapComponent map = new FRMapComponent(
         		"VAADIN/sbtiles/{z}/{x}/{y}.png",
         		"South Bend");
         map.setCenter(41.68, -86.25);

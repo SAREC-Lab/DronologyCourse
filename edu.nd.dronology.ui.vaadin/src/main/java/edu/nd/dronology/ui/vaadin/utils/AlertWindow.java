@@ -5,6 +5,11 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+/**
+ * This is a simple Vaadin Alert Window
+ * 
+ * @author Jinghui Cheng
+ */
 public class AlertWindow extends Window {
 	private static final long serialVersionUID = 2621348163200455408L;
 
