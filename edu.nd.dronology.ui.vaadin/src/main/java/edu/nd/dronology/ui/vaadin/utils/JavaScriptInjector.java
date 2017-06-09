@@ -10,32 +10,24 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 
 /**
- * This is to be used to execute JS or jQuery code on the client side
+ * This is to be used to execute JS code on the client side.
+ * If you wish you use JQuery, inject jquery.min.js in the main UI.
+ * Then...
  * <p>
- * 1. Write a JS file and save it to Deployed Resources: /webapp/VAADIN/js/. You can use JQuery if you wish.
+ * 1. Write a JS file and save it to Deployed Resources: /webapp/VAADIN/js/.
  * 2. Use the JQueryInjector class like this:
  * 		JQueryInjector.getInstance().injectJSCode("[your js file name.js]");
  * 
  * @author Jinghui Cheng
  */
-public class JQueryInjector {
-	private static JQueryInjector instance = null;
-	protected JQueryInjector() {
-		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-		Path p = Paths.get(basepath+"/VAADIN/js/jquery.min.js");
-		byte[] b = null;
-		try {
-			b = Files.readAllBytes(p);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		String fileString = new String(b, StandardCharsets.UTF_8);
-		Page.getCurrent().getJavaScript().execute(fileString);
+public class JavaScriptInjector {
+	private static JavaScriptInjector instance = null;
+	protected JavaScriptInjector() {
 	}
 	
-	public static JQueryInjector getInstance() {
+	public static JavaScriptInjector getInstance() {
 		if(instance == null) {
-			instance = new JQueryInjector();
+			instance = new JavaScriptInjector();
 		}
 		return instance;
 	}
