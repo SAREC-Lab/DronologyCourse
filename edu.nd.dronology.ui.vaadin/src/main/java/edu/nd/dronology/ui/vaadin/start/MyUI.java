@@ -26,8 +26,8 @@ public class MyUI extends UI {
 	@Override
     protected void init(VaadinRequest vaadinRequest) {
 		AFMainLayout activeflights = new AFMainLayout();
-        setContent(activeflights);
-        activeflights.setSizeFull();
+      setContent(activeflights);
+      activeflights.setSizeFull();
     }
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)

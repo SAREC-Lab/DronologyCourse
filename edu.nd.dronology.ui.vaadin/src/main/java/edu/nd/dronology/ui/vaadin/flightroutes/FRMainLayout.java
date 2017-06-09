@@ -20,12 +20,12 @@ public class FRMainLayout extends CustomComponent {
 		FRControlsComponent controls = new FRControlsComponent();
         
 		FRMapComponent map = new FRMapComponent(
-        		"VAADIN/sbtiles/{z}/{x}/{y}.png",
-        		"South Bend");
-        map.setCenter(41.68, -86.25);
-        map.setZoomLevel(13);
-        
-        content.addComponents(controls, map);
-        setCompositionRoot(content);
+  		"VAADIN/sbtiles/{z}/{x}/{y}.png",
+  		"South Bend");
+    map.setCenter(41.68, -86.25);
+    map.setZoomLevel(13);
+    
+    content.addComponents(controls, map);
+    setCompositionRoot(content);
 	}
 }

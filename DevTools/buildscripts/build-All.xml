@@ -16,7 +16,7 @@
 		<delete>
 			<fileset dir="${publish.dir}" includes="**/*.jar" />
 		</delete>
-		 
+		  
 	</target>
 	
 

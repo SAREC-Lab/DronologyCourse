@@ -30,8 +30,8 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
 		
-        setCompositionRoot(content);  
-        content.addComponents(leafletMap);
+    setCompositionRoot(content);  
+    content.addComponents(leafletMap);
 	}
 	
 	public void setCenter(double centerLat, double centerLon) {

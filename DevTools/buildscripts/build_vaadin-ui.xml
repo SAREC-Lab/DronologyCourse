@@ -43,7 +43,7 @@
 		<copy file="{src.dir}/../../../DevTools/libs/vaadin/vaadin-shared-8.0.6.jar" todir="${build.dir}/lib" />
 		
 		 
-		
+		 
 	</target>
 
 

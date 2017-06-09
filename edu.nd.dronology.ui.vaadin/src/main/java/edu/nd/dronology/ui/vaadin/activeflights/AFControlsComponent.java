@@ -18,9 +18,8 @@ public class AFControlsComponent extends CustomComponent {
 		
 		VerticalLayout content = new VerticalLayout();
 		
-		Button btn = new Button("Test");
+		Button btn = new Button("AF Page");
 		content.addComponent(btn);
-		
-        setCompositionRoot(content);
+		setCompositionRoot(content);
 	}
 }

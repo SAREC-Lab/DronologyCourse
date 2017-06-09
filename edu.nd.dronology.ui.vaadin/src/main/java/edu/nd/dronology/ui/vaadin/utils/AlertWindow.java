@@ -21,11 +21,11 @@ public class AlertWindow extends Window {
 		this.setResizable(false);
 		this.setDraggable(false);
 
-        VerticalLayout layout = new VerticalLayout();
-        Label text = new Label(message);
-        Button okButton = new Button("OK", event->close());
-        layout.addComponents(text, okButton);
-        
-        this.setContent(layout);
+    VerticalLayout layout = new VerticalLayout();
+    Label text = new Label(message);
+    Button okButton = new Button("OK", event->close());
+    layout.addComponents(text, okButton);
+    
+    this.setContent(layout);
 	}
 }
