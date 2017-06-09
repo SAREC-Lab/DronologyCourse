@@ -168,4 +168,3 @@ public class Configuration {
 		this.saveConfig(FILENAME);
 	}
 }
-
