@@ -19,13 +19,13 @@ public class AFMainLayout extends CustomComponent {
 		
 		AFControlsComponent controls = new AFControlsComponent();
         
-        AFMapComponent map = new AFMapComponent(
-        		"VAADIN/sbtiles/{z}/{x}/{y}.png",
-        		"South Bend");
-        map.setCenter(41.68, -86.25);
-        map.setZoomLevel(13);
-        
-        content.addComponents(controls, map);
-        setCompositionRoot(content);
+			AFMapComponent map = new AFMapComponent(
+				"VAADIN/sbtiles/{z}/{x}/{y}.png",
+				"South Bend");
+			map.setCenter(41.68, -86.25);
+			map.setZoomLevel(13);
+			
+			content.addComponents(controls, map);
+			setCompositionRoot(content);
 	}
 }
