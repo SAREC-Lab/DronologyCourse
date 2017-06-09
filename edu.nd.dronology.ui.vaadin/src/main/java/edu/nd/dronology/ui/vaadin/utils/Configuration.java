@@ -31,9 +31,6 @@ public class Configuration {
 		return Configuration.instance;
 	}
 	
-	/**
-	 * TODO: get FILENAME
-	 */
 	public static final String FILENAME = "src/main/webapp/VAADIN/config/configuration.json";
 	
 	private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
