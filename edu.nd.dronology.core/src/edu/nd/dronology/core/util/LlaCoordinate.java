@@ -125,7 +125,11 @@ public class LlaCoordinate {
 		double z = Math.sin(lat);
 		return new NVector(x, y, z, altitude);
 	}
-
+	
+	public PVector toPVector() {
+		return this.toNVector().toPVector();
+	}
+	
 	private void setAltitude(double altitude) {
 		// on wrong side of the earth...
 		// if (altitude < -6378137) {
