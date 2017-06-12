@@ -111,7 +111,7 @@ if __name__=="__main__":
 	#		'type':'physical',
 	#		'ConnectionData':{
 	#			'ConnectionString':'/dev/ttyUSB0',
-	#			'baud':57600,
+	#			'BaudRate':57600,
 	#		},
 	#	},
 	#]
