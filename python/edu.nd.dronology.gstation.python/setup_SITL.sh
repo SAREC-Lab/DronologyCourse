@@ -15,7 +15,7 @@ sudo pip install dronekit-sitl
 # used by startSITL.sh
 sudo apt-get install -y screen
 # used in python for communication with the Java ground station
-sudo pip install twisted
+sudo pip install twisted==13.1.0
 sudo pip install service_identity
 # used by mavproxy for map and console
 sudo pip install console
