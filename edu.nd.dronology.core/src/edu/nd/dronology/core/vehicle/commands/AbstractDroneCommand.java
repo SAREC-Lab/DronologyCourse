@@ -19,7 +19,7 @@ public class AbstractDroneCommand implements IDroneCommand {
 	protected final transient Map<String, Object> innerdata = new HashMap<>();
 
 	protected AbstractDroneCommand(String droneId, String commandId) {
-		data.put("id", droneId);
+		data.put("id", Integer.parseInt(droneId));
 		data.put("command", commandId);
 		data.put("data", innerdata);
 

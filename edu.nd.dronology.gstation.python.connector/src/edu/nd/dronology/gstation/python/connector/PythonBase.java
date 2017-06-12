@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -20,6 +22,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.DroneAttribute;
@@ -56,6 +59,8 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 	Thread thread;
 
+	private final Map<String, IDroneStatusUpdateListener> registeredListeners = new ConcurrentHashMap<>();
+
 	@Discuss(discuss = "port+ip should be specified in property file/passed to base when initialized")
 	public PythonBase() {
 		try {
@@ -78,7 +83,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			droneStates = new HashMap<>();
 			LOGGER.info("Connected to " + pythonSocket.getInetAddress().toString() + "@" + pythonSocket.getPort());
 			servicesExecutor.submit(this);
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			LOGGER.error(e);
 		}
 	}
@@ -103,6 +108,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		}
 	}
 
+	@Discuss(discuss = "change from recursive to loop....")
 	public void parseIncomingData() {
 		int dataLength = incomingData.indexOf('\r');
 		if (dataLength >= 0) {
@@ -154,26 +160,68 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	}
 
 	public void updateDroneInfo(int ID, JSONObject data) {
+
 		PythonDroneState thisDroneState = droneStates.get(ID);
 		thisDroneState.loadfromJSON(data);
-//		LOGGER.info("Drone info updated. ID: "+Integer.toString(ID)+" Coordinate: ("+Long.toString(thisDroneState.getLocation().getLatitude())+","+Long.toString(thisDroneState.getLocation().getLongitude())+","+Integer.toString(thisDroneState.getLocation().getAltitude())+")..."); 
+//		LOGGER.info("Drone info updated. ID: " + Integer.toString(ID) + "Coordinate: ("
+//				+ Long.toString(thisDroneState.getLocation().getLatitude()) + ","
+//				+ Long.toString(thisDroneState.getLocation().getLongitude()) + ","
+//				+ Integer.toString(thisDroneState.getLocation().getAltitude()) + ")...");
+
+		try {
+			propagateStatusUpdate(ID, thisDroneState);
+		} catch (DroneException e) {
+			LOGGER.error(e);
+		}
+
+	}
+
+	private void propagateStatusUpdate(int iD, PythonDroneState thisDroneState) throws DroneException {
+
+		if (!registeredListeners.containsKey(Integer.toString(iD))) {
+			// throw new DroneException("An listener with '" + iD + "' is not
+			// registered");
+			LOGGER.info("An listener with '" + iD + "' is not registered");
+			return;
+		}
+
+		try {
+			IDroneStatusUpdateListener listener = registeredListeners.get(Integer.toString(iD));
+			 listener.updateCoordinates(thisDroneState.getLocation());
+			 listener.updateBatteryLevel(thisDroneState.getBatteryLevel());
+		} catch (Throwable t) {
+			LOGGER.error(t);
+		}
+
+		/// IDroneStatusUpdateListener listener = registeredListeners.get(iD);
+		// listener.updateCoordinates(thisDroneState.getLocation());
+		
+		// TODO: update other sensors and battery....
+		// TODO.. switch to asynchronous listener notification
+
 	}
 
 	public void handleNewDrone(int ID, JSONObject data) {
 		unallocatedLock.lock();
 		unallocatedIDs.add(ID);
-//		PythonDroneState newState = new PythonDroneState();
+		// PythonDroneState newState = new PythonDroneState();
 		droneStates.put(ID, new PythonDroneState());
 		unallocatedLock.unlock();
 		updateDroneInfo(ID, data);
 		PythonDroneState newState = droneStates.get(ID);
-		LOGGER.info("New drone recognized with id "+Integer.toString(ID)+" and coordinate ("+Long.toString(newState.getLocation().getLatitude())+","+Long.toString(newState.getLocation().getLongitude())+","+Integer.toString(newState.getLocation().getAltitude())+")..."); 
+		LOGGER.info("New drone recognized with id " + Integer.toString(ID) + " and coordinate ("
+				+ Long.toString(newState.getLocation().getLatitude()) + ","
+				+ Long.toString(newState.getLocation().getLongitude()) + ","
+				+ Integer.toString(newState.getLocation().getAltitude()) + ")...");
 		registerDrone(ID, newState);
 
 	}
 
 	private void registerDrone(int iD, PythonDroneState state) {
-		LOGGER.info("New drone registered with id "+Integer.toString(iD)+" and coordinate ("+Long.toString(state.getLocation().getLatitude())+","+Long.toString(state.getLocation().getLongitude())+","+Integer.toString(state.getLocation().getAltitude())+")..."); 
+		LOGGER.info("New drone registered with id " + Integer.toString(iD) + " and coordinate ("
+				+ Long.toString(state.getLocation().getLatitude()) + ","
+				+ Long.toString(state.getLocation().getLongitude()) + ","
+				+ Integer.toString(state.getLocation().getAltitude()) + ")...");
 		DroneInitializationInfo info = new DroneInitializationInfo(Integer.toString(iD), Integer.toString(iD),
 				state.getLocation());
 		try {
@@ -315,5 +363,16 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		default:
 			return null;
 		}
+	}
+
+	@Override
+	public void setStatusCallbackListener(String id, IDroneStatusUpdateListener listener) throws DroneException {
+		if (registeredListeners.containsKey(id)) {
+			throw new DroneException("An listener with '" + id + "' is already registered");
+
+		}
+
+		registeredListeners.put(id, listener);
+
 	}
 }
