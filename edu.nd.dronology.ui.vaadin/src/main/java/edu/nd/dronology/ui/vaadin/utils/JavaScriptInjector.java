@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.JavaScript;
 
 /**
  * This is to be used to execute JS code on the client side.
@@ -21,23 +21,12 @@ import com.vaadin.server.VaadinService;
  * @author Jinghui Cheng
  */
 public class JavaScriptInjector {
-	private static JavaScriptInjector instance = null;
-	protected JavaScriptInjector() {
-	}
-	
-	public static JavaScriptInjector getInstance() {
-		if(instance == null) {
-			instance = new JavaScriptInjector();
-		}
-		return instance;
-	}
-	
 	/**
-	 * Execute JS code. The .js file need to be put into /VAADIN/js/
+	 * Execute JS file. The .js file need to be put into /VAADIN/js/
 	 *
 	 * @param  jsFileName .js file name
 	 */
-	public void injectJSCode(String jsFileName) {
+	public static void injectJSFile(String jsFileName) {
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		Path p = Paths.get(basepath + "/VAADIN/js/" + jsFileName);
 		byte[] b = null;
@@ -47,6 +36,15 @@ public class JavaScriptInjector {
 			e.printStackTrace();
 		}
 		String fileString = new String(b, StandardCharsets.UTF_8);
-		Page.getCurrent().getJavaScript().execute(fileString);
+		JavaScript.getCurrent().execute(fileString);
+	}
+	
+	/**
+	 * Execute JS code.
+	 *
+	 * @param  jsCode the js code to be executed
+	 */
+	public static void executeJSCode(String jsCode) {
+		JavaScript.getCurrent().execute(jsCode);
 	}
 }
