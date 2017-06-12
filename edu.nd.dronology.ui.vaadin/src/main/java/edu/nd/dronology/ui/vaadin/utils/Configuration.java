@@ -16,7 +16,7 @@ import org.json.JSONObject;
 /**
  * Configuration singleton class that stores all UI parameters
  * 
- * @author Patrick
+ * @author Patrick Falvey
  *
  */
 
@@ -104,9 +104,7 @@ public class Configuration {
 	private boolean saveConfig(String fileName){
 		try {
 			PrintWriter configFile = new PrintWriter(fileName, "UTF-8");
-			
-			
-			
+		
       JSONObject json = new JSONObject();
       json.put("projectName", this.projectName);
       json.put("mapCenterLat", this.mapCenterLat);
@@ -115,11 +113,10 @@ public class Configuration {
 		
       LOGGER.log(Level.INFO, null, json.toString());
 			
-      configFile.write(json.toString());
-            
+      configFile.write(json.toString());        
 
       configFile.close();
-
+      
 		} catch (FileNotFoundException | UnsupportedEncodingException exc) {
 			LOGGER.log(Level.SEVERE, null, exc);
       return false;
@@ -127,9 +124,7 @@ public class Configuration {
     	LOGGER.log(Level.SEVERE, null, exc);
 			return false;
 		}
-
-		return true;
-		
+		return true;	
 	}
 	
 	public String getProjectName(){
