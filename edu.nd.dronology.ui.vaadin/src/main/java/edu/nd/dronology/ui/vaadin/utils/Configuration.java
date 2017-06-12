@@ -94,9 +94,9 @@ public class Configuration {
 		 * set default values for variables
 		 */
 		this.projectName = "";
-		this.mapCenterLat = 0;
-		this.mapCenterLon = 0;
-		this.mapDefaultZoom = 0;
+		this.mapCenterLat = 41.521902;
+		this.mapCenterLon = -86.241003;
+		this.mapDefaultZoom = 13;
 		
 		return this.saveConfig(fileName);
 	}
