@@ -97,22 +97,23 @@ class GroundStation():
 		threading.Thread(target=self.send_drone_list_cont).start()
 	
 if __name__=="__main__":
-	# drones = [
-		# {
-			# 'type':'SITL',
-			# 'ConnectionData':{
-				# 'inst':0,
-				# 'home':'41.732955,-86.180886,0,0',
-			# },
-		# },
-	# ]
 	drones = [
 		{
-			'type':'physical',
+			'type':'SITL',
 			'ConnectionData':{
-				'ConnectionString':'192.168.56.101:14550',
+				'inst':0,
+				'home':'41.732955,-86.180886,0,0',
 			},
 		},
 	]
+	#drones = [
+	#	{
+	#		'type':'physical',
+	#		'ConnectionData':{
+	#			'ConnectionString':'/dev/ttyUSB0',
+	#			'BaudRate':57600,
+	#		},
+	#	},
+	#]
 	comm = GroundStation(1234,drones)
 	
