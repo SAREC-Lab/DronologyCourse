@@ -38,6 +38,8 @@ sudo apt-get install -y libsdl1.2-dev
 sudo apt-get install -y libgstreamer-plugins-base0.10-dev
 sudo pip install -v wxpython
 
+sudo apt-get install -y python-wxgtk2.8
+
 
 # install ardupilot
 export prevdir=$(pwd)
