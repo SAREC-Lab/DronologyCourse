@@ -97,12 +97,20 @@ class GroundStation():
 		threading.Thread(target=self.send_drone_list_cont).start()
 	
 if __name__=="__main__":
+	# drones = [
+		# {
+			# 'type':'SITL',
+			# 'ConnectionData':{
+				# 'inst':0,
+				# 'home':'41.732955,-86.180886,0,0',
+			# },
+		# },
+	# ]
 	drones = [
 		{
-			'type':'SITL',
+			'type':'physical',
 			'ConnectionData':{
-				'inst':0,
-				'home':'41.732955,-86.180886,0,0',
+				'ConnectionString':'192.168.56.101:14550',
 			},
 		},
 	]

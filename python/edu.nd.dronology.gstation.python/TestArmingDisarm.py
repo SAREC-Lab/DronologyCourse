@@ -12,12 +12,21 @@ from DroneComm import *
 #	},
 #]
 
+# drone_info = [
+	# {
+		# 'type':'physical',
+		# 'ConnectionData':{
+			# 'ConnectionString':'/dev/ttyUSB0',
+			# 'BaudRate':57600,
+		# },
+	# },
+# ]
+
 drone_info = [
 	{
 		'type':'physical',
 		'ConnectionData':{
-			'ConnectionString':'/dev/ttyUSB0',
-			'BaudRate':57600,
+			'ConnectionString':'127.0.0.1:14550',
 		},
 	},
 ]

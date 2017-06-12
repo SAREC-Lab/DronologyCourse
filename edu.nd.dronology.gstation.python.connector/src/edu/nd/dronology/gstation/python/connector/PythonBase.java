@@ -26,6 +26,9 @@ import edu.nd.dronology.core.vehicle.DroneAttribute;
 import edu.nd.dronology.core.vehicle.IDroneAttribute;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -57,11 +60,15 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	public PythonBase() {
 		try {
 
-			String host = InetAddress.getLocalHost().getHostAddress();
+			// InetAddress hostAddr = InetAddress.getLocalHost();
+			// InetAddress hostAddr = InetAddress.getByName("huey.cse.nd.edu");
+			InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
+			// InetAddress hostAddr = InetAddress.getByName("ilia.cse.nd.edu");
 			int port = 1234;
+			String hostStr = hostAddr.toString();
 
-			LOGGER.info("Connecting to Python base " + host + "@" + port);
-			pythonSocket = new Socket(InetAddress.getLocalHost(), port);
+			LOGGER.info("Connecting to Python base " + hostStr + "@" + port);
+			pythonSocket = new Socket(hostAddr, port);
 
 			inStream = pythonSocket.getInputStream();
 			outStream = pythonSocket.getOutputStream();
@@ -86,7 +93,9 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 				incomingData = incomingData + inString;
 				parseIncomingData();
 
-				// more data might still be available. call this function again. // TODO: modify this to not use recursion (unnecessarily uses up stack space and causes overflows)
+				// more data might still be available. call this function again.
+				// // TODO: modify this to not use recursion (unnecessarily uses
+				// up stack space and causes overflows)
 				getIncomingData();
 			}
 		} catch (IOException e) {
@@ -100,7 +109,9 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			String dataChunk = incomingData.substring(0, dataLength);
 			incomingData = incomingData.substring(dataLength + 1);
 			parseData(dataChunk);
-			// more data might still be available. call this function again. // TODO: modify this to not use recursion (unnecessarily uses up stack space)
+			// more data might still be available. call this function again. //
+			// TODO: modify this to not use recursion (unnecessarily uses up
+			// stack space)
 			parseIncomingData();
 		}
 	}
@@ -120,35 +131,57 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 	public void handleData(String type, Object data) {
 		/*
-		 * System.out.println("Incoming data:"); // temporary placeholder to identify incoming data System.out.println("Type: "+type); System.out.print("Data: "); System.out.println(data); // temporary
-		 * placeholder to identify incoming data System.out.print("Data type: "); System.out.println(data.getClass()); // temporary placeholder to identify incoming data
+		 * System.out.println("Incoming data:"); // temporary placeholder to
+		 * identify incoming data System.out.println("Type: "+type);
+		 * System.out.print("Data: "); System.out.println(data); // temporary
+		 * placeholder to identify incoming data
+		 * System.out.print("Data type: "); System.out.println(data.getClass());
+		 * // temporary placeholder to identify incoming data
 		 */
 
 		switch (type) {
-			case "drone_list":
-				handleDroneList((JSONObject) data);
-				break;
-			case "new_drone":
-				JSONObject json = (JSONObject) data;
-				int ID = (int) json.get("id");
-				JSONObject droneData = (JSONObject) json.get("data");
-				handleNewDrone(ID, droneData);
-				break;
-			default:
+		case "drone_list":
+			handleDroneList((JSONObject) data);
+			break;
+		case "new_drone":
+			JSONObject json = (JSONObject) data;
+			int ID = (int) json.get("id");
+			JSONObject droneData = (JSONObject) json.get("data");
+			handleNewDrone(ID, droneData);
+			break;
+		default:
 		}
 	}
 
 	public void updateDroneInfo(int ID, JSONObject data) {
 		PythonDroneState thisDroneState = droneStates.get(ID);
 		thisDroneState.loadfromJSON(data);
+//		LOGGER.info("Drone info updated. ID: "+Integer.toString(ID)+" Coordinate: ("+Long.toString(thisDroneState.getLocation().getLatitude())+","+Long.toString(thisDroneState.getLocation().getLongitude())+","+Integer.toString(thisDroneState.getLocation().getAltitude())+")..."); 
 	}
 
 	public void handleNewDrone(int ID, JSONObject data) {
 		unallocatedLock.lock();
 		unallocatedIDs.add(ID);
+//		PythonDroneState newState = new PythonDroneState();
 		droneStates.put(ID, new PythonDroneState());
 		unallocatedLock.unlock();
 		updateDroneInfo(ID, data);
+		PythonDroneState newState = droneStates.get(ID);
+		LOGGER.info("New drone recognized with id "+Integer.toString(ID)+" and coordinate ("+Long.toString(newState.getLocation().getLatitude())+","+Long.toString(newState.getLocation().getLongitude())+","+Integer.toString(newState.getLocation().getAltitude())+")..."); 
+		registerDrone(ID, newState);
+
+	}
+
+	private void registerDrone(int iD, PythonDroneState state) {
+		LOGGER.info("New drone registered with id "+Integer.toString(iD)+" and coordinate ("+Long.toString(state.getLocation().getLatitude())+","+Long.toString(state.getLocation().getLongitude())+","+Integer.toString(state.getLocation().getAltitude())+")..."); 
+		DroneInitializationInfo info = new DroneInitializationInfo(Integer.toString(iD), Integer.toString(iD),
+				state.getLocation());
+		try {
+			DroneSetupService.getInstance().initializeDrones(info);
+		} catch (DronologyServiceException e) {
+			LOGGER.error(e);
+		}
+
 	}
 
 	public void handleDroneList(JSONObject data) {
@@ -176,7 +209,8 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		}
 	}
 
-	// public void sendCommand(int id, String command, Map<String, Object> data) {
+	// public void sendCommand(int id, String command, Map<String, Object> data)
+	// {
 	//
 	// JSONObject rootObject = new JSONObject();
 	// rootObject.put("type", "command");
@@ -209,7 +243,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		boolean stillLooping = true;
 		while (stillLooping) {
 			// wait until an unallocated drone is available
-			System.out.println("waiting for available drone...");
+			LOGGER.info("waiting for available drone...");
 			Thread.sleep(500);
 			if (!unallocatedIDs.isEmpty()) {
 				if (!unallocatedLock.isLocked()) {
@@ -219,7 +253,8 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 				}
 			}
 		}
-		// TODO: This is not threadsafe - may need to add some threadlocking code here
+		// TODO: This is not threadsafe - may need to add some threadlocking
+		// code here
 		int ID = unallocatedIDs.get(0);
 		unallocatedIDs.remove(0);
 		allocatedIDs.add(ID);
@@ -273,12 +308,12 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	@Override
 	public IDroneAttribute<?> getAttribute(String droneId, String key) {
 		switch (key) {
-			case IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE:
-				return new DroneAttribute<>(key, getDroneState(Integer.parseInt(droneId)).getBatteryVoltage());
-			case IDroneAttribute.ATTRIBUTE_LOCATION:
-				return new DroneAttribute<>(key, getDroneState(Integer.parseInt(droneId)).getLocation());
-			default:
-				return null;
+		case IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE:
+			return new DroneAttribute<>(key, getDroneState(Integer.parseInt(droneId)).getBatteryVoltage());
+		case IDroneAttribute.ATTRIBUTE_LOCATION:
+			return new DroneAttribute<>(key, getDroneState(Integer.parseInt(droneId)).getLocation());
+		default:
+			return null;
 		}
 	}
 }

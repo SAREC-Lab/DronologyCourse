@@ -7,6 +7,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.services.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.libs"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.gstation.python.connector"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

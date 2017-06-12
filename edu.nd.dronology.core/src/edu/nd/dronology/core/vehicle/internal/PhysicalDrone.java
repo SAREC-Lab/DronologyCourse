@@ -76,6 +76,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone {
 
 	@Override
 	public Coordinate getCoordinates() {
+		LOGGER.info("Coordinates retrieved: ("+Long.toString(baseStation.getLocation(droneID).getLatitude())+","+Long.toString(baseStation.getLocation(droneID).getLongitude())+","+Integer.toString(baseStation.getLocation(droneID).getAltitude())+")");
 		// return baseStation.getDroneState(droneID).getLocation();
 		return baseStation.getLocation(droneID);
 	}
