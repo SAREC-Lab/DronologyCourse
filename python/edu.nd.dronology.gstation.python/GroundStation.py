@@ -15,6 +15,7 @@ class GroundStation():
 			new_drone = DroneComm(drone['type'],drone['ConnectionData'])
 			self.drones[self.current_drone_id] = new_drone
 			self.current_drone_id = self.current_drone_id + 1
+		print "finished initializing drones..."
 		self.send_drone_list_cont_async()
 		self.java.startComm()
 	
@@ -86,6 +87,8 @@ class GroundStation():
 			'type':'drone_list',
 			'data':drone_list,
 		}
+		print "sending drone list: "
+		print drone_list
 		self.java.send_dict_last(data)
 	
 	def send_drone_list_cont(self):

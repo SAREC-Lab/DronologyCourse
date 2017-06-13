@@ -24,6 +24,7 @@ class DroneComm(object):
 			print "WARNING: Unrecognized connection type: {type}".format(type=self.type)
 			print "WARNING: Defaulting to simulated drone"
 			self.Drone = SimDrone(self.ConnectionData)
+		print "drone initialized"
 		
 	
 	def gotoLocation(self,location):

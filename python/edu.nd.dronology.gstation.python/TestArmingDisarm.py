@@ -12,24 +12,24 @@ from DroneComm import *
 #	},
 #]
 
-# drone_info = [
-	# {
-		# 'type':'physical',
-		# 'ConnectionData':{
-			# 'ConnectionString':'/dev/ttyUSB0',
-			# 'BaudRate':57600,
-		# },
-	# },
-# ]
-
 drone_info = [
 	{
 		'type':'physical',
 		'ConnectionData':{
-			'ConnectionString':'127.0.0.1:14550',
+			'ConnectionString':'/dev/ttyUSB0',
+			'BaudRate':57600,
 		},
 	},
 ]
+
+#drone_info = [
+#	{
+#		'type':'physical',
+#		'ConnectionData':{
+#			'ConnectionString':'127.0.0.1:14550',
+#		},
+#	},
+#]
 
 current_drone_id = 0
 drones = {}
@@ -38,15 +38,16 @@ for drone in drone_info:
 	drones[current_drone_id] = new_drone
 	current_drone_id = current_drone_id + 1
 
-drones[0].setMode("GUIDED")
-print " Arming motors for testing..."
-drones[0].setArmed(True)
-
-while not drones[0].getArmed():
-	print " Waiting for arming..."
-	drones[0].setArmed(True)
-	time.sleep(1)
-
-print " Disarming motors..."
-drones[0].setArmed(False)
+for drone in drones:
+	drone.setMode("GUIDED")
+	print " Arming motors for testing..."
+	drone.setArmed(True)
+	
+	while not drone.getArmed():
+		print " Waiting for arming..."
+		drone.setArmed(True)
+		time.sleep(1)
+	
+	print " Disarming motors..."
+	drone.setArmed(False)
 

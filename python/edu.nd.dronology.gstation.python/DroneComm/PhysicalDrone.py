@@ -9,6 +9,7 @@ class PhysicalDrone(object):
 			self.vehicle = connect(ConnectionData['ConnectionString'], wait_ready=True, baud=ConnectionData['BaudRate'])
 		else:
 			self.vehicle = connect(ConnectionData['ConnectionString'], wait_ready=True)
+		print "connected to "+ConnectionData['ConnectionString']
 	
 	def gotoLocation(self,location):
 		# TODO this doesn't belong here
