@@ -87,8 +87,8 @@ class GroundStation():
 			'type':'drone_list',
 			'data':drone_list,
 		}
-		print "sending drone list: "
-		print drone_list
+		#print "sending drone list: "
+		#print drone_list
 		self.java.send_dict_last(data)
 	
 	def send_drone_list_cont(self):
