@@ -22,19 +22,30 @@ public class AFInfoPanel extends CustomComponent{
 		/**
 		 * dummy/example boxes
 		 */
-		addBox("Patrick", "Enroute", 124, 41.3145, -86.25324, 150, 30);
+		addBox(false, "Patrick", "Enroute", 124, "red", 41.3145, -86.25324, 150, 30, false);
 		addBox();
-		addBox("Falvey", "Hovering", 88, 41.3234, -86.353, 200, 0);
+		addBox(true, "Falvey", "Hovering", 88, "yellow", 41.3234, -86.353, 200, 0, true);
 	}
 	
-	public void addBox(String name, String status, int batteryLife, double lat, double lon, double alt, double speed){
-		AFInfoBox box = new AFInfoBox(name, status, batteryLife, lat, lon, alt, speed);
+	public void addBox(boolean isChecked, String name, String status, int batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
+		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
 		content.addComponent(box);
 	}
 	
 	public void addBox(){
 		AFInfoBox box = new AFInfoBox();
 		content.addComponent(box);
+	}
+	public boolean removeBox(String name){
+		int numBoxes = content.getComponentCount();
+		for(int i = 0; i < numBoxes; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (box.getName().equals(name)){
+				content.removeComponent(box);
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
