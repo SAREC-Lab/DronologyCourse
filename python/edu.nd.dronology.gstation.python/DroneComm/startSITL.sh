@@ -35,7 +35,7 @@ export ardupath=$(<ardupath.conf)
 mkdir -p .SITL_workingdir
 cd .SITL_workingdir
 export instance=0
-export speed=100
+export speed=1
 export rate=10
 export home=41.732955,-86.180886,0,0
 
