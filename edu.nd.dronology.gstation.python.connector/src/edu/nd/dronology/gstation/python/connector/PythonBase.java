@@ -129,6 +129,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			String parsedType = (String) dataObject.get("type");
 			Object parsedData = dataObject.get("data");
 			handleData(parsedType, parsedData);
+			LOGGER.info("data handled.");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -136,15 +137,13 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	}
 
 	public void handleData(String type, Object data) {
-		/*
-		 * System.out.println("Incoming data:"); // temporary placeholder to
-		 * identify incoming data System.out.println("Type: "+type);
-		 * System.out.print("Data: "); System.out.println(data); // temporary
-		 * placeholder to identify incoming data
-		 * System.out.print("Data type: "); System.out.println(data.getClass());
-		 * // temporary placeholder to identify incoming data
-		 */
-
+		
+		System.out.println("Incoming data:"); // temporary placeholder toidentify incoming data
+		System.out.println("Type: "+type);
+		System.out.print("Data: "); System.out.println(data); // temporary placeholder to identify incoming data
+		System.out.print("Data type: "); System.out.println(data.getClass());
+		// temporary placeholder to identify incoming data
+		
 		switch (type) {
 		case "drone_list":
 			handleDroneList((JSONObject) data);
@@ -163,10 +162,10 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 		PythonDroneState thisDroneState = droneStates.get(ID);
 		thisDroneState.loadfromJSON(data);
-//		LOGGER.info("Drone info updated. ID: " + Integer.toString(ID) + "Coordinate: ("
-//				+ Long.toString(thisDroneState.getLocation().getLatitude()) + ","
-//				+ Long.toString(thisDroneState.getLocation().getLongitude()) + ","
-//				+ Integer.toString(thisDroneState.getLocation().getAltitude()) + ")...");
+		LOGGER.info("Drone info updated. ID: " + Integer.toString(ID) + "Coordinate: ("
+				+ Long.toString(thisDroneState.getLocation().getLatitude()) + ","
+				+ Long.toString(thisDroneState.getLocation().getLongitude()) + ","
+				+ Integer.toString(thisDroneState.getLocation().getAltitude()) + ")...");
 
 		try {
 			propagateStatusUpdate(ID, thisDroneState);
@@ -207,6 +206,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		// PythonDroneState newState = new PythonDroneState();
 		droneStates.put(ID, new PythonDroneState());
 		unallocatedLock.unlock();
+		LOGGER.info("New drone recognized with id " + Integer.toString(ID));
 		updateDroneInfo(ID, data);
 		PythonDroneState newState = droneStates.get(ID);
 		LOGGER.info("New drone recognized with id " + Integer.toString(ID) + " and coordinate ("
@@ -233,6 +233,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	}
 
 	public void handleDroneList(JSONObject data) {
+		LOGGER.info("dronelist: "+data.toJSONString());
 		for (Object keyObj : data.keySet()) {
 			String key = (String) keyObj;
 			Object droneInfo = data.get(keyObj);

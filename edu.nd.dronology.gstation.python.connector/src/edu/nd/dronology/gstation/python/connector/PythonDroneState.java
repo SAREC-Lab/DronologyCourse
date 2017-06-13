@@ -176,6 +176,7 @@ public class PythonDroneState {
 		for(Object keyObj:droneInfo.keySet()) {
 			String key = (String) keyObj;
 			Object data = droneInfo.get(keyObj);
+			System.out.println("key: "+key+" data: "+data.toString());
 			switch(key) {
 				case "location":
 					setLocation(coordFromJSON((JSONObject) data));
@@ -191,9 +192,20 @@ public class PythonDroneState {
 					break;
 				case "battery":
 					JSONObject batteryInfo = (JSONObject) data;
-					setBatteryVoltage((double) batteryInfo.get("voltage"));
-					setBatteryCurrent((double) batteryInfo.get("current"));
+					try {
+						setBatteryVoltage((double) batteryInfo.get("voltage"));
+						setBatteryCurrent((double) batteryInfo.get("current"));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					Object level = batteryInfo.get("level");
+					try {
+						System.out.println(level.getClass());
+						System.out.print("level: ");
+						System.out.println(level);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					if(level instanceof java.lang.Long) {
 						long level_l = (long) level;
 						setBatteryLevel(level_l);
