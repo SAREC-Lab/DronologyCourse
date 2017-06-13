@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vaadin.server.VaadinService;
+
 
 /**
  * Configuration singleton class that stores all UI parameters
@@ -31,7 +33,9 @@ public class Configuration {
 		return Configuration.instance;
 	}
 	
-	public static final String FILENAME = "src/main/webapp/VAADIN/config/configuration.json";
+	public static final String FILENAME = 
+			VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + 
+			"/VAADIN/config/configuration.json";
 	
 	private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
 	
@@ -45,6 +49,7 @@ public class Configuration {
 	
 	private double mapDefaultZoom;
 	
+	//configuration file needs to be put into /src/main/webapp/VAADIN/config/
 	private Configuration(){
 		boolean result = this.loadConfig(FILENAME);
 		if (!result){
