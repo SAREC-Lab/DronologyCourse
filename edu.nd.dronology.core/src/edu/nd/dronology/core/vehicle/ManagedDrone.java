@@ -136,6 +136,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * Controls takeoff of drone
 	 * 
 	 * @throws FlightZoneException
+	 * @throws InterruptedException 
 	 */
 	public void takeOff() throws FlightZoneException {
 		missionCompleted = false;
@@ -146,6 +147,15 @@ public class ManagedDrone extends Observable implements Runnable {
 		droneState.setModeToTakingOff();
 		drone.getDroneStatus().setStatus(droneState.getStatus()); // A bit ugly, but this was added to keep state for GUI middleware updated.
 		drone.takeOff(targetAltitude);
+		while(drone.getAltitude()<(targetAltitude-3)) { //TODO: ask about how to properly determine when finished taking off
+			LOGGER.info("Waiting for drone #"+drone.getDroneStatus().getID()+" to complete takeoff...");
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				LOGGER.error(e);
+			}
+		}
 		droneState.setModeToFlying();
 		drone.getDroneStatus().setStatus(droneState.getStatus());
 	}

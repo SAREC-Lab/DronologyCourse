@@ -79,7 +79,7 @@ public class SoloDirector implements IFlightDirector {
 	}
 
 	private Coordinate flyToNextWayPoint() {
-		// System.out.println("Trying to fly to next way point");
+		//LOGGER.info("Flying to next waypoint");
 		if (!wayPoints.isEmpty()) {
 			Coordinate nextWayPoint = wayPoints.get(0); // Always get the top one
 			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points

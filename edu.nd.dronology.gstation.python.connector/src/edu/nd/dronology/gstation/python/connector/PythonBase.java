@@ -332,6 +332,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 	@Override
 	public void sendCommand(IDroneCommand cmd) throws DroneException {
+		LOGGER.info("Sending "+cmd.getClass().getSimpleName() +" command to drone");
 		sendData(cmd.toJsonString());
 	}
 
