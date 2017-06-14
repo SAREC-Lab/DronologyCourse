@@ -29,7 +29,7 @@ public class DronologyServiceRunner {
 			DroneSimulatorService.getInstance().startService();
 			RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 
-			runtimeMode.setVirtualEnvironment();
+			runtimeMode.setPhysicalEnvironment();
 			runtimeMode.setCommandHandler(new PythonBase());
 
 		} catch (DronologyServiceException e) {

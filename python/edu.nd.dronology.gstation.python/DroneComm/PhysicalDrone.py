@@ -14,7 +14,7 @@ class PhysicalDrone(object):
 	def gotoLocation(self,location):
 		# TODO this doesn't belong here
 		# also unsafe max speed
-		self.setGroundspeed(500);
+		# self.setGroundspeed(500);
 		
 		self.vehicle.simple_goto(location.toGlobalRelative())
 	
