@@ -141,11 +141,11 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 	public void handleData(String type, Object data) {
 		
-		System.out.println("Incoming data:"); // temporary placeholder toidentify incoming data
-		System.out.println("Type: "+type);
-		System.out.print("Data: "); System.out.println(data); // temporary placeholder to identify incoming data
-		System.out.print("Data type: "); System.out.println(data.getClass());
-		// temporary placeholder to identify incoming data
+//		System.out.println("Incoming data:"); // temporary placeholder toidentify incoming data
+//		System.out.println("Type: "+type);
+//		System.out.print("Data: "); System.out.println(data); // temporary placeholder to identify incoming data
+//		System.out.print("Data type: "); System.out.println(data.getClass());
+//		// temporary placeholder to identify incoming data
 		
 		switch (type) {
 		case "drone_list":

@@ -2,9 +2,16 @@ package edu.nd.dronology.gstation.python.connector;
 
 import org.json.simple.JSONObject;
 
+import edu.nd.dronology.core.flight.Flights;
 import edu.nd.dronology.core.util.Coordinate;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 @Integrate
 public class PythonDroneState {
+	
+	private static final ILogger LOGGER = LoggerProvider.getLogger(PythonDroneState.class);
+	
+	
 	private Coordinate location;
 	private Coordinate attitude;
 	private Coordinate velocity;
@@ -176,7 +183,7 @@ public class PythonDroneState {
 		for(Object keyObj:droneInfo.keySet()) {
 			String key = (String) keyObj;
 			Object data = droneInfo.get(keyObj);
-			System.out.println("key: "+key+" data: "+data.toString());
+//			System.out.println("key: "+key+" data: "+data.toString());
 			switch(key) {
 				case "location":
 					setLocation(coordFromJSON((JSONObject) data));
@@ -194,6 +201,10 @@ public class PythonDroneState {
 					JSONObject batteryInfo = (JSONObject) data;
 					try {
 						setBatteryVoltage((double) batteryInfo.get("voltage"));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					try {
 						setBatteryCurrent((double) batteryInfo.get("current"));
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -256,7 +267,7 @@ public class PythonDroneState {
 					setMode((String) data);
 					break;
 				default:
-					System.out.println("Unrecognized drone attribute: "+key);
+					LOGGER.warn("Unrecognized drone attribute: "+key);
 			}
 		}
 	}
