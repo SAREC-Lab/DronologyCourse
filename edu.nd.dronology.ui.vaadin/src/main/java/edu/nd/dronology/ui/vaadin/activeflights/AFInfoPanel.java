@@ -87,7 +87,7 @@ public class AFInfoPanel extends CustomComponent{
 	}
 	
 	public boolean removeBox(String name){
-		for(int i = 1; i < numUAVs; i++){
+		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getName().equals(name)){
 				content.removeComponent(box);
@@ -100,14 +100,14 @@ public class AFInfoPanel extends CustomComponent{
 	}
 	
 	public void selectAll(boolean select){
-		for(int i = 1; i < numUAVs; i++){
+		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setIsChecked(select);
 		}
 	}
 	
 	public void setVisibility(boolean visible){
-		for(int i = 1; i < numUAVs; i++){
+		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setBoxVisible(visible);
 		}
