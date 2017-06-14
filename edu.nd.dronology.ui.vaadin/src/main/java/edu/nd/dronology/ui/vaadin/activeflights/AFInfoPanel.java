@@ -17,7 +17,7 @@ public class AFInfoPanel extends CustomComponent{
 	private static final long serialVersionUID = -3663049148276256302L;
 	private Panel panel = new Panel();
 	private VerticalLayout content = new VerticalLayout();
-	private int numUAVs = content.getComponentCount();
+	private int numUAVs;
 	private boolean selectAll = true;
 	private boolean visible = false;
 	public AFInfoPanel(){
@@ -63,7 +63,7 @@ public class AFInfoPanel extends CustomComponent{
 	  });
 		
 	  content.addComponent(buttons);
-	  
+	  numUAVs = content.getComponentCount() - 1;
 		/**
 		 * dummy/example boxes
 		 */
@@ -75,14 +75,14 @@ public class AFInfoPanel extends CustomComponent{
 	public void addBox(boolean isChecked, String name, String status, int batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
 		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
 		content.addComponent(box);
-		numUAVs = content.getComponentCount();
+		numUAVs = content.getComponentCount() - 1;
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 	}
 	
 	public void addBox(){
 		AFInfoBox box = new AFInfoBox();
 		content.addComponent(box);
-		numUAVs = content.getComponentCount();
+		numUAVs = content.getComponentCount() - 1;
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 	}
 	
@@ -91,7 +91,7 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getName().equals(name)){
 				content.removeComponent(box);
-				numUAVs = content.getComponentCount();
+				numUAVs = content.getComponentCount() - 1;
 				panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 				return true;
 			}
