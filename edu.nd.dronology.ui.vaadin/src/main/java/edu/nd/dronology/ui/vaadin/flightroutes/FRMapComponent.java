@@ -32,19 +32,20 @@ public class FRMapComponent extends CustomComponent {
 		VerticalLayout content = new VerticalLayout();
 		
 		MapMarkerUtilities route = new MapMarkerUtilities();
+		route.getGrid().addStyleName("af_table_component");
 		
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
 		
 		leafletMap.addClickListener(e -> {
-			route.addPin(e.getPoint(), this);
+			route.addPin(e.getPoint(), leafletMap);
 		});
 		
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
 		
 		setCompositionRoot(content);  
-		content.addComponents(leafletMap);
+		content.addComponents(leafletMap, route.getGrid());
 	}
 	
 	public void setCenter(double centerLat, double centerLon) {

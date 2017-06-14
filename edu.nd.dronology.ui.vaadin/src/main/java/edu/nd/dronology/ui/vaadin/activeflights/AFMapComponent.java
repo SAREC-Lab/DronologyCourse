@@ -7,7 +7,6 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
-import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 
 /**
  * This is the map component for the Active Flights UI
@@ -31,15 +30,9 @@ public class AFMapComponent extends CustomComponent {
 		
 		VerticalLayout content = new VerticalLayout();
 		
-		MapMarkerUtilities route = new MapMarkerUtilities();
-		
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
-		
-		leafletMap.addClickListener(e -> {
-			route.addPin(e.getPoint(), this);
-		});
-		
+
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
 		

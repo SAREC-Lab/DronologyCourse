@@ -36,7 +36,8 @@
 	
 	//Custom variables
 	$screen-width: 1440px;
-	$screen-height: 90vh;
+	$screen-height: 400px;
+	$table-height: 400px;
 	
 	//Custom styles
 	.af_main_layout {
@@ -46,7 +47,7 @@
 		margin: auto;
 	}
 	.v-leaflet {
-		height: $screen-height;
+		height: $screen-height !important;
 	}
 	.af_controls_component {
 		width: 25% !important;
@@ -54,6 +55,9 @@
 	}
 	.af_map_component {
 		width: 75% !important;
+	}
+	.af_table_component {
+		height: $table-height !important;
 	}
 	.v-margin-top {
 		padding-top:0px !important;
