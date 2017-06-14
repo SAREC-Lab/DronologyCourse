@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
-// org.json.simple obtained from json-simple-1.1.1.jar downloaded from https://code.google.com/archive/p/json-simple/
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,6 +27,7 @@ import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.DroneAttribute;
 import edu.nd.dronology.core.vehicle.IDroneAttribute;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
+import edu.nd.dronology.core.vehicle.commands.GoToCommand;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -129,7 +129,6 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			String parsedType = (String) dataObject.get("type");
 			Object parsedData = dataObject.get("data");
 			handleData(parsedType, parsedData);
-			LOGGER.info("data handled.");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,13 +136,15 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	}
 
 	public void handleData(String type, Object data) {
-		
-		System.out.println("Incoming data:"); // temporary placeholder toidentify incoming data
-		System.out.println("Type: "+type);
-		System.out.print("Data: "); System.out.println(data); // temporary placeholder to identify incoming data
-		System.out.print("Data type: "); System.out.println(data.getClass());
-		// temporary placeholder to identify incoming data
-		
+		/*
+		 * System.out.println("Incoming data:"); // temporary placeholder to
+		 * identify incoming data System.out.println("Type: "+type);
+		 * System.out.print("Data: "); System.out.println(data); // temporary
+		 * placeholder to identify incoming data
+		 * System.out.print("Data type: "); System.out.println(data.getClass());
+		 * // temporary placeholder to identify incoming data
+		 */
+
 		switch (type) {
 		case "drone_list":
 			handleDroneList((JSONObject) data);
@@ -162,10 +163,12 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 		PythonDroneState thisDroneState = droneStates.get(ID);
 		thisDroneState.loadfromJSON(data);
-		LOGGER.info("Drone info updated. ID: " + Integer.toString(ID) + "Coordinate: ("
-				+ Long.toString(thisDroneState.getLocation().getLatitude()) + ","
-				+ Long.toString(thisDroneState.getLocation().getLongitude()) + ","
-				+ Integer.toString(thisDroneState.getLocation().getAltitude()) + ")...");
+		// LOGGER.info("Drone info updated. ID: " + Integer.toString(ID) +
+		// "Coordinate: ("
+		// + Long.toString(thisDroneState.getLocation().getLatitude()) + ","
+		// + Long.toString(thisDroneState.getLocation().getLongitude()) + ","
+		// + Integer.toString(thisDroneState.getLocation().getAltitude()) +
+		// ")...");
 
 		try {
 			propagateStatusUpdate(ID, thisDroneState);
@@ -186,15 +189,15 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 		try {
 			IDroneStatusUpdateListener listener = registeredListeners.get(Integer.toString(iD));
-			 listener.updateCoordinates(thisDroneState.getLocation());
-			 listener.updateBatteryLevel(thisDroneState.getBatteryLevel());
+			listener.updateCoordinates(thisDroneState.getLocation());
+			listener.updateBatteryLevel(thisDroneState.getBatteryLevel());
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		}
 
 		/// IDroneStatusUpdateListener listener = registeredListeners.get(iD);
 		// listener.updateCoordinates(thisDroneState.getLocation());
-		
+
 		// TODO: update other sensors and battery....
 		// TODO.. switch to asynchronous listener notification
 
@@ -206,7 +209,6 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		// PythonDroneState newState = new PythonDroneState();
 		droneStates.put(ID, new PythonDroneState());
 		unallocatedLock.unlock();
-		LOGGER.info("New drone recognized with id " + Integer.toString(ID));
 		updateDroneInfo(ID, data);
 		PythonDroneState newState = droneStates.get(ID);
 		LOGGER.info("New drone recognized with id " + Integer.toString(ID) + " and coordinate ("
@@ -233,7 +235,6 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	}
 
 	public void handleDroneList(JSONObject data) {
-		LOGGER.info("dronelist: "+data.toJSONString());
 		for (Object keyObj : data.keySet()) {
 			String key = (String) keyObj;
 			Object droneInfo = data.get(keyObj);
@@ -333,7 +334,14 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 	@Override
 	public void sendCommand(IDroneCommand cmd) throws DroneException {
-		LOGGER.info("Sending "+cmd.getClass().getSimpleName() +" command to drone");
+		
+		if (cmd instanceof GoToCommand) {
+			GoToCommand cmdGoTo = (GoToCommand) cmd;
+			LOGGER.info("Sending " + cmd.getClass().getSimpleName() + " command to drone" + cmdGoTo.toJsonString());
+		}
+		else{
+			LOGGER.info("Sending " + cmd.getClass().getSimpleName() + " command to drone");
+		}
 		sendData(cmd.toJsonString());
 	}
 

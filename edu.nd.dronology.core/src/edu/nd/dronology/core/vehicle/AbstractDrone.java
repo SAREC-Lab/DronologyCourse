@@ -1,9 +1,12 @@
 package edu.nd.dronology.core.vehicle;
 
+import edu.nd.dronology.core.fleet.PhysicalDroneFleetFactory;
 import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.util.NullUtil;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Abstract Base class for both virtual and physical drones
@@ -14,6 +17,9 @@ import edu.nd.dronology.util.NullUtil;
  */
 public abstract class AbstractDrone implements IDrone {
 
+	private static final ILogger LOGGER = LoggerProvider.getLogger(AbstractDrone.class);
+
+	
 	private Coordinate basePosition; // In current version drones always return to base at the end of their flights.
 	protected Coordinate currentPosition;
 	protected final String droneName;
@@ -70,8 +76,10 @@ public abstract class AbstractDrone implements IDrone {
 	 */
 	@Override
 	public void setBaseCoordinates(Coordinate basePosition) {
+		
 		this.basePosition = new Coordinate(basePosition.getLatitude(), basePosition.getLongitude(),
 				basePosition.getAltitude());
+		LOGGER.info("Base Coordinate of Drone '"+droneName+" set to '"+ basePosition.toString());
 	}
 
 	/**

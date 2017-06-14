@@ -27,7 +27,7 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	private FlightZoneManager flightManager;
 	private AbstractDroneFleetFactory droneFleetFactory;
 	private List<IDroneStatusChangeListener> listenerList = new ArrayList<>();
-	private static final boolean IS_PYHSICAL = true;
+	private static final boolean IS_PYHSICAL = false;
 
 	public DroneSetupServiceInstance() {
 		super("DRONESETUP");
