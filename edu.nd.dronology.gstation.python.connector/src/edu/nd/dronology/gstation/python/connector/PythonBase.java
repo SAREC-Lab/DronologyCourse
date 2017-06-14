@@ -71,6 +71,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			// InetAddress hostAddr = InetAddress.getByName("huey.cse.nd.edu");
 			InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
 			// InetAddress hostAddr = InetAddress.getByName("ilia.cse.nd.edu");
+			// InetAddress hostAddr = InetAddress.getByName("192.168.1.144");
 			
 			int port = 1234;
 			String hostStr = hostAddr.toString();

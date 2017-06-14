@@ -11,7 +11,7 @@ import edu.nd.dronology.core.exceptions.FlightZoneException;
  * @version 0.01
  *
  */
-public class DroneFlightStateManager {
+public class DroneFlightStateManagerold {
 
 @Discuss(discuss="in air_air mode not considered so far..needs to be included!")
 	private enum FlightMode {
@@ -23,7 +23,7 @@ public class DroneFlightStateManager {
 	/**
 	 * Constructor States for both FlightMode and SafetyMode set to initial state
 	 */
-	public DroneFlightStateManager() {
+	public DroneFlightStateManagerold() {
 		currentFlightMode = FlightMode.ON_GROUND;
 	}
 
