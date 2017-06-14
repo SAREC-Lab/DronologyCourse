@@ -38,6 +38,19 @@ public class AFInfoBox extends CustomComponent{
 	private double alt;
 	private double speed;
 	private boolean hoverInPlace;
+	
+	private CheckBox check = new CheckBox();
+	private Label statusInfo1 = new Label();
+	private Label statusInfo2 = new Label();
+	private Label statusInfo3 = new Label();
+	private Label health = new Label();
+	private Label locationInfo1 = new Label();
+	private Label locationInfo2 = new Label();
+	private Label locationInfo3 = new Label();
+	private Label locationInfo4 = new Label();
+	private Switch hoverSwitch = new Switch();
+	
+	private GridLayout bottomContent = new GridLayout(2, 1);
   /**
    * default constructor
    */
@@ -45,14 +58,12 @@ public class AFInfoBox extends CustomComponent{
 		VerticalLayout mainContent = new VerticalLayout();
 		HorizontalLayout topContent = new HorizontalLayout();
 		VerticalLayout statusContent = new VerticalLayout();
-		GridLayout bottomContent = new GridLayout(2, 1);
 		VerticalLayout bottomButtons = new VerticalLayout();
 		VerticalLayout bottomSwitch = new VerticalLayout();
 		
 		/**
 		 * top layer components
 		 */
-		CheckBox check = new CheckBox();
 		isChecked = false;
 		check.setValue(isChecked);
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
@@ -64,12 +75,14 @@ public class AFInfoBox extends CustomComponent{
     name = "NAME/ID of UAV";
     status = "Status";
     batteryLife = 0;
-    Label statusInfo1 = new Label("<b>" + name + "</b>", ContentMode.HTML);
-		Label statusInfo2 = new Label("Status: " + status, ContentMode.HTML);
-		Label statusInfo3 = new Label("Battery Life: " + Integer.toString(batteryLife) + " min", ContentMode.HTML);
+    statusInfo1.setContentMode( ContentMode.HTML);
+    statusInfo2.setContentMode( ContentMode.HTML);
+    statusInfo3.setContentMode( ContentMode.HTML);
+    statusInfo1.setValue("<b>" + name + "</b>");
+		statusInfo2.setValue("Status: " + status);
+		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
-		Label health = new Label();
 		healthColor = "green";
 		health.setCaptionAsHtml(true);
 		health.setCaption( "<span style=\'color: " + healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml()  + "</span>");
@@ -93,15 +106,18 @@ public class AFInfoBox extends CustomComponent{
 		alt = 0;
 		speed = 0;
 		lon = 0;
-		Label locationInfo1 = new Label("Latitude:\t" + Double.toString(lat), ContentMode.HTML);
-		Label locationInfo2 = new Label("Longitude:\t" + Double.toString(lon), ContentMode.HTML);
-		Label locationInfo3 = new Label("Altitude:\t" + Double.toString(alt) + "feet", ContentMode.HTML);
-		Label locationInfo4 = new Label("Ground Speed:\t" + Double.toString(speed) + "mph", ContentMode.HTML);
+		locationInfo1.setContentMode(ContentMode.HTML);
+		locationInfo2.setContentMode(ContentMode.HTML);
+		locationInfo3.setContentMode(ContentMode.HTML);
+		locationInfo4.setContentMode(ContentMode.HTML);
+		locationInfo1.setValue("Latitude:\t" + Double.toString(lat));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(lon));
+		locationInfo3.setValue("Altitude:\t" + Double.toString(alt) + "feet");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(speed) + "mph");
 		
 		/**
 		 * bottom layer components
 		 */
-		Switch hoverSwitch = new Switch();
 		Label caption = new Label("Hover in Place");
 		hoverInPlace = false;
 		hoverSwitch.setValue(hoverInPlace);
@@ -135,22 +151,7 @@ public class AFInfoBox extends CustomComponent{
 		topContent.addLayoutClickListener(e->{
 				Component child = e.getChildComponent();
 				if(child == null || !child.getClass().getCanonicalName().equals("com.vaadin.ui.CheckBox")){
-					if (visible){
-						visible = false;
-						locationInfo1.setVisible(visible);
-						locationInfo2.setVisible(visible);
-						locationInfo3.setVisible(visible);
-						locationInfo4.setVisible(visible);
-						bottomContent.setVisible(visible);
-					}
-					else {
-						visible = true;
-						locationInfo1.setVisible(visible);
-						locationInfo2.setVisible(visible);
-						locationInfo3.setVisible(visible);
-						locationInfo4.setVisible(visible);
-						bottomContent.setVisible(visible);
-					}
+					setBoxVisible(visible);
 			}		
 		});
 		setCompositionRoot(mainContent);
@@ -183,14 +184,13 @@ public class AFInfoBox extends CustomComponent{
 		VerticalLayout mainContent = new VerticalLayout();
 		HorizontalLayout topContent = new HorizontalLayout();
 		VerticalLayout statusContent = new VerticalLayout();
-		GridLayout bottomContent = new GridLayout(2, 1);
 		VerticalLayout bottomButtons = new VerticalLayout();
 		VerticalLayout bottomSwitch = new VerticalLayout();
 		
 		/**
 		 * top layer components
 		 */
-		CheckBox check = new CheckBox();
+		
 		check.setValue(this.isChecked);
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
     FileResource resource = new FileResource(new File(basepath+"/VAADIN/img/drone_icon.png"));
@@ -198,12 +198,14 @@ public class AFInfoBox extends CustomComponent{
     droneImage.setSource(resource);
     droneImage.setWidth("50px");
     droneImage.setHeight("50px");
-    Label statusInfo1 = new Label("<b>" + this.name + "</b>", ContentMode.HTML);
-		Label statusInfo2 = new Label("Status: " + this.status, ContentMode.HTML);
-		Label statusInfo3 = new Label("Battery Life: " + Integer.toString(this.batteryLife) + " min", ContentMode.HTML);
+    statusInfo1.setContentMode( ContentMode.HTML);
+    statusInfo2.setContentMode( ContentMode.HTML);
+    statusInfo3.setContentMode( ContentMode.HTML);
+    statusInfo1.setValue("<b>" + name + "</b>");
+		statusInfo2.setValue("Status: " + status);
+		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
-		Label health = new Label();
 		health.setCaptionAsHtml(true);
 		health.setCaption( "<span style=\'color: " + this.healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml()  + "</span>");
 		if (this.healthColor.equals("green"))
@@ -222,15 +224,18 @@ public class AFInfoBox extends CustomComponent{
 		/**
 		 * middle layer components
 		 */
-		Label locationInfo1 = new Label("Latitude:\t" + Double.toString(this.lat), ContentMode.HTML);
-		Label locationInfo2 = new Label("Longitude:\t" + Double.toString(this.lon), ContentMode.HTML);
-		Label locationInfo3 = new Label("Altitude:\t" + Double.toString(this.alt) + "feet", ContentMode.HTML);
-		Label locationInfo4 = new Label("Ground Speed:\t" + Double.toString(this.speed) + "mph", ContentMode.HTML);
+		locationInfo1.setContentMode(ContentMode.HTML);
+		locationInfo2.setContentMode(ContentMode.HTML);
+		locationInfo3.setContentMode(ContentMode.HTML);
+		locationInfo4.setContentMode(ContentMode.HTML);
+		locationInfo1.setValue("Latitude:\t" + Double.toString(this.lat));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(this.lon));
+		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + "feet");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + "mph");
 		
 		/**
 		 * bottom layer components
 		 */
-		Switch hoverSwitch = new Switch();
 		hoverSwitch.setValue(this.hoverInPlace);
 		Label caption = new Label("Hover in Place");
 		bottomSwitch.addComponents(caption, hoverSwitch);
@@ -263,22 +268,7 @@ public class AFInfoBox extends CustomComponent{
 		topContent.addLayoutClickListener(e->{
 				Component child = e.getChildComponent();
 				if(child == null || !child.getClass().getCanonicalName().equals("com.vaadin.ui.CheckBox")){
-					if (visible){
-						visible = false;
-						locationInfo1.setVisible(visible);
-						locationInfo2.setVisible(visible);
-						locationInfo3.setVisible(visible);
-						locationInfo4.setVisible(visible);
-						bottomContent.setVisible(visible);
-					}
-					else {
-						visible = true;
-						locationInfo1.setVisible(visible);
-						locationInfo2.setVisible(visible);
-						locationInfo3.setVisible(visible);
-						locationInfo4.setVisible(visible);
-						bottomContent.setVisible(visible);
-					}		
+					setBoxVisible(visible);
 			}	
 		});
 		setCompositionRoot(mainContent);
@@ -286,6 +276,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setIsChecked(boolean isChecked){
 		this.isChecked = isChecked;
+		check.setValue(this.isChecked);
 	}
 	
 	public boolean getIsChecked(){
@@ -294,6 +285,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setName(String name){
 		this.name = name;
+		statusInfo1.setValue("<b>" + name + "</b>");
 	}
 	
 	public String getName(){
@@ -302,6 +294,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setStatus(String status){
 		this.status = status;
+		statusInfo2.setValue("Status: " + status);
 	}
 	
 	public String getStatus(){
@@ -310,6 +303,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setBatteryLife(int batteryLife){
 		this.batteryLife = batteryLife;
+		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
 	}
 	
 	public int getBatteryLife(){
@@ -318,6 +312,13 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setHealthColor(String healthColor){
 		this.healthColor = healthColor;
+		health.setCaption( "<span style=\'color: " + healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml()  + "</span>");
+		if (this.healthColor.equals("green"))
+			health.setDescription("Normally Functionable");
+		else if (this.healthColor.equals("yellow"))
+			health.setDescription("Needs Attention");
+		else if (this.healthColor.equals("red"))
+			health.setDescription("Needs Immediate Attention");
 	}
 	
 	public String getHealthColor(){
@@ -326,6 +327,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setLat(double lat){
 		this.lat = lat;
+		locationInfo1.setValue("Latitude:\t" + Double.toString(this.lat));
 	}
 	
 	public double getLat(){
@@ -334,6 +336,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setLon(double lon){
 		this.lon = lon;
+		locationInfo2.setValue("Longitude:\t" + Double.toString(this.lon));
 	}
 	
 	public double getLon(){
@@ -342,6 +345,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setAlt(double alt){
 		this.alt = alt;
+		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + "feet");
 	}
 	
 	public double getAlt(){
@@ -350,6 +354,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setSpeed(double speed){
 		this.speed = speed;
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + "mph");
 	}
 	
 	public double getSpeed(){
@@ -358,9 +363,34 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setHoverInPlace(boolean hoverInPlace){
 		this.hoverInPlace = hoverInPlace;
+		hoverSwitch.setValue(this.hoverInPlace);
 	}
 	
 	public boolean getHoverInPlace(){
 		return this.hoverInPlace;
 	}
+	
+	public void setBoxVisible(boolean visible){
+		if (visible){
+			this.visible = false;
+			locationInfo1.setVisible(this.visible);
+			locationInfo2.setVisible(this.visible);
+			locationInfo3.setVisible(this.visible);
+			locationInfo4.setVisible(this.visible);
+			bottomContent.setVisible(this.visible);
+		}
+		else {
+			this.visible = true;
+			locationInfo1.setVisible(this.visible);
+			locationInfo2.setVisible(this.visible);
+			locationInfo3.setVisible(this.visible);
+			locationInfo4.setVisible(this.visible);
+			bottomContent.setVisible(this.visible);
+		}	
+	}
+	
+	public boolean getBoxVisible(){
+		return this.visible;
+	}
+	
 }
