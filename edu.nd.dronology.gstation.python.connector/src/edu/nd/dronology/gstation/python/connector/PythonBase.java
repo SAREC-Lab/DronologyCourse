@@ -64,11 +64,14 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	@Discuss(discuss = "port+ip should be specified in property file/passed to base when initialized")
 	public PythonBase() {
 		try {
-
+			
+			// Uncomment the following line corresponding to the hostname of the GroundStation or add another with the desired hostname
+			
 			// InetAddress hostAddr = InetAddress.getLocalHost();
 			// InetAddress hostAddr = InetAddress.getByName("huey.cse.nd.edu");
 			InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
 			// InetAddress hostAddr = InetAddress.getByName("ilia.cse.nd.edu");
+			
 			int port = 1234;
 			String hostStr = hostAddr.toString();
 
