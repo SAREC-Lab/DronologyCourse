@@ -17,7 +17,7 @@ public class AFInfoPanel extends CustomComponent{
 	private static final long serialVersionUID = -3663049148276256302L;
 	private Panel panel = new Panel();
 	private VerticalLayout content = new VerticalLayout();
-	private int numUAVs;
+	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
 	public AFInfoPanel(){
