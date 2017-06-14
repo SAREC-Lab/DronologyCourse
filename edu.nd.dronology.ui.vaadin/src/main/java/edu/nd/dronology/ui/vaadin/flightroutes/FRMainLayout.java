@@ -18,7 +18,7 @@ public class FRMainLayout extends CustomComponent {
 		content.setSizeFull();
 		
 		FRControlsComponent controls = new FRControlsComponent();
-        
+		
 		FRMapComponent map = new FRMapComponent(
   		"VAADIN/sbtiles/{z}/{x}/{y}.png",
   		"South Bend");
