@@ -2,8 +2,10 @@
 <configuration name="citeomat" packages="net.mv.logging">
 	<properties>
 	
-	<property name="net.mv.filepath">logs\citeomat.log</property>
-	<property name="net.mv.filename">citeomat</property>
+	<property name="net.mv.filepath">logs\dronology.log</property>
+	<property name="net.mv.filename">dronology</property>
+	<property name="net.mv.filepathHW">logs\dronology-hw.log</property>
+	<property name="net.mv.filenameHW">dronology-hw</property>
 	<property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS}  [%-5.5p] %-20M | %-5C:%L | %msg%n</property>
 		
 	</properties>
@@ -26,6 +28,11 @@
 			<DefaultRolloverStrategy max="2"/>
 		</RollingFile>
 		
+			
+		<File name="appender-server-1-error" fileName="${net.mv.filepathHW}" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+		
 	
 		
 		
@@ -34,6 +41,12 @@
 		<root level="debug"> <!-- We log everything -->
 			<appender-ref ref="Console"/> <!-- To console -->
 			<appender-ref ref="RollingFile"/> <!-- And to a rotated file -->
+			 <AppenderRef ref="appender-server-1-error" level="FATAL" />
 		</root>
+		
+		
+	
+		
+	
 	</loggers>
 </configuration>

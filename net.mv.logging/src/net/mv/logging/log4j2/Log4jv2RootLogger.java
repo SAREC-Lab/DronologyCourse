@@ -151,4 +151,17 @@ public class Log4jv2RootLogger implements ILogger {
 
 	}
 
+
+	@Override
+	public void hwInfo(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void hwFatal(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
