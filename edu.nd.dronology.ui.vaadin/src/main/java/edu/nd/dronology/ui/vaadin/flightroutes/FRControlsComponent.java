@@ -2,7 +2,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.HorizontalLayout;
 
 /**
  * This is the control panel framework for the Flight Routes UI
@@ -14,12 +14,13 @@ public class FRControlsComponent extends CustomComponent {
 	
 	public FRControlsComponent() {
 		this.setWidth("100%");
-		addStyleName("controls_component");
+		addStyleName("af_controls_component");
 		
-		VerticalLayout content = new VerticalLayout();
+		HorizontalLayout content = new HorizontalLayout();
+		FRInfoPanel information = new FRInfoPanel();
 		
-		Button btn = new Button("FR Page");
-		content.addComponent(btn);
-    setCompositionRoot(content);
+		content.addComponent(information);
+		
+		setCompositionRoot(content);
 	}
 }

@@ -59,6 +59,8 @@ $valo-menu-background-color: #eee;
 	}
 	.map_component {
 		width: 75% !important;
+		float: right;
+		vertical-align: top;
 	}
 	.fr_leaflet_map {
 		height: $fr-map-height;
@@ -118,5 +120,24 @@ $valo-menu-background-color: #eee;
 		&:focus {
 			outline: none !important;
 		}
+	}
+	.list_style_name{
+		padding-left: 5px;
+		font-weight: bold;
+	}
+	.fr_route_created{
+		font-size: 85%;
+		line-height: .8;
+		padding-left: 40px;
+	}
+	.fr_route_modified{
+		font-size: 85%;
+		line-height: .8;
+		padding-left: 5px;
+	}
+	.fr_route_length{
+		font-size: 85%;
+		line-height: .8;
+		padding-left: 13px;
 	}
 }
