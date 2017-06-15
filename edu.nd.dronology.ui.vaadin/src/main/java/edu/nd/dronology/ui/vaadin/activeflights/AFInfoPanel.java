@@ -1,6 +1,7 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
@@ -24,10 +25,22 @@ public class AFInfoPanel extends CustomComponent{
 		
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 		panel.setContent(content);
-		panel.setHeight("500px");
-		setCompositionRoot(panel);
+		panel.setHeight("400px");
 		
 		HorizontalLayout buttons = new HorizontalLayout();
+		VerticalLayout sideBar = new VerticalLayout();
+		
+		AFEmergencyComponent emergency = new AFEmergencyComponent();
+		
+		emergency.addOnClickListener( e -> {
+			Component child = e.getChildComponent();
+			if (child.getCaption().equals("All UAVs Hover in Place")){
+				this.setAllToHover();
+			}
+		});
+
+		sideBar.addComponents(panel, emergency);
+		setCompositionRoot(sideBar);
 		
 		Button selectButton = new Button("Select all");
 	  selectButton.addStyleName(ValoTheme.BUTTON_LINK);
@@ -110,6 +123,13 @@ public class AFInfoPanel extends CustomComponent{
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setBoxVisible(visible);
+		}
+	}
+	
+	public void setAllToHover(){
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			box.setHoverInPlace(true);
 		}
 	}
 	

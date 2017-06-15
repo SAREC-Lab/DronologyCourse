@@ -32,5 +32,6 @@ public class MyUI extends UI {
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
 		private static final long serialVersionUID = -5422579448768796912L;
+		
     }
 }

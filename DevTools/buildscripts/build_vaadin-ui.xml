@@ -41,8 +41,8 @@
 		<copy file="{src.dir}/../../../DevTools/libs/vaadin/javax.servlet-api-3.0.1.jar" todir="${build.dir}/lib" />
 		<copy file="{src.dir}/../../../DevTools/libs/vaadin/v-leaflet-2.0.0.jar" todir="${build.dir}/lib" />
 		<copy file="{src.dir}/../../../DevTools/libs/vaadin/vaadin-shared-8.0.6.jar" todir="${build.dir}/lib" />
-		
-		 
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/jts-1.13.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/switch-3.0.0.jar" todir="${build.dir}/lib" />
 		 
 	</target>
 

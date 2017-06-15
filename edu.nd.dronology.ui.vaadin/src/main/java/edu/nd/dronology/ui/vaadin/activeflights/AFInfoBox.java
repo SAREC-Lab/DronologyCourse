@@ -128,6 +128,9 @@ public class AFInfoBox extends CustomComponent{
 		 * bottom layer components
 		 */
 		hoverSwitch.setValue(this.hoverInPlace);
+		hoverSwitch.addValueChangeListener( e -> {
+			this.setHoverInPlace(this.hoverSwitch.getValue());
+		});
 		Label caption = new Label("Hover in Place");
 		bottomSwitch.addComponents(caption, hoverSwitch);
 		
@@ -193,6 +196,10 @@ public class AFInfoBox extends CustomComponent{
 	public void setStatus(String status){
 		this.status = status;
 		statusInfo2.setValue("Status: " + status);
+		if (this.status.equals("Hovering"))
+				this.hoverSwitch.setValue(true);
+		else
+			this.hoverSwitch.setValue(false);
 	}
 	
 	public String getStatus(){
@@ -262,6 +269,13 @@ public class AFInfoBox extends CustomComponent{
 	public void setHoverInPlace(boolean hoverInPlace){
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
+		if (this.hoverInPlace){
+			this.status = "Hovering";
+			statusInfo2.setValue("Status: " + status);
+		} else {
+			this.status = "Enroute";
+			statusInfo2.setValue("Status: " + status);
+		}
 	}
 	
 	public boolean getHoverInPlace(){
