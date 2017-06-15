@@ -2,6 +2,8 @@ package edu.nd.dronology.core.utilities;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+
 import org.junit.Test;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
@@ -47,6 +49,51 @@ public class TestPVector {
 		double dy = a.getY() - b.getY();
 		double dz = a.getZ() - b.getZ();
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+	
+	@Test
+	public void testHashCode() {
+		HashSet<PVector> s = new HashSet<PVector>();
+		PVector p0 = new LlaCoordinate(0,0,0).toPVector();
+		PVector p1 = new LlaCoordinate(0,0,0).toPVector();
+		assertEquals(p0.hashCode(), p1.hashCode());
+		
+		PVector p2 = new LlaCoordinate(1,0,0).toPVector();
+		assertNotEquals(p0.hashCode(), p2.hashCode());
+		
+		s.add(p0);
+		s.add(p1);
+		assertEquals(1, s.size());
+		s.add(p2);
+		assertEquals(2, s.size());
+	}
+	
+	@Test
+	public void testEquals() {
+		PVector p0 = new LlaCoordinate(0, 0, 23.3).toPVector();
+		PVector p1 = new LlaCoordinate(0, 0, 23.3).toPVector();
+		PVector p2 = new LlaCoordinate(0, 0, 24.3).toPVector();
+		assertEquals(p0, p1);
+		assertNotEquals(p0, p2);
+
+		
+	}
+	
+	@Test
+	public void testEquals2() {
+		PVector p0 = new LlaCoordinate(88.32432, -124.4723, 23.3).toPVector();
+		PVector p1 = new LlaCoordinate(88.32432, -124.4723, 23.3).toPVector();
+		PVector p2 = new LlaCoordinate(13.231, 46.231, 24.3).toPVector();
+		assertEquals(p0, p1);
+		assertNotEquals(p0, p2);
+		
+	}
+	
+	@Test
+	public void testToString() {
+		PVector p = new PVector(123.3, 456.5, 789.7);
+		assertEquals("PVector(123.300000, 456.500000, 789.700000)", p.toString());
+		
 	}
 
 	public void testToLla() {
@@ -94,6 +141,17 @@ public class TestPVector {
 	  assertEquals(lat, lla.getLatitude(), EPSILON);
 	  assertEquals(lon, lla.getLongitude(), EPSILON);
 	  assertEquals(alt, lla.getAltitude(), EPSILON);
+	}
+	
+	@Test
+	public void testGetters() {
+		double x = 123456.0;
+		double y = 3339182.0;
+		double z = 999.999;
+		PVector p = new PVector(x, y, z);
+		assertEquals(x, p.getX(), 0.0);
+		assertEquals(y, p.getY(), 0.0);
+		assertEquals(z, p.getZ(), 0.0);
 	}
 
 	@Test
@@ -143,7 +201,7 @@ public class TestPVector {
 	  assertEquals(lon, lla.getLongitude(), EPSILON);
 	  assertEquals(alt, lla.getAltitude(), EPSILON);
 	}
-
+	HashSet<PVector> s = new HashSet<PVector>();
 	@Test
 	public void testToLla7() {
 	  double lat = -90.0;
