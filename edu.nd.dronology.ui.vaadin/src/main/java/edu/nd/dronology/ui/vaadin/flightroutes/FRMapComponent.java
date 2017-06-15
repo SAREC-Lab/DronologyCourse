@@ -21,9 +21,10 @@ public class FRMapComponent extends CustomComponent {
 
 	public FRMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
-		addStyleName("af_map_component");
+		addStyleName("map_component");
 		
 		leafletMap = new LMap();
+		leafletMap.addStyleName("fr_leaflet_map");
 		
 		Configuration configuration = Configuration.getInstance();
 		leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
@@ -32,7 +33,7 @@ public class FRMapComponent extends CustomComponent {
 		VerticalLayout content = new VerticalLayout();
 		
 		MapMarkerUtilities route = new MapMarkerUtilities();
-		route.getGrid().addStyleName("af_table_component");
+		route.getGrid().addStyleName("fr_table_component");
 		
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);

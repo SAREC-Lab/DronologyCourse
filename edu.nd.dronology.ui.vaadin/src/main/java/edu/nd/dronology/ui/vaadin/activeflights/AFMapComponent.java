@@ -20,7 +20,7 @@ public class AFMapComponent extends CustomComponent {
 
 	public AFMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
-		addStyleName("af_map_component");
+		addStyleName("map_component");
 		
 		leafletMap = new LMap();
 		

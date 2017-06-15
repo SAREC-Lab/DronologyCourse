@@ -36,28 +36,32 @@
 	
 	//Custom variables
 	$screen-width: 1440px;
-	$screen-height: 400px;
-	$table-height: 400px;
+	$screen-height: 90vh;
+	$fr-map-height: 55vh;
+	$fr-table-height: 35vh;
 	
 	//Custom styles
-	.af_main_layout {
+	.main_layout {
 		max-width: $screen-width;
 		left: 0;
 		right: 0;
 		margin: auto;
 	}
 	.v-leaflet {
-		height: $screen-height !important;
+		height: $screen-height;
 	}
-	.af_controls_component {
+	.controls_component {
 		width: 25% !important;
 		height: $screen-height;
 	}
-	.af_map_component {
+	.map_component {
 		width: 75% !important;
 	}
-	.af_table_component {
-		height: $table-height !important;
+	.fr_leaflet_map {
+		height: $fr-map-height;
+	}
+	.fr_table_component {
+		height: $fr-table-height !important;
 	}
 	.v-margin-top {
 		padding-top:0px !important;

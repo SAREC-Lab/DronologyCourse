@@ -12,7 +12,7 @@ public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	
 	public FRMainLayout() {
-		addStyleName("af_main_layout");
+		addStyleName("main_layout");
 		
 		CssLayout content = new CssLayout();
 		content.setSizeFull();

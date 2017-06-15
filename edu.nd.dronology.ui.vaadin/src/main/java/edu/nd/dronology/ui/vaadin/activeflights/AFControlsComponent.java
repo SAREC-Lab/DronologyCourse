@@ -13,7 +13,7 @@ public class AFControlsComponent extends CustomComponent {
 	
 	public AFControlsComponent() {
 		this.setWidth("100%");
-		addStyleName("af_controls_component");
+		addStyleName("controls_component");
 		
 		VerticalLayout content = new VerticalLayout();
 		
