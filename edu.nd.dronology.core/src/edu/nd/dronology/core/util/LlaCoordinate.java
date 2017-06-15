@@ -105,7 +105,10 @@ public class LlaCoordinate {
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
-	
+
+	/**
+	 * @return a terrestrial position defined by an N-vector plus altitude
+	 */
 	public NVector toNVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article
@@ -113,9 +116,9 @@ public class LlaCoordinate {
 		 * Kenneth Gade. You can find it at https://goo.gl/iCqdCn (see equation
 		 * 3 in 5.2.1.)
 		 * 
-		 * Note: equation 3 is unconventional as it swaps the z component with
-		 * x component. This code follows the more common convention and returns
-		 * z and x to their proper place
+		 * Note: equation 3 is unconventional as it swaps the z component with x
+		 * component. This code follows the more common convention and returns z
+		 * and x to their proper place
 		 */
 		double lat = Math.toRadians(latitude);
 		double lon = Math.toRadians(longitude);
@@ -125,11 +128,15 @@ public class LlaCoordinate {
 		double z = Math.sin(lat);
 		return new NVector(x, y, z, altitude);
 	}
-	
+
+	/**
+	 * @return a terrestrial position defined by an x, y, and z coordinate in an
+	 *         Earth centered Earth fixed reference frame.
+	 */
 	public PVector toPVector() {
 		return this.toNVector().toPVector();
 	}
-	
+
 	private void setAltitude(double altitude) {
 		// on wrong side of the earth...
 		// if (altitude < -6378137) {
