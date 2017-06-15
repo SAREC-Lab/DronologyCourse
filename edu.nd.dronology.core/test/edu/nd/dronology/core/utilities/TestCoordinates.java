@@ -51,7 +51,7 @@ public class TestCoordinates {
 		assertEquals(2, cord.size());
 		assertTrue(cord.remove(c4));
 		assertEquals(1, cord.size());
-		c1.setAltitude(25);
+//		c1.setAltitude(25);
 		
 		assertTrue(cord.remove(c1));
 		assertEquals(0, cord.size());

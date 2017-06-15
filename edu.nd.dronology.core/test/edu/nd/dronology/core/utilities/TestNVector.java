@@ -141,4 +141,208 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(y, p.getY(), FLOATING_POINT_ERROR);
 		assertEquals(z, p.getZ(), FLOATING_POINT_ERROR);
 	}
+	
+	@Test
+	public void testToLla() {
+		double lat = 40.690577;
+		double lon = -74.045691;
+		double alt = 10.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla2() {
+		double lat = 90.0;
+		double lon = 0.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla3() {
+		double lat = -90.0;
+		double lon = 0.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla4() {
+		double lat = 0.0;
+		double lon = 180.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla5() {
+		double lat = 37.738863;
+		double lon = -122.454088;
+		double alt = 82.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla6() {
+		double lat = -37.738863;
+		double lon = -122.454088;
+		double alt = 82.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla7() {
+		double lat = 0.0;
+		double lon = 0.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla9() {
+		double lat = 45.0;
+		double lon = 45.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla10() {
+		double lat = 45.0;
+		double lon = 45.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla11() {
+		double lat = -45.0;
+		double lon = 45.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla12() {
+		double lat = -45.0;
+		double lon = -45.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla13() {
+		double lat = 45.0;
+		double lon = -45.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla14() {
+		double lat = 45.0;
+		double lon = 135.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla15() {
+		double lat = -45.0;
+		double lon = 135.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla16() {
+		double lat = -45.0;
+		double lon = -135.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla17() {
+		double lat = 45.0;
+		double lon = -135.0;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
+	
+	@Test
+	public void testToLla18() {
+		double lat = 0.0;
+		double lon = -179.999999999999;
+		double alt = 0.0;
+		NVector n = new LlaCoordinate(lat, lon, alt).toNVector();
+		LlaCoordinate lla = n.toLlaCoordinate();
+		assertEquals(lat, lla.getLatitude(), FLOATING_POINT_ERROR);
+		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
+		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
+	}
 }

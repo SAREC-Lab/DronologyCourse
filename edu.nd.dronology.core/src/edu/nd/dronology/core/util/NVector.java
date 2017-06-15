@@ -123,5 +123,11 @@ public class NVector {
 		double px = f * ab2 * x + altitude * x;
 		return new PVector(px, py, pz);
 	}
+	
+	public LlaCoordinate toLlaCoordinate() {
+		double lat = Math.asin(this.getZ());
+		double lon = Math.atan2(this.getY(), this.getX());
+		return new LlaCoordinate(Math.toDegrees(lat), Math.toDegrees(lon), this.getAltitude());
+	}
 
 }
