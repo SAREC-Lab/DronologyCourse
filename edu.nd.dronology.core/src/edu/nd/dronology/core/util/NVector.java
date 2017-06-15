@@ -1,5 +1,19 @@
 package edu.nd.dronology.core.util;
 
+/**
+ * A terrestrial position defined by a normal vector (N-vector) and an altitude.
+ * 
+ * An N-vector is a normal Vector that points out from the surface of the WGS-84
+ * reference ellipsoid. The normal vector is combined with an altitude which
+ * represents the distance above (or below) the reference ellipsoid (note this
+ * is the distance above sea level as sea level is defined as the surface of the
+ * ellipsoid in WGS-84). The n-vector and altitude together precisely define a
+ * position on Earth. The n-vector should be a unit vector (i.e. a vector with a
+ * magnitude = 1). The altitude should be in meters.
+ * 
+ * @author Michael Murphy
+ *
+ */
 public class NVector {
 
 	public static final double SEMI_MAJOR = 6378137.0;
@@ -13,6 +27,18 @@ public class NVector {
 
 	private double altitude;
 
+	/**
+	 * 
+	 * @param x
+	 *            the x component of the normal vector
+	 * @param y
+	 *            the y component of the normal vector
+	 * @param z
+	 *            the z component of the normal vector
+	 * @param altitude
+	 *            the distance above the reference ellipsoid (negative altitudes
+	 *            represent altitude below this ellipsoid).
+	 */
 	public NVector(double x, double y, double z, double altitude) {
 		double m = Math.sqrt(x * x + y * y + z * z);
 		this.x = x / m;
@@ -24,6 +50,7 @@ public class NVector {
 	public NVector toNVector() {
 		return this;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -93,6 +120,13 @@ public class NVector {
 		return z;
 	}
 
+	/**
+	 * Finds the distance in meters from this NVector to another.
+	 * 
+	 * @param other
+	 *            the other position to find the position to.
+	 * @return The distance from this position to the other in meters
+	 */
 	public double distance(NVector other) {
 		PVector pSelf = toPVector();
 		PVector pOther = other.toPVector();
@@ -103,6 +137,10 @@ public class NVector {
 
 	}
 
+	/**
+	 * @return a terrestrial position defined by an x, y, and z coordinate in an
+	 *         Earth centered Earth fixed reference frame.
+	 */
 	public PVector toPVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article
@@ -123,7 +161,11 @@ public class NVector {
 		double px = f * ab2 * x + altitude * x;
 		return new PVector(px, py, pz);
 	}
-	
+
+	/**
+	 * @return a terrestrial position defined by a latitude, longitude, and
+	 *         altitude.
+	 */
 	public LlaCoordinate toLlaCoordinate() {
 		double lat = Math.asin(this.getZ());
 		double lon = Math.atan2(this.getY(), this.getX());

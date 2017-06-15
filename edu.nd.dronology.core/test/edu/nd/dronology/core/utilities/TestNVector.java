@@ -2,6 +2,8 @@ package edu.nd.dronology.core.utilities;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+
 import org.junit.Test;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
@@ -23,12 +25,24 @@ public class TestNVector {
 
 	@Test
 	public void testHashCode() {
-		fail("Not yet implemented");
+		NVector n = new LlaCoordinate(37.638680, -122.420983, 16.57).toNVector();
+		NVector n1 = new LlaCoordinate(37.638680, -122.420983, 16.57).toNVector();
+		NVector n2 = new LlaCoordinate(37.719840, -122.496163, 12.81).toNVector();
+		HashSet<NVector> set = new HashSet<NVector>();
+		set.add(n);
+		set.add(n1);
+		assertEquals(1, set.size());
+		set.add(n2);
+		assertEquals(2, set.size());
 	}
 
 	@Test
 	public void testEquals() {
-		fail("Not yet implemented");
+		NVector n = new LlaCoordinate(37.638680, -122.420983, 16.57).toNVector();
+		NVector n1 = new LlaCoordinate(37.638680, -122.420983, 16.57).toNVector();
+		NVector n2 = new LlaCoordinate(37.719840, -122.496163, 12.81).toNVector();
+		assertEquals(n, n1);
+		assertNotEquals(n1, n2);
 	}
 
 	@Test
@@ -37,17 +51,52 @@ public class TestNVector {
 		assertEquals("NVector(0.600000, 0.800000, 0.000000, altitude=76.400000)", x.toString());
 	}
 
+	@Test
+	public void testDistance() {
+		/*
+		 * Went to google maps and found a football field. Football fields are
+		 * usually 100 yards from end zone to end zone. I right clicked on each
+		 * end zone and found the latitude and longitude. I then found the
+		 * elevation of the field. I got the values for n1 and n2 from Levi
+		 * Stadium (home field for the 49ers).
+		 */
+		NVector n1 = new LlaCoordinate(37.402719, -121.969790, 4.70).toNVector();
+		NVector n2 = new LlaCoordinate(37.403442, -121.970283, 4.70).toNVector();
+		/*
+		 * Of course right clicking on google maps is not very precise so I set
+		 * epsilon to half a foot in meters.
+		 * 
+		 * 0.1524 meters = 0.5 feet
+		 * 
+		 * The distance function works in meters
+		 */
+		assertEquals(91.44, n1.distance(n2), 0.1524);
+	}
+
+	@Test
+	public void testGetters() {
+		NVector n = new NVector(1, 0, 0, 2);
+		assertEquals(1.0, n.getX(), 0.0);
+		assertEquals(2.0, n.getAltitude(), 0.0);
+
+		NVector n1 = new NVector(0, 1, 0, 0);
+		assertEquals(1.0, n1.getY(), 0.0);
+
+		NVector n2 = new NVector(0, 0, 1, 0);
+		assertEquals(1.0, n2.getZ(), 0.0);
+
+	}
+
 	/*
 	 * In testToPVector(), testPvector1(), testPvector2(), ..., testPvector9()
 	 * The local variables x, y, and z where calculated in python using a
 	 * library called nvector. Here is the python3 code:
-
-import nvector as nv wgs84 = nv.FrameE(name='WGS84')
-pointA = wgs84.GeoPoint(latitude=40, longitude=-74, z=-10.0,degrees=True)
-print(pointA.to_ecef_vector().pvector.ravel())
- 
-	 * Note: z = -1 * altitude
-	 * To install nvector you can use pip:
+	 * 
+	 * import nvector as nv wgs84 = nv.FrameE(name='WGS84') pointA =
+	 * wgs84.GeoPoint(latitude=40, longitude=-74, z=-10.0,degrees=True)
+	 * print(pointA.to_ecef_vector().pvector.ravel())
+	 * 
+	 * Note: z = -1 * altitude To install nvector you can use pip:
 	 * 
 	 * pip3 install nvector
 	 * 
@@ -141,7 +190,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(y, p.getY(), FLOATING_POINT_ERROR);
 		assertEquals(z, p.getZ(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla() {
 		double lat = 40.690577;
@@ -153,7 +202,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla2() {
 		double lat = 90.0;
@@ -165,7 +214,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla3() {
 		double lat = -90.0;
@@ -177,7 +226,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla4() {
 		double lat = 0.0;
@@ -189,7 +238,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla5() {
 		double lat = 37.738863;
@@ -201,7 +250,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla6() {
 		double lat = -37.738863;
@@ -213,7 +262,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla7() {
 		double lat = 0.0;
@@ -225,7 +274,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla9() {
 		double lat = 45.0;
@@ -237,7 +286,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla10() {
 		double lat = 45.0;
@@ -249,7 +298,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla11() {
 		double lat = -45.0;
@@ -261,7 +310,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla12() {
 		double lat = -45.0;
@@ -273,7 +322,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla13() {
 		double lat = 45.0;
@@ -285,7 +334,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla14() {
 		double lat = 45.0;
@@ -297,7 +346,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla15() {
 		double lat = -45.0;
@@ -309,7 +358,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla16() {
 		double lat = -45.0;
@@ -321,7 +370,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla17() {
 		double lat = 45.0;
@@ -333,7 +382,7 @@ print(pointA.to_ecef_vector().pvector.ravel())
 		assertEquals(lon, lla.getLongitude(), FLOATING_POINT_ERROR);
 		assertEquals(alt, lla.getAltitude(), FLOATING_POINT_ERROR);
 	}
-	
+
 	@Test
 	public void testToLla18() {
 		double lat = 0.0;
