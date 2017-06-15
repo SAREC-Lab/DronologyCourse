@@ -1,6 +1,11 @@
 package edu.nd.dronology.ui.vaadin.start;
 
+import java.io.File;
+
+import com.vaadin.server.FileResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
@@ -27,35 +32,51 @@ public class NavigationBar extends CustomComponent {
   private FRMainLayout flightroutes = new FRMainLayout();
 	public NavigationBar(){
 		
-		MenuBar.Command changeToActive = new MenuBar.Command(){
-			private static final long serialVersionUID = -8302013415286995087L;
-			@Override
-			public void menuSelected(MenuItem selectedItem) {
-				content.removeComponent(flightroutes);
-				content.addComponent(activeflights);
-			}
-		};
-		
-		MenuBar.Command changeToRoutes = new MenuBar.Command(){
-			private static final long serialVersionUID = -4634294050634183985L;
+		class NavigationBarCommand implements MenuBar.Command {
+			private static final long serialVersionUID = 1L;
 
+			private MenuItem previous = null;
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
-				content.removeComponent(activeflights);
-				content.addComponent(flightroutes);
+				if (selectedItem.getText().equals("Active Flights")) {
+					content.removeComponent(flightroutes);
+					content.addComponent(activeflights);
+				} else if (selectedItem.getText().equals("Flight Routes")) {
+					content.removeComponent(activeflights);
+					content.addComponent(flightroutes);
+				} else {
+					return;
+				}
+				
+				if (previous != null)
+          previous.setStyleName(null);
+				selectedItem.setStyleName("active");
+				previous = selectedItem;
 			}
-		};
+			
+			public void setDefaultItem (MenuItem defaultItem) {
+				previous = defaultItem;
+				menuSelected(defaultItem);
+			}
+		}
+		
+		NavigationBarCommand menubarCommand = new NavigationBarCommand();
 		
 		activeflights.setSizeFull();
 		flightroutes.setSizeFull();
 		
 		MenuBar menuBar = new MenuBar();
 		menuBar.setWidth("100%");
-		
-		menuBar.addItem("Active Flights", changeToActive);
-		menuBar.addItem("Flight Routes", changeToRoutes);
 
-    content.addComponents(menuBar, activeflights);
+    content.addComponents(menuBar);
+
+		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+		FileResource afIcon = new FileResource(new File(basepath + "/VAADIN/img/radar_icon.png"));
+		FileResource frIcon = new FileResource(new File(basepath + "/VAADIN/img/route_icon.png"));
+		
+		MenuItem activeFlightsItem = menuBar.addItem("Active Flights", afIcon, menubarCommand);
+		menubarCommand.setDefaultItem(activeFlightsItem);
+		menuBar.addItem("Flight Routes", frIcon, menubarCommand);
     
     setCompositionRoot(content);
 	}

@@ -2,29 +2,28 @@
 
 // Global variable overrides. Must be declared before importing Valo.
 
-// Defines the plaintext font size, weight and family. Font size affects general component sizing.
-//$v-font-size: 16px;
-//$v-font-weight: 300;
-//$v-font-family: "Open Sans", sans-serif;
+$v-app-loading-text: "Dronology";
 
-// Defines the border used by all components.
-//$v-border: 1px solid (v-shade 0.7);
-//$v-border-radius: 4px;
-
-// Affects the color of some component elements, e.g Button, Panel title, etc
-//$v-background-color: hsl(210, 0%, 98%);
-// Affects the color of content areas, e.g  Panel and Window content, TextField input etc
-//$v-app-background-color: $v-background-color;
-
-// Affects the visual appearance of all components
-//$v-gradient: v-linear 8%;
-//$v-bevel-depth: 30%;
-//$v-shadow-opacity: 5%;
-
-// Defines colors for indicating status (focus, success, failure)
-//$v-focus-color: valo-focus-color(); // Calculates a suitable color automatically
-//$v-friendly-color: #2c9720;
-//$v-error-indicator-color: #ed473b;
+$v-font-family: "Roboto", sans-serif;
+$v-font-weight: 400;
+$v-font-weight--header: 400;
+$v-background-color: #fff;
+$v-focus-color: #000040;
+$v-focus-style: none;
+$v-luminance-threshold: 180;
+$v-border: 2px solid v-shade;
+$v-border-radius: 6px;
+$v-bevel: false;
+$v-gradient: false;
+$v-shadow: false;
+$v-textfield-bevel: false;
+$v-textfield-shadow: false;
+$v-link-text-decoration: false;
+$v-selection-overlay-padding-horizontal: 0;
+$v-selection-overlay-padding-vertical: 6px;
+$v-selection-item-height: 30px;
+$v-selection-item-border-radius: 0;
+$valo-menu-background-color: #eee;
 
 // For more information, see: https://vaadin.com/book/-/page/themes.valo.html
 // Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
@@ -39,6 +38,10 @@
 	$screen-height: 90vh;
 	$fr-map-height: 55vh;
 	$fr-table-height: 35vh;
+	
+	$color-dark-5: #000040;
+	$color-light-5: #ffffff;
+	$color-light-4: #eeeeee;
 	
 	//Custom styles
 	.main_layout {
@@ -64,15 +67,56 @@
 		height: $fr-table-height !important;
 	}
 	.v-margin-top {
-		padding-top:0px !important;
+		padding-top:2px !important;
 	}
 	.v-margin-right {
-		padding-right:0px !important;
+		padding-right:2px !important;
 	}
 	.v-margin-bottom {
-		padding-bottom:0px !important;
+		padding-bottom:2px !important;
 	}
 	.v-margin-left {
-		padding-left:0px !important;
+		padding-left:2px !important;
+	}
+	.v-menubar {
+		background-color: $color-dark-5;
+		color: $color-light-5;
+		border-radius: 0px;
+		border: 0px;
+		height: 45px;
+		line-height: 45px;
+		
+		> .v-menubar-menuitem {
+			border-radius: 0px;
+			border: 0px;
+			
+			&:first-child {
+				border-radius: 0px;
+				border: 0px;
+			}
+			
+			&:last-child {
+				border-radius: 0px;
+				border: 0px;
+			}
+			.v-icon {
+				width: 28px;
+				padding: 0 6px 4px 6px;
+				-webkit-filter: invert(100%);
+			}
+		}
+		
+		> .v-menubar-menuitem-active {
+			background-color: $color-light-4;
+			color: $color-dark-5;
+			
+			.v-icon {
+				-webkit-filter: invert(0%);
+			}
+		}
+	
+		&:focus {
+			outline: none !important;
+		}
 	}
 }
