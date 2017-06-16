@@ -81,5 +81,23 @@ public class DroneStatus implements Serializable{
 	public long getLatitude(){
 		return latitude;
 	}
+	
+	
+	public int getAltitude() {
+		return altitude;
+	}
+
+	public double getBatteryLevel() {
+		return batteryLevel;
+	}
+
+	public double getVelocity() {
+		return velocity;
+	}
+
+	public Map<String, String> getInfo() {
+		return info;
+	}
+
 
 }
