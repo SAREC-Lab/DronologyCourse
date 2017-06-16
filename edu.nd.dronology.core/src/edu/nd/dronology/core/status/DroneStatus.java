@@ -98,6 +98,6 @@ public class DroneStatus implements Serializable{
 	public Map<String, String> getInfo() {
 		return info;
 	}
-
+ 
 
 }
