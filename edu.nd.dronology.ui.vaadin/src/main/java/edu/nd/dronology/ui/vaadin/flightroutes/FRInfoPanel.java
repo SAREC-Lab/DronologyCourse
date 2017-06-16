@@ -3,8 +3,10 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.PopupView;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 /**
@@ -26,6 +28,7 @@ public class FRInfoPanel extends CustomComponent {
 	private VerticalLayout totalLayout = new VerticalLayout();
 	private VerticalLayout routes = new VerticalLayout();
 	private HorizontalLayout buttons = new HorizontalLayout();
+	private String routeInputName;
 	
 	public FRInfoPanel(){
 		
@@ -40,10 +43,32 @@ public class FRInfoPanel extends CustomComponent {
 		
 		Button newRoute = new Button("+");
 		newRoute.setWidth("42px");
+		
+		VerticalLayout popupContent = new VerticalLayout();
+		
+		TextField inputField = new TextField();
+		inputField.addValueChangeListener(e -> {
+			routeInputName = (String) inputField.getValue();
+			Notification.show(routeInputName);
+			addRoute(routeInputName, "41342", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
+		});
+		
+		popupContent.addComponent(inputField);
+		
+		PopupView popup = new PopupView(null, popupContent);
+		buttons.addComponent(popup); //?
+		
+		newRoute.addClickListener(e->{	
+			popup.setPopupVisible(true);
+			
+		});
+		
+		buttons.addComponents(newRoute, popup); 
+		
 		Button filter = new Button("Filter");
 		filter.setWidth("68px");
 		
-		buttons.addComponents(newRoute, filter);
+		buttons.addComponents(filter);
 		
 		totalLayout.addComponents(buttons, routes);
 		
