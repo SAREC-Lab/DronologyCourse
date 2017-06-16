@@ -68,7 +68,7 @@ $valo-menu-background-color: #eee;
 		height: $fr-map-height !important;
 	}
 	.fr_table_component {
-		height: $fr-table-height !important;
+		height: calc(#{$fr-table-height} - 6px) !important;
 	}
 	.fr_info_panel {
 		height: $screen-height;
