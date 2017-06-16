@@ -20,7 +20,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<!-- If there are no local customisations, this can also be "fetch" or "cdn" -->
+		<!-- If there are no local customisations, this can also be "fetch" or 
+			"cdn" -->
 		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
 	</properties>
 
@@ -85,6 +86,41 @@
 			<artifactId>json</artifactId>
 			<version>20170516</version>
 		</dependency>
+
+		<dependency>
+			<groupId>nd.edu.dronology</groupId>
+			<artifactId>core</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/libs/nd.edu.dronology.core.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>nd.edu.dronology</groupId>
+			<artifactId>services.core</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/libs/nd.edu.dronology.services.core.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>nd.edu.dronology</groupId>
+			<artifactId>util</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/libs/nd.edu.dronology.util.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>net.mv</groupId>
+			<artifactId>logger</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/libs/net.mv.logger.jar</systemPath>
+		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
@@ -133,7 +169,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- The Jetty plugin allows us to easily test the development build by
+			<!-- The Jetty plugin allows us to easily test the development build by 
 				running jetty:run on the command line. -->
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
