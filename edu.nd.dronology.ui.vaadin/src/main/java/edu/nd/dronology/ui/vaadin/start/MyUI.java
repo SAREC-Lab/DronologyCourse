@@ -1,5 +1,8 @@
 package edu.nd.dronology.ui.vaadin.start;
 
+import java.rmi.RemoteException;
+import java.util.Map;
+
 import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
@@ -7,6 +10,13 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
+
+import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -23,15 +33,35 @@ public class MyUI extends UI {
 	
 	@Override
     protected void init(VaadinRequest vaadinRequest) {
+			provider.init("localhost", 9898);
+		  IDroneSetupRemoteService service;
+
+		  BaseServiceProvider provider = MyUI.getProvider();
+		  try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				service.initializeDrones(new DroneInitializationInfo("PatrickF", "Flying", new Coordinate(41683809, -86250143, 150)));
+				service.initializeDrones(new DroneInitializationInfo("JamesH", "Flying", new Coordinate( 41684579, -862443923, 150)));
+				service.initializeDrones(new DroneInitializationInfo("MichelleG", "Flying", new Coordinate(41681373, -862425899, 150)));
+
+			} catch (DronologyServiceException | RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			NavigationBar navigationBar = new NavigationBar();
 			setContent(navigationBar);
 			navigationBar.setSizeFull();
     }
-
+	public static BaseServiceProvider getProvider(){
+		return provider;
+	}
+	
+	private static BaseServiceProvider provider = new BaseServiceProvider();
+	
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
 		private static final long serialVersionUID = -5422579448768796912L;
+		
 		
     }
 }

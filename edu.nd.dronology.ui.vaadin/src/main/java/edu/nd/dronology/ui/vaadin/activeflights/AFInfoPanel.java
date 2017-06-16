@@ -1,5 +1,9 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
+import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
@@ -7,6 +11,12 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
  * 
@@ -21,6 +31,8 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
+//private static final ILogger LOGGER = LoggerProvider.getLogger(AFInfoPanel.class);
+
 	public AFInfoPanel(){
 		
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
@@ -81,15 +93,27 @@ public class AFInfoPanel extends CustomComponent{
 		
 	  content.addComponent(buttons);
 	  numUAVs = content.getComponentCount() - 1;
+	  
+	  IDroneSetupRemoteService service;
+	  Map<String, DroneStatus> drones;
+	  BaseServiceProvider provider = MyUI.getProvider();
+	  try {
+			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			drones = service.getDrones();
+			for (Entry<String, DroneStatus> e:drones.entrySet()){
+				addBox(false, e.getValue().getID(), e.getValue().getStatus(), e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(), e.getValue().getAltitude(), e.getValue().getVelocity(), false);
+			}
+		} catch (DronologyServiceException | RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	  
 		/**
 		 * dummy/example boxes
 		 */
-		addBox(false, "Patrick", "Enroute", 124, "red", 41.3145, -86.25324, 150, 30, false);
-		addBox();
-		addBox(true, "Falvey", "Hovering", 88, "yellow", 41.3234, -86.353, 200, 0, true);
 	}
 	
-	public void addBox(boolean isChecked, String name, String status, int batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
+	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, long lat, long lon, int alt, double speed, boolean hoverInPlace){
 		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
 		content.addComponent(box);
 		numUAVs = content.getComponentCount() - 1;

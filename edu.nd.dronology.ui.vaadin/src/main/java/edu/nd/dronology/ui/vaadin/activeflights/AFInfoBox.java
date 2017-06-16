@@ -31,11 +31,11 @@ public class AFInfoBox extends CustomComponent{
 	private boolean isChecked;
 	private String name;
 	private String status;
-	private int batteryLife;
+	private double batteryLife;
 	private String healthColor;
-	private double lat;
-	private double lon;
-	private double alt;
+	private long lat;
+	private long lon;
+	private int alt;
 	private double speed;
 	private boolean hoverInPlace;
 	
@@ -49,7 +49,10 @@ public class AFInfoBox extends CustomComponent{
 	private Label locationInfo3 = new Label();
 	private Label locationInfo4 = new Label();
 	private Switch hoverSwitch = new Switch();
-	
+
+	private VerticalLayout mainContent = new VerticalLayout();
+	private HorizontalLayout topContent = new HorizontalLayout();
+	private VerticalLayout middleContent = new VerticalLayout();
 	private GridLayout bottomContent = new GridLayout(2, 1);
 	
 	/**
@@ -65,7 +68,7 @@ public class AFInfoBox extends CustomComponent{
 	 * @param speed
 	 * @param hoverInPlace 
 	 */
-	public AFInfoBox(boolean isChecked, String name, String status, int batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
+	public AFInfoBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, long lat, long lon, int alt, double speed, boolean hoverInPlace){
 		this.isChecked = isChecked;
 		this.name = name;
 		this.status = status;
@@ -76,12 +79,16 @@ public class AFInfoBox extends CustomComponent{
 		this.alt = alt;
 		this.speed = speed;
 		this.hoverInPlace = hoverInPlace;
-		VerticalLayout mainContent = new VerticalLayout();
-		HorizontalLayout topContent = new HorizontalLayout();
+		
+		this.addStyleName("af_info_box");
+		
 		VerticalLayout statusContent = new VerticalLayout();
 		VerticalLayout bottomButtons = new VerticalLayout();
 		VerticalLayout bottomSwitch = new VerticalLayout();
-		
+
+		topContent.addStyleName("af_info_top_content");
+		middleContent.addStyleName("af_info_middle_content");
+		bottomContent.addStyleName("af_info_bottom_content");
 		/**
 		 * top layer components
 		 */
@@ -91,13 +98,11 @@ public class AFInfoBox extends CustomComponent{
     FileResource resource = new FileResource(new File(basepath+"/VAADIN/img/drone_icon.png"));
     Image droneImage = new Image();
     droneImage.setSource(resource);
-    droneImage.setWidth("50px");
-    droneImage.setHeight("50px");
  
     statusInfo1.setValue(name);
     statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
 		statusInfo2.setValue("Status: " + status);
-		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
+		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
 		health.setCaptionAsHtml(true);
@@ -110,19 +115,20 @@ public class AFInfoBox extends CustomComponent{
 			health.setDescription("Needs Immediate Attention");
 		topContent.addComponents(check, droneImage, statusContent, health);
 		topContent.setSpacing(false);
-		topContent.setComponentAlignment(check, Alignment.MIDDLE_LEFT);
-		topContent.setComponentAlignment(droneImage, Alignment.MIDDLE_LEFT);
-		topContent.setComponentAlignment(statusContent, Alignment.MIDDLE_LEFT);
-		topContent.setComponentAlignment(health, Alignment.MIDDLE_RIGHT);
+		topContent.setComponentAlignment(check, Alignment.TOP_LEFT);
+		topContent.setComponentAlignment(droneImage, Alignment.TOP_LEFT);
+		topContent.setComponentAlignment(statusContent, Alignment.TOP_LEFT);
+		topContent.setComponentAlignment(health, Alignment.TOP_RIGHT);
 		
 		/**
 		 * middle layer components
 		 */
 
-		locationInfo1.setValue("Latitude:\t" + Double.toString(this.lat));
-		locationInfo2.setValue("Longitude:\t" + Double.toString(this.lon));
-		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + "feet");
+		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
+		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
+		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + "feet");
 		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + "mph");
+		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
 		
 		/**
 		 * bottom layer components
@@ -141,23 +147,13 @@ public class AFInfoBox extends CustomComponent{
 		
 		bottomButtons.addComponents(returnToHome, assignNewRoute);
 		bottomContent.addComponent(bottomSwitch, 0, 0);		
-		bottomContent.setComponentAlignment(bottomSwitch, Alignment.MIDDLE_LEFT);
 		bottomContent.addComponent(bottomButtons, 1, 0);
-		bottomContent.setComponentAlignment(bottomButtons, Alignment.TOP_LEFT);
 		
-		mainContent.addComponents(topContent, locationInfo1, locationInfo2, locationInfo3, locationInfo4, bottomContent);
-		mainContent.setComponentAlignment(bottomContent, Alignment.TOP_LEFT);
-		mainContent.setComponentAlignment(locationInfo1, Alignment.MIDDLE_CENTER);
-		mainContent.setComponentAlignment(locationInfo2, Alignment.MIDDLE_CENTER);
-		mainContent.setComponentAlignment(locationInfo3, Alignment.MIDDLE_CENTER);
-		mainContent.setComponentAlignment(locationInfo4, Alignment.MIDDLE_CENTER);
+		mainContent.addComponents(topContent, middleContent, bottomContent);
 		mainContent.setSizeUndefined();
 		mainContent.setSpacing(false);
 		
-		locationInfo1.setVisible(visible);
-		locationInfo2.setVisible(visible);
-		locationInfo3.setVisible(visible);
-		locationInfo4.setVisible(visible);
+		middleContent.setVisible(visible);
 		bottomContent.setVisible(visible);
 		topContent.addLayoutClickListener(e->{
 				Component child = e.getChildComponent();
@@ -206,12 +202,12 @@ public class AFInfoBox extends CustomComponent{
 		return this.status;
 	}
 	
-	public void setBatteryLife(int batteryLife){
+	public void setBatteryLife(double batteryLife){
 		this.batteryLife = batteryLife;
-		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
+		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
 	}
 	
-	public int getBatteryLife(){
+	public double getBatteryLife(){
 		return this.batteryLife;
 	}
 	
@@ -230,30 +226,30 @@ public class AFInfoBox extends CustomComponent{
 		return this.healthColor;
 	}
 	
-	public void setLat(double lat){
+	public void setLat(long lat){
 		this.lat = lat;
-		locationInfo1.setValue("Latitude:\t" + Double.toString(this.lat));
+		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
 	}
 	
-	public double getLat(){
+	public Long getLat(){
 		return this.lat;
 	}
 	
-	public void setLon(double lon){
+	public void setLon(Long lon){
 		this.lon = lon;
-		locationInfo2.setValue("Longitude:\t" + Double.toString(this.lon));
+		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
 	}
 	
 	public double getLon(){
 		return this.lon;
 	}
 	
-	public void setAlt(double alt){
+	public void setAlt(int alt){
 		this.alt = alt;
-		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + "feet");
+		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + "feet");
 	}
 	
-	public double getAlt(){
+	public int getAlt(){
 		return this.alt;
 	}
 	
@@ -285,18 +281,12 @@ public class AFInfoBox extends CustomComponent{
 	public void setBoxVisible(boolean visible){
 		if (visible){
 			this.visible = false;
-			locationInfo1.setVisible(this.visible);
-			locationInfo2.setVisible(this.visible);
-			locationInfo3.setVisible(this.visible);
-			locationInfo4.setVisible(this.visible);
+			middleContent.setVisible(this.visible);
 			bottomContent.setVisible(this.visible);
 		}
 		else {
 			this.visible = true;
-			locationInfo1.setVisible(this.visible);
-			locationInfo2.setVisible(this.visible);
-			locationInfo3.setVisible(this.visible);
-			locationInfo4.setVisible(this.visible);
+			middleContent.setVisible(this.visible);
 			bottomContent.setVisible(this.visible);
 		}	
 	}
