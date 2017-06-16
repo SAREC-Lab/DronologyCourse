@@ -8,6 +8,11 @@ import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+/**
+ * 
+ * @author Patrick Falvey
+ *
+ */
 public class AFEmergencyComponent extends CustomComponent{
 	private static final long serialVersionUID = -650745296345774988L;
 	private HorizontalLayout buttons = new HorizontalLayout();
