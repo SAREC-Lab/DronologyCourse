@@ -48,7 +48,7 @@ public class FRInfoPanel extends CustomComponent {
 		
 		TextField inputField = new TextField();
 		inputField.addValueChangeListener(e -> {
-			routeInputName = (String) inputField.getValue();
+			routeInputName = inputField.getValue();
 			Notification.show(routeInputName);
 			addRoute(routeInputName, "41342", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
 		});
