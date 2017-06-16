@@ -39,7 +39,9 @@ public class MyUI extends UI {
 		  BaseServiceProvider provider = MyUI.getProvider();
 		  try {
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-				service.initializeDrones(new DroneInitializationInfo("PatrickF", "dsafgh", new Coordinate(41, -86, 150)));
+				service.initializeDrones(new DroneInitializationInfo("PatrickF", "Flying", new Coordinate(41683809, -86250143, 150)));
+				service.initializeDrones(new DroneInitializationInfo("JamesH", "Flying", new Coordinate( 41684579, -862443923, 150)));
+				service.initializeDrones(new DroneInitializationInfo("MichelleG", "Flying", new Coordinate(41681373, -862425899, 150)));
 
 			} catch (DronologyServiceException | RemoteException e1) {
 				// TODO Auto-generated catch block
@@ -53,7 +55,7 @@ public class MyUI extends UI {
 		return provider;
 	}
 	
-		private static BaseServiceProvider provider = new BaseServiceProvider();
+	private static BaseServiceProvider provider = new BaseServiceProvider();
 	
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)

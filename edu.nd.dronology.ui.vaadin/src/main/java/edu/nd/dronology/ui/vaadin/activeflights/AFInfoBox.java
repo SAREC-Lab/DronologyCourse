@@ -31,11 +31,11 @@ public class AFInfoBox extends CustomComponent{
 	private boolean isChecked;
 	private String name;
 	private String status;
-	private int batteryLife;
+	private double batteryLife;
 	private String healthColor;
-	private double lat;
-	private double lon;
-	private double alt;
+	private long lat;
+	private long lon;
+	private int alt;
 	private double speed;
 	private boolean hoverInPlace;
 	
@@ -68,7 +68,7 @@ public class AFInfoBox extends CustomComponent{
 	 * @param speed
 	 * @param hoverInPlace 
 	 */
-	public AFInfoBox(boolean isChecked, String name, String status, int batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
+	public AFInfoBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, long lat, long lon, int alt, double speed, boolean hoverInPlace){
 		this.isChecked = isChecked;
 		this.name = name;
 		this.status = status;
@@ -102,7 +102,7 @@ public class AFInfoBox extends CustomComponent{
     statusInfo1.setValue(name);
     statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
 		statusInfo2.setValue("Status: " + status);
-		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
+		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
 		health.setCaptionAsHtml(true);
@@ -124,9 +124,9 @@ public class AFInfoBox extends CustomComponent{
 		 * middle layer components
 		 */
 
-		locationInfo1.setValue("Latitude:\t" + Double.toString(this.lat));
-		locationInfo2.setValue("Longitude:\t" + Double.toString(this.lon));
-		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + "feet");
+		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
+		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
+		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + "feet");
 		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + "mph");
 		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
 		
@@ -202,12 +202,12 @@ public class AFInfoBox extends CustomComponent{
 		return this.status;
 	}
 	
-	public void setBatteryLife(int batteryLife){
+	public void setBatteryLife(double batteryLife){
 		this.batteryLife = batteryLife;
-		statusInfo3.setValue("Battery Life: " + Integer.toString(batteryLife) + " min");
+		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
 	}
 	
-	public int getBatteryLife(){
+	public double getBatteryLife(){
 		return this.batteryLife;
 	}
 	
@@ -226,30 +226,30 @@ public class AFInfoBox extends CustomComponent{
 		return this.healthColor;
 	}
 	
-	public void setLat(double lat){
+	public void setLat(long lat){
 		this.lat = lat;
-		locationInfo1.setValue("Latitude:\t" + Double.toString(this.lat));
+		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
 	}
 	
-	public double getLat(){
+	public Long getLat(){
 		return this.lat;
 	}
 	
-	public void setLon(double lon){
+	public void setLon(Long lon){
 		this.lon = lon;
-		locationInfo2.setValue("Longitude:\t" + Double.toString(this.lon));
+		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
 	}
 	
 	public double getLon(){
 		return this.lon;
 	}
 	
-	public void setAlt(double alt){
+	public void setAlt(int alt){
 		this.alt = alt;
-		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + "feet");
+		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + "feet");
 	}
 	
-	public double getAlt(){
+	public int getAlt(){
 		return this.alt;
 	}
 	
