@@ -13,6 +13,7 @@ public class AFEmergencyComponent extends CustomComponent{
 	private HorizontalLayout buttons = new HorizontalLayout();
 	public AFEmergencyComponent(){
 		VerticalLayout layout = new VerticalLayout();
+		layout.addStyleName("af_emergency_operations");
     
 		Label caption = new Label("Emergency Operations");
 		caption.addStyleName(ValoTheme.LABEL_BOLD);

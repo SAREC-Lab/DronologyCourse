@@ -40,8 +40,10 @@ $valo-menu-background-color: #eee;
 	$fr-table-height: 35vh;
 	
 	$color-dark-5: #000040;
+	$color-dark-4: #224080;
 	$color-light-5: #ffffff;
-	$color-light-4: #eeeeee;
+	$color-light-4: #f5f5f5;
+	$color-light-3: #eeeeee;
 	
 	//Custom styles
 	.main_layout {
@@ -59,25 +61,65 @@ $valo-menu-background-color: #eee;
 	}
 	.map_component {
 		width: 75% !important;
+		padding-left: 6px;
 	}
+
 	.fr_leaflet_map {
-		height: $fr-map-height;
+		height: $fr-map-height !important;
 	}
 	.fr_table_component {
 		height: $fr-table-height !important;
 	}
+
+	.af_info_panel {
+		height: calc(#{$screen-height} - 106px);
+	}
+	.af_emergency_operations {
+		height: 100px;
+	}
+	.af_uav_list_controls {
+		float: right;
+		height: 20px;
+	}
+
+	.control_panel {
+		border-radius: 0;
+		border: 0;
+		background-color: $color-light-4;
+		.v-panel-caption {
+			background-image: -webkit-linear-gradient(top, $color-dark-4 0%, $color-dark-4 100%);
+			background-image: linear-gradient(to bottom, $color-dark-4 0%, $color-dark-4 100%);
+			backgound-color: $color-dark-4;
+			color: $color-light-5;
+			border-radius: 0;
+			border: 0;
+		}
+	}
+
 	.v-margin-top {
-		padding-top:2px !important;
+		padding-top:0px;
+		.v-margin-top {
+			padding-top:0px;
+		}
 	}
 	.v-margin-right {
-		padding-right:2px !important;
+		padding-right:0px;
 	}
 	.v-margin-bottom {
-		padding-bottom:2px !important;
+		padding-bottom:0px;
 	}
 	.v-margin-left {
-		padding-left:2px !important;
+		padding-left:0px;
 	}
+	.v-spacing {
+		width: 6px;
+		height: 6px;
+	}
+
+	.v-verticallayout-card, .v-horizontallayout-card {
+		border-radius: 0;
+	}
+
 	.v-menubar {
 		background-color: $color-dark-5;
 		color: $color-light-5;
@@ -107,7 +149,7 @@ $valo-menu-background-color: #eee;
 		}
 		
 		> .v-menubar-menuitem-active {
-			background-color: $color-light-4;
+			background-color: $color-light-3;
 			color: $color-dark-5;
 			
 			.v-icon {
@@ -116,7 +158,14 @@ $valo-menu-background-color: #eee;
 		}
 	
 		&:focus {
-			outline: none !important;
+			outline: none;
 		}
+	}
+
+	.small_button_link {
+		font-size: 75%;
+		text-decoration: underline;
+		height: 20px;
+		padding: 3px 6px;
 	}
 }

@@ -25,7 +25,8 @@ public class AFInfoPanel extends CustomComponent{
 		
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 		panel.setContent(content);
-		panel.setHeight("400px");
+		panel.addStyleName("af_info_panel");
+		panel.addStyleName("control_panel");
 		
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout sideBar = new VerticalLayout();
@@ -44,10 +45,13 @@ public class AFInfoPanel extends CustomComponent{
 		
 		Button selectButton = new Button("Select all");
 	  selectButton.addStyleName(ValoTheme.BUTTON_LINK);
+	  selectButton.addStyleName("small_button_link");
 	  Button visibleButton = new Button("Expand all");
 	  visibleButton.addStyleName(ValoTheme.BUTTON_LINK);
+	  visibleButton.addStyleName("small_button_link");
 	  
 	  buttons.addComponents(selectButton, visibleButton);
+	  buttons.addStyleName("af_uav_list_controls");
 	  
 	  selectButton.addClickListener( e -> {
 	  	if (selectAll){
