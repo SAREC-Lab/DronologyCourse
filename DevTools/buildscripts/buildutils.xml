@@ -36,6 +36,11 @@
 	<target name="-copy-core">
 		<copy file="${publish.dir}/${jar.core}" tofile="${build.dir}/lib/${jar.core}" overwrite="true" />
 	</target>
+	
+	<target name="-copy-service-core">
+			<copy file="${publish.dir}/${jar.services.core}" tofile="${build.dir}/lib/${jar.services.core}" overwrite="true" />
+		</target>
+
 
 	<target name="-copy-util">
 		<copy file="${publish.dir}/${jar.util}" tofile="${build.dir}/lib/${jar.util}" overwrite="true" />

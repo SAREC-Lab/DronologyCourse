@@ -14,10 +14,13 @@
 
 		<antcall target="copy-libs" inheritall="true" />
 		<antcall target="copy-vaadin-libs" inheritall="true" />
+		<antcall target="-copy-core" inheritall="true" />
+		<antcall target="-copy-service-core" inheritall="true" />
 		<antcall target="-copy-logger" inheritall="true" />
 		<antcall target="-copy-util" inheritall="true" />
 
 		<antcall target="compile" inheritall="true" />
+	<!--	<antcall target="build-war" inheritall="true" />-->
 		<!--<antcall target="cleanup" inheritall="true" />-->
 
 		<!--<antcall target="copy-libs" inheritall="true" />
@@ -28,6 +31,29 @@
 
 
 	</target>
+	
+	
+	<target name="build-war">
+
+	   <war destfile="fax.war" webxml="${web.dir}/web.xml">
+	      <fileset dir="${web.dir}/WebContent">
+	         <include name="**/*.*"/>
+	      </fileset>
+	      
+	      <lib dir="thirdpartyjars">
+	         <exclude name="portlet.jar"/>
+	      </lib>
+	      
+	      <classes dir="${build.dir}/web"/>
+	   </war>
+	   
+	</target>
+	
+	
+	
+	
+	
+	
 
 	<target name="copy-vaadin-libs">
 
