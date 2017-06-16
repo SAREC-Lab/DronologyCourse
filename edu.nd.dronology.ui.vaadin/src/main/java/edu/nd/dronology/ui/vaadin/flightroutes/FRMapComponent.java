@@ -35,6 +35,9 @@ public class FRMapComponent extends CustomComponent {
 		MapMarkerUtilities route = new MapMarkerUtilities();
 		route.getGrid().addStyleName("fr_table_component");
 		
+		FRTableDisplay tableDisplay = new FRTableDisplay(route.getGrid());
+		tableDisplay.makeEditable();
+		
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
 		

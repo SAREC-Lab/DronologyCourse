@@ -5,12 +5,9 @@ import java.util.ArrayList;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
-import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Notification;
 
 /**
  * This is the class that contains all logic for plotting flight routes.
@@ -20,21 +17,24 @@ import com.vaadin.ui.Notification;
 
 public class MapMarkerUtilities {
 
-	ArrayList<Point> mapPoints = new ArrayList<Point>();
+	ArrayList<WayPoint> mapPoints = new ArrayList<WayPoint>();
 	ArrayList<LPolyline> polylines = new ArrayList<LPolyline>();
-	private Grid<Point> grid = new Grid<>();
-	private Point previou;
+	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
 	
 	public MapMarkerUtilities() {
-		grid.addColumn(Point::getLat).setCaption("Latitude");
-		grid.addColumn(Point::getLon).setCaption("Longitude");
+		grid.getColumn("latitude").setCaption("Latitude");
+		grid.getColumn("longitude").setCaption("Longitude");
 	}
 
 	public void addPin(Point point, LMap map) {
 		LMarker leafletMarker = new LMarker(point);
         leafletMarker.addClickListener(event -> {
+        	for (int i = 0; i < mapPoints.size(); i++) {
+        		if (mapPoints.get(i).isAtPoint(event.getPoint()))
+        			mapPoints.remove(mapPoints.get(i));
+        	}
+
         	map.removeComponent(leafletMarker);
-        	mapPoints.remove(leafletMarker.getPoint());
         	removeAllLines(polylines, map);
         	grid.setItems(mapPoints);
         	polylines = drawLines(mapPoints, map);
@@ -51,8 +51,8 @@ public class MapMarkerUtilities {
         		index = mapPoints.indexOf(point);
         	else {
         		for (int i = 0; i < mapPoints.size(); i++){
-        			String latlon = Double.toString(mapPoints.get(i).getLat());
-        			latlon += Double.toString(mapPoints.get(i).getLon());
+        			String latlon = Double.toString(mapPoints.get(i).getPoint().getLat());
+        			latlon += Double.toString(mapPoints.get(i).getPoint().getLon());
         			if (latlon.equals(leafletMarker.getDescription())){
         				index = i;
         			}
@@ -60,23 +60,24 @@ public class MapMarkerUtilities {
         	}
         	String description = (Double.toString(leafletMarker.getPoint().getLat()) + Double.toString(leafletMarker.getPoint().getLon()));
         	leafletMarker.setDescription(description);
-        	mapPoints.set(index, leafletMarker.getPoint());
+        	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
+        	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
         	removeAllLines(polylines, map);
         	polylines = drawLines(mapPoints, map);
         	grid.setItems(mapPoints);
         });
 		map.addComponent(leafletMarker);
-		mapPoints.add(point);
+		mapPoints.add(new WayPoint(point));
 		removeAllLines(polylines, map);
     	polylines = drawLines(mapPoints, map);
 		grid.setItems(mapPoints);
 	}
 	
-	public ArrayList<LPolyline> drawLines(ArrayList<Point> mapPoints, LMap map) {
+	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, LMap map) {
 		ArrayList<LPolyline> polylines = new ArrayList<LPolyline>();
 		
 		for (int i = mapPoints.size() - 1; i > 0; i--) {
-        	LPolyline polyline = new LPolyline(mapPoints.get(i), mapPoints.get(i-1));
+        	LPolyline polyline = new LPolyline(mapPoints.get(i).getPoint(), mapPoints.get(i-1).getPoint());
         	polylines.add(polyline);
 			map.addComponent(polyline);
 		}
@@ -89,7 +90,7 @@ public class MapMarkerUtilities {
     	}
 	}
 	
-	public Grid<Point> getGrid() {
+	public Grid<WayPoint> getGrid() {
 		return grid;
 	}
 
