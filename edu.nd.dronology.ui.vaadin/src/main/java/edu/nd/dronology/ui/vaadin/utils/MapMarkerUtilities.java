@@ -1,6 +1,7 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
@@ -17,8 +18,8 @@ import com.vaadin.ui.Grid;
 
 public class MapMarkerUtilities {
 
-	ArrayList<WayPoint> mapPoints = new ArrayList<WayPoint>();
-	ArrayList<LPolyline> polylines = new ArrayList<LPolyline>();
+	ArrayList<WayPoint> mapPoints = new ArrayList<>();
+	ArrayList<LPolyline> polylines = new ArrayList<>();
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
 	
 	public MapMarkerUtilities() {
@@ -28,9 +29,11 @@ public class MapMarkerUtilities {
 
 	public void addPin(Point point, LMap map) {
 		LMarker leafletMarker = new LMarker(point);
+		leafletMarker.setId(UUID.randomUUID().toString());
+		
         leafletMarker.addClickListener(event -> {
         	for (int i = 0; i < mapPoints.size(); i++) {
-        		if (mapPoints.get(i).isAtPoint(event.getPoint()))
+        		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
         			mapPoints.remove(mapPoints.get(i));
         	}
 
@@ -47,37 +50,29 @@ public class MapMarkerUtilities {
          */
         leafletMarker.addDragEndListener(event-> {
         	int index = -1;
-        	if (leafletMarker.getDescription().equals(""))
-        		index = mapPoints.indexOf(point);
-        	else {
-        		for (int i = 0; i < mapPoints.size(); i++){
-        			String latlon = Double.toString(mapPoints.get(i).getPoint().getLat());
-        			latlon += Double.toString(mapPoints.get(i).getPoint().getLon());
-        			if (latlon.equals(leafletMarker.getDescription())){
-        				index = i;
-        			}
-        		}
+        	for (int i = 0; i < mapPoints.size(); i++) {
+        		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
+      				index = i;
         	}
-        	String description = (Double.toString(leafletMarker.getPoint().getLat()) + Double.toString(leafletMarker.getPoint().getLon()));
-        	leafletMarker.setDescription(description);
         	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
         	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
         	removeAllLines(polylines, map);
         	polylines = drawLines(mapPoints, map);
         	grid.setItems(mapPoints);
         });
+        
 		map.addComponent(leafletMarker);
-		mapPoints.add(new WayPoint(point));
+		WayPoint p = new WayPoint(point);
+		p.setId(leafletMarker.getId());
+		mapPoints.add(p);
 		removeAllLines(polylines, map);
     	polylines = drawLines(mapPoints, map);
 		grid.setItems(mapPoints);
 	}
 	
-	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, LMap map) {
-		ArrayList<LPolyline> polylines = new ArrayList<LPolyline>();
-		
+	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, LMap map) {		
 		for (int i = mapPoints.size() - 1; i > 0; i--) {
-        	LPolyline polyline = new LPolyline(mapPoints.get(i).getPoint(), mapPoints.get(i-1).getPoint());
+        	LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i-1).toPoint());
         	polylines.add(polyline);
 			map.addComponent(polyline);
 		}

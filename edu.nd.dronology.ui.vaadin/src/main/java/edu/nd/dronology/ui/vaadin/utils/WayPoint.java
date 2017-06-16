@@ -27,7 +27,7 @@ public class WayPoint {
 			return false;
 		}
 	}
-	public Point getPoint() {
+	public Point toPoint() {
 		Point point = new Point(Double.parseDouble(longitude), Double.parseDouble(latitude));
 		return point;
 	}
