@@ -70,7 +70,9 @@ public class MapMarkerUtilities {
 		grid.setItems(mapPoints);
 	}
 	
-	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, LMap map) {		
+	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, LMap map) {
+		ArrayList<LPolyline> polylines = new ArrayList<>();
+		
 		for (int i = mapPoints.size() - 1; i > 0; i--) {
         	LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i-1).toPoint());
         	polylines.add(polyline);

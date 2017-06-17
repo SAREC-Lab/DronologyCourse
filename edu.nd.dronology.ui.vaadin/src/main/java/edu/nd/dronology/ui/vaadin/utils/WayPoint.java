@@ -28,7 +28,7 @@ public class WayPoint {
 		}
 	}
 	public Point toPoint() {
-		Point point = new Point(Double.parseDouble(longitude), Double.parseDouble(latitude));
+		Point point = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
 		return point;
 	}
 	public String getId() {
