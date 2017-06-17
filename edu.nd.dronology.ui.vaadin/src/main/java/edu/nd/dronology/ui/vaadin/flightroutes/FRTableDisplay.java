@@ -3,6 +3,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.TextField;
 
+import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
@@ -13,14 +14,17 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
  */
 
 public class FRTableDisplay {
-	private static final int HasValue = 0;
-	private Grid<WayPoint> grid;
+	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
 	
-	public FRTableDisplay(Grid<WayPoint> grid) {
-		this.grid = grid;
+	public FRTableDisplay() {
+		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "approachingSpeed");
 	}
 	
-	public void makeEditable() {
+	public Grid<WayPoint> getGrid() {
+		return grid;
+	}
+	
+	public void makeEditable(MapMarkerUtilities mapMarkers) {
 //		Binder<Point> binder = grid.getEditor().getBinder();
 
 		TextField latitude = new TextField();
@@ -39,6 +43,9 @@ public class FRTableDisplay {
 //			    taskField, Point.getLat(), Point.setLat());
 		
 		grid.getEditor().setEnabled(true);
+		grid.getEditor().addSaveListener(event -> {
+			mapMarkers.updatePinForWayPoint(event.getBean());
+		});
 		grid.asSingleSelect();
 	}
 }

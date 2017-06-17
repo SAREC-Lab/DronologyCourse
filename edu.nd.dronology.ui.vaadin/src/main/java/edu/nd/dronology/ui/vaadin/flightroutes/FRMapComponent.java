@@ -31,25 +31,25 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
 		
 		VerticalLayout content = new VerticalLayout();
+
+		FRTableDisplay tableDisplay = new FRTableDisplay();
+		MapMarkerUtilities route = new MapMarkerUtilities(leafletMap, tableDisplay.getGrid());
+		tableDisplay.getGrid().addStyleName("fr_table_component");
 		
-		MapMarkerUtilities route = new MapMarkerUtilities();
-		route.getGrid().addStyleName("fr_table_component");
-		
-		FRTableDisplay tableDisplay = new FRTableDisplay(route.getGrid());
-		tableDisplay.makeEditable();
+		tableDisplay.makeEditable(route);
 		
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
 		
 		leafletMap.addClickListener(e -> {
-			route.addPin(e.getPoint(), leafletMap);
+			route.addNewPin(e.getPoint());
 		});
 		
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
 		
 		setCompositionRoot(content);  
-		content.addComponents(leafletMap, route.getGrid());
+		content.addComponents(leafletMap, tableDisplay.getGrid());
 	}
 	
 	public void setCenter(double centerLat, double centerLon) {
