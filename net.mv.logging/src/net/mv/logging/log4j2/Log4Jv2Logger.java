@@ -137,7 +137,7 @@ public class Log4Jv2Logger implements ILogger {
 	@Override
 	public void hwFatal(final Object message) {
 		Object logMessage = message.toString();
-		log.logIfEnabled(throwingSource, HW_INFO, MARKER, logMessage, null);
+		log.logIfEnabled(throwingSource, HW_FATAL, MARKER, logMessage, null);
 		//throwAdapter.fatal(message);
 	}
 	
