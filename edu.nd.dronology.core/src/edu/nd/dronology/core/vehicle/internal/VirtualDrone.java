@@ -53,6 +53,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	@Override
 	public void flyTo(Coordinate targetCoordinates) {
 		NullUtil.checkNull(targetCoordinates);
+	//	LOGGER.info("Flying to: "+ targetCoordinates.toString());
 		simulator.setFlightPath(currentPosition, targetCoordinates);
 	}
 
@@ -60,12 +61,13 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	public void land() throws FlightZoneException {
 		try {
 			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			LOGGER.error(e);
-		}
 		simulator.checkPoint();
 		simulator.stopBatteryDrain();
+		} catch (Throwable e) {
+			LOGGER.error(e);
+		}
 	}
+		
 
 	@Override
 	public double getBatteryStatus() {

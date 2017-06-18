@@ -70,6 +70,7 @@ public class DroneFlightStateManager {
 
 		if (uavStateMachine.canFire(FlightModeTransition.TO_ON_GROUND)) {
 			uavStateMachine.fire(FlightModeTransition.TO_ON_GROUND);
+			LOGGER.info("Mode set to:" + uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.TO_ON_GROUND + "'");
@@ -93,6 +94,7 @@ public class DroneFlightStateManager {
 
 		if (uavStateMachine.canFire(FlightModeTransition.PLAN_ASSIGNED)) {
 			uavStateMachine.fire(FlightModeTransition.PLAN_ASSIGNED);
+			LOGGER.info("Mode set to :" + uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.PLAN_ASSIGNED + "'");
@@ -100,6 +102,7 @@ public class DroneFlightStateManager {
 
 		if (currentFlightMode == FlightMode.ON_GROUND) {
 			currentFlightMode = FlightMode.AWAITING_TAKEOFF_CLEARANCE;
+		
 		} else {
 			throw new FlightZoneException("You may not transition to " + FlightMode.AWAITING_TAKEOFF_CLEARANCE
 					+ " directly from " + currentFlightMode);
@@ -141,6 +144,7 @@ public class DroneFlightStateManager {
 		
 		if (uavStateMachine.canFire(FlightModeTransition.TARGET_ALTITUED_REACHED)) {
 			uavStateMachine.fire(FlightModeTransition.TARGET_ALTITUED_REACHED);
+			LOGGER.info("Mode set to:" + uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.TARGET_ALTITUED_REACHED + "'");

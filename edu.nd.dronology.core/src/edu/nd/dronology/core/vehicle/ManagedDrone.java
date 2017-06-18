@@ -37,7 +37,7 @@ public class ManagedDrone extends Observable implements Runnable {
 
 	private final IDrone drone; // Controls primitive flight commands for drone
 
-	@Discuss(discuss = "why does each drone has his on instance of that?")
+	@Discuss(discuss = "why does each drone has his on instance of that? - This variable is never set!")
 	private DroneSeparationMonitor safetyMgr;
 
 	private DroneFlightStateManager droneState;
@@ -55,7 +55,7 @@ public class ManagedDrone extends Observable implements Runnable {
 
 	@Discuss(discuss = "why not final? - new flight director for each flight??")
 	private IFlightDirector flightDirector = null; // Each drone can be assigned
-													// a single flight plan.
+	// a single flight plan.
 	private int targetAltitude = 0;
 
 	/**
@@ -73,12 +73,12 @@ public class ManagedDrone extends Observable implements Runnable {
 		droneSafetyState = new DroneSafetyStateManager();
 		drone.getDroneStatus().setStatus(droneState.getStatus());
 		this.flightDirector = FlightDirectorFactory.getFlightDirector(this); // Don't
-																				// really
-																				// want
-																				// to
-																				// create
-																				// it
-																				// here.
+		// really
+		// want
+		// to
+		// create
+		// it
+		// here.
 	}
 
 	/**
@@ -89,10 +89,10 @@ public class ManagedDrone extends Observable implements Runnable {
 	public void assignFlight(IFlightDirector flightDirective) {
 		this.flightDirector = flightDirective;
 		this.flightDirector.addWayPoint(drone.getBaseCoordinates()); // Currently
-																		// must
-																		// always
-																		// return
-																		// home.
+		// must
+		// always
+		// return
+		// home.
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	 */
 	public void unassignFlight() {
 		flightDirector = null; // DANGER. NEEDS FIXING. CANNOT UNASSIGN FLIGHT
-								// WITHOUT RETURNING TO BASE!!!
+		// WITHOUT RETURNING TO BASE!!!
 		LOGGER.warn("Unassigned DRONE: " + getDroneName());
 	}
 
@@ -136,7 +136,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	/**
 	 * 
 	 * @param targetAltitude
-	 *            Sets target altitude for takeoff
+	 *          Sets target altitude for takeoff
 	 */
 	public void setTargetAltitude(int targetAltitude) {
 		this.targetAltitude = targetAltitude;
@@ -154,23 +154,12 @@ public class ManagedDrone extends Observable implements Runnable {
 		}
 		LOGGER.info(getDroneName() + " ==> Taking off");
 		droneState.setModeToTakingOff();
-		drone.getDroneStatus().setStatus(droneState.getStatus()); // A bit ugly,
-																	// but this
-																	// was added
-																	// to keep
-																	// state for
-																	// GUI
-																	// middleware
-																	// updated.
+		drone.getDroneStatus().setStatus(droneState.getStatus());
 		drone.takeOff(targetAltitude);
 
 		// DIRTY WORKAROUND.....
-		while (drone.getAltitude() < (targetAltitude - 3)) { // TODO: ask about
-																// how to
-																// properly
-																// determine
-																// when finished
-																// taking off
+		while (drone.getAltitude() < (targetAltitude - 3)) {
+			// TODO: ask about how to properly when finished taking off
 			LOGGER.info("Waiting for drone #" + drone.getDroneStatus().getID() + " to complete takeoff...");
 			try {
 				Thread.sleep(500);
@@ -226,19 +215,25 @@ public class ManagedDrone extends Observable implements Runnable {
 
 				// Move the drone. Returns FALSE if it cannot move because it
 				// has reached destination
-				if (!drone.move(10))
+				if (!drone.move(10)) {
+					LOGGER.info("Waypoint reached:" + targetCoordinates.toString());
 					flightDirector.clearCurrentWayPoint();
+				}
 				// Check for end of flight
 				checkForEndOfFlight();
 
 				// Check for takeoff conditions
 				checkForTakeOff();
 
-				
-				
 				// Set check voltage
 				drone.setVoltageCheckPoint();
+				// Added another check for previously denied takeoff...
+				// not working right now because safety manger is null...
 			}
+			if (droneState.isAwaitingTakeoffClearance()) {
+				// checkForTakeOff();
+			}
+			LOGGER.info(drone.getDroneName() + " " + droneState.getStatus());
 		}
 	}
 
