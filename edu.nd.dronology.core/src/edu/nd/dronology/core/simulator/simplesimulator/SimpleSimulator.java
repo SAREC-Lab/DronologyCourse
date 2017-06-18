@@ -44,7 +44,7 @@ public class SimpleSimulator implements IFlightSimulator{
 
 	@Override
 	public void stopBatteryDrain() {
-		stopBatteryDrain();
+	voltageSimulator.startBatteryDrain();
 		
 	}
 
