@@ -1,5 +1,12 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
@@ -8,6 +15,17 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+
+import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.services.core.items.IFlightRoute;
+import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
+import edu.nd.dronology.services.core.persistence.PersistenceException;
+import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
  * 
@@ -30,11 +48,37 @@ public class FRInfoPanel extends CustomComponent {
 	private HorizontalLayout buttons = new HorizontalLayout();
 	private String routeInputName;
 	
+	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+	ByteArrayInputStream inStream;
+
+	private IFlightRoute route;
+	
 	public FRInfoPanel(){
 		
-		addRoute("Fast ", "46033", "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
-		addRoute("Slow ", "48293", "Aug 10, 2016, 5:04PM", "Aug 23, 2017, 5:12PM", "3.1mi");
-		addRoute("Direct ", "48213", "Jan 5, 2017, 8:00AM", "Feb 12, 2017, 3:56PM", "1.2mi");
+		  IFlightRouteplanningRemoteService service;
+		  BaseServiceProvider provider = MyUI.getProvider();
+		 
+		  try {
+				
+			    service = (IFlightRouteplanningRemoteService) provider.getRemoteManager().getService(IFlightRouteplanningRemoteService.class);
+				
+				Collection<FlightRouteInfo> items = service.getItems();
+				
+				String id; 
+				String name;
+				
+				//gets routes from dronology and requests their name/id
+				for(FlightRouteInfo e: items){
+					id = e.getId();
+					name = e.getName();
+					addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+					
+				}
+				
+			} catch (DronologyServiceException | RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		
 		panel.setCaption(numberRoutes + " Routes in database");
 		panel.setContent(totalLayout);
@@ -48,7 +92,7 @@ public class FRInfoPanel extends CustomComponent {
 		
 		TextField inputField = new TextField();
 		inputField.addValueChangeListener(e -> {
-			routeInputName = inputField.getValue();
+			routeInputName = (String) inputField.getValue();
 			Notification.show(routeInputName);
 			addRoute(routeInputName, "41342", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
 		});
@@ -56,7 +100,7 @@ public class FRInfoPanel extends CustomComponent {
 		popupContent.addComponent(inputField);
 		
 		PopupView popup = new PopupView(null, popupContent);
-		buttons.addComponent(popup); //?
+		buttons.addComponent(popup); 
 		
 		newRoute.addClickListener(e->{	
 			popup.setPopupVisible(true);

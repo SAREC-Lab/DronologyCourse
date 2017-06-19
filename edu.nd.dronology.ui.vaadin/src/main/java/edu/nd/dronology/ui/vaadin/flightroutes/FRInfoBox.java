@@ -48,7 +48,7 @@ public class FRInfoBox extends CustomComponent {
 		HorizontalLayout allContent = new HorizontalLayout();
 		
 		//this next section creates 4 different labels and adds styles to format them appropriately
-		Label nameidLabel = new Label(name + "Route: " + id);
+		Label nameidLabel = new Label(name + " ID: " + id);
 		nameidLabel.addStyleName("list_style_name");
 		Label createdLabel = new Label("Created:  " + created);
 		createdLabel.addStyleName("fr_route_created");
