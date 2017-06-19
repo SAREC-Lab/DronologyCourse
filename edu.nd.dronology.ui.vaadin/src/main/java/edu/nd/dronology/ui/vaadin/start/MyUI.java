@@ -1,7 +1,6 @@
 package edu.nd.dronology.ui.vaadin.start;
 
 import java.rmi.RemoteException;
-import java.util.Map;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -11,7 +10,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
-import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;

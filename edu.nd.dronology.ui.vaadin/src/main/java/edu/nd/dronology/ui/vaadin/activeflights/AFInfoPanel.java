@@ -3,6 +3,8 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -31,9 +33,11 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
+	private Map<String, DroneStatus> drones;
+	private boolean test = true;
 //private static final ILogger LOGGER = LoggerProvider.getLogger(AFInfoPanel.class);
 
-	public AFInfoPanel(){
+	public AFInfoPanel(){	
 		
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 		panel.setContent(content);
@@ -95,7 +99,6 @@ public class AFInfoPanel extends CustomComponent{
 	  numUAVs = content.getComponentCount() - 1;
 	  
 	  IDroneSetupRemoteService service;
-	  Map<String, DroneStatus> drones;
 	  BaseServiceProvider provider = MyUI.getProvider();
 	  try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
@@ -108,9 +111,14 @@ public class AFInfoPanel extends CustomComponent{
 			e1.printStackTrace();
 		}
 	  
-		/**
-		 * dummy/example boxes
-		 */
+		Timer t = new Timer( );
+		t.scheduleAtFixedRate(new TimerTask() {
+		    @Override
+		    public void run() {
+		      refreshDrones();
+		    }
+		}, 1000,1000);
+	
 	}
 	
 	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, long lat, long lon, int alt, double speed, boolean hoverInPlace){
@@ -161,5 +169,18 @@ public class AFInfoPanel extends CustomComponent{
 		}
 	}
 	
+	public void refreshDrones(){
+		int i = 1;
+		for (Entry<String, DroneStatus> e:drones.entrySet()){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			box.setStatus(e.getValue().getStatus());
+			box.setBatteryLife(e.getValue().getBatteryLevel());
+			box.setLat(e.getValue().getLatitude());
+			box.setLon(e.getValue().getLongitude());
+			box.setAlt(e.getValue().getAltitude());
+			box.setSpeed(e.getValue().getVelocity());
+			i++;
+		}
+	}
 }
 
