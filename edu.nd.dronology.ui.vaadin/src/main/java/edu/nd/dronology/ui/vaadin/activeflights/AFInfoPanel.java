@@ -174,10 +174,14 @@ public class AFInfoPanel extends CustomComponent{
 			 */
 			if (newDrones.size() > drones.size()){
 				for (Entry<String, DroneStatus> e1:newDrones.entrySet()){
+					boolean nameMatch = false;
 					for (Entry<String, DroneStatus> e2:drones.entrySet()){
-						if (!e1.getValue().getID().equals(e2.getValue().getID())){
-							this.addBox(false, e1.getValue().getID(), e1.getValue().getStatus(), e1.getValue().getBatteryLevel(), "green", e1.getValue().getLatitude(), e1.getValue().getLongitude(), e1.getValue().getAltitude(), e1.getValue().getVelocity(), false);
+						if (e1.getValue().getID().equals(e2.getValue().getID())){
+							nameMatch = true;
 						}	
+					}
+					if (!nameMatch){
+						this.addBox(false, e1.getValue().getID(), e1.getValue().getStatus(), e1.getValue().getBatteryLevel(), "green", e1.getValue().getLatitude(), e1.getValue().getLongitude(), e1.getValue().getAltitude(), e1.getValue().getVelocity(), false);
 					}
 				}
 			}
