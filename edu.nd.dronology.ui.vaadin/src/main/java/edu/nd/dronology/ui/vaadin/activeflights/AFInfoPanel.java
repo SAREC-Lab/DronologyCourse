@@ -124,6 +124,13 @@ public class AFInfoPanel extends CustomComponent{
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * 				the name/ID of the drone
+	 * @return
+	 * 				returns true if successful. returns false if failed
+	 */
 	public boolean removeBox(String name){
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
@@ -162,7 +169,10 @@ public class AFInfoPanel extends CustomComponent{
 		try {
 			Map<String, DroneStatus> newDrones;
 			newDrones = service.getDrones();
-			if (newDrones.size() < drones.size()){
+			/**
+			 * add new drones to the panel
+			 */
+			if (newDrones.size() > drones.size()){
 				for (Entry<String, DroneStatus> e1:newDrones.entrySet()){
 					for (Entry<String, DroneStatus> e2:drones.entrySet()){
 						if (!e1.getValue().getID().equals(e2.getValue().getID())){
@@ -171,21 +181,52 @@ public class AFInfoPanel extends CustomComponent{
 					}
 				}
 			}
+			/**
+			 * delete old drones from the panel
+			 */
+			if (newDrones.size() < drones.size()){
+				for (Entry<String, DroneStatus> old:drones.entrySet()){
+					boolean exists = false;
+					for (Entry<String, DroneStatus> current:newDrones.entrySet()){
+						if (old.getValue().getID().equals(current.getValue().getID()))
+							exists = true;
+					}
+					if (!exists){
+						for (int i = 1; i < numUAVs + 1; i++){
+							AFInfoBox box = (AFInfoBox) content.getComponent(i);
+							if (old.getValue().getID().equals(box.getName()))
+									this.removeBox(box.getName());
+						}
+					}
+				}
+			}
 		} catch (RemoteException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		int i = 1;
-		for (Entry<String, DroneStatus> e:drones.entrySet()){
-			AFInfoBox box = (AFInfoBox) content.getComponent(i);
-			box.setStatus(e.getValue().getStatus());
-			box.setBatteryLife(e.getValue().getBatteryLevel());
-			box.setLat(e.getValue().getLatitude());
-			box.setLon(e.getValue().getLongitude());
-			box.setAlt(e.getValue().getAltitude());
-			box.setSpeed(e.getValue().getVelocity());
-			i++;
+		/**
+		 * update current drones' status
+		 */
+		try {
+			drones = service.getDrones();
+			for (Entry<String, DroneStatus> e:drones.entrySet()){
+				for (int i = 1; i < numUAVs + 1; i++){
+					AFInfoBox box = (AFInfoBox) content.getComponent(i);
+					if (e.getValue().getID().equals(box.getName())){
+						box.setStatus(e.getValue().getStatus());
+						box.setBatteryLife(e.getValue().getBatteryLevel());
+						box.setLat(e.getValue().getLatitude());
+						box.setLon(e.getValue().getLongitude());
+						box.setAlt(e.getValue().getAltitude());
+						box.setSpeed(e.getValue().getVelocity());
+					}
+				}
+			}
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
+	
 }
 
