@@ -10,14 +10,13 @@ import com.vaadin.ui.CssLayout;
  */
 public class AFMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
+	private AFControlsComponent controls = new AFControlsComponent();
 	
 	public AFMainLayout() {
 		addStyleName("main_layout");
 		
 		CssLayout content = new CssLayout();
-		content.setSizeFull();
-		
-		AFControlsComponent controls = new AFControlsComponent();
+		content.setSizeFull();	
         
 			AFMapComponent map = new AFMapComponent(
 				"VAADIN/sbtiles/{z}/{x}/{y}.png",
@@ -27,5 +26,9 @@ public class AFMainLayout extends CustomComponent {
 			
 			content.addComponents(controls, map);
 			setCompositionRoot(content);
+	}
+	
+	public AFControlsComponent getControls(){
+		return controls;
 	}
 }

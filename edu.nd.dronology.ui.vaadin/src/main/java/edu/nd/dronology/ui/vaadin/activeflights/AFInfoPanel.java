@@ -3,8 +3,6 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -34,7 +32,8 @@ public class AFInfoPanel extends CustomComponent{
 	private boolean selectAll = true;
 	private boolean visible = false;
 	private Map<String, DroneStatus> drones;
-	private boolean test = true;
+	private IDroneSetupRemoteService service;
+  private BaseServiceProvider provider = MyUI.getProvider();
 //private static final ILogger LOGGER = LoggerProvider.getLogger(AFInfoPanel.class);
 
 	public AFInfoPanel(){	
@@ -98,8 +97,6 @@ public class AFInfoPanel extends CustomComponent{
 	  content.addComponent(buttons);
 	  numUAVs = content.getComponentCount() - 1;
 	  
-	  IDroneSetupRemoteService service;
-	  BaseServiceProvider provider = MyUI.getProvider();
 	  try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			drones = service.getDrones();
@@ -110,14 +107,6 @@ public class AFInfoPanel extends CustomComponent{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	  
-		Timer t = new Timer( );
-		t.scheduleAtFixedRate(new TimerTask() {
-		    @Override
-		    public void run() {
-		      refreshDrones();
-		    }
-		}, 1000,1000);
 	
 	}
 	
@@ -170,6 +159,22 @@ public class AFInfoPanel extends CustomComponent{
 	}
 	
 	public void refreshDrones(){
+		try {
+			Map<String, DroneStatus> newDrones;
+			newDrones = service.getDrones();
+			if (newDrones.size() < drones.size()){
+				for (Entry<String, DroneStatus> e1:newDrones.entrySet()){
+					for (Entry<String, DroneStatus> e2:drones.entrySet()){
+						if (!e1.getValue().getID().equals(e2.getValue().getID())){
+							this.addBox(false, e1.getValue().getID(), e1.getValue().getStatus(), e1.getValue().getBatteryLevel(), "green", e1.getValue().getLatitude(), e1.getValue().getLongitude(), e1.getValue().getAltitude(), e1.getValue().getVelocity(), false);
+						}	
+					}
+				}
+			}
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		int i = 1;
 		for (Entry<String, DroneStatus> e:drones.entrySet()){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);

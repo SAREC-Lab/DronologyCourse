@@ -10,17 +10,19 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class AFControlsComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
-	
+	private AFInfoPanel info = new AFInfoPanel();
 	public AFControlsComponent() {
 		this.setWidth("100%");
 		addStyleName("controls_component");
 		
 		VerticalLayout content = new VerticalLayout();
-		
-		AFInfoPanel info = new AFInfoPanel();
+
 		content.addComponent(info);
 		setCompositionRoot(content);
-		
-		
 	}
+	
+	public AFInfoPanel getPanel(){
+		return info;
+	}
+	
 }

@@ -5,7 +5,6 @@ import java.io.File;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
@@ -80,4 +79,9 @@ public class NavigationBar extends CustomComponent {
     
     setCompositionRoot(content);
 	}
+	
+	public AFMainLayout getAFLayout(){
+		return activeflights;
+	}
+	
 }
