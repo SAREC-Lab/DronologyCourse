@@ -6,7 +6,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * 
@@ -21,13 +20,12 @@ public class AFEmergencyComponent extends CustomComponent{
 		layout.addStyleName("af_emergency_operations");
     
 		Label caption = new Label("Emergency Operations");
-		caption.addStyleName(ValoTheme.LABEL_BOLD);
-    NativeButton hover = new NativeButton("All UAVs Hover in Place");
-    NativeButton home = new NativeButton("All UAVs Return to Home");
+    NativeButton hover = new NativeButton("All UAVs<br>Hover in Place");
+    NativeButton home = new NativeButton("All UAVs<br>Return to Home");
+    hover.setCaptionAsHtml(true);
+    hover.addStyleName("button_warning");
     home.setCaptionAsHtml(true);
-    layout.addStyleName(ValoTheme.LAYOUT_CARD);
-    hover.setWidth("125px");
-    home.setWidth("135px");
+    home.addStyleName("button_warning");
     
     buttons.addComponents(hover, home);
     layout.addComponents(caption, buttons);

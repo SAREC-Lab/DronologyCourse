@@ -42,12 +42,63 @@ $valo-menu-background-color: #eee;
 	
 	$color-dark-5: #000040;
 	$color-dark-4: #224080;
+	$color-dark-1: #999999;
 	$color-light-5: #ffffff;
 	$color-light-4: #f5f5f5;
 	$color-light-3: #eeeeee;
 	$color-light-2: #d0d0d0;
 	
+	$color-warning-main: #f0ad4e;
+	$color-warning-main-border: #eea236;
+	$color-warning-hover: #ec971f;
+	$color-warning-hover-border: #d58512;
+	
+	$color-danger-main: #d9534f;
+	$color-danger-main-border: #d43f3a;
+	$color-danger-hover: #c9302c;
+	$color-danger-hover-border: #ac2925;
+		
 	//Custom styles
+	.v-button:focus,
+	.v-nativebutton:focus {
+		outline: none;
+	}
+	.button_warning {
+		color: $color-light-5;
+		background-color: $color-warning-main;
+		border-color: $color-warning-main-border;
+		border-width: 1px;
+	}
+	.button_warning:focus,
+	.button_warning.focus {
+		color: $color-light-5;
+		background-color: $color-warning-main;
+		border-color: $color-warning-main-border;
+	}
+	.button_warning:hover {
+		color: $color-light-5;
+		background-color: $color-warning-hover;
+		border-color: $color-warning-hover-border;
+	}
+
+	.btn-danger {
+		color: $color-light-5;
+		background-color: $color-danger-main;
+		border-color: $color-danger-main-border;
+		border-width: 1px;
+	}
+	.btn-danger:focus,
+	.btn-danger.focus {
+		color: $color-light-5;
+		background-color: $color-danger-main;
+		border-color: $color-danger-main-border;
+	}
+	.btn-danger:hover {
+		color: $color-light-5;
+		background-color: $color-danger-hover;
+		border-color: $color-danger-hover-border;
+	}
+	
 	.main_layout {
 		max-width: $screen-width;
 		left: 0;
@@ -165,6 +216,22 @@ $valo-menu-background-color: #eee;
 	}
 	.af_emergency_operations {
 		height: 100px;
+		border: 1px solid $color-dark-1;
+		padding: 3px 8px !important;
+		
+		> .v-slot:first-of-type {
+			font-weight: bold;
+		}
+		> .v-slot:last-of-type {
+			text-align: center;
+		}
+		
+		.v-nativebutton {
+			width: 145px !important;
+			font-size: 90%;
+			text-align: center;
+			margin: 2px 8px;
+		}
 	}
 	.af_uav_list_controls {
 		float: right;
