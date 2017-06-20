@@ -85,14 +85,14 @@ public class FRInfoPanel extends CustomComponent {
 		panel.addStyleName("fr_info_panel");
 		panel.addStyleName("control_panel");
 		
-		Button newRoute = new Button("+");
-		newRoute.setWidth("42px");
+		Button newRoute = new Button("+ Add a new route");
+		newRoute.addStyleName("fr_new_route_button");
 		
 		VerticalLayout popupContent = new VerticalLayout();
 		
 		TextField inputField = new TextField();
 		inputField.addValueChangeListener(e -> {
-			routeInputName = (String) inputField.getValue();
+			routeInputName = inputField.getValue();
 			Notification.show(routeInputName);
 			addRoute(routeInputName, "41342", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
 		});
@@ -109,10 +109,10 @@ public class FRInfoPanel extends CustomComponent {
 		
 		buttons.addComponents(newRoute, popup); 
 		
-		Button filter = new Button("Filter");
-		filter.setWidth("68px");
-		
-		buttons.addComponents(filter);
+//		Button filter = new Button("Filter");
+//		filter.setWidth("68px");
+//		
+//		buttons.addComponents(filter);
 		
 		totalLayout.addComponents(buttons, routes);
 		

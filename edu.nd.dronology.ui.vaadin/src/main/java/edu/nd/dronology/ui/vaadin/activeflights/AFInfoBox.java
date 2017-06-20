@@ -12,7 +12,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
@@ -53,7 +52,7 @@ public class AFInfoBox extends CustomComponent{
 	private VerticalLayout mainContent = new VerticalLayout();
 	private HorizontalLayout topContent = new HorizontalLayout();
 	private VerticalLayout middleContent = new VerticalLayout();
-	private GridLayout bottomContent = new GridLayout(2, 1);
+	private HorizontalLayout bottomContent = new HorizontalLayout();
 	
 	/**
 	 * non default constructor
@@ -79,7 +78,8 @@ public class AFInfoBox extends CustomComponent{
 		this.alt = alt;
 		this.speed = speed;
 		this.hoverInPlace = hoverInPlace;
-		
+
+		this.addStyleName("info_box");
 		this.addStyleName("af_info_box");
 		
 		VerticalLayout statusContent = new VerticalLayout();
@@ -87,7 +87,7 @@ public class AFInfoBox extends CustomComponent{
 		VerticalLayout bottomSwitch = new VerticalLayout();
 
 		topContent.addStyleName("af_info_top_content");
-		middleContent.addStyleName("af_info_middle_content");
+		middleContent.addStyleName("detailed_info_well");
 		bottomContent.addStyleName("af_info_bottom_content");
 		/**
 		 * top layer components
@@ -100,6 +100,7 @@ public class AFInfoBox extends CustomComponent{
     droneImage.setSource(resource);
  
     statusInfo1.setValue(name);
+    statusInfo1.addStyleName("info_box_name");
     statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
 		statusInfo2.setValue("Status: " + status);
 		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
@@ -146,8 +147,7 @@ public class AFInfoBox extends CustomComponent{
 		assignNewRoute.setHeight("30px");
 		
 		bottomButtons.addComponents(returnToHome, assignNewRoute);
-		bottomContent.addComponent(bottomSwitch, 0, 0);		
-		bottomContent.addComponent(bottomButtons, 1, 0);
+		bottomContent.addComponents(bottomSwitch, bottomButtons);
 		
 		mainContent.addComponents(topContent, middleContent, bottomContent);
 		mainContent.setSizeUndefined();

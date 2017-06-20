@@ -43,22 +43,24 @@ public class FRInfoBox extends CustomComponent {
 		this.modified = modified;
 		this.length = length;
 		
-		VerticalLayout routeDescription = new VerticalLayout();  
-		VerticalLayout buttons = new VerticalLayout();  //
-		HorizontalLayout allContent = new HorizontalLayout();
+		this.addStyleName("info_box");
+		this.addStyleName("fr_info_box");
+
+		VerticalLayout routeDescription = new VerticalLayout();
+		routeDescription.addStyleName("detailed_info_well");
+		HorizontalLayout titleBar = new HorizontalLayout();
+		VerticalLayout allContent = new VerticalLayout();
 		
-		//this next section creates 4 different labels and adds styles to format them appropriately
+		//create name id label
 		Label nameidLabel = new Label(name + " ID: " + id);
-		nameidLabel.addStyleName("list_style_name");
+		nameidLabel.addStyleName("info_box_name");
+			
+		//this next section creates 3 different labels and adds styles to format them appropriately
 		Label createdLabel = new Label("Created:  " + created);
-		createdLabel.addStyleName("fr_route_created");
 		Label modifiedLabel = new Label("Last Modified:  " + modified);
-		modifiedLabel.addStyleName("fr_route_modified");
 		Label lengthLabel = new Label("Total Length: " + length);
-		lengthLabel.addStyleName("fr_route_length");
 		
-		routeDescription.addComponents(nameidLabel, createdLabel, modifiedLabel, lengthLabel);
-		routeDescription.setSpacing(false);
+		routeDescription.addComponents(createdLabel, modifiedLabel, lengthLabel);
 		
 		//imports images for buttons
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/edit.png"));
@@ -67,24 +69,16 @@ public class FRInfoBox extends CustomComponent {
 		Button editButton = new Button();
 		Button trashButton = new Button();
 		
-		editButton.setHeight("25px");
-		editButton.setWidth("25px");
-		
-		trashButton.setHeight("25px");
-		trashButton.setWidth("25px");
-		
 		editButton.setIcon(editIcon);
 		trashButton.setIcon(trashIcon);
 		
 		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		trashButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		
-		buttons.addComponents(editButton, trashButton);
+		titleBar.addComponents(nameidLabel, trashButton, editButton);
 		
 		//adds all content together and aligns the buttons on the right
-		allContent.addComponents(routeDescription, buttons);
-		allContent.setComponentAlignment(routeDescription, Alignment.MIDDLE_LEFT);
-		allContent.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
+		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
 		
