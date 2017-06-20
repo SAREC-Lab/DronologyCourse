@@ -103,7 +103,9 @@ public class AFInfoBox extends CustomComponent{
     statusInfo1.addStyleName("info_box_name");
     statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
 		statusInfo2.setValue("Status: " + status);
-		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
+		this.batteryLife = Math.round(this.batteryLife * 100);
+		this.batteryLife = this.batteryLife / 100;
+		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " min");
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
 		health.setCaptionAsHtml(true);
@@ -127,8 +129,8 @@ public class AFInfoBox extends CustomComponent{
 
 		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
 		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
-		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + "feet");
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + "mph");
+		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + " meters");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
 		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
 		
 		/**
@@ -204,7 +206,9 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setBatteryLife(double batteryLife){
 		this.batteryLife = batteryLife;
-		statusInfo3.setValue("Battery Life: " + Double.toString(batteryLife) + " min");
+		this.batteryLife = Math.round(this.batteryLife * 100);
+		this.batteryLife = this.batteryLife / 100;
+		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " min");
 	}
 	
 	public double getBatteryLife(){
@@ -246,7 +250,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setAlt(int alt){
 		this.alt = alt;
-		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + "feet");
+		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + " meters");
 	}
 	
 	public int getAlt(){
@@ -255,7 +259,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setSpeed(double speed){
 		this.speed = speed;
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + "mph");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
 	}
 	
 	public double getSpeed(){
