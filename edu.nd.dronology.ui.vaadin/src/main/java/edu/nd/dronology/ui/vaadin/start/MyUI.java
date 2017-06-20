@@ -1,5 +1,6 @@
 package edu.nd.dronology.ui.vaadin.start;
 
+import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,6 +13,10 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
+import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 
 /**
@@ -30,6 +35,20 @@ public class MyUI extends UI {
 	
 	@Override
     protected void init(VaadinRequest vaadinRequest) {
+		IDroneSetupRemoteService service;
+
+	  BaseServiceProvider provider = MyUI.getProvider();
+	  try {
+			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			//service.initializeDrones(new DroneInitializationInfo("PatrickF", "Flying", new Coordinate(41683809, -86250143, 150)));
+			//service.initializeDrones(new DroneInitializationInfo("JamesH", "Flying", new Coordinate( 41684579, -862443923, 150)));
+			//service.initializeDrones(new DroneInitializationInfo("MichelleG", "Flying", new Coordinate(41681373, -862425899, 150)));
+
+		} catch (DronologyServiceException | RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 			provider.init("localhost", 9898);
 			NavigationBar navigationBar = new NavigationBar();
 			setContent(navigationBar);
@@ -41,9 +60,12 @@ public class MyUI extends UI {
 			t.scheduleAtFixedRate(new TimerTask() {
 			    @Override
 			    public void run() {
-			      access(() -> navigationBar.getAFLayout().getControls().getPanel().refreshDrones());
+			      access(() -> {
+			      	navigationBar.getAFLayout().getControls().getPanel().refreshDrones();
+			      	navigationBar.getAFLayout().getAFMap().updateDroneMarkers();
+			      });
 			    }
-			}, 1000,1000);
+			}, 250, 250);
     }
 	public static BaseServiceProvider getProvider(){
 		return provider;

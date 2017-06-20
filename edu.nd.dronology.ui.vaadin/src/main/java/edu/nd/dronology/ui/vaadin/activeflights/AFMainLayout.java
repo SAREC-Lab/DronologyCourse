@@ -11,16 +11,15 @@ import com.vaadin.ui.CssLayout;
 public class AFMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	private AFControlsComponent controls = new AFControlsComponent();
-	
+	private AFMapComponent map = new AFMapComponent(
+			"VAADIN/sbtiles/{z}/{x}/{y}.png",
+			"South Bend");
 	public AFMainLayout() {
 		addStyleName("main_layout");
 		
 		CssLayout content = new CssLayout();
 		content.setSizeFull();	
-        
-			AFMapComponent map = new AFMapComponent(
-				"VAADIN/sbtiles/{z}/{x}/{y}.png",
-				"South Bend");
+			
 			map.setCenter(41.68, -86.25);
 			map.setZoomLevel(13);
 			
@@ -30,5 +29,9 @@ public class AFMainLayout extends CustomComponent {
 	
 	public AFControlsComponent getControls(){
 		return controls;
+	}
+	
+	public AFMapComponent getAFMap(){
+		return map;
 	}
 }
