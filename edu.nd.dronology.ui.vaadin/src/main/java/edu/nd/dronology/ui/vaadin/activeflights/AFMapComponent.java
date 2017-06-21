@@ -3,11 +3,13 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
+import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
@@ -17,11 +19,16 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
+import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
+import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
  * This is the map component for the Active Flights UI
@@ -34,19 +41,23 @@ public class AFMapComponent extends CustomComponent {
 	private LMap leafletMap;
 	private ArrayList<LMarker> markers = new ArrayList<>();
 	private Map<String, DroneStatus> drones;
+	private List<FlightPlanInfo> currentFlights;
 	private IDroneSetupRemoteService service;
+	private IFlightManagerRemoteService flightRouteService;
   private BaseServiceProvider provider = MyUI.getProvider();
+  private ArrayList<ArrayList<LPolyline>> flightRoutes = new ArrayList<>();
 	
+  private MapMarkerUtilities utilities;
+  
   private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
   private FileResource drone_icon = new FileResource(new File(basepath+"/VAADIN/img/drone_icon.png"));
-  
   
 	public AFMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
 		addStyleName("map_component");
 		
 		leafletMap = new LMap();
-		
+		utilities = new MapMarkerUtilities(leafletMap);
 		Configuration configuration = Configuration.getInstance();
 		leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
@@ -58,14 +69,16 @@ public class AFMapComponent extends CustomComponent {
 
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
-		
+
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		addDroneMarkers();
+		addActiveFlightRoutes();
 		
 		setCompositionRoot(content);  
 		content.addComponents(leafletMap);
@@ -94,7 +107,44 @@ public class AFMapComponent extends CustomComponent {
 	public LMap getMapInstance() {
 		return leafletMap;
 	}
-
+	
+	public void addActiveFlightRoutes(){
+		try {
+			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
+			for (FlightPlanInfo e:currentFlights){
+				List<Coordinate> coordinates = e.getWaypoints();
+				ArrayList<WayPoint> wayPoints = new ArrayList<>();
+				for (Coordinate coord:coordinates){		
+					Point point = new Point(coord.getLatitude()*.000001, coord.getLongitude()*.000001);
+					WayPoint wayPoint = new WayPoint(point);
+					wayPoints.add(wayPoint);
+				}
+				ArrayList<LPolyline> polyLines = utilities.drawLines(wayPoints);
+				flightRoutes.add(polyLines);
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void updateActiveFlightRoutes(){
+		try {
+			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
+			if (currentFlights.size() != flightRoutes.size()){
+				for (ArrayList<LPolyline> e:flightRoutes){
+					utilities.removeAllLines(e);
+				}
+				flightRoutes.clear();
+				this.addActiveFlightRoutes();	
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void addDroneMarkers(){
 		try {
 			drones = service.getDrones();
@@ -186,7 +236,6 @@ public class AFMapComponent extends CustomComponent {
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		  
+		}	  
 	}
 }

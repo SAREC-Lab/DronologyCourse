@@ -30,6 +30,10 @@ public class MapMarkerUtilities {
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
+	
+	public MapMarkerUtilities(LMap map){
+		this.map = map;
+	}
 
 	public void addNewPin(Point point) {
 		WayPoint p = new WayPoint(point);
@@ -100,16 +104,16 @@ public class MapMarkerUtilities {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 		
 		for (int i = mapPoints.size() - 1; i > 0; i--) {
-        	LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i-1).toPoint());
-        	polylines.add(polyline);
+			LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i-1).toPoint());
+      polylines.add(polyline);
 			map.addComponent(polyline);
 		}
 		return polylines;
 	}
 	
 	public void removeAllLines(ArrayList<LPolyline> polylines) {
-    	for (int i = polylines.size() - 1; i >= 0; i--) {
-    		map.removeComponent(polylines.get(i));
-    	}
+		for (int i = polylines.size() - 1; i >= 0; i--) {
+			map.removeComponent(polylines.get(i));
+    }
 	}
 }
