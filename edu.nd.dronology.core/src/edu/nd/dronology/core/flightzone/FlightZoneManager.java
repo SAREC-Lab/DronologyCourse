@@ -103,7 +103,7 @@ public class FlightZoneManager implements Runnable {
 			if (drone != null) {
 				safetyMgr.attachDrone(drone);
 				IFlightPlan flightPlan = flights.getNextFlightPlan();
-				LOGGER.info(flightPlan.getFlightID());
+				LOGGER.info(flightPlan.getFlightID() +" assigned to "+ drone.getDroneName());
 				IFlightDirector flightDirectives = new SoloDirector(drone);
 				flightDirectives.setWayPoints(flightPlan.getWayPoints());
 				drone.assignFlight(flightDirectives);
@@ -174,6 +174,7 @@ public class FlightZoneManager implements Runnable {
 				}
 
 				if (flights.hasAwaitingTakeOff()) {
+					LOGGER.info("Awaiting Takeoff:"+flights.getAwaitingTakeOffFlights().get(0).getFlightID());
 					try {
 						flights.checkForTakeOffReadiness(droneFleet);
 					} catch (FlightZoneException e1) {

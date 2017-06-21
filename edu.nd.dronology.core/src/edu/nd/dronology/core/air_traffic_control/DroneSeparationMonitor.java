@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.vehicle.ManagedDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Safety manager is responsible for monitoring drone positions to ensure minimum safety distance is not violated
@@ -12,6 +14,8 @@ import edu.nd.dronology.core.vehicle.ManagedDrone;
  *
  */
 public class DroneSeparationMonitor {
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSeparationMonitor.class);
+
 	private List<ManagedDrone> drones = new ArrayList<>();
 	private Long safetyZone; // Set arbitrarily for now.
 
@@ -51,6 +55,7 @@ public class DroneSeparationMonitor {
 		long longDelta = Math.abs(drone1.getLongitude() - drone2.getLongitude());
 		long latDelta = Math.abs(drone1.getLatitude() - drone2.getLatitude());
 		return (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
+
 	}
 
 	/**
@@ -62,15 +67,16 @@ public class DroneSeparationMonitor {
 	 */
 	public boolean permittedToTakeOff(ManagedDrone managedDrone) {
 		for (ManagedDrone drone2 : drones) {
-			if (!managedDrone.equals(drone2) && drone2.getFlightModeState().isFlying())
-				if (getDistance(managedDrone, drone2) < safetyZone * 1.5) // We
-					// require
-					// extra
-					// distance
-					// prior
-					// to
-					// takeoff
+			if (!managedDrone.equals(drone2) && drone2.getFlightModeState().isFlying()) {
+				long dronDistance = getDistance(managedDrone, drone2);
+				if (dronDistance < safetyZone * 1.5) {
+					LOGGER.error("Safety Distance Violation - Drone not allowed to TakeOff! distance: " + dronDistance
+							+ " safety zone: " + safetyZone + " => " + DistanceUtil.distance(managedDrone.getLatitude(),
+									drone2.getLatitude(), managedDrone.getLongitude(), drone2.getLongitude(), 0, 0)
+							+ "m");
 					return false;
+				}
+			}
 		}
 		return true;
 	}

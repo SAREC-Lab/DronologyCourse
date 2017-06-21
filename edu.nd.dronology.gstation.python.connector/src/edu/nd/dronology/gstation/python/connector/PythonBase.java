@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +28,6 @@ import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.DroneAttribute;
 import edu.nd.dronology.core.vehicle.IDroneAttribute;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
-import edu.nd.dronology.core.vehicle.commands.GoToCommand;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -64,15 +64,16 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 	@Discuss(discuss = "port+ip should be specified in property file/passed to base when initialized")
 	public PythonBase() {
 		try {
-			
-			// Uncomment the following line corresponding to the hostname of the GroundStation or add another with the desired hostname
-			
+
+			// Uncomment the following line corresponding to the hostname of the
+			// GroundStation or add another with the desired hostname
+
 			// InetAddress hostAddr = InetAddress.getLocalHost();
 			// InetAddress hostAddr = InetAddress.getByName("huey.cse.nd.edu");
 			InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
 			// InetAddress hostAddr = InetAddress.getByName("ilia.cse.nd.edu");
 			// InetAddress hostAddr = InetAddress.getByName("192.168.1.144");
-			
+
 			int port = 1234;
 			String hostStr = hostAddr.toString();
 
@@ -87,6 +88,9 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			droneStates = new HashMap<>();
 			LOGGER.info("Connected to " + pythonSocket.getInetAddress().toString() + "@" + pythonSocket.getPort());
 			servicesExecutor.submit(this);
+
+		} catch (UnknownHostException e) {
+			LOGGER.hwFatal("Can't connect to Python Groundstation ");
 		} catch (Throwable e) {
 			LOGGER.error(e);
 		}
@@ -134,18 +138,19 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 			Object parsedData = dataObject.get("data");
 			handleData(parsedType, parsedData);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 
 	public void handleData(String type, Object data) {
-	
-//		System.out.println("Incoming data:"); // temporary placeholder toidentify incoming data
-//		System.out.println("Type: "+type);
-//		System.out.print("Data: "); System.out.println(data); // temporary placeholder to identify incoming data
-//		System.out.print("Data type: "); System.out.println(data.getClass());
-//		// temporary placeholder to identify incoming data
+		LOGGER.hwInfo(type+"["+data.toString()+"]");
+		// System.out.println("Incoming data:"); // temporary placeholder
+		// toidentify incoming data
+		// System.out.println("Type: "+type);
+		// System.out.print("Data: "); System.out.println(data); // temporary
+		// placeholder to identify incoming data
+		// System.out.print("Data type: "); System.out.println(data.getClass());
+		// // temporary placeholder to identify incoming data
 
 		switch (type) {
 		case "drone_list":
@@ -213,19 +218,12 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 		unallocatedLock.unlock();
 		updateDroneInfo(ID, data);
 		PythonDroneState newState = droneStates.get(ID);
-		LOGGER.info("New drone recognized with id " + Integer.toString(ID) + " and coordinate ("
-				+ Long.toString(newState.getLocation().getLatitude()) + ","
-				+ Long.toString(newState.getLocation().getLongitude()) + ","
-				+ Integer.toString(newState.getLocation().getAltitude()) + ")...");
 		registerDrone(ID, newState);
 
 	}
 
 	private void registerDrone(int iD, PythonDroneState state) {
-		LOGGER.info("New drone registered with id " + Integer.toString(iD) + " and coordinate ("
-				+ Long.toString(state.getLocation().getLatitude()) + ","
-				+ Long.toString(state.getLocation().getLongitude()) + ","
-				+ Integer.toString(state.getLocation().getAltitude()) + ")...");
+		LOGGER.hwInfo("New drone registered with id " + Integer.toString(iD) + state.toString());
 		DroneInitializationInfo info = new DroneInitializationInfo(Integer.toString(iD), Integer.toString(iD),
 				state.getLocation());
 		try {
@@ -336,14 +334,7 @@ public class PythonBase implements Runnable, IDroneCommandHandler {
 
 	@Override
 	public void sendCommand(IDroneCommand cmd) throws DroneException {
-		
-		if (cmd instanceof GoToCommand) {
-			GoToCommand cmdGoTo = (GoToCommand) cmd;
-			LOGGER.info("Sending " + cmd.getClass().getSimpleName() + " command to drone" + cmdGoTo.toJsonString());
-		}
-		else{
-			LOGGER.info("Sending " + cmd.getClass().getSimpleName() + " command to drone");
-		}
+		LOGGER.hwInfo("Sending Command to UAV " + cmd.toString());
 		sendData(cmd.toJsonString());
 	}
 

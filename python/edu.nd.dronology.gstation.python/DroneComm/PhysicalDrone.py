@@ -37,6 +37,19 @@ class PhysicalDrone(object):
 	def getVelocity(self):
 		return CoordFromList(self.vehicle.velocity)
 	
+	def setVelocity(self,velocity):
+		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
+			0,       # time_boot_ms (not used)
+			0, 0,    # target_system, target_component
+			mavutil.mavlink.MAV_FRAME_BODY_NED, # frame
+			0b0000111111000111, # type_mask (only speeds enabled)
+			0, 0, 0, # x, y, z positions
+			velocity.getX(), velocity.getY(), velocity.getZ(), # x, y, z velocity in m/s
+			0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+			0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+		# send command to vehicle
+		self.vehicle.send_mavlink(msg)
+	
 	def getGimbalRotation(self):
 		return CoordFromRotation(self.vehicle.gimbal)
 	

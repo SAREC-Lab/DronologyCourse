@@ -82,6 +82,8 @@ public interface IDrone {
 
 	public Coordinate getBaseCoordinates();
 	
+	public void setGroundSpeed(double speed);
 	
+	public void setVelocity(double x, double y, double z);
 
 }
