@@ -41,6 +41,9 @@ class GroundStation():
 			drone.gotoLocation(coord)
 		elif command=="takeoff":
 			drone.takeoff(data['altitude'])
+		elif command=="setVelocity":
+			coord = CoordFromDict(data)
+			drone.setVelocity(coord)
 		elif command=="setGimbalRotation":
 			coord = CoordFromDict(data)
 			drone.setGimbalRotation(coord)

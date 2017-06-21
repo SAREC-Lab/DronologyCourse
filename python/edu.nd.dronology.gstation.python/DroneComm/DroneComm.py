@@ -42,6 +42,9 @@ class DroneComm(object):
 	def getVelocity(self):
 		return self.Drone.getVelocity()
 	
+	def setVelocity(self,velocity):
+		self.Drone.setVelocity(velocity)
+	
 	def getGimbalRotation(self):
 		return self.Drone.getGimbalRotation()
 	

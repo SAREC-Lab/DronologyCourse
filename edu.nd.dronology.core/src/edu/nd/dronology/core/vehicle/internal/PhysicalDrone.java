@@ -8,7 +8,9 @@ import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.commands.GoToCommand;
+import edu.nd.dronology.core.vehicle.commands.SetGroundSpeedCommand;
 import edu.nd.dronology.core.vehicle.commands.SetModeCommand;
+import edu.nd.dronology.core.vehicle.commands.SetVelocityCommand;
 import edu.nd.dronology.core.vehicle.commands.TakeoffCommand;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -192,5 +194,21 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	public void updateBatteryLevel(double batteryLevel) {
 	//	super.
 		
+	}
+	
+	public void setGroundSpeed(double speed) throws FlightZoneException {
+		try {
+			baseStation.sendCommand(new SetGroundSpeedCommand(Integer.toString(droneID), speed));
+		} catch (DroneException e) {
+			throw new FlightZoneException(e);
+		}
+	}
+	
+	public void setVelocity(double x, double y, double z) throws FlightZoneException {
+		try {
+			baseStation.sendCommand(new SetVelocityCommand(Integer.toString(droneID), x, y, z));
+		} catch (DroneException e) {
+			throw new FlightZoneException(e);
+		}
 	}
 }
