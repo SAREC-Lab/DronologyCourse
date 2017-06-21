@@ -99,6 +99,9 @@ class DroneComm(object):
 	def setMode(self,mode):
 		self.Drone.setMode(mode)
 	
+	def getSysidThismav(self):
+		return self.Drone.getSysidThismav()
+	
 	def step(self):
 		self.Drone.step()
 	
@@ -117,5 +120,6 @@ class DroneComm(object):
 			'groundspeed': self.getGroundspeed(),
 			'armed': self.getArmed(),
 			'mode': self.getMode(),
+			'sysidThismav': self.getSysidThismav(),
 		}
 	

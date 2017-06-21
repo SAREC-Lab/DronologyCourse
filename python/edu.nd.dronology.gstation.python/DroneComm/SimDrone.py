@@ -100,6 +100,10 @@ class SimDrone(object):
 		# self.Drone.setMode(mode)
 		return
 	
+	def getSysidThismav(self):
+		# return self.Drone.getSysidThismav()
+		return
+	
 	def step(self):
 		# self.Drone.step()
 		return

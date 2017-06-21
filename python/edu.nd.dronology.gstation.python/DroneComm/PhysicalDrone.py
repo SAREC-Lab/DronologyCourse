@@ -80,7 +80,7 @@ class PhysicalDrone(object):
 		return self.vehicle.heading
 	
 	def setHeading(self,heading):
-		# unknown how to perform this function! Will add later if functionality discovered.
+		# TODO unknown how to perform this function! Will add later if functionality discovered.
 		return
 	
 	def getArmable(self):
@@ -119,6 +119,9 @@ class PhysicalDrone(object):
 			print " Waiting for mode change to \""+mode+"\"..."
 			self.vehicle.mode = VehicleMode(mode)
 			time.sleep(1)
+	
+	def getSysidThismav(self):
+		return self.vehicle.parameters['SYSID_THISMAV']
 	
 	def step(self):
 		# I believe no action is needed here on the physical drone
