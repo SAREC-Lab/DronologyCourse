@@ -38,7 +38,8 @@ for drone in drone_info:
 	drones[current_drone_id] = new_drone
 	current_drone_id = current_drone_id + 1
 
-for drone in drones:
+for drone_id in drones:
+	drone = drones[drone_id]
 	drone.setMode("GUIDED")
 	print " Arming motors for testing..."
 	drone.setArmed(True)
