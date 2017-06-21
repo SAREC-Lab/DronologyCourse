@@ -23,6 +23,7 @@ public class MapMarkerUtilities {
 	private Grid<WayPoint> grid;
 	private ArrayList<WayPoint> mapPoints = new ArrayList<>();
 	private ArrayList<LPolyline> polylines = new ArrayList<>();
+	private ArrayList<LMarker> pins = new ArrayList<>();
 	
 	public MapMarkerUtilities(LMap map, Grid<WayPoint> grid) {
 		this.map = map;
@@ -35,20 +36,23 @@ public class MapMarkerUtilities {
 		this.map = map;
 	}
 
-	public void addNewPin(Point point) {
+	public WayPoint addNewPin(Point point) {
 		WayPoint p = new WayPoint(point);
 		p.setId(UUID.randomUUID().toString());
 		addPinForWayPoint(p);
 		
 		mapPoints.add(p);
 		removeAllLines(polylines);
-    polylines = drawLines(mapPoints);
+		polylines = drawLines(mapPoints);
 		grid.setItems(mapPoints);
+		
+		return p;
 	}
 	
 	public void addPinForWayPoint(WayPoint wayPoint) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
 		leafletMarker.setId(wayPoint.getId());
+		pins.add(leafletMarker);
 		
     leafletMarker.addClickListener(event -> {
     	for (int i = 0; i < mapPoints.size(); i++) {
@@ -105,7 +109,7 @@ public class MapMarkerUtilities {
 		
 		for (int i = mapPoints.size() - 1; i > 0; i--) {
 			LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i-1).toPoint());
-      polylines.add(polyline);
+			polylines.add(polyline);
 			map.addComponent(polyline);
 		}
 		return polylines;
@@ -114,6 +118,30 @@ public class MapMarkerUtilities {
 	public void removeAllLines(ArrayList<LPolyline> polylines) {
 		for (int i = polylines.size() - 1; i >= 0; i--) {
 			map.removeComponent(polylines.get(i));
-    }
+		}
+	}
+
+	public ArrayList<WayPoint> getMapPoints() {
+		return mapPoints;
+	}
+	
+	public Grid<WayPoint> getGrid() {
+		return grid;
+	}
+	
+	public ArrayList<LPolyline> getPolylines() {
+		return polylines;
+	}
+	
+	public void setPolylines(ArrayList<LPolyline> polylines) {
+		this.polylines = polylines;
+	}
+	
+	public ArrayList<LMarker> getPins() {
+		return pins;
+	}
+	
+	public LMap getMap() {
+		return map;
 	}
 }

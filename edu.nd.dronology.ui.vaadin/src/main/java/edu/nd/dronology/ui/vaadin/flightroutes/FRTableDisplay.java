@@ -25,23 +25,11 @@ public class FRTableDisplay {
 	}
 	
 	public void makeEditable(MapMarkerUtilities mapMarkers) {
-//		Binder<Point> binder = grid.getEditor().getBinder();
-
 		TextField latitude = new TextField();
 		TextField longitude = new TextField();
 		
 		grid.getColumn("latitude").setEditorComponent(latitude);
 		grid.getColumn("longitude").setEditorComponent(longitude);
-//		int Point;
-//		Binding<Point, Double> latitudeBinding = binder.bind(HasValue<Point>, Point::getLat, Point::setLat);
-		
-//		binder.bind(latitude, Point::getLat, Point::setLat);
-//		binder.bind(longitude, Point::getLon, Point::setLon); 
-		
-//		TextField taskField = new TextField();
-//		Binding<Point, Double> doneBinding = binder.bind(
-//			    taskField, Point.getLat(), Point.setLat());
-		
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
 			mapMarkers.updatePinForWayPoint(event.getBean());
