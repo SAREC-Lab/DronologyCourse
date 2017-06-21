@@ -3,7 +3,6 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,7 +13,6 @@ import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 

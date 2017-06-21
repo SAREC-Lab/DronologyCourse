@@ -49,6 +49,8 @@ public class Configuration {
 	
 	private double mapDefaultZoom;
 	
+	private int refreshRate;
+	
 	//configuration file needs to be put into /src/main/webapp/VAADIN/config/
 	private Configuration(){
 		boolean result = this.loadConfig(FILENAME);
@@ -86,6 +88,7 @@ public class Configuration {
 			this.mapCenterLat = this.config.getDouble("mapCenterLat");
 			this.mapCenterLon = this.config.getDouble("mapCenterLon");
 			this.mapDefaultZoom = this.config.getDouble("mapDefaultZoom");
+			this.refreshRate = this.config.getInt("refreshRate");
 		} catch (JSONException exc) {
 			LOGGER.log(Level.SEVERE, null, exc);
 			return false;
@@ -102,6 +105,7 @@ public class Configuration {
 		this.mapCenterLat = 0;
 		this.mapCenterLon = 0;
 		this.mapDefaultZoom = 0;
+		this.refreshRate = 0;
 		
 		return this.saveConfig(fileName);
 	}
@@ -115,6 +119,7 @@ public class Configuration {
       json.put("mapCenterLat", this.mapCenterLat);
       json.put("mapCenterLon", this.mapCenterLon);
       json.put("mapDefaultZoom", this.mapDefaultZoom);
+      json.put("refreshRate", this.refreshRate);
 		
       LOGGER.log(Level.INFO, null, json.toString());
 			
@@ -165,6 +170,15 @@ public class Configuration {
 	
 	public void setMapDefaultZoom(double mapDefaultZoom){
 		this.mapDefaultZoom = mapDefaultZoom;
+		this.saveConfig(FILENAME);
+	}
+	
+	public int getRefreshRate(){
+		return refreshRate;
+	}
+	
+	public void setRefreshRate(int refreshRate){
+		this.refreshRate = refreshRate;
 		this.saveConfig(FILENAME);
 	}
 }

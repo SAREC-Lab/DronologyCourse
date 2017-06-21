@@ -2,5 +2,6 @@
 	"projectName":"Test Program Name",
 	"mapCenterLat":41.521902,
 	"mapCenterLon":-86.241003,
-	"mapDefaultZoom":8
+	"mapDefaultZoom":8,
+	"refreshRate":250
 }	
