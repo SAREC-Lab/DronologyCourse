@@ -196,19 +196,19 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		
 	}
 	
-	public void setGroundSpeed(double speed) throws FlightZoneException {
+	public void setGroundSpeed(double speed) {
 		try {
 			baseStation.sendCommand(new SetGroundSpeedCommand(Integer.toString(droneID), speed));
 		} catch (DroneException e) {
-			throw new FlightZoneException(e);
+			LOGGER.error(e);
 		}
 	}
 	
-	public void setVelocity(double x, double y, double z) throws FlightZoneException {
+	public void setVelocity(double x, double y, double z) {
 		try {
 			baseStation.sendCommand(new SetVelocityCommand(Integer.toString(droneID), x, y, z));
 		} catch (DroneException e) {
-			throw new FlightZoneException(e);
+			LOGGER.error(e);
 		}
 	}
 }
