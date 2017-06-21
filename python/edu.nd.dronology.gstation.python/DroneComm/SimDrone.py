@@ -24,6 +24,10 @@ class SimDrone(object):
 		# return self.Drone.getVelocity()
 		return
 	
+	def setVelocity(self,velocity):
+		# return self.Drone.setVelocity()
+		return
+	
 	def getGimbalRotation(self):
 		# return self.Drone.getGimbalRotation()
 		return

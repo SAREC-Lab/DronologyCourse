@@ -24,6 +24,10 @@ class HTTPdrone(object):
 		# return self.Drone.getVelocity()
 		return
 	
+	def setVelocity(self,velocity):
+		# self.Drone.setVelocity(velocity)
+		return
+	
 	def getGimbalRotation(self):
 		# return self.Drone.getGimbalRotation()
 		return
