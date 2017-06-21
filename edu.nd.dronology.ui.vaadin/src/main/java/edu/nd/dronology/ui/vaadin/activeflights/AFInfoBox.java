@@ -105,7 +105,7 @@ public class AFInfoBox extends CustomComponent{
 		statusInfo2.setValue("Status: " + status);
 		this.batteryLife = Math.round(this.batteryLife * 100);
 		this.batteryLife = this.batteryLife / 100;
-		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " min");
+		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " %");
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
 		health.setCaptionAsHtml(true);
@@ -208,7 +208,7 @@ public class AFInfoBox extends CustomComponent{
 		this.batteryLife = batteryLife;
 		this.batteryLife = Math.round(this.batteryLife * 100);
 		this.batteryLife = this.batteryLife / 100;
-		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " min");
+		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " %");
 	}
 	
 	public double getBatteryLife(){
