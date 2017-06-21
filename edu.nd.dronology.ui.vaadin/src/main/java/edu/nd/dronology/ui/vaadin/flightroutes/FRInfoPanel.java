@@ -1,9 +1,12 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,8 +18,11 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Component;
+import org.vaadin.addon.leaflet.LMap;
 
 import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
@@ -26,6 +32,7 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
+import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
  * 
@@ -53,6 +60,12 @@ public class FRInfoPanel extends CustomComponent {
 
 	private IFlightRoute route;
 	
+	private int index;
+	private int numComponents;
+	ArrayList routeList;
+	FlightRouteInfo flight;
+	
+	
 	public FRInfoPanel(){
 		
 		  IFlightRouteplanningRemoteService service;
@@ -63,6 +76,7 @@ public class FRInfoPanel extends CustomComponent {
 			    service = (IFlightRouteplanningRemoteService) provider.getRemoteManager().getService(IFlightRouteplanningRemoteService.class);
 				
 				Collection<FlightRouteInfo> items = service.getItems();
+				routeList = new ArrayList(items);
 				
 				String id; 
 				String name;
@@ -141,6 +155,13 @@ public class FRInfoPanel extends CustomComponent {
 			}
 		}
 		return false;
+	}
+	public VerticalLayout getRoutes(){
+		return routes;
+	}
+	public FlightRouteInfo getFlight(int index){
+		flight = (FlightRouteInfo) routeList.get(index);
+		return flight;
 	}
 
 }

@@ -157,6 +157,35 @@ $valo-menu-background-color: #eee;
 			}
 		}
 	}
+	
+	.info_box_colored {
+		border: 1px solid $color-light-2;
+		border-radius: 4px;
+		padding: 6px;
+		font-size: 85%;
+		background-color: #91b3ea;
+		
+		.v-layout {
+			width: 100%;
+		}
+
+		.info_box_name {
+			font-weight: bold;
+			font-size: 140%;
+		}
+		.detailed_info_well {
+			width: calc(100% - 20px) !important;
+			line-height:120%;
+			border-radius: 15px;
+			background-color: $color-light-5;
+			padding: 3px !important;
+			margin: 4px 10px;
+			
+			.v-slot {
+				text-align: center;
+			}
+		}
+	}
 
 	.fr_leaflet_map {
 		height: $fr-map-height !important;

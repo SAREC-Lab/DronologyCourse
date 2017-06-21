@@ -9,13 +9,15 @@ import com.vaadin.ui.CustomComponent;
  */
 public class FRControlsComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
+	FRInfoPanel information = new FRInfoPanel();
 	
 	public FRControlsComponent() {
 		this.setWidth("100%");
 		addStyleName("controls_component");
 		
-		FRInfoPanel information = new FRInfoPanel();
-		
 		setCompositionRoot(information);
+	}
+	public FRInfoPanel getInfoPanel(){
+		return information;
 	}
 }

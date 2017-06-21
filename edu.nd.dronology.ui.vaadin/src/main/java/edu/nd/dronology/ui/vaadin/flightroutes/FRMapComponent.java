@@ -40,6 +40,8 @@ public class FRMapComponent extends CustomComponent {
 	private Button cancelButton = new Button("Cancel");
 	private boolean atEnd = false;
 	private boolean buttonSelected = false;
+	FRTableDisplay tableDisplay = new FRTableDisplay();
+	MapMarkerUtilities route;
 
 	public FRMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
@@ -52,10 +54,10 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
 		
+		route = new MapMarkerUtilities(leafletMap, tableDisplay.getGrid());
+		
 		VerticalLayout content = new VerticalLayout();
-
-		FRTableDisplay tableDisplay = new FRTableDisplay();
-		MapMarkerUtilities route = new MapMarkerUtilities(leafletMap, tableDisplay.getGrid());
+		
 		tableDisplay.getGrid().addStyleName("fr_table_component");
 		
 		tableDisplay.makeEditable(route);
@@ -95,7 +97,7 @@ public class FRMapComponent extends CustomComponent {
 			popupContent.addComponent(buttons2);
 			
 			popup = new PopupView(null, popupContent);
-			buttons.addComponents(popup); //?
+			buttons.addComponents(popup); 
 			
 			totalLayout.addComponents(buttons, routes);
 			
@@ -194,6 +196,9 @@ public class FRMapComponent extends CustomComponent {
 	
 	public LMap getMapInstance() {
 		return leafletMap;
+	}
+	public MapMarkerUtilities getUtils(){
+		return route;
 	}
 
 }

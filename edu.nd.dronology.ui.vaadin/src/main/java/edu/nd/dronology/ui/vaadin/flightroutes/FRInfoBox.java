@@ -52,7 +52,7 @@ public class FRInfoBox extends CustomComponent {
 		VerticalLayout allContent = new VerticalLayout();
 		
 		//create name id label
-		Label nameidLabel = new Label(name + " ID: " + id);
+		Label nameidLabel = new Label(name);
 		nameidLabel.addStyleName("info_box_name");
 			
 		//this next section creates 3 different labels and adds styles to format them appropriately
@@ -84,7 +84,7 @@ public class FRInfoBox extends CustomComponent {
 		
 	}
 	
-	//default if no parameters are passesd
+	//default if no parameters are passed
 	public FRInfoBox(){	
 		this("NAME", "id", "Jun 3, 2017, 9:24 AM", "Jun 8, 2017, 11:04 AM", "2.1 miles");
 	}
