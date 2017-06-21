@@ -19,17 +19,11 @@ class PhysicalDrone(object):
 		self.vehicle.simple_goto(location.toGlobalRelative())
 	
 	def takeoff(self,altitude):
+		print " Confirming motors are disarmed..."
+		self.setArmed(False)
 		self.setMode("GUIDED")
 		print " Arming motors for takeoff..."
 		self.setArmed(True)
-		
-		while not self.getArmed():
-			print " Waiting for arming..."
-			self.setArmed(True)
-			time.sleep(1)
-		
-		
-		
 		print " Taking off..."
 		
 		self.vehicle.simple_takeoff(altitude)
@@ -95,7 +89,12 @@ class PhysicalDrone(object):
 		return self.vehicle.armed
 	
 	def setArmed(self,armed):
+		print " Setting armed state to "+str(armed)+"..."
 		self.vehicle.armed = armed
+		while self.getArmed()!=armed:
+			print " Waiting for arming state change to "+str(armed)+"..."
+			self.vehicle.armed = armed
+			time.sleep(1)
 	
 	def getMode(self):
 		return self.vehicle.mode.name
