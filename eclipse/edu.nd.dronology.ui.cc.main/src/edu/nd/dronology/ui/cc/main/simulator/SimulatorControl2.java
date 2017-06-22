@@ -207,7 +207,7 @@ public class SimulatorControl2 extends Composite {
 			flightManagerService = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
 
-			flightManagerService.planFlight(wayPoints.get(0), wayPoints);
+			flightManagerService.planFlight("TESTPLAN", wayPoints.get(0), wayPoints);
 
 		} catch (Exception e) {
 			LOGGER.error(e);
