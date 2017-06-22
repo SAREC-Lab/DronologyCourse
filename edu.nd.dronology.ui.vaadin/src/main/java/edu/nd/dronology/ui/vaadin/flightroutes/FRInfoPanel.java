@@ -2,13 +2,9 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
@@ -18,21 +14,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Component;
-import org.vaadin.addon.leaflet.LMap;
 
-import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
-import edu.nd.dronology.services.core.persistence.PersistenceException;
-import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
-import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
  * 
@@ -114,14 +103,14 @@ public class FRInfoPanel extends CustomComponent {
 		popupContent.addComponent(inputField);
 		
 		PopupView popup = new PopupView(null, popupContent);
-		buttons.addComponent(popup); 
 		
 		newRoute.addClickListener(e->{	
 			popup.setPopupVisible(true);
 			
 		});
 		
-		buttons.addComponents(newRoute, popup); 
+		buttons.addComponents(newRoute, popup);
+		buttons.addStyleName("fr_new_route_button_area");
 		
 //		Button filter = new Button("Filter");
 //		filter.setWidth("68px");

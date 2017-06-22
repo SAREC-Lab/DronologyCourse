@@ -134,7 +134,7 @@ $valo-menu-background-color: #eee;
 		border: 1px solid $color-light-2;
 		border-radius: 4px;
 		padding: 6px;
-		font-size: 85%;
+		font-size: 12px;
 		
 		.v-layout {
 			width: 100%;
@@ -142,7 +142,7 @@ $valo-menu-background-color: #eee;
 
 		.info_box_name {
 			font-weight: bold;
-			font-size: 140%;
+			font-size: 14px;
 		}
 		.detailed_info_well {
 			width: calc(100% - 20px) !important;
@@ -151,6 +151,7 @@ $valo-menu-background-color: #eee;
 			background-color: $color-light-5;
 			padding: 3px !important;
 			margin: 4px 10px;
+			font-size: 12px;
 			
 			.v-slot {
 				text-align: center;
@@ -158,33 +159,8 @@ $valo-menu-background-color: #eee;
 		}
 	}
 	
-	.info_box_colored {
-		border: 1px solid $color-light-2;
-		border-radius: 4px;
-		padding: 6px;
-		font-size: 85%;
+	.info_box_focus {
 		background-color: #91b3ea;
-		
-		.v-layout {
-			width: 100%;
-		}
-
-		.info_box_name {
-			font-weight: bold;
-			font-size: 140%;
-		}
-		.detailed_info_well {
-			width: calc(100% - 20px) !important;
-			line-height:120%;
-			border-radius: 15px;
-			background-color: $color-light-5;
-			padding: 3px !important;
-			margin: 4px 10px;
-			
-			.v-slot {
-				text-align: center;
-			}
-		}
 	}
 
 	.fr_leaflet_map {
@@ -197,10 +173,18 @@ $valo-menu-background-color: #eee;
 	.fr_info_panel {
 		height: $screen-height;
 		.v-panel-captionwrap {
-			margin-bottom: -35px;
+		}
+		.v-panel-content {
+			> .v-layout {
+				padding-top: 5px;
+			}
+		}
+		.v-slot-fr_new_route_button_area {
+			position: fixed;
+			top: 63px;
 		}
 		.fr_new_route_button {
-			font-size: 70%;
+			font-size: 11px;
 			padding: 0 8px;
 			height: 26px;
 			top: -8px;
@@ -219,22 +203,6 @@ $valo-menu-background-color: #eee;
 			float: right;
 			margin: 0 2px;
 		}
-	}
-
-	.fr_route_created{
-		font-size: 85%;
-		line-height: .8;
-		padding-left: 40px;
-	}
-	.fr_route_modified{
-		font-size: 85%;
-		line-height: .8;
-		padding-left: 5px;
-	}
-	.fr_route_length{
-		font-size: 85%;
-		line-height: .8;
-		padding-left: 13px;
 	}
 
 	.af_info_panel {
@@ -257,7 +225,7 @@ $valo-menu-background-color: #eee;
 		
 		.v-nativebutton {
 			width: 145px !important;
-			font-size: 90%;
+			font-size: 14px;
 			text-align: center;
 			margin: 2px 8px;
 		}
@@ -372,7 +340,7 @@ $valo-menu-background-color: #eee;
 	}
 
 	.small_button_link {
-		font-size: 75%;
+		font-size: 11px;
 		text-decoration: underline;
 		height: 20px;
 		padding: 3px 6px;

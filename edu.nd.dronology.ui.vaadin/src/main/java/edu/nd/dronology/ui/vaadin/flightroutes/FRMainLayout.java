@@ -49,8 +49,7 @@ public class FRMainLayout extends CustomComponent {
 		//adds click listener to route list
 		routes.addLayoutClickListener(e->{
 			Component child = e.getChildComponent();
-			child.setStyleName("info_box_colored");
-			child.addStyleName("fr_info_box");
+			child.addStyleName("info_box_focus");
 			index = routes.getComponentIndex(child);
 			
 			//gets FRInfoPanel component through FRControlsComponent, and flight info from accessor in FRInfoPanel
@@ -61,7 +60,7 @@ public class FRMainLayout extends CustomComponent {
 			long tempLat;
 			int numComponents;
 		
-			ArrayList<WayPoint> waypoints = new ArrayList<WayPoint>() ;
+			ArrayList<WayPoint> waypoints = new ArrayList<>() ;
 			Point pt = new Point();
 		
 			//trying to convert to waypoint
@@ -91,8 +90,7 @@ public class FRMainLayout extends CustomComponent {
 			//when one route is clicked, the others go back to default background color
 			for(int i = 0; i < numComponents; i++){
 				if(i != index){
-					routes.getComponent(i).setStyleName("info_box");
-					routes.addStyleName("fr_info_box");
+					routes.getComponent(i).removeStyleName("info_box_focus");
 				}
 			}
 		});
