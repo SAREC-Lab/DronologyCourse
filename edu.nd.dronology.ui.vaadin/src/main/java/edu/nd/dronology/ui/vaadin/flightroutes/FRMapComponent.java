@@ -110,11 +110,11 @@ public class FRMapComponent extends CustomComponent {
 			buttonSelected = false;
 			
 			altitudeField.addValueChangeListener(event -> {
-				altitude = (String) altitudeField.getValue();
+				altitude = altitudeField.getValue();
 			});
 			
 			approachingSpeedField.addValueChangeListener(event -> {
-				approachingSpeed = (String) approachingSpeedField.getValue();
+				approachingSpeed = approachingSpeedField.getValue();
 			});
 
 			altitudeField.setRequiredIndicatorVisible(true);

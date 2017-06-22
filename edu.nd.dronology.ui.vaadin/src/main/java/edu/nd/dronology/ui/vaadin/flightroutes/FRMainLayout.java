@@ -71,8 +71,8 @@ public class FRMainLayout extends CustomComponent {
 				tempLong = coor.getLongitude();
 				tempLat = coor.getLatitude();
 			
-				double doubleLong = (double) tempLong;
-				double doubleLat = (double) tempLat;
+				double doubleLong = tempLong;
+				double doubleLat = tempLat;
 					
 				pt.setLat(doubleLat);
 				pt.setLon(doubleLong);
