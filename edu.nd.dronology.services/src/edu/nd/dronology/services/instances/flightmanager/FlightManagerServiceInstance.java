@@ -49,8 +49,8 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	}
 
 	@Override
-	public void planFlight(Coordinate coordinates, List<Coordinate> flight) {
-		flightManager.planFlight(coordinates, flight);
+	public void planFlight(String planName, Coordinate coordinates, List<Coordinate> flight) {
+		flightManager.planFlight(planName,coordinates, flight);
 
 	}
 
