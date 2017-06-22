@@ -10,7 +10,6 @@ public interface IDroneCommandHandler {
 	
 	public void sendCommand(IDroneCommand command) throws DroneException;
 
-
 	void setStatusCallbackListener(String id, IDroneStatusUpdateListener listener) throws DroneException;
 
 }
