@@ -120,6 +120,12 @@ public class MapMarkerUtilities {
 			map.removeComponent(polylines.get(i));
 		}
 	}
+	
+	public void removeAllMarkers(ArrayList<LMarker> markers) {
+		for (int i = markers.size() - 1; i >= 0; i--) {
+			map.removeComponent(markers.get(i));
+		}
+	}
 
 	public ArrayList<WayPoint> getMapPoints() {
 		return mapPoints;

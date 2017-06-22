@@ -13,6 +13,7 @@ import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CustomComponent;
@@ -46,11 +47,13 @@ public class AFMapComponent extends CustomComponent {
 	private IFlightManagerRemoteService flightRouteService;
   private BaseServiceProvider provider = MyUI.getProvider();
   private ArrayList<ArrayList<LPolyline>> flightRoutes = new ArrayList<>();
+  private ArrayList<ArrayList<LMarker>> wayPointMarkers = new ArrayList<>();
 	
   private MapMarkerUtilities utilities;
   
   private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-  private FileResource drone_icon = new FileResource(new File(basepath+"/VAADIN/img/drone_icon.png"));
+  private FileResource droneIcon = new FileResource(new File(basepath+"/VAADIN/img/drone_icon.png"));
+  private FileResource dotIcon = new FileResource(new File(basepath+"/VAADIN/img/dot.png"));
   
 	public AFMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
@@ -114,17 +117,29 @@ public class AFMapComponent extends CustomComponent {
 			for (FlightPlanInfo e:currentFlights){
 				List<Coordinate> coordinates = e.getWaypoints();
 				ArrayList<WayPoint> wayPoints = new ArrayList<>();
+				ArrayList<LMarker> wayPointMarker = new ArrayList<>();
 				Coordinate tempCoord = e.getStartLocation();
 				Point tempPoint = new Point(tempCoord.getLatitude()*.000001, tempCoord.getLongitude()*.000001);
 				WayPoint tempWayPoint = new WayPoint(tempPoint);
 				wayPoints.add(tempWayPoint);
+				LMarker tempMarker = new LMarker(tempPoint);
+				tempMarker.setIcon(dotIcon);
+				tempMarker.setIconSize(new Point(15, 15));
+				wayPointMarker.add(tempMarker);
+				leafletMap.addComponent(tempMarker);
 				for (Coordinate coord:coordinates){		
 					Point point = new Point(coord.getLatitude()*.000001, coord.getLongitude()*.000001);
 					WayPoint wayPoint = new WayPoint(point);
 					wayPoints.add(wayPoint);
+					LMarker marker = new LMarker(point);
+					marker.setIcon(dotIcon);
+					marker.setIconSize(new Point(15,15));
+					wayPointMarker.add(marker);
+					leafletMap.addComponent(marker);
 				}
 				ArrayList<LPolyline> polyLines = utilities.drawLines(wayPoints);
 				flightRoutes.add(polyLines);
+				wayPointMarkers.add(wayPointMarker);
 			}
 		} catch (RemoteException e) {
 			try {
@@ -147,7 +162,11 @@ public class AFMapComponent extends CustomComponent {
 				for (ArrayList<LPolyline> e:flightRoutes){
 					utilities.removeAllLines(e);
 				}
+				for (ArrayList<LMarker> e:wayPointMarkers){
+					utilities.removeAllMarkers(e);
+				}
 				flightRoutes.clear();
+				wayPointMarkers.clear();
 				this.addActiveFlightRoutes();	
 			}
 		} catch (RemoteException e) {
@@ -180,7 +199,7 @@ public class AFMapComponent extends CustomComponent {
 		for (Entry<String, DroneStatus> e:drones.entrySet()){
 			LMarker marker = new LMarker(e.getValue().getLatitude()*.000001, e.getValue().getLongitude()*.000001);
 			marker.setId(e.getValue().getID());
-			marker.setIcon(drone_icon);
+			marker.setIcon(droneIcon);
 			marker.setIconSize(new Point(30, 30));
 			markers.add(marker);
 			leafletMap.addComponent(marker);
@@ -214,7 +233,7 @@ public class AFMapComponent extends CustomComponent {
 							if (!old){
 								LMarker newMarker = new LMarker(e1.getValue().getLatitude()*.000001, e1.getValue().getLongitude()*.000001);
 								newMarker.setId(e1.getValue().getID());
-								newMarker.setIcon(drone_icon);
+								newMarker.setIcon(droneIcon);
 								newMarker.setIconSize(new Point(30, 30));
 								markers.add(newMarker);
 								leafletMap.addComponent(newMarker);
@@ -233,7 +252,7 @@ public class AFMapComponent extends CustomComponent {
 					if (!exists){
 						LMarker marker = new LMarker(e.getValue().getLatitude()*.000001, e.getValue().getLongitude()*.000001);
 						marker.setId(e.getValue().getID());
-						marker.setIcon(drone_icon);
+						marker.setIcon(droneIcon);
 						marker.setIconSize(new Point(77, 33));
 						markers.add(marker);
 						leafletMap.addComponent(marker);
