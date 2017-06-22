@@ -2,7 +2,7 @@ package edu.nd.dronology.services.launch;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
-import edu.nd.dronology.gstation.python.connector.PythonBase;
+import edu.nd.dronology.gstation.python.connector.PythonBase2;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.services.instances.dronesimulator.DroneSimulatorService;
@@ -30,7 +30,7 @@ public class DronologyServiceRunner {
 			RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 
 			runtimeMode.setPhysicalEnvironment();
-			runtimeMode.setCommandHandler(new PythonBase());
+			runtimeMode.setCommandHandler(new PythonBase2());
 
 		} catch (DronologyServiceException e) {
 			LOGGER.error(e);
