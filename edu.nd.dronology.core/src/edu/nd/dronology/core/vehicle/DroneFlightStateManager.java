@@ -8,11 +8,8 @@ import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 /**
- * Associates a drone state object with a drone. ONLY set this in the drone
- * constructor. NEVER interchange at runtime - otherwise drone state will be
- * incorrectly changed. State changes for Flight Modes must follow the
- * transition: OnGround -> AwaitingTakeOffClearance -> TakingOff -> Flying ->
- * Landing All other transitions will result in an exception being thrown
+ * Associates a drone state object with a drone. ONLY set this in the drone constructor. NEVER interchange at runtime - otherwise drone state will be incorrectly changed. State changes for Flight
+ * Modes must follow the transition: OnGround -> AwaitingTakeOffClearance -> TakingOff -> Flying -> Landing All other transitions will result in an exception being thrown
  * 
  * @author Jane Cleland-Huang
  * @version 0.01
@@ -35,17 +32,19 @@ public class DroneFlightStateManager {
 
 	private FlightMode currentFlightMode = FlightMode.ON_GROUND;
 
+	private final String droneId;
+
 	/**
-	 * Constructor States for both FlightMode and SafetyMode set to initial
-	 * state
+	 * Constructor States for both FlightMode and SafetyMode set to initial state
 	 */
-	public DroneFlightStateManager() {
+	public DroneFlightStateManager(ManagedDrone drone) {
+		this.droneId = drone.getDroneName();
 		currentFlightMode = FlightMode.ON_GROUND;
 		buildStateMachine();
 	}
 
 	private void buildStateMachine() {
-		uavStateMachine = new StateMachine(FlightMode.ON_GROUND);
+		uavStateMachine = new StateMachine<>(FlightMode.ON_GROUND);
 		uavStateMachine.configure(FlightMode.ON_GROUND).permit(FlightModeTransition.PLAN_ASSIGNED,
 				FlightMode.AWAITING_TAKEOFF_CLEARANCE);
 		uavStateMachine.configure(FlightMode.AWAITING_TAKEOFF_CLEARANCE).permit(FlightModeTransition.TAKEOFF_GRANTED,
@@ -64,13 +63,14 @@ public class DroneFlightStateManager {
 	 * Set Flight Mode to OnGround
 	 * 
 	 * @throws FlightZoneException
-	 *             if mode change does not follow allowed state transition.
+	 *           if mode change does not follow allowed state transition.
 	 */
 	public void setModeToOnGround() throws FlightZoneException {
 
 		if (uavStateMachine.canFire(FlightModeTransition.TO_ON_GROUND)) {
 			uavStateMachine.fire(FlightModeTransition.TO_ON_GROUND);
-			LOGGER.info("Mode set to:" + uavStateMachine.getState());
+			notifyStateChange(uavStateMachine.getState());
+
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.TO_ON_GROUND + "'");
@@ -88,13 +88,13 @@ public class DroneFlightStateManager {
 	 * Set Flight mode to awaiting Takeoff Clearance
 	 * 
 	 * @throws FlightZoneException
-	 *             if mode change does not follow allowed state transition.
+	 *           if mode change does not follow allowed state transition.
 	 */
 	public void setModeToAwaitingTakeOffClearance() throws FlightZoneException {
 
 		if (uavStateMachine.canFire(FlightModeTransition.PLAN_ASSIGNED)) {
 			uavStateMachine.fire(FlightModeTransition.PLAN_ASSIGNED);
-			LOGGER.info("Mode set to :" + uavStateMachine.getState());
+			notifyStateChange(uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.PLAN_ASSIGNED + "'");
@@ -102,10 +102,10 @@ public class DroneFlightStateManager {
 
 		if (currentFlightMode == FlightMode.ON_GROUND) {
 			currentFlightMode = FlightMode.AWAITING_TAKEOFF_CLEARANCE;
-		
+
 		} else {
-			throw new FlightZoneException("You may not transition to " + FlightMode.AWAITING_TAKEOFF_CLEARANCE
-					+ " directly from " + currentFlightMode);
+			throw new FlightZoneException(
+					"You may not transition to " + FlightMode.AWAITING_TAKEOFF_CLEARANCE + " directly from " + currentFlightMode);
 		}
 	}
 
@@ -113,18 +113,18 @@ public class DroneFlightStateManager {
 	 * Set flight mode to Taking off
 	 * 
 	 * @throws FlightZoneException
-	 *             if mode change does not follow allowed state transition.
+	 *           if mode change does not follow allowed state transition.
 	 */
 	public void setModeToTakingOff() throws FlightZoneException {
-		
-		
+
 		if (uavStateMachine.canFire(FlightModeTransition.TAKEOFF_GRANTED)) {
 			uavStateMachine.fire(FlightModeTransition.TAKEOFF_GRANTED);
+			notifyStateChange(uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.TAKEOFF_GRANTED + "'");
 		}
-		
+
 		if (currentFlightMode == FlightMode.AWAITING_TAKEOFF_CLEARANCE) {
 			currentFlightMode = FlightMode.TAKING_OFF;
 		} else {
@@ -137,19 +137,18 @@ public class DroneFlightStateManager {
 	 * Set flight mode to Flying
 	 * 
 	 * @throws FlightZoneException
-	 *             if mode change does not follow allowed state transition.
+	 *           if mode change does not follow allowed state transition.
 	 */
 	public void setModeToFlying() throws FlightZoneException {
-		
-		
+
 		if (uavStateMachine.canFire(FlightModeTransition.TARGET_ALTITUED_REACHED)) {
 			uavStateMachine.fire(FlightModeTransition.TARGET_ALTITUED_REACHED);
-			LOGGER.info("Mode set to:" + uavStateMachine.getState());
+			notifyStateChange(uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.TARGET_ALTITUED_REACHED + "'");
 		}
-		
+
 		if (currentFlightMode == FlightMode.TAKING_OFF) {
 			currentFlightMode = FlightMode.FLYING;
 		} else {
@@ -162,18 +161,18 @@ public class DroneFlightStateManager {
 	 * Set flight mode to Landing
 	 * 
 	 * @throws FlightZoneException
-	 *             if mode change does not follow allowed state transition.
+	 *           if mode change does not follow allowed state transition.
 	 */
 	public void setModeToLanding() throws FlightZoneException {
-		
+
 		if (uavStateMachine.canFire(FlightModeTransition.LANDING_GRANTED)) {
 			uavStateMachine.fire(FlightModeTransition.LANDING_GRANTED);
+			notifyStateChange(uavStateMachine.getState());
 		} else {
 			LOGGER.error("You may not transition from '" + uavStateMachine.getState() + "' with trigger '"
 					+ FlightModeTransition.LANDING_GRANTED + "'");
 		}
-		
-		
+
 		if (currentFlightMode == FlightMode.FLYING) {
 			currentFlightMode = FlightMode.LANDING;
 		} else {
@@ -197,8 +196,7 @@ public class DroneFlightStateManager {
 
 	/**
 	 * 
-	 * @return true if drone is currently in AwaitingTakeOffClearance mode,
-	 *         false otherwise
+	 * @return true if drone is currently in AwaitingTakeOffClearance mode, false otherwise
 	 */
 	public boolean isAwaitingTakeoffClearance() {
 		return currentFlightMode == FlightMode.AWAITING_TAKEOFF_CLEARANCE;
@@ -238,4 +236,10 @@ public class DroneFlightStateManager {
 	public String getStatus() {
 		return currentFlightMode.toString();
 	}
+
+	private void notifyStateChange(FlightMode state) {
+		LOGGER.info("Drone '" + droneId + "' set to: " + uavStateMachine.getState());
+
+	}
+
 }
