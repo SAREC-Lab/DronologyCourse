@@ -9,12 +9,11 @@ class GroundStation():
 	def __init__(self,port,drones):
 		self.java = JavaComm(port)
 		self.java.setDataHandler(self.receivedData)
-		self.current_drone_id = 0
 		self.drones = {}
 		for drone in drones:
 			new_drone = DroneComm(drone['type'],drone['ConnectionData'])
-			self.drones[self.current_drone_id] = new_drone
-			self.current_drone_id = self.current_drone_id + 1
+			new_drone_id = new_drone.getID()
+			self.drones[new_drone_id] = new_drone
 		print "finished initializing drones..."
 		self.send_drone_list_cont_async()
 		self.java.startComm()
@@ -108,7 +107,7 @@ if __name__=="__main__":
 			'type':'SITL',
 			'ConnectionData':{
 				'inst':0,
-				'home':'41.732955,-86.180886,0,0',
+				'home':'41.519408,-86.239996,0,0',
 			},
 		},
 	]

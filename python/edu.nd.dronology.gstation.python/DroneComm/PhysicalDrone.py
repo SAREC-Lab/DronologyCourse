@@ -120,8 +120,8 @@ class PhysicalDrone(object):
 			self.vehicle.mode = VehicleMode(mode)
 			time.sleep(1)
 	
-	def getSysidThismav(self):
-		return self.vehicle.parameters['SYSID_THISMAV']
+	def getID(self):
+		return str(self.vehicle.parameters['SYSID_THISMAV'])
 	
 	def step(self):
 		# I believe no action is needed here on the physical drone
