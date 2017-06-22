@@ -26,7 +26,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	private static final ILogger LOGGER = LoggerProvider.getLogger(PhysicalDrone.class);
 
 	private IDroneCommandHandler baseStation;
-	private int droneID;
+	private String droneID;
 	private Coordinate currentTarget;
 
 	public PhysicalDrone(String drnName, IDroneCommandHandler baseStation) {
@@ -41,11 +41,14 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		// TODO: fix the timing of this to actually get incoming data all the
 		// time (maybe in another thread?)
 		try {
-			droneID = baseStation.getNewDroneID();
-			baseStation.setStatusCallbackListener(Integer.toString(droneID), this);
+			// droneID = baseStation.getNewDroneID();
+			droneID = drnName;
+			baseStation.setStatusCallbackListener(droneID, this);
 		} catch (Exception | DroneException e) {
 			LOGGER.error(e);
 		}
+		// createDispatchThread
+
 	}
 
 	@Override
@@ -74,12 +77,12 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		// }
 
 		if (targetCoordinates != currentTarget) { // TODO: add some time limit
-													// for refreshing the
-													// information in case it
-													// didn't properly get sent
+			// for refreshing the
+			// information in case it
+			// didn't properly get sent
 			currentTarget = targetCoordinates;
 			try {
-				baseStation.sendCommand(new GoToCommand(Integer.toString(droneID), targetCoordinates));
+				baseStation.sendCommand(new GoToCommand(droneID, targetCoordinates));
 			} catch (DroneException e) {
 				LOGGER.error(e);
 			}
@@ -89,17 +92,19 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	@Override
 	public Coordinate getCoordinates() {
-		LOGGER.info("Coordinates retrieved: (" + Long.toString(baseStation.getLocation(droneID).getLatitude()) + ","
-				+ Long.toString(baseStation.getLocation(droneID).getLongitude()) + ","
-				+ Integer.toString(baseStation.getLocation(droneID).getAltitude()) + ")");
-		// return baseStation.getDroneState(droneID).getLocation();
-		return baseStation.getLocation(droneID);
+
+		// IDroneAttribute<Coordinate> location = baseStation.getAttribute(droneID, IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
+		// Coordinate coordinate = location.getValue();
+		// LOGGER.info("Coordinates retrieved: (" + Long.toString(coordinate.getLatitude()) + ","
+		// + Long.toString(coordinate.getLongitude()) + "," + Integer.toString(coordinate.getAltitude()) + ")");
+		// return coordinate;
+		return droneStatus.getCoordinates();
 	}
 
 	@Override
 	public void land() throws FlightZoneException {
 		try {
-			baseStation.sendCommand(new SetModeCommand(Integer.toString(droneID), SetModeCommand.MODE_LAND));
+			baseStation.sendCommand(new SetModeCommand(droneID, SetModeCommand.MODE_LAND));
 		} catch (DroneException e) {
 			throw new FlightZoneException(e);
 		}
@@ -111,7 +116,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		// tempData.put("altitude", altitude);
 		// baseStation.sendCommand(droneID, "takeoff", tempData);
 		try {
-			baseStation.sendCommand(new TakeoffCommand(Integer.toString(droneID), altitude));
+			baseStation.sendCommand(new TakeoffCommand(droneID, altitude));
 		} catch (DroneException e) {
 			throw new FlightZoneException(e);
 		}
@@ -125,8 +130,13 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	@Override
 	public double getBatteryStatus() {
 		// in volts
-		// return baseStation.getDroneState(droneID).getBatteryVoltage();
-		return baseStation.getBatteryVoltage(droneID);
+
+		return droneStatus.getBatteryLevel();
+
+		// IDroneAttribute<Double> attribute = baseStation.getAttribute(droneID, IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
+		// Double level = attribute.getValue();
+		// LOGGER.info("Battery LeveL :" +level);
+		// return level;
 	}
 
 	@Override
@@ -151,7 +161,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		int vertThreshold = 2;
 		// Coordinates currentPos =
 		// baseStation.getDroneState(droneID).getLocation();
-		Coordinate currentPos = baseStation.getLocation(droneID);
+		Coordinate currentPos = getCoordinates();
 		float dx = currentTarget.getLatitude() - currentPos.getLatitude();
 		float dy = currentTarget.getLongitude() - currentPos.getLongitude();
 		int dz = currentTarget.getAltitude() - currentPos.getAltitude();
@@ -164,6 +174,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		if (dz < 0) {
 			dz = -1 * dz;
 		}
+		// LOGGER.info(dx+":"+dy+":"+dz);
 		if (dx > horizThreshold) {
 			return false;
 		}
@@ -178,7 +189,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	@Override
 	public void updateCoordinates(Coordinate location) {
-	//	LOGGER.info("Coordinates updated");
+		// LOGGER.info("Coordinates updated");
 
 		super.setCoordinates(location.getLatitude(), location.getLongitude(), location.getAltitude());
 
@@ -190,25 +201,30 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	}
 
-	@Override
-	public void updateBatteryLevel(double batteryLevel) {
-	//	super.
-		
-	}
-	
 	public void setGroundSpeed(double speed) {
 		try {
-			baseStation.sendCommand(new SetGroundSpeedCommand(Integer.toString(droneID), speed));
+			baseStation.sendCommand(new SetGroundSpeedCommand(droneID, speed));
 		} catch (DroneException e) {
 			LOGGER.error(e);
 		}
 	}
-	
+
 	public void setVelocity(double x, double y, double z) {
 		try {
-			baseStation.sendCommand(new SetVelocityCommand(Integer.toString(droneID), x, y, z));
+			baseStation.sendCommand(new SetVelocityCommand(droneID, x, y, z));
 		} catch (DroneException e) {
 			LOGGER.error(e);
 		}
+	}
+
+	@Override
+	public void updateBatteryLevel(double batteryLevel) {
+		// super.
+
+	}
+
+	@Override
+	public void updateVelocity(double velocity) {
+		super.setVelocity(velocity);
 	}
 }
