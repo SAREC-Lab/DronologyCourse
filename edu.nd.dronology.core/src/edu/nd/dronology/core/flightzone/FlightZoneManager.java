@@ -31,7 +31,7 @@ public class FlightZoneManager implements Runnable {
 	 */
 	public FlightZoneManager() throws InterruptedException {
 		droneFleet = DroneFleetManager.getInstance();
-		safetyMgr = new DroneSeparationMonitor();
+		safetyMgr = DroneSeparationMonitor.getInstance();
 		flights = new Flights(safetyMgr);
 	}
 
@@ -52,8 +52,8 @@ public class FlightZoneManager implements Runnable {
 	 * @param start
 	 * @param wayPoints
 	 */
-	public void planFlight(Coordinate start, List<Coordinate> wayPoints) {
-		IFlightPlan flightPlan = FlightPlanFactory.create(start, wayPoints);
+	public void planFlight(String planName, Coordinate start, List<Coordinate> wayPoints) {
+		IFlightPlan flightPlan = FlightPlanFactory.create(planName, start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}
 
@@ -103,11 +103,11 @@ public class FlightZoneManager implements Runnable {
 			if (drone != null) {
 				safetyMgr.attachDrone(drone);
 				IFlightPlan flightPlan = flights.getNextFlightPlan();
-				LOGGER.info(flightPlan.getFlightID() +" assigned to "+ drone.getDroneName());
+				LOGGER.info(flightPlan.getFlightID() + " assigned to " + drone.getDroneName());
 				IFlightDirector flightDirectives = new SoloDirector(drone);
 				flightDirectives.setWayPoints(flightPlan.getWayPoints());
 				drone.assignFlight(flightDirectives);
-				//this needs to be moved to launch....
+				// this needs to be moved to launch....
 				flightPlan.setStatusToFlying(drone);
 				drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
 				return drone;
@@ -119,21 +119,18 @@ public class FlightZoneManager implements Runnable {
 
 	private void launchToWaypoint(ManagedDrone drone) throws FlightZoneException {
 		drone.getFlightDirective().flyToNextPoint();
-		//flightPlan.setStatusToFlying(drone);
+		// flightPlan.setStatusToFlying(drone);
 
 	}
 
 	/**
-	 * Main run routine -- called internally. Launches a new flight if viable,
-	 * and checks for flights which have landed. Launched flights run
-	 * autonomously at one thread per drone.
+	 * Main run routine -- called internally. Launches a new flight if viable, and checks for flights which have landed. Launched flights run autonomously at one thread per drone.
 	 */
 	@Discuss(discuss = "change from thread to listener based")
 	public void run2() {
 		while (true) {
 			// Launch new flight if feasible
-			int numberOfLaunchedFlights = flights.getCurrentFlights().size()
-					+ flights.getAwaitingTakeOffFlights().size();
+			int numberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
 			if (flights.hasPendingFlight() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
 				try {
 					launchSingleDroneToWayPoints();
@@ -163,8 +160,7 @@ public class FlightZoneManager implements Runnable {
 		while (true) {
 			ManagedDrone launched = null;
 			// Launch new flight if feasible
-			int numberOfLaunchedFlights = flights.getCurrentFlights().size()
-					+ flights.getAwaitingTakeOffFlights().size();
+			int numberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
 
 			if (flights.hasPendingFlight() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
 				try {
@@ -174,7 +170,7 @@ public class FlightZoneManager implements Runnable {
 				}
 
 				if (flights.hasAwaitingTakeOff()) {
-					LOGGER.info("Awaiting Takeoff:"+flights.getAwaitingTakeOffFlights().get(0).getFlightID());
+					LOGGER.info("Awaiting Takeoff:" + flights.getAwaitingTakeOffFlights().get(0).getFlightID());
 					try {
 						flights.checkForTakeOffReadiness(droneFleet);
 					} catch (FlightZoneException e1) {
@@ -182,15 +178,23 @@ public class FlightZoneManager implements Runnable {
 					}
 				}
 
-				try {
-					if (launched!=null) {
-						launchToWaypoint(launched);
-					}
-				} catch (FlightZoneException e) {
-					LOGGER.error(e);
-				}
+//				try {
+//					if (launched != null) {
+//						launchToWaypoint(launched);
+//					}
+//				} catch (FlightZoneException e) {
+//					LOGGER.error(e);
+//				}
 
+			} if (flights.hasAwaitingTakeOff() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
+				LOGGER.info("Awaiting Takeoff:" + flights.getAwaitingTakeOffFlights().get(0).getFlightID());
+				try {
+					flights.checkForTakeOffReadiness(droneFleet);
+				} catch (FlightZoneException e1) {
+					LOGGER.error("Failed Check for takeoff readiness.", e1);
+				}
 			}
+
 			// Check if any flights have landed
 			flights.checkForLandedFlights(droneFleet, safetyMgr);
 
