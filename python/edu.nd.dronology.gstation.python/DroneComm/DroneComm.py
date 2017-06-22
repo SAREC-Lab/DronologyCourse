@@ -120,6 +120,6 @@ class DroneComm(object):
 			'groundspeed': self.getGroundspeed(),
 			'armed': self.getArmed(),
 			'mode': self.getMode(),
-			'sysidThismav': self.getSysidThismav(),
+			'id': self.getSysidThismav(),
 		}
 	
