@@ -36,6 +36,8 @@ public class FRMainLayout extends CustomComponent {
 		
 		FRControlsComponent controls = new FRControlsComponent();
 		
+		//FRMetaInfo bar = new FRMetaInfo(flightInfo);
+		
 		FRMapComponent map = new FRMapComponent(
   		"VAADIN/sbtiles/{z}/{x}/{y}.png",
   		"South Bend");
@@ -45,6 +47,7 @@ public class FRMainLayout extends CustomComponent {
 		VerticalLayout routes;
     
 		routes = controls.getInfoPanel().getRoutes();
+
 		
 		//adds click listener to route list
 		routes.addLayoutClickListener(e->{
@@ -56,10 +59,11 @@ public class FRMainLayout extends CustomComponent {
 			//gets FRInfoPanel component through FRControlsComponent, and flight info from accessor in FRInfoPanel
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<Coordinate> coords = flightInfo.getCoordinates();
-    	
+			
 			long tempLong;
 			long tempLat;
 			int numComponents;
+			boolean first = true;
 		
 			ArrayList<WayPoint> waypoints = new ArrayList<WayPoint>() ;
 			Point pt = new Point();
@@ -71,20 +75,20 @@ public class FRMainLayout extends CustomComponent {
 				tempLong = coor.getLongitude();
 				tempLat = coor.getLatitude();
 			
-				double doubleLong = tempLong;
-				double doubleLat = tempLat;
-					
+				double doubleLong = tempLong * .000001;
+				double doubleLat = tempLat * .000001;
+				
 				pt.setLat(doubleLat);
 				pt.setLon(doubleLong);
 			
 				WayPoint way = new WayPoint(pt);
 			
-				map.getUtils().addNewPin(pt);
+				map.getUtils().addNewPinRemoveOld(pt, first);
 			
 				waypoints.add(way);
-			
+				first = false;
 			}
-    	
+			
 			map.getUtils().drawLines(waypoints);
     
 			numComponents = routes.getComponentCount();
@@ -93,10 +97,11 @@ public class FRMainLayout extends CustomComponent {
 				if(i != index){
 					routes.getComponent(i).setStyleName("info_box");
 					routes.addStyleName("fr_info_box");
+					
 				}
 			}
 		});
-   
+		
     	content.addComponents(controls, map);
     	setCompositionRoot(content);
 	}

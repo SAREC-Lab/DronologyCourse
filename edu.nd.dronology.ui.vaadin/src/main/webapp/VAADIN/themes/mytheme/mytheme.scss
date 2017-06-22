@@ -190,9 +190,22 @@ $valo-menu-background-color: #eee;
 	.fr_leaflet_map {
 		height: $fr-map-height !important;
 	}
+	.fr_leaflet_map_edit_mode {
+		height: $fr-map-height !important;
+		border-style: solid;
+		border-width: 5px; 
+		border-color: #000000;
+	}
 	.fr_table_component {
 		height: calc(#{$fr-table-height} - 6px) !important;
 		width: 100% !important;
+	}
+	.fr_table_component_edit_mode {
+		height: calc(#{$fr-table-height} - 6px) !important;
+		width: 100% !important;
+		border-width: 5px;
+		border-style: solid; 
+		border-color: #000000;
 	}
 	.fr_info_panel {
 		height: $screen-height;
@@ -377,4 +390,5 @@ $valo-menu-background-color: #eee;
 		height: 20px;
 		padding: 3px 6px;
 	}
+	
 }

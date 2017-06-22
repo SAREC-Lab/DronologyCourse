@@ -48,6 +48,21 @@ public class MapMarkerUtilities {
 		
 		return p;
 	}
+	public WayPoint addNewPinRemoveOld(Point point, boolean first) {
+		WayPoint p = new WayPoint(point);
+		p.setId(UUID.randomUUID().toString());
+		addPinForWayPoint(p);
+		
+		if(first){
+			mapPoints.clear();
+		}
+		mapPoints.add(p);
+		removeAllLines(polylines);
+		polylines = drawLines(mapPoints);
+		grid.setItems(mapPoints);
+		
+		return p;
+	}
 	
 	public void addPinForWayPoint(WayPoint wayPoint) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
