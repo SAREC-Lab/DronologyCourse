@@ -3,6 +3,7 @@ package edu.nd.dronology.core.air_traffic_control;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.dronology.core.fleet.DroneFleetManager;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -16,6 +17,8 @@ import net.mv.logging.LoggerProvider;
 public class DroneSeparationMonitor {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSeparationMonitor.class);
 
+	private static volatile DroneSeparationMonitor INSTANCE = null;
+
 	private List<ManagedDrone> drones = new ArrayList<>();
 	private Long safetyZone; // Set arbitrarily for now.
 
@@ -24,9 +27,22 @@ public class DroneSeparationMonitor {
 	 */
 	public DroneSeparationMonitor() {
 		drones = new ArrayList<>();
-		safetyZone = (long) 10000;
+		safetyZone = (long) 10;
 	}
 
+	public static DroneSeparationMonitor getInstance() {
+
+		if (INSTANCE == null) {
+			synchronized (DroneSeparationMonitor.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new DroneSeparationMonitor();
+				}
+			}
+		}
+		return INSTANCE;
+	}
+	
+	
 	/**
 	 * Attach a drone to the safety manager. Only attached drones are managed.
 	 * 
@@ -78,6 +94,7 @@ public class DroneSeparationMonitor {
 				}
 			}
 		}
+		LOGGER.info("All clear - "+managedDrone.getDroneName()+ " clearrance for take-off");
 		return true;
 	}
 
