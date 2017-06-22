@@ -204,6 +204,30 @@ public class PythonDroneState {
 	// return tempData;
 	// }
 	//
+	
+	private double doSafeDoubleConversion(Object value) {
+		if (value instanceof java.lang.Long) {
+			long value_l = (long) value;
+			return (double) value_l;
+		} else if (value instanceof java.lang.Double) {
+			return (double) value;
+		} else {
+			// fallback because of NullPointerException in some cases
+			LOGGER.hwFatal("Unknown type for conversion to double: ");
+			
+			try {
+				System.out.println(value.getClass());
+				System.out.print("value: ");
+				System.out.println(value);
+			} catch (Exception e) {
+//				LOGGER.error(e);
+			}
+			
+			System.out.println("Falling back to setting level to 0.");
+			return 0.0;
+		}
+	}
+	
 	public void loadfromJSON(JSONObject droneInfo) {
 		for (Object keyObj : droneInfo.keySet()) {
 			String key = (String) keyObj;
@@ -224,41 +248,44 @@ public class PythonDroneState {
 				break;
 			case "battery":
 				JSONObject batteryInfo = (JSONObject) data;
-				try {
-					setBatteryVoltage((double) batteryInfo.get("voltage"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					setBatteryCurrent((double) batteryInfo.get("current"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				Object level = batteryInfo.get("level");
-				try {
-					System.out.println(level.getClass());
-					System.out.print("level: ");
-					System.out.println(level);
-				} catch (Exception e) {
-					LOGGER.error(e);
-				}
-				if (level instanceof java.lang.Long) {
-					long level_l = (long) level;
-					setBatteryLevel(level_l);
-				} else if (level instanceof java.lang.Double) {
-					setBatteryLevel((double) level);
-				} else {
-					// fallback because of NullPointerException in some cases
-					LOGGER.hwFatal("Unknown type for battery level: ");
-					/*
-					 * try { System.out.println(level.getClass());
-					 * System.out.print("level: "); System.out.println(level); }
-					 * catch (Exception e) { e.printStackTrace(); }
-					 */
-					System.out.println("Falling back to setting level to 0.");
-					setBatteryLevel(0.0);
-				}
-				// setBatteryLevel((double) batteryInfo.get("level"));
+				setBatteryVoltage(doSafeDoubleConversion(batteryInfo.get("voltage")));
+				setBatteryCurrent(doSafeDoubleConversion(batteryInfo.get("current")));
+				setBatteryLevel(doSafeDoubleConversion(batteryInfo.get("level")));
+//				try {
+//					setBatteryVoltage((double) batteryInfo.get("voltage"));
+//				} catch (Exception e) {
+//					LOGGER.error(e);
+//				}
+//				try {
+//					setBatteryCurrent((double) batteryInfo.get("current"));
+//				} catch (Exception e) {
+//					LOGGER.error(e);
+//				}
+//				Object level = batteryInfo.get("level");
+//				try {
+//					System.out.println(level.getClass());
+//					System.out.print("level: ");
+//					System.out.println(level);
+//				} catch (Exception e) {
+//					LOGGER.error(e);
+//				}
+//				if (level instanceof java.lang.Long) {
+//					long level_l = (long) level;
+//					setBatteryLevel(level_l);
+//				} else if (level instanceof java.lang.Double) {
+//					setBatteryLevel((double) level);
+//				} else {
+//					// fallback because of NullPointerException in some cases
+//					LOGGER.hwFatal("Unknown type for battery level: ");
+//					/*
+//					 * try { System.out.println(level.getClass());
+//					 * System.out.print("level: "); System.out.println(level); }
+//					 * catch (Exception e) { e.printStackTrace(); }
+//					 */
+//					System.out.println("Falling back to setting level to 0.");
+//					setBatteryLevel(0.0);
+//				}
+//				// setBatteryLevel((double) batteryInfo.get("level"));
 				break;
 			case "home":
 				setHome(coordFromJSON((JSONObject) data));
