@@ -19,17 +19,11 @@ class PhysicalDrone(object):
 		self.vehicle.simple_goto(location.toGlobalRelative())
 	
 	def takeoff(self,altitude):
+		print " Confirming motors are disarmed..."
+		self.setArmed(False)
 		self.setMode("GUIDED")
 		print " Arming motors for takeoff..."
 		self.setArmed(True)
-		
-		while not self.getArmed():
-			print " Waiting for arming..."
-			self.setArmed(True)
-			time.sleep(1)
-		
-		
-		
 		print " Taking off..."
 		
 		self.vehicle.simple_takeoff(altitude)
@@ -42,6 +36,19 @@ class PhysicalDrone(object):
 	
 	def getVelocity(self):
 		return CoordFromList(self.vehicle.velocity)
+	
+	def setVelocity(self,velocity):
+		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
+			0,       # time_boot_ms (not used)
+			0, 0,    # target_system, target_component
+			mavutil.mavlink.MAV_FRAME_BODY_NED, # frame
+			0b0000111111000111, # type_mask (only speeds enabled)
+			0, 0, 0, # x, y, z positions
+			velocity.getX(), velocity.getY(), velocity.getZ(), # x, y, z velocity in m/s
+			0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+			0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+		# send command to vehicle
+		self.vehicle.send_mavlink(msg)
 	
 	def getGimbalRotation(self):
 		return CoordFromRotation(self.vehicle.gimbal)
@@ -73,7 +80,7 @@ class PhysicalDrone(object):
 		return self.vehicle.heading
 	
 	def setHeading(self,heading):
-		# unknown how to perform this function! Will add later if functionality discovered.
+		# TODO unknown how to perform this function! Will add later if functionality discovered.
 		return
 	
 	def getArmable(self):
@@ -95,7 +102,12 @@ class PhysicalDrone(object):
 		return self.vehicle.armed
 	
 	def setArmed(self,armed):
+		print " Setting armed state to "+str(armed)+"..."
 		self.vehicle.armed = armed
+		while self.getArmed()!=armed:
+			print " Waiting for arming state change to "+str(armed)+"..."
+			self.vehicle.armed = armed
+			time.sleep(1)
 	
 	def getMode(self):
 		return self.vehicle.mode.name
@@ -107,6 +119,9 @@ class PhysicalDrone(object):
 			print " Waiting for mode change to \""+mode+"\"..."
 			self.vehicle.mode = VehicleMode(mode)
 			time.sleep(1)
+	
+	def getSysidThismav(self):
+		return self.vehicle.parameters['SYSID_THISMAV']
 	
 	def step(self):
 		# I believe no action is needed here on the physical drone

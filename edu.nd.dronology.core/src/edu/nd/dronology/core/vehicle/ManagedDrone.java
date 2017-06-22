@@ -181,6 +181,12 @@ public class ManagedDrone extends Observable implements Runnable {
 	public void flyTo(Coordinate targetCoordinates) {
 		drone.flyTo(targetCoordinates);
 	}
+	public void setGroundSpeed(double speed) {
+		drone.setGroundSpeed(speed);
+	}
+	public void setVelocity(double x, double y, double z) {
+		drone.setVelocity(x,y,z);
+	}
 
 	/**
 	 * Gets current coordinates from virtual or physical drone

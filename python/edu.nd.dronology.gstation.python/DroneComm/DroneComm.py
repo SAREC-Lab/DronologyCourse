@@ -42,6 +42,9 @@ class DroneComm(object):
 	def getVelocity(self):
 		return self.Drone.getVelocity()
 	
+	def setVelocity(self,velocity):
+		self.Drone.setVelocity(velocity)
+	
 	def getGimbalRotation(self):
 		return self.Drone.getGimbalRotation()
 	
@@ -96,6 +99,9 @@ class DroneComm(object):
 	def setMode(self,mode):
 		self.Drone.setMode(mode)
 	
+	def getSysidThismav(self):
+		return self.Drone.getSysidThismav()
+	
 	def step(self):
 		self.Drone.step()
 	
@@ -114,5 +120,6 @@ class DroneComm(object):
 			'groundspeed': self.getGroundspeed(),
 			'armed': self.getArmed(),
 			'mode': self.getMode(),
+			'sysidThismav': self.getSysidThismav(),
 		}
 	

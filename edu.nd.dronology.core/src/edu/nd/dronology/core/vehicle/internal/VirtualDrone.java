@@ -98,4 +98,16 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 		return simulator.isDestinationReached(distanceMovedPerTimeStep);
 	}
 
+	@Override
+	public void setGroundSpeed(double speed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setVelocity(double x, double y, double z) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

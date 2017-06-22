@@ -2,24 +2,25 @@
 
 from DroneComm import *
 
+#drone_info = [
+#	{
+#		'type':'SITL',
+#		'ConnectionData':{
+#			'inst':0,
+#			'home':'41.732955,-86.180886,0,0',
+#		},
+#	},
+#]
+
 drone_info = [
 	{
-		'type':'SITL',
+		'type':'physical',
 		'ConnectionData':{
-			'inst':0,
-			'home':'41.732955,-86.180886,0,0',
+			'ConnectionString':'/dev/ttyUSB0',
+			'BaudRate':57600,
 		},
 	},
 ]
-
-# drone_info = [
-	# {
-		# 'type':'physical',
-		# 'ConnectionData':{
-			# 'ConnectionString':'192.168.42.1:1234',
-		# },
-	# },
-# ]
 
 current_drone_id = 0
 drones = {}
