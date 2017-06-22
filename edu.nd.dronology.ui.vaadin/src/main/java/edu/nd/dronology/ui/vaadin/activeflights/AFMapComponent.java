@@ -114,6 +114,10 @@ public class AFMapComponent extends CustomComponent {
 			for (FlightPlanInfo e:currentFlights){
 				List<Coordinate> coordinates = e.getWaypoints();
 				ArrayList<WayPoint> wayPoints = new ArrayList<>();
+				Coordinate tempCoord = e.getStartLocation();
+				Point tempPoint = new Point(tempCoord.getLatitude()*.000001, tempCoord.getLongitude()*.000001);
+				WayPoint tempWayPoint = new WayPoint(tempPoint);
+				wayPoints.add(tempWayPoint);
 				for (Coordinate coord:coordinates){		
 					Point point = new Point(coord.getLatitude()*.000001, coord.getLongitude()*.000001);
 					WayPoint wayPoint = new WayPoint(point);
