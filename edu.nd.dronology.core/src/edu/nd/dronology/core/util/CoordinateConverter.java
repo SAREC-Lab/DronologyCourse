@@ -7,7 +7,6 @@ public class CoordinateConverter {
 		long lat = floatToCoordLong(location.getLatitude());
 		long lon = floatToCoordLong(location.getLongitude());
 		int alt = (int) Math.ceil(location.getAltitude());
-		System.out.println("ALTITUDE: " + alt + " --> " + location.getAltitude());
 		return new Coordinate(lat, lon, alt);
 	}
 

@@ -92,4 +92,9 @@ public abstract class AbstractDrone implements IDrone {
 		return basePosition;
 	}
 
+	public void setVelocity(double velocity) {
+		droneStatus.setVelocity(velocity);
+		
+	}
+
 }
