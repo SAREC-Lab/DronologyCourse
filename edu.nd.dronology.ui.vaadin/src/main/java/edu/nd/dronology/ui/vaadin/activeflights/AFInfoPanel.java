@@ -205,6 +205,14 @@ public class AFInfoPanel extends CustomComponent{
 				}
 			}
 		} catch (RemoteException e1) {
+			try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			content.removeAllComponents();
+			numUAVs = 0;
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -227,6 +235,14 @@ public class AFInfoPanel extends CustomComponent{
 				}
 			}
 		} catch (RemoteException e1) {
+			try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			content.removeAllComponents();
+			numUAVs = 0;
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
