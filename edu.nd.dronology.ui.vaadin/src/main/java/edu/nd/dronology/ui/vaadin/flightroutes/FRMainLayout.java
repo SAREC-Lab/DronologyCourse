@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
-	int index;
-	
+	private int index;
+	private FRControlsComponent controls = new FRControlsComponent();
 	WayPoint way;
 	ArrayList<WayPoint> waypoints;
 	
@@ -34,7 +34,7 @@ public class FRMainLayout extends CustomComponent {
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 		
-		FRControlsComponent controls = new FRControlsComponent();
+		
 		
 		//FRMetaInfo bar = new FRMetaInfo();
 		
@@ -104,5 +104,12 @@ public class FRMainLayout extends CustomComponent {
 		
     	content.addComponents(controls, map);
     	setCompositionRoot(content);
+	}
+	public FRControlsComponent getControls(){
+		return controls;
+	}
+	
+	public int getIndex(){
+		return index;
 	}
 }
