@@ -4,6 +4,7 @@ import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -14,6 +15,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
@@ -44,6 +46,8 @@ public class FRMapComponent extends CustomComponent {
 	private boolean buttonSelected = false;
 	FRTableDisplay tableDisplay = new FRTableDisplay();
 	MapMarkerUtilities route;
+	VerticalLayout content = new VerticalLayout();
+	FRMetaInfo bar = new FRMetaInfo();
 
 	public FRMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
@@ -58,7 +62,7 @@ public class FRMapComponent extends CustomComponent {
 		
 		route = new MapMarkerUtilities(leafletMap, tableDisplay.getGrid());
 		
-		VerticalLayout content = new VerticalLayout();
+		
 		
 		tableDisplay.getGrid().addStyleName("fr_table_component");
 		
@@ -196,9 +200,39 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.zoomToContent();
 		
 		setCompositionRoot(content);  
+		//content.addComponents(leafletMap, tableDisplay.getGrid());
+	}
+	public void display(){
+		//set bar fields
+		content.addComponent(bar);
 		content.addComponents(leafletMap, tableDisplay.getGrid());
 	}
-	
+	public void display(FlightRouteInfo info){
+		FRMetaInfo selectedBar = new FRMetaInfo(info);
+		
+		CheckBox tempBox = selectedBar.getCheckBox();
+		tempBox.addValueChangeListener(event->{
+			
+			if(tempBox.getValue()){
+				displayTable();
+			}
+			else{
+				displayNoTable();
+			}
+		});
+		
+		
+		
+		content.removeAllComponents();
+		content.addComponent(selectedBar);
+		content.addComponents(leafletMap, tableDisplay.getGrid());
+	}
+	public void displayNoTable(){
+		content.removeComponent(tableDisplay.getGrid());
+	}
+	public void displayTable(){
+		content.addComponent(tableDisplay.getGrid());
+	}
 	public void setCenter(double centerLat, double centerLon) {
 		leafletMap.setCenter(41.68, -86.25);
 	}

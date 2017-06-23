@@ -36,7 +36,7 @@ public class FRMainLayout extends CustomComponent {
 		
 		FRControlsComponent controls = new FRControlsComponent();
 		
-		//FRMetaInfo bar = new FRMetaInfo(flightInfo);
+		//FRMetaInfo bar = new FRMetaInfo();
 		
 		FRMapComponent map = new FRMapComponent(
   		"VAADIN/sbtiles/{z}/{x}/{y}.png",
@@ -48,7 +48,7 @@ public class FRMainLayout extends CustomComponent {
     
 		routes = controls.getInfoPanel().getRoutes();
 
-		
+		map.display();
 		//adds click listener to route list
 		routes.addLayoutClickListener(e->{
 			Component child = e.getChildComponent();
@@ -58,6 +58,9 @@ public class FRMainLayout extends CustomComponent {
 			//gets FRInfoPanel component through FRControlsComponent, and flight info from accessor in FRInfoPanel
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<Coordinate> coords = flightInfo.getCoordinates();
+			
+			//also remove?
+			map.display(flightInfo);
 			
 			long tempLong;
 			long tempLat;
