@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
+import org.vaadin.addon.leaflet.LeafletClickEvent;
+import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.Component;
@@ -19,11 +21,29 @@ import com.vaadin.ui.Grid;
  */
 
 public class MapMarkerUtilities {
+	private class MarkerClickListener implements LeafletClickListener {
+
+		@Override
+		public void onClick(LeafletClickEvent event) {
+			LMarker leafletMarker = (LMarker)event.getSource();
+	    	for (int i = 0; i < mapPoints.size(); i++) {
+	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
+	    			mapPoints.remove(mapPoints.get(i));
+	    	}
+
+	    	map.removeComponent(leafletMarker);
+	    	removeAllLines(polylines);
+	    	polylines = drawLines(mapPoints);
+	    	grid.setItems(mapPoints);
+		}		
+	}
 	private LMap map;
 	private Grid<WayPoint> grid;
 	private ArrayList<WayPoint> mapPoints = new ArrayList<>();
 	private ArrayList<LPolyline> polylines = new ArrayList<>();
 	private ArrayList<LMarker> pins = new ArrayList<>();
+	private boolean lineClicked = false;
+	private int lineIndex = -1;
 	
 	public MapMarkerUtilities(LMap map, Grid<WayPoint> grid) {
 		this.map = map;
@@ -36,12 +56,17 @@ public class MapMarkerUtilities {
 		this.map = map;
 	}
 
-	public WayPoint addNewPin(Point point) {
+	public WayPoint addNewPin(Point point, boolean lineClicked) {
 		WayPoint p = new WayPoint(point);
 		p.setId(UUID.randomUUID().toString());
 		addPinForWayPoint(p);
 		
-		mapPoints.add(p);
+		if (!lineClicked) {
+			mapPoints.add(p);
+		} else {
+			mapPoints.add(lineIndex, p);
+		}
+		
 		removeAllLines(polylines);
 		polylines = drawLines(mapPoints);
 		grid.setItems(mapPoints);
@@ -69,17 +94,7 @@ public class MapMarkerUtilities {
 		leafletMarker.setId(wayPoint.getId());
 		pins.add(leafletMarker);
 		
-    leafletMarker.addClickListener(event -> {
-    	for (int i = 0; i < mapPoints.size(); i++) {
-    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
-    			mapPoints.remove(mapPoints.get(i));
-    	}
-
-    	map.removeComponent(leafletMarker);
-    	removeAllLines(polylines);
-    	polylines = drawLines(mapPoints);
-    	grid.setItems(mapPoints);
-    });
+    leafletMarker.addClickListener(new MarkerClickListener());
     
     /**
      * Drag End Listener is a listener that updates the path if a waypoint is moved.
@@ -122,10 +137,22 @@ public class MapMarkerUtilities {
 	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 		
-		for (int i = mapPoints.size() - 1; i > 0; i--) {
-			LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i-1).toPoint());
+		for (int i = 0; i < mapPoints.size() - 1; i++) {
+			LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i+1).toPoint());
+			polyline.setId(UUID.randomUUID().toString());
+			
 			polylines.add(polyline);
 			map.addComponent(polyline);
+			
+			polyline.addClickListener(event -> {
+				lineClicked = true;
+				for (int j = 0; j < polylines.size(); j++) {
+					if (polylines.get(j).getId().equals(polyline.getId())) {
+						lineIndex = j+1;
+	    			}
+				}
+				removeAllLines(polylines);
+			});
 		}
 		return polylines;
 	}
@@ -134,6 +161,14 @@ public class MapMarkerUtilities {
 		for (int i = polylines.size() - 1; i >= 0; i--) {
 			map.removeComponent(polylines.get(i));
 		}
+	}
+
+	public void enableRouteEditing () {
+		
+	}
+	
+	public void disableRouteEditing () {
+		
 	}
 	
 	public void removeAllMarkers(ArrayList<LMarker> markers) {
@@ -165,4 +200,13 @@ public class MapMarkerUtilities {
 	public LMap getMap() {
 		return map;
 	}
+	
+	public boolean getLineClicked () {
+		return lineClicked;
+	}
+	
+	public void setLineClicked (boolean lineClicked) {
+		this.lineClicked = lineClicked;
+	}
+
 }

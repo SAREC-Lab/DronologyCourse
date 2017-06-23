@@ -6,11 +6,13 @@ import org.vaadin.addon.leaflet.LTileLayer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
@@ -66,6 +68,23 @@ public class FRMapComponent extends CustomComponent {
 		tiles.setUrl(tileDataURL);
 		
 		leafletMap.addClickListener(e -> {
+			
+			
+			Window subWindow = new Window("Sub-window");
+	        VerticalLayout subContent = new VerticalLayout();
+	        subWindow.setContent(subContent);
+
+	        // Put some components in it
+	        subContent.addComponent(new Label("Meatball sub"));
+	        subContent.addComponent(new Button("Awlright"));
+
+	        // Center it in the browser window
+	        subWindow.center();
+
+	        // Open it in the UI
+	        //addWindow(subWindow);
+			
+			
 			if (atEnd && !buttonSelected) {
 		    	for (int i = 0; i < route.getMapPoints().size(); i++) {
 		    		if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
@@ -105,8 +124,14 @@ public class FRMapComponent extends CustomComponent {
 			popup.setPopupVisible(true);
 			popup.setHideOnMouseOut(false);
 			
-			currentWayPoint = route.addNewPin(e.getPoint());
+			if (route.getLineClicked()) {
+				Notification.show("Line was clicked");
+			}
+				
+			currentWayPoint = route.addNewPin(e.getPoint(), route.getLineClicked());
 			
+			route.setLineClicked(false);
+				
 			buttonSelected = false;
 			
 			altitudeField.addValueChangeListener(event -> {
