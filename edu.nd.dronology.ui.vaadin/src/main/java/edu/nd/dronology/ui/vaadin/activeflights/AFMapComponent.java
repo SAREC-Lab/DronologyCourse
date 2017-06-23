@@ -127,13 +127,6 @@ public class AFMapComponent extends CustomComponent {
 				flightRoutes.add(polyLines);
 			}
 		} catch (RemoteException e) {
-			try {
-				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -151,13 +144,6 @@ public class AFMapComponent extends CustomComponent {
 				this.addActiveFlightRoutes();	
 			}
 		} catch (RemoteException e) {
-			try {
-				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -167,13 +153,6 @@ public class AFMapComponent extends CustomComponent {
 		try {
 			drones = service.getDrones();
 		} catch (RemoteException e) {
-			try {
-				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -259,13 +238,6 @@ public class AFMapComponent extends CustomComponent {
 				remove.clear();
 			}
 		} catch (RemoteException e) {
-			try {
-				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	  
