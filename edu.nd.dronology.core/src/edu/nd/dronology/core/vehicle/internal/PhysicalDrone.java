@@ -201,6 +201,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	}
 
+	@Override
 	public void setGroundSpeed(double speed) {
 		try {
 			baseStation.sendCommand(new SetGroundSpeedCommand(droneID, speed));
@@ -209,6 +210,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		}
 	}
 
+	@Override
 	public void setVelocity(double x, double y, double z) {
 		try {
 			baseStation.sendCommand(new SetVelocityCommand(droneID, x, y, z));

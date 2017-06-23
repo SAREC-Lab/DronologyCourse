@@ -14,6 +14,9 @@ import edu.nd.dronology.core.util.PreciseTimestamp;
 
 public class UAVMessage implements Serializable {
 
+
+	private static final long serialVersionUID = 66568831657375322L;
+
 	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
 			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).setVersion(1.0)
 			.serializeSpecialFloatingPointValues().create();
