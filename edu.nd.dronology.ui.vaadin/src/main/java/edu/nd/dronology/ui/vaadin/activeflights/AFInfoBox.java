@@ -126,10 +126,11 @@ public class AFInfoBox extends CustomComponent{
 		/**
 		 * middle layer components
 		 */
-
-		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
-		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
+		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat * .000001) * 1000000.0) / 1000000.0));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon * .000001) * 1000000.0) / 100000.0));
 		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + " meters");
+		this.speed = Math.round(this.speed * 100);
+		this.speed = this.speed / 100;
 		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
 		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
 		
@@ -232,7 +233,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setLat(long lat){
 		this.lat = lat;
-		locationInfo1.setValue("Latitude:\t" + Long.toString(this.lat));
+		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat * .000001) * 1000000.0) / 1000000.0));
 	}
 	
 	public Long getLat(){
@@ -241,7 +242,7 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setLon(Long lon){
 		this.lon = lon;
-		locationInfo2.setValue("Longitude:\t" + Long.toString(this.lon));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon * .000001) * 1000000.0) / 1000000.0));
 	}
 	
 	public double getLon(){
@@ -259,6 +260,8 @@ public class AFInfoBox extends CustomComponent{
 	
 	public void setSpeed(double speed){
 		this.speed = speed;
+		this.speed = Math.round(this.speed * 100);
+		this.speed = this.speed / 100;
 		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
 	}
 	
