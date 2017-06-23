@@ -15,8 +15,12 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 
 /**
  * 
@@ -148,6 +152,30 @@ public class AFInfoBox extends CustomComponent{
 		Button assignNewRoute = new Button("Assign New Route");
 		returnToHome.setHeight("30px");
 		assignNewRoute.setHeight("30px");
+		
+		assignNewRoute.addClickListener( e-> {
+			Window window = new Window("Assign New Route");
+			VerticalLayout content = new VerticalLayout();
+			FRMainLayout frLayout = new FRMainLayout();
+			HorizontalLayout buttons = new HorizontalLayout();
+			
+			Button cancel = new Button("Cancel");
+			Button apply = new Button("Apply");
+			apply.setEnabled(false);
+			cancel.addClickListener( event -> {
+				UI.getCurrent().removeWindow(window);
+			});
+			frLayout.getControls().getInfoPanel().addListener(  ClickListener -> {
+				apply.setEnabled(true);
+			});
+			buttons.addComponents(cancel, apply);
+			content.addComponents(frLayout, buttons);
+			
+			window.setContent(content);
+			window.setModal(true);
+			window.setWidth(1296, Unit.PIXELS);
+			UI.getCurrent().addWindow(window);
+		});
 		
 		bottomButtons.addComponents(returnToHome, assignNewRoute);
 		bottomContent.addComponents(bottomSwitch, bottomButtons);
