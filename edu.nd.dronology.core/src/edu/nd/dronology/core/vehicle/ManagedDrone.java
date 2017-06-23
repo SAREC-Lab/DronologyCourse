@@ -3,6 +3,9 @@ package edu.nd.dronology.core.vehicle;
 import java.util.Observable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.common.util.concurrent.RateLimiter;
 
@@ -11,7 +14,6 @@ import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.FlightDirectorFactory;
 import edu.nd.dronology.core.flight.IFlightDirector;
-import edu.nd.dronology.core.flight.internal.SoloDirector;
 import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.util.NamedThreadFactory;
 import edu.nd.dronology.util.NullUtil;
@@ -37,10 +39,10 @@ public class ManagedDrone extends Observable implements Runnable {
 			new NamedThreadFactory("ManagedDrone"));
 
 	private final IDrone drone; // Controls primitive flight commands for drone
-	
-	@Discuss(discuss="why does each drone has his on instance of that?")
-	private DroneSeparationMonitor safetyMgr;
-	
+
+	@Discuss(discuss = "why does each drone has his on instance of that? - This variable is never set!")
+	private final DroneSeparationMonitor safetyMgr;
+
 	private DroneFlightStateManager droneState;
 	private DroneSafetyStateManager droneSafetyState;
 
@@ -54,10 +56,13 @@ public class ManagedDrone extends Observable implements Runnable {
 	private static final int NORMAL_SLEEP = 1;
 	private int currentSleep = NORMAL_SLEEP;
 
-	
 	@Discuss(discuss = "why not final? - new flight director for each flight??")
-	private IFlightDirector flightDirector = null; // Each drone can be assigned a single flight plan.
+	private IFlightDirector flightDirector = null; // Each drone can be assigned
+	// a single flight plan.
 	private int targetAltitude = 0;
+
+	private final Lock lock = new ReentrantLock();
+	private final Condition continueCycle = lock.newCondition();
 
 	/**
 	 * Constructs drone
@@ -65,15 +70,22 @@ public class ManagedDrone extends Observable implements Runnable {
 	 * @param drone
 	 * @param drnName
 	 */
-	
-	@Discuss(discuss="FlightDirector should be injected.. we might end up having different ones...")
+
+	@Discuss(discuss = "FlightDirector should be injected.. we might end up having different ones...")
 	public ManagedDrone(IDrone drone) {
 		NullUtil.checkNull(drone);
+		safetyMgr = DroneSeparationMonitor.getInstance();
 		this.drone = drone;// specify
-		droneState = new DroneFlightStateManager();
+		droneState = new DroneFlightStateManager(this);
 		droneSafetyState = new DroneSafetyStateManager();
 		drone.getDroneStatus().setStatus(droneState.getStatus());
-		this.flightDirector = FlightDirectorFactory.getFlightDirector(this); // Don't really want to create it here.
+		this.flightDirector = FlightDirectorFactory.getFlightDirector(this); // Don't
+		// really
+		// want
+		// to
+		// create
+		// it
+		// here.
 	}
 
 	/**
@@ -83,14 +95,19 @@ public class ManagedDrone extends Observable implements Runnable {
 	 */
 	public void assignFlight(IFlightDirector flightDirective) {
 		this.flightDirector = flightDirective;
-		this.flightDirector.addWayPoint(drone.getBaseCoordinates()); // Currently must always return home.
+		this.flightDirector.addWayPoint(drone.getBaseCoordinates()); // Currently
+		// must
+		// always
+		// return
+		// home.
 	}
 
 	/**
 	 * Removes an assigned flight
 	 */
 	public void unassignFlight() {
-		flightDirector = null; // DANGER. NEEDS FIXING. CANNOT UNASSIGN FLIGHT WITHOUT RETURNING TO BASE!!!
+		flightDirector = null; // DANGER. NEEDS FIXING. CANNOT UNASSIGN FLIGHT
+		// WITHOUT RETURNING TO BASE!!!
 		LOGGER.warn("Unassigned DRONE: " + getDroneName());
 	}
 
@@ -142,11 +159,24 @@ public class ManagedDrone extends Observable implements Runnable {
 		if (targetAltitude == 0) {
 			throw new FlightZoneException("Target Altitude is 0");
 		}
-		LOGGER.info(getDroneName() + " ==> Taking off");
 		droneState.setModeToTakingOff();
-		drone.getDroneStatus().setStatus(droneState.getStatus()); // A bit ugly, but this was added to keep state for GUI middleware updated.
+		drone.getDroneStatus().setStatus(droneState.getStatus());
 		drone.takeOff(targetAltitude);
-		droneState.setModeToFlying();
+
+		// DIRTY WORKAROUND.....
+		// while (drone.getAltitude() < (targetAltitude - 3)) {
+		// // TODO: ask about how to properly when finished taking off
+		// LOGGER.info("Waiting for drone #" + drone.getDroneStatus().getID() + " to complete takeoff...");
+		//
+		// System.out.println(drone.getAltitude());
+		// try {
+		// Thread.sleep(500);
+		// } catch (InterruptedException e) {
+		// LOGGER.error(e);
+		// }
+		// }
+
+		// droneState.setModeToFlying();
 		drone.getDroneStatus().setStatus(droneState.getStatus());
 	}
 
@@ -178,9 +208,16 @@ public class ManagedDrone extends Observable implements Runnable {
 	public void run() {
 
 		while (true) {// && j < 500){
-			// Drone has been temporarily halted. Reset to normal mode once sleep is completed.
+			// Drone has been temporarily halted. Reset to normal mode once
+			// sleep is completed.
 			LIMITER.acquire();
 			setSleep(NORMAL_SLEEP);
+			// try {
+			// continueCycle.await();
+			// } catch (InterruptedException e) {
+			// LOGGER.error(e);
+			// }
+
 			if (droneSafetyState.isSafetyModeHalted()) {
 				droneSafetyState.setSafetyModeToNormal();
 			}
@@ -189,18 +226,50 @@ public class ManagedDrone extends Observable implements Runnable {
 			if (flightDirector != null && droneState.isFlying()) {
 				targetCoordinates = flightDirector.flyToNextPoint();
 
-				// Move the drone. Returns FALSE if it cannot move because it has reached destination
-				if (!drone.move(10))
+				// Move the drone. Returns FALSE if it cannot move because it
+				// has reached destination
+				if (!drone.move(10)) {
+					LOGGER.info(drone.getDroneName() + " - Waypoint reached - " + targetCoordinates.toString());
 					flightDirector.clearCurrentWayPoint();
+				}
 				// Check for end of flight
 				checkForEndOfFlight();
 
 				// Check for takeoff conditions
-				checkForTakeOff();
+				// checkForTakeOff();
 
 				// Set check voltage
 				drone.setVoltageCheckPoint();
+				// Added another check for previously denied takeoff...
+				// not working right now because safety manger is null...
 			}
+			if (droneState.isAwaitingTakeoffClearance()) {
+				// checkForTakeOff();
+			}
+			if (droneState.isTakingOff()) {
+				if (drone.getAltitude() >= (targetAltitude - 3)) {
+					try {
+						droneState.setModeToFlying();
+						drone.getDroneStatus().setStatus(droneState.getStatus());
+					} catch (FlightZoneException e) {
+						LOGGER.error(e);
+					}
+
+				}
+			}
+			// while (drone.getAltitude() < (targetAltitude - 3)) {
+			// // TODO: ask about how to properly when finished taking off
+			// LOGGER.info("Waiting for drone #" + drone.getDroneStatus().getID() + " to complete takeoff...");
+			//
+			// System.out.println(drone.getAltitude());
+			// try {
+			// Thread.sleep(500);
+			// } catch (InterruptedException e) {
+			// LOGGER.error(e);
+			// }
+			// }
+
+			// LOGGER.info(drone.getDroneName() + " " + droneState.getStatus());
 		}
 	}
 
@@ -234,7 +303,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	// Check for takeoff. Takeoff if conditions are satisfied.
 	private boolean checkForTakeOff() {
 
-		if (flightDirector != null && flightDirector.readyToTakeOff())
+		if (flightDirector != null && !flightDirector.readyToTakeOff())
 			return false;
 		if (droneState.isTakingOff())
 			return false;
@@ -245,11 +314,11 @@ public class ManagedDrone extends Observable implements Runnable {
 
 		LOGGER.info("Passed takeoff test");
 		// Otherwise
-		try {
-			takeOff();
-		} catch (FlightZoneException e) {
-			LOGGER.error(getDroneName() + " is not able to takeoff!", e);
-		}
+		// try {
+		// takeOff();
+		// } catch (FlightZoneException e) {
+		// LOGGER.error(getDroneName() + " is not able to takeoff!", e);
+		// }
 		return true;
 	}
 
@@ -302,6 +371,7 @@ public class ManagedDrone extends Observable implements Runnable {
 		// currentSleep = seconds * 1000;
 		setSleep(seconds / 1000);
 		droneSafetyState.setSafetyModeToHalted();
+		// continueCycle.signal();
 	}
 
 	/**

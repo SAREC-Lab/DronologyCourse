@@ -252,4 +252,17 @@ private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAUL
 		
 	}
 
+	@Override
+	public void hwInfo(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void hwFatal(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

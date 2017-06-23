@@ -30,8 +30,8 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 		return new FlightManagerServiceInstance();
 	}
 
-	public void planFlight(Coordinate coordinates, List<Coordinate> flight) {
-		serviceInstance.planFlight(coordinates, flight);
+	public void planFlight(String planName, Coordinate coordinates, List<Coordinate> flight) {
+		serviceInstance.planFlight(planName,coordinates, flight);
 
 	}
 

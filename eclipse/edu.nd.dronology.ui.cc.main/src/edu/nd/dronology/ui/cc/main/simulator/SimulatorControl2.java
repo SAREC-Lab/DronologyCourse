@@ -207,7 +207,7 @@ public class SimulatorControl2 extends Composite {
 			flightManagerService = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
 
-			flightManagerService.planFlight(wayPoints.get(0), wayPoints);
+			flightManagerService.planFlight("TESTPLAN", wayPoints.get(0), wayPoints);
 
 		} catch (Exception e) {
 			LOGGER.error(e);
@@ -248,7 +248,8 @@ public class SimulatorControl2 extends Composite {
 			coordTransform = DecimalDegreesToXYConverter.getInstance();
 
 			ZoneBounds zb = ZoneBounds.getInstance();
-			zb.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
+			//zb.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
+			zb.setZoneBounds(41519600, -86240900, 41518900, -86238900, 100);
 			DecimalDegreesToXYConverter.getInstance().setUp(xRange, yRange, LeftDivider); // Setup happens only once. Must happen after Zonebounds are set.
 
 			String flightArea = "(" + DegreesFormatter.prettyFormatDegrees(zb.getNorthLatitude()) + ","

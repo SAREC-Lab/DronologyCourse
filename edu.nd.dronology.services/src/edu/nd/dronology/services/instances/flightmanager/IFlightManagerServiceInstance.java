@@ -8,8 +8,9 @@ import edu.nd.dronology.services.core.info.FlightInfo;
 
 public interface IFlightManagerServiceInstance extends IServiceInstance {
 
-	public void planFlight(Coordinate coordinates, List<Coordinate> flight);
 
 	public FlightInfo getFlightDetails();
+
+	void planFlight(String planName, Coordinate coordinates, List<Coordinate> flight);
 
 }

@@ -1,12 +1,14 @@
 package edu.nd.dronology.core.fleet;
 
+import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
-import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Creates a fleet of physical drones. Not yet implemented.
@@ -16,6 +18,9 @@ import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
  */
 public class PhysicalDroneFleetFactory extends AbstractDroneFleetFactory {
 
+	private static final ILogger LOGGER = LoggerProvider.getLogger(PhysicalDroneFleetFactory.class);
+
+	
 	private static volatile PhysicalDroneFleetFactory INSTANCE = null;
 	private IDroneCommandHandler commandHandler;
 
@@ -38,15 +43,23 @@ public class PhysicalDroneFleetFactory extends AbstractDroneFleetFactory {
 	}
 
 	@Override
+	@Discuss(discuss="todo: fligh to altitude 10... workaround just for testing purposes... needs to be fixed..")
 	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude)
 			throws DroneException {
 		if(RuntimeDroneTypes.getInstance().getCommandHandler()==null){
 			throw new DroneException("Physical Drone Command Handler not prperly initialized!");
 		}
 		
+		
+		
 		IDrone drone = new PhysicalDrone(createDroneID(droneID), RuntimeDroneTypes.getInstance().getCommandHandler());
 		ManagedDrone managedDrone = new ManagedDrone(drone);
-		Coordinate currentPosition = new Coordinate(latitude, longitude, altitude);
+		
+		
+		Coordinate currentPosition = new Coordinate(latitude, longitude, 10);
+		LOGGER.info("Drone initialized at: "+ currentPosition.toString());
+		
+		
 		drone.setBaseCoordinates(currentPosition);
 		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		managedDrone.start();

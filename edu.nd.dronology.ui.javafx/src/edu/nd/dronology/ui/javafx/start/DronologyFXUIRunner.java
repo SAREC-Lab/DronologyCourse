@@ -69,11 +69,11 @@ public class DronologyFXUIRunner {
 				flightManagerService = (IFlightManagerRemoteService) provider.getRemoteManager()
 						.getService(IFlightManagerRemoteService.class);
 
-				flightManagerService.planFlight(flight.get(0), flight);
+				flightManagerService.planFlight("p1",flight.get(0), flight);
 				flight = guiProxyLoadOneFlight2();
-				flightManagerService.planFlight(flight.get(0), flight);
+				flightManagerService.planFlight("p2",flight.get(0), flight);
 				flight = guiProxyLoadOneFlight3();
-				flightManagerService.planFlight(flight.get(0), flight);
+				flightManagerService.planFlight("p3",flight.get(0), flight);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e);

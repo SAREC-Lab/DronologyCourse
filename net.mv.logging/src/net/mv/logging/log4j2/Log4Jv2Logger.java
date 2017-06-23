@@ -20,6 +20,11 @@ public class Log4Jv2Logger implements ILogger {
 	private org.apache.logging.log4j.Logger logger;
 	private Log4JLogForwarder throwAdapter;
 	private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAULT);
+	
+	
+	final Level HW_INFO = Level.forName("HW_INFO", 60);
+	final Level HW_FATAL = Level.forName("HW_FATAL", 30);
+
 
 	public Log4Jv2Logger(final Class<?> clazz) {
 		this(clazz.getName(), clazz);
@@ -122,6 +127,20 @@ public class Log4Jv2Logger implements ILogger {
 		throwAdapter.fatal(throwable);
 	}
 
+	@Override
+	public void hwInfo(final Object message) {
+		Object logMessage = message.toString();
+		log.logIfEnabled(throwingSource, HW_INFO, MARKER, logMessage, null);
+		//throwAdapter.fatal(message);
+	}
+	
+	@Override
+	public void hwFatal(final Object message) {
+		Object logMessage = message.toString();
+		log.logIfEnabled(throwingSource, HW_FATAL, MARKER, logMessage, null);
+		//throwAdapter.fatal(message);
+	}
+	
 
 	public void throwTrace(Throwable throwable) throws Throwable {
 		throwAdapter.throwTrace(throwable);

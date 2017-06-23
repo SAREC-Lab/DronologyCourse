@@ -45,7 +45,7 @@ public class FlightPlan implements IFlightPlan{
 	 *          Starting coordinates
 	 * @param wayPoints
 	 */
-	public FlightPlan(Coordinate start, List<Coordinate> wayPoints) {
+	public FlightPlan(String planName, Coordinate start, List<Coordinate> wayPoints) {
 		this.wayPoints = wayPoints;
 		this.startLocation = start;
 		if (wayPoints.size() > 0) {
@@ -53,7 +53,7 @@ public class FlightPlan implements IFlightPlan{
 		} else {
 			endLocation = startLocation;
 		}
-		this.flightID = "DF-" + Integer.toString(++flightNumber);
+		this.flightID = "DF-" + Integer.toString(++flightNumber)+ " - "+planName;
 		status = Status.PLANNED;
 	}
 

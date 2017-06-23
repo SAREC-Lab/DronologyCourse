@@ -13,8 +13,9 @@ import edu.nd.dronology.services.core.info.FlightInfo;
  */
 public interface IFlightManagerRemoteService extends IRemoteableService {
 
-	void planFlight(Coordinate coordinates, List<Coordinate> flight) throws RemoteException;
-
+	
 	public FlightInfo getFlightDetails() throws RemoteException;
+
+	void planFlight(String planName, Coordinate coordinates, List<Coordinate> flight) throws RemoteException;
 
 }

@@ -42,5 +42,9 @@ public interface ILogger {
 
 	void trace(Throwable throwable);
 
+	void hwInfo(Object message);
+
+	void hwFatal(Object message);
+
 
 }

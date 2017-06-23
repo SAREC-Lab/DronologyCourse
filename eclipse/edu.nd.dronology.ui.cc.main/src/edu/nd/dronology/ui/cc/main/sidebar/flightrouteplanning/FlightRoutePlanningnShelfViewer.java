@@ -178,7 +178,7 @@ public class FlightRoutePlanningnShelfViewer extends AbstractSidebarViewer<Fligh
 
 			List<Coordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
 			Coordinate initPoint = coordds.remove(0);
-			service.planFlight(initPoint, coordds);
+			service.planFlight(remoteItem.getName(),initPoint, coordds);
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

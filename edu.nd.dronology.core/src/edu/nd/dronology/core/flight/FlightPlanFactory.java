@@ -7,8 +7,8 @@ import edu.nd.dronology.core.util.Coordinate;
 
 public class FlightPlanFactory {
 
-	public static IFlightPlan create(Coordinate start, List<Coordinate> wayPoints) {
-		return new FlightPlan(start, wayPoints);
+	public static IFlightPlan create(String planName, Coordinate start, List<Coordinate> wayPoints) {
+		return new FlightPlan(planName,start, wayPoints);
 	}
 
 }

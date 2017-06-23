@@ -149,7 +149,7 @@ public class DroneSimulatorServiceInstance extends AbstractFileTransmitServiceIn
 
 			List<Coordinate> coordds = new ArrayList<>(info.getCoordinates());
 			Coordinate initPoint = coordds.remove(0);
-			FlightManagerService.getInstance().planFlight(initPoint, coordds);
+			FlightManagerService.getInstance().planFlight(info.getName(),initPoint, coordds);
 		}
 
 	}
