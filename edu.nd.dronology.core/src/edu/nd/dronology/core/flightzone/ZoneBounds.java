@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.flightzone;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 /**
  * Establishes geographical zone for the simulation Singleton
@@ -10,11 +10,11 @@ import edu.nd.dronology.core.util.Coordinate;
  * @version 0.1
  */
 public class ZoneBounds {
-	private long westLongitude = 0;
-	private long eastLongitude = 0;
-	private long northLatitude = 0;
-	private long southLatitude = 0;
-	private int maxAltitude = 0;
+	private double westLongitude = 0;
+	private double eastLongitude = 0;
+	private double northLatitude = 0;
+	private double southLatitude = 0;
+	private double maxAltitude = 0;
 
 	private static volatile ZoneBounds INSTANCE = null;
 
@@ -46,7 +46,7 @@ public class ZoneBounds {
 	 * @param eastLon
 	 * @param maxAlt
 	 */
-	public void setZoneBounds(long northLat, long westLon, long southLat, long eastLon, int maxAlt) {
+	public void setZoneBounds(double northLat, double westLon, double southLat, double eastLon, double maxAlt) {
 		westLongitude = westLon;
 		eastLongitude = eastLon;
 		northLatitude = northLat;
@@ -61,7 +61,7 @@ public class ZoneBounds {
 	 * @return
 	 * @throws FlightZoneException
 	 */
-	public boolean inBounds(Coordinate coords) throws FlightZoneException {
+	public boolean inBounds(LlaCoordinate coords) throws FlightZoneException {
 		if (westLongitude != 0 || eastLongitude != 0) { // Assume two longitude values must not both be zero if bounds are set.
 			// Check if in bounds
 			return true; // or false
@@ -74,7 +74,7 @@ public class ZoneBounds {
 	 * 
 	 * @return longitude degree
 	 */
-	public long getWestLongitude() {
+	public double getWestLongitude() {
 		return westLongitude;
 	}
 
@@ -83,7 +83,7 @@ public class ZoneBounds {
 	 * 
 	 * @return
 	 */
-	public long getEastLongitude() {
+	public double getEastLongitude() {
 		return eastLongitude;
 	}
 
@@ -92,7 +92,7 @@ public class ZoneBounds {
 	 * 
 	 * @return
 	 */
-	public long getNorthLatitude() {
+	public double getNorthLatitude() {
 		return northLatitude;
 	}
 
@@ -101,7 +101,7 @@ public class ZoneBounds {
 	 * 
 	 * @return southLatitude degree
 	 */
-	public long getSouthLatitude() {
+	public double getSouthLatitude() {
 		return southLatitude;
 	}
 
@@ -110,8 +110,8 @@ public class ZoneBounds {
 	 * 
 	 * @return Coordinates representing the top left position
 	 */
-	public Coordinate getTopLeft() {
-		return new Coordinate(northLatitude, westLongitude, maxAltitude);
+	public LlaCoordinate getTopLeft() {
+		return new LlaCoordinate(northLatitude, westLongitude, maxAltitude);
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class ZoneBounds {
 	 * 
 	 * @return distance in degrees of longitude (x axis)
 	 */
-	public long getXRange() {
+	public double getXRange() {
 		return Math.abs(eastLongitude - westLongitude);
 	}
 
@@ -128,7 +128,7 @@ public class ZoneBounds {
 	 * 
 	 * @return
 	 */
-	public long getYRange() {
+	public double getYRange() {
 		return Math.abs(northLatitude - southLatitude);
 	}
 

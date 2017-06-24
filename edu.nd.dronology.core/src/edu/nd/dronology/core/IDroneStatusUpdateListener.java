@@ -1,12 +1,12 @@
 package edu.nd.dronology.core;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 
 @Discuss(discuss="needs renaming to hardware status update listener...")
 public interface IDroneStatusUpdateListener {
 
-	void updateCoordinates(Coordinate location);
+	void updateCoordinates(LlaCoordinate location);
 
 	void updateDroneState(String status);
 

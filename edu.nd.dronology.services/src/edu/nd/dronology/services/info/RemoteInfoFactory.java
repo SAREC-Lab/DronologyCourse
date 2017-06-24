@@ -4,7 +4,8 @@ import java.util.List;
 
 import edu.nd.dronology.core.flight.Flights;
 import edu.nd.dronology.core.flight.IFlightPlan;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
 
@@ -42,8 +43,11 @@ public class RemoteInfoFactory {
 	private static FlightPlanInfo createPlanInfo(IFlightPlan flt) {
 		FlightPlanInfo flightPlanInfo = new FlightPlanInfo(flt.getFlightID(), flt.getFlightID());
 		String droneId = flt.getAssignedDrone() != null ? flt.getAssignedDrone().getDroneName() : "--";
-		List<Coordinate> waypoints = flt.getWayPoints();
-		Coordinate start = flt.getStartLocation();
+		
+	
+		
+		List<Waypoint> waypoints = flt.getWayPoints();
+		LlaCoordinate start = flt.getStartLocation();
 		long startTime = flt.getStartTime();
 		long endTime = flt.getEndTime();
 

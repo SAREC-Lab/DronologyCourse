@@ -2,7 +2,7 @@ package edu.nd.dronology.services.instances.flightmanager;
 
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.base.AbstractServerService;
 import edu.nd.dronology.services.core.info.FlightInfo;
 
@@ -30,7 +30,7 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 		return new FlightManagerServiceInstance();
 	}
 
-	public void planFlight(String planName, Coordinate coordinates, List<Coordinate> flight) {
+	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
 		serviceInstance.planFlight(planName,coordinates, flight);
 
 	}

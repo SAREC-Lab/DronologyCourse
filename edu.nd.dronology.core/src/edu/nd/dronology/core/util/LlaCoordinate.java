@@ -3,6 +3,8 @@
  */
 package edu.nd.dronology.core.util;
 
+import java.io.Serializable;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -11,37 +13,32 @@ import com.google.gson.annotations.SerializedName;
  * @author Michael Murphy
  *
  */
-public class LlaCoordinate {
-	
+public class LlaCoordinate implements Serializable {
+
+	private static final long serialVersionUID = 1261660925357051253L;
 	@SerializedName("x")
-	private double latitude;
+	private final double latitude;
 	@SerializedName("y")
-	private double longitude;
+	private final double longitude;
 	@SerializedName("z")
-	private double altitude;
+	private final double altitude;
 
 	/**
-	 * A terrestrial position defined by latitude, longitude, and altitude
-	 * (LLA).
+	 * A terrestrial position defined by latitude, longitude, and altitude (LLA).
 	 * 
 	 * @param latitude
-	 *            the angle north of the equator in degrees (negative angles
-	 *            define latitudes in the southern hemisphere). Must be a value
-	 *            within this interval: -90 <= latitude <= 90
+	 *          the angle north of the equator in degrees (negative angles define latitudes in the southern hemisphere). Must be a value within this interval: -90 <= latitude <= 90
 	 * @param longitude
-	 *            the angle east of the prime meridian in degrees (negative
-	 *            angles define longitudes in the western hemisphere). Must be a
-	 *            value within this interval: -180 < longitude <= 180
+	 *          the angle east of the prime meridian in degrees (negative angles define longitudes in the western hemisphere). Must be a value within this interval: -180 < longitude <= 180
 	 * @param altitude
-	 *            the distance above sea level in meters or more precisely the
-	 *            distance above the surface of the WGS-84 reference ellipsoid.
+	 *          the distance above sea level in meters or more precisely the distance above the surface of the WGS-84 reference ellipsoid.
 	 * @throws IllegalArgumentException
-	 *             when the latitude or longitude is outside the specified range
+	 *           when the latitude or longitude is outside the specified range
 	 */
 	public LlaCoordinate(double latitude, double longitude, double altitude) {
-		setLatitude(latitude);
-		setLongitude(longitude);
-		setAltitude(altitude);
+		this.latitude = checkLatitudeRange(latitude);
+		this.longitude = checkLongitudeRange(longitude);
+		this.altitude = checkAltitudeRange(altitude);
 	}
 
 	@Override
@@ -65,9 +62,7 @@ public class LlaCoordinate {
 	/**
 	 * The altitude
 	 * 
-	 * @return the distance above sea level or more precisely the distance above
-	 *         the surface of the WGS-84 reference ellipsoid. For this project
-	 *         we need this distance in meters
+	 * @return the distance above sea level or more precisely the distance above the surface of the WGS-84 reference ellipsoid. For this project we need this distance in meters
 	 */
 	public double getAltitude() {
 		return altitude;
@@ -81,8 +76,7 @@ public class LlaCoordinate {
 	/**
 	 * The latitude angle.
 	 * 
-	 * @return the angle north of the equator in degrees (negative angles define
-	 *         latitudes in the southern hemisphere).
+	 * @return the angle north of the equator in degrees (negative angles define latitudes in the southern hemisphere).
 	 */
 	public double getLatitude() {
 		return latitude;
@@ -91,8 +85,7 @@ public class LlaCoordinate {
 	/**
 	 * The longitude angle
 	 * 
-	 * @return the angle east of the prime meridian in degrees (negative angles
-	 *         define longitudes in the western hemisphere)
+	 * @return the angle east of the prime meridian in degrees (negative angles define longitudes in the western hemisphere)
 	 */
 	public double getLongitude() {
 		return longitude;
@@ -117,14 +110,10 @@ public class LlaCoordinate {
 	 */
 	public NVector toNVector() {
 		/*
-		 * The formula this code is based on can be found in a journal article
-		 * called: "A Non-singular Horizontal Position Representation" by
-		 * Kenneth Gade. You can find it at https://goo.gl/iCqdCn (see equation
-		 * 3 in 5.2.1.)
+		 * The formula this code is based on can be found in a journal article called: "A Non-singular Horizontal Position Representation" by Kenneth Gade. You can find it at https://goo.gl/iCqdCn (see
+		 * equation 3 in 5.2.1.)
 		 * 
-		 * Note: equation 3 is unconventional as it swaps the z component with x
-		 * component. This code follows the more common convention and returns z
-		 * and x to their proper place
+		 * Note: equation 3 is unconventional as it swaps the z component with x component. This code follows the more common convention and returns z and x to their proper place
 		 */
 		double lat = Math.toRadians(latitude);
 		double lon = Math.toRadians(longitude);
@@ -136,33 +125,32 @@ public class LlaCoordinate {
 	}
 
 	/**
-	 * @return a terrestrial position defined by an x, y, and z coordinate in an
-	 *         Earth centered Earth fixed reference frame.
+	 * @return a terrestrial position defined by an x, y, and z coordinate in an Earth centered Earth fixed reference frame.
 	 */
 	public PVector toPVector() {
 		return this.toNVector().toPVector();
 	}
 
-	private void setAltitude(double altitude) {
+	private double checkAltitudeRange(double altitude) {
 		// on wrong side of the earth...
 		// if (altitude < -6378137) {
 		// throw new IllegalArgumentException("Invalid altitude");
 		// }
-		this.altitude = altitude;
+		return altitude;
 	}
 
-	private void setLatitude(double latitude) {
+	private double checkLatitudeRange(double latitude) {
 		if (Math.abs(latitude) > 90) {
 			throw new IllegalArgumentException("Invalid latitude");
 		}
-		this.latitude = latitude;
+		return latitude;
 	}
 
-	private void setLongitude(double longitude) {
+	private double checkLongitudeRange(double longitude) {
 		if (longitude > 180 || longitude <= -180) {
 			throw new IllegalArgumentException("Invalid longitude");
 		}
-		this.longitude = longitude;
+		return longitude;
 	}
 
 }

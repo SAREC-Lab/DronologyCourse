@@ -1,9 +1,11 @@
 package edu.nd.dronology.core.vehicle.internal;
 
+import edu.nd.dronology.core.CoordinateChange;
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.CoordinateConverter;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
@@ -27,12 +29,12 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	private IDroneCommandHandler baseStation;
 	private String droneID;
-	private Coordinate currentTarget;
+	private LlaCoordinate currentTarget;
 
 	public PhysicalDrone(String drnName, IDroneCommandHandler baseStation) {
 		super(drnName);
 		this.baseStation = baseStation;
-		currentTarget = new Coordinate(0, 0, 0);
+		currentTarget = new LlaCoordinate(0, 0, 0);
 
 		// droneID = 0; // TODO: fix this to properly obtain a drone ID
 		// the drone ID is made available in the baseStation.getIncomingData()
@@ -52,22 +54,22 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	}
 
 	@Override
-	public long getLatitude() {
+	public double getLatitude() {
 		return getCoordinates().getLatitude();
 	}
 
 	@Override
-	public long getLongitude() {
+	public double getLongitude() {
 		return getCoordinates().getLongitude();
 	}
 
 	@Override
-	public int getAltitude() {
+	public double getAltitude() {
 		return getCoordinates().getAltitude();
 	}
 
 	@Override
-	public void flyTo(Coordinate targetCoordinates) {
+	public void flyTo(LlaCoordinate targetCoordinates) {
 		// if (targetCoordinates != currentTarget) { // TODO: add some time
 		// limit for refreshing the information in case it didn't properly get
 		// sent
@@ -91,7 +93,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	}
 
 	@Override
-	public Coordinate getCoordinates() {
+	public LlaCoordinate getCoordinates() {
 
 		// IDroneAttribute<Coordinate> location = baseStation.getAttribute(droneID, IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
 		// Coordinate coordinate = location.getValue();
@@ -111,7 +113,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	}
 
 	@Override
-	public void takeOff(int altitude) throws FlightZoneException {
+	public void takeOff(double altitude) throws FlightZoneException {
 		// HashMap<String, Object> tempData = new HashMap<String, Object>();
 		// tempData.put("altitude", altitude);
 		// baseStation.sendCommand(droneID, "takeoff", tempData);
@@ -140,7 +142,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	}
 
 	@Override
-	public boolean move(int i) {
+	public boolean move(double i) {
 		// update data from the server
 		// TODO: this might not necessarily be the best place to update this
 		// baseStation.getIncomingData();
@@ -156,15 +158,23 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	}
 
 	@Override
+	@CoordinateChange
 	public boolean isDestinationReached(int i) {
 		int horizThreshold = 50;
 		int vertThreshold = 2;
 		// Coordinates currentPos =
 		// baseStation.getDroneState(droneID).getLocation();
-		Coordinate currentPos = getCoordinates();
-		float dx = currentTarget.getLatitude() - currentPos.getLatitude();
-		float dy = currentTarget.getLongitude() - currentPos.getLongitude();
-		int dz = currentTarget.getAltitude() - currentPos.getAltitude();
+		LlaCoordinate currentPos = getCoordinates();
+		// float dx = currentTarget.getLatitude() - currentPos.getLatitude();
+		// float dy = currentTarget.getLongitude() - currentPos.getLongitude();
+		// int dz = currentTarget.getAltitude() - currentPos.getAltitude();
+
+		float dx = CoordinateConverter.floatToCoordLong(currentTarget.getLatitude())
+				- CoordinateConverter.floatToCoordLong(currentPos.getLatitude());
+		float dy = CoordinateConverter.floatToCoordLong(currentTarget.getLongitude())
+				- CoordinateConverter.floatToCoordLong(currentPos.getLongitude());
+		int dz = new Double(currentTarget.getAltitude() - currentPos.getAltitude()).intValue();
+
 		if (dx < 0) {
 			dx = -1 * dx;
 		}
@@ -188,7 +198,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	}
 
 	@Override
-	public void updateCoordinates(Coordinate location) {
+	public void updateCoordinates(LlaCoordinate location) {
 		// LOGGER.info("Coordinates updated");
 
 		super.setCoordinates(location.getLatitude(), location.getLongitude(), location.getAltitude());

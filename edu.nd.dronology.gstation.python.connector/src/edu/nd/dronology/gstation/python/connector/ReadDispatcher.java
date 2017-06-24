@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.MalformedJsonException;
 
 import edu.nd.dronology.core.util.FormatUtil;
 import net.mv.logging.ILogger;
@@ -45,10 +46,15 @@ public class ReadDispatcher implements Runnable {
 				String line = reader.readLine();
 				line = reader.readLine();
 				if (line != null) {
-					//TODO: create the timestamp before deserializing the object....
-					UAVMessage message = GSON.fromJson(line, UAVMessage.class);
-					message.timestamp();
-					processMessage(message);
+					// TODO: create the timestamp before deserializing the object....
+					try {
+						UAVMessage message = GSON.fromJson(line, UAVMessage.class);
+						message.timestamp();
+						processMessage(message);
+					} catch (Exception ex) {
+						LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
+					}
+
 				} else {
 					LOGGER.hwFatal("null message received!");
 				}

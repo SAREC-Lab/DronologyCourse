@@ -1,9 +1,8 @@
 package edu.nd.dronology.core.vehicle;
 
-import edu.nd.dronology.core.fleet.PhysicalDroneFleetFactory;
 import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -19,9 +18,8 @@ public abstract class AbstractDrone implements IDrone {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(AbstractDrone.class);
 
-	
-	private Coordinate basePosition; // In current version drones always return to base at the end of their flights.
-	protected Coordinate currentPosition;
+	private LlaCoordinate basePosition; // In current version drones always return to base at the end of their flights.
+	protected LlaCoordinate currentPosition;
 	protected final String droneName;
 	protected DroneStatus droneStatus; // PHY
 
@@ -34,28 +32,35 @@ public abstract class AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public void setCoordinates(long lat, long lon, int alt) { // For physical drone this must be set by reading position
-		currentPosition = new Coordinate(lat, lon, alt);
+	public void setCoordinates(double lat, double lon, double alt) { // For physical drone this must be set by reading position
+		currentPosition = new LlaCoordinate(lat, lon, alt);
 		droneStatus.updateCoordinates(lat, lon, alt);
 	}
 
 	@Override
-	public long getLatitude() {
+	public void setCoordinates(LlaCoordinate coordinate) { // For physical drone this must be set by reading position
+		currentPosition = coordinate;
+		droneStatus.updateCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(),
+				currentPosition.getAltitude());
+	}
+
+	@Override
+	public double getLatitude() {
 		return currentPosition.getLatitude();
 	}
 
 	@Override
-	public long getLongitude() {
+	public double getLongitude() {
 		return currentPosition.getLongitude();
 	}
 
 	@Override
-	public int getAltitude() {
+	public double getAltitude() {
 		return currentPosition.getAltitude();
 	}
 
 	@Override
-	public Coordinate getCoordinates() {
+	public LlaCoordinate getCoordinates() {
 		return currentPosition;
 	}
 
@@ -75,11 +80,11 @@ public abstract class AbstractDrone implements IDrone {
 	 * @param basePosition
 	 */
 	@Override
-	public void setBaseCoordinates(Coordinate basePosition) {
-		
-		this.basePosition = new Coordinate(basePosition.getLatitude(), basePosition.getLongitude(),
+	public void setBaseCoordinates(LlaCoordinate basePosition) {
+
+		this.basePosition = new LlaCoordinate(basePosition.getLatitude(), basePosition.getLongitude(),
 				basePosition.getAltitude());
-		LOGGER.info("Base Coordinate of Drone '"+droneName+" set to '"+ basePosition.toString());
+		LOGGER.info("Base Coordinate of Drone '" + droneName + " set to '" + basePosition.toString());
 	}
 
 	/**
@@ -88,13 +93,13 @@ public abstract class AbstractDrone implements IDrone {
 	 * @return base coordinates
 	 */
 	@Override
-	public Coordinate getBaseCoordinates() {
+	public LlaCoordinate getBaseCoordinates() {
 		return basePosition;
 	}
 
 	public void setVelocity(double velocity) {
 		droneStatus.setVelocity(velocity);
-		
+
 	}
 
 }

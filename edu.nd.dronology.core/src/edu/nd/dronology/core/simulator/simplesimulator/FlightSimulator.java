@@ -1,6 +1,8 @@
 package edu.nd.dronology.core.simulator.simplesimulator;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.air_traffic_control.DistanceUtil;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -10,24 +12,28 @@ import net.mv.logging.LoggerProvider;
  * @author Jane Cleland-Huang
  * @version 0.1
  */
-public class FlightSimulator  {
+public class FlightSimulator {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightSimulator.class);
 
-	private Coordinate currentPosition;
-	private Coordinate targetPosition;
-	private double theta;
+	private LlaCoordinate currentPosition;
+	private LlaCoordinate targetPosition;
+	// private double theta;
 	private Long previousDistance = 0L;
 
-	//private VirtualDrone drone;
+	private boolean reached = false;
+
+	private VirtualDrone drone;
+
+	// private VirtualDrone drone;
 
 	/**
 	 * Creates a flight simulator object for a single virtual drone
 	 * 
 	 * @param drone
 	 */
-	protected FlightSimulator() {
-	//	this.drone = drone;
+	protected FlightSimulator(VirtualDrone drone) {
+		this.drone = drone;
 	}
 
 	/**
@@ -38,8 +44,13 @@ public class FlightSimulator  {
 	 * @param targetPos
 	 *          Coordinates of target position
 	 */
-	public void setFlightPath(Coordinate currentPos, Coordinate targetPos) {
-		this.currentPosition = currentPos;
+	public void setFlightPath(LlaCoordinate currentPos, LlaCoordinate targetPos) {
+		if (currentPosition == null || reached) {
+
+			this.currentPosition = currentPos;
+			reached = false;
+		}
+
 		this.targetPosition = targetPos;
 		previousDistance = getRemainingDistance();
 	}
@@ -58,8 +69,8 @@ public class FlightSimulator  {
 	 * 
 	 * @return
 	 */
-	private long computeLatitudeDelta() {
-		return currentPosition.getLatitude() - targetPosition.getLatitude();
+	private double computeLatitudeDelta() {
+		return (currentPosition.getLatitude() - targetPosition.getLatitude()) * 1000000;
 	}
 
 	/**
@@ -67,19 +78,22 @@ public class FlightSimulator  {
 	 * 
 	 * @return
 	 */
-	private long computeLongitudeDelta() {
-		return currentPosition.getLongitude() - targetPosition.getLongitude();
+	private double computeLongitudeDelta() {
+		return (currentPosition.getLongitude() - targetPosition.getLongitude()) * 1000000;
 	}
 
 	/**
 	 * Computes the angle at which a drone is flying with respect to the vertical
+	 * 
+	 * @return
 	 */
-	private void computeAngle() {
+	private double computeAngle() {
 		double height = computeLatitudeDelta(); // opposite
 		// double width = (computeLongitudeDelta());
 		double hypotenuse = getRemainingDistance();
 		double sinTheta = height / hypotenuse;
-		theta = Math.asin(sinTheta) * 180 / Math.PI;
+		double angle = Math.asin(sinTheta) * 180 / Math.PI;
+		return Double.isNaN(angle) ? 1 : angle;
 	}
 
 	/**
@@ -89,35 +103,59 @@ public class FlightSimulator  {
 	 *          : Distance in degree points to move per iteration
 	 * @return isStillMoving?
 	 */
-	public boolean move(long step) {
-		// First determine which relative quadrant the target is in -- in relation to current position at the origin of X,Y axes
+	public boolean move(double step) {
+		try {
+			// First determine which relative quadrant the target is in -- in relation to current position at the origin of X,Y axes
 
-		computeAngle();
-		long heightIncrement = Math.abs((long) (Math.sin(theta) * step));
-		long widthIncrement = Math.abs((long) (Math.cos(theta) * step));
+			double theta = computeAngle();
+			double heightIncrement = Math.abs((long) (Math.sin(theta) * step));
+			double widthIncrement = Math.abs((long) (Math.cos(theta) * step));
 
-		// Latitude delta
-		if (currentPosition.getLatitude() < targetPosition.getLatitude()) {
-			currentPosition.setLatitude(currentPosition.getLatitude() + heightIncrement); // Drone is south of Target
-		} else {
-			currentPosition.setLatitude(currentPosition.getLatitude() - heightIncrement); // Drone is North (or same) as target
-		}
-		// Longitude delta
-		if (currentPosition.getLongitude() < targetPosition.getLongitude()) {
-			currentPosition.setLongitude(currentPosition.getLongitude() + widthIncrement); // Drone is to the left/west of target
-		} else {
-			currentPosition.setLongitude(currentPosition.getLongitude() - widthIncrement); // Drone is to the right/east of target
-		}
-		// double distanceMoved = Math.sqrt(Math.pow(heightIncrement,2)+Math.pow(widthIncrement,2));
+			double scaleFactor = 0.1;
 
-		if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200) {
-			previousDistance = getRemainingDistance();
-			//LOGGER.info(drone.getDroneName() + " ==> Waypoint reached");
-			return false;
-		} else {
-			previousDistance = getRemainingDistance();
-			return true;
+			widthIncrement *= scaleFactor;
+			heightIncrement *= scaleFactor;
+			double newLongit = 0;
+			double newLatid = 0;
+
+			// Latitude delta
+			if (currentPosition.getLatitude() < targetPosition.getLatitude()) {
+				// currentPosition.setLatitude(currentPosition.getLatitude() + heightIncrement); // Drone is south of Target
+				newLatid = (currentPosition.getLatitude() * 1000000) + heightIncrement;
+			} else {
+				// currentPosition.setLatitude(currentPosition.getLatitude() - heightIncrement); // Drone is North (or same) as target
+				newLatid = (currentPosition.getLatitude() * 1000000) - heightIncrement;
+			}
+			// Longitude delta
+			if (currentPosition.getLongitude() < targetPosition.getLongitude()) {
+				// currentPosition.setLongitude(currentPosition.getLongitude() + widthIncrement); // Drone is to the left/west of target
+				newLongit = (currentPosition.getLongitude() * 1000000) + widthIncrement;
+			} else {
+				// currentPosition.setLongitude(currentPosition.getLongitude() - widthIncrement); // Drone is to the right/east of target
+				newLongit = (currentPosition.getLongitude() * 1000000) - widthIncrement;
+			}
+			// double distanceMoved = Math.sqrt(Math.pow(heightIncrement,2)+Math.pow(widthIncrement,2));
+
+			newLatid = newLatid / 1000000;
+			newLongit = newLongit / 1000000;
+
+			currentPosition = new LlaCoordinate(newLatid, newLongit, currentPosition.getAltitude());
+			LOGGER.trace("Remaining Dinstance: " + DistanceUtil.distance(currentPosition, targetPosition));
+			// if (previousDistance <= getRemainingDistance() && getRemainingDistance() < 200) {
+			drone.setCoordinates(currentPosition);
+			if (DistanceUtil.distance(currentPosition, targetPosition) < 2) {
+				previousDistance = getRemainingDistance();
+				// LOGGER.info(drone.getDroneName() + " ==> Waypoint reached");
+				reached = true;
+				return false;
+			} else {
+				previousDistance = getRemainingDistance();
+				return true;
+			}
+		} catch (Exception e) {
+			LOGGER.error(e);
 		}
+		return false;
 
 	}
 
@@ -128,9 +166,9 @@ public class FlightSimulator  {
 	 *          Checks location with respect to target position.
 	 * @return true if target position is reached.
 	 */
-	public boolean isDestinationReached(long distanceMovedPerTimeStep) {
-		long latDistance = Math.abs(currentPosition.getLatitude() - targetPosition.getLatitude());
-		long lonDistance = Math.abs(currentPosition.getLongitude() - targetPosition.getLongitude());
+	public boolean isDestinationReached(double distanceMovedPerTimeStep) {
+		double latDistance = Math.abs(currentPosition.getLatitude() - targetPosition.getLatitude());
+		double lonDistance = Math.abs(currentPosition.getLongitude() - targetPosition.getLongitude());
 		return lonDistance <= distanceMovedPerTimeStep && latDistance <= distanceMovedPerTimeStep;
 	}
 

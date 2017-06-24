@@ -1,13 +1,14 @@
 package edu.nd.dronology.core.vehicle.commands;
 
-import edu.nd.dronology.core.util.Coordinate;
-
+import edu.nd.dronology.core.CoordinateChange;
+import edu.nd.dronology.core.util.LlaCoordinate;
+@CoordinateChange
 public class GoToCommand extends AbstractDroneCommand implements IDroneCommand {
 
-	public GoToCommand(String droneId, Coordinate coord) {
+	public GoToCommand(String droneId, LlaCoordinate coord) {
 		super(droneId, CommandIds.GOTO_LOCATION_COMMAND);
-		innerdata.put("x", coordLongToFloat(coord.getLatitude()));
-		innerdata.put("y", coordLongToFloat(coord.getLongitude()));
+		innerdata.put("x", coord.getLatitude());
+		innerdata.put("y", coord.getLongitude());
 		innerdata.put("z", coord.getAltitude());
 	}
 

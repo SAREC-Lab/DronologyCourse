@@ -4,9 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.nd.dronology.core.flight.internal.SoloDirector;
-import edu.nd.dronology.core.util.Coordinate;
-import edu.nd.dronology.core.vehicle.ManagedDrone;
-import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 
 public class TestSoloDirector {
 
@@ -28,7 +27,7 @@ public class TestSoloDirector {
 	 */
 	@Test(expected = Exception.class)
 	public void testReturnHomeWithWrongCoordinates() {
-		testInstance.returnHome(new Coordinate(1, 2, 3));
+		testInstance.returnHome(new Waypoint(new LlaCoordinate(1, 2, 3)));
 
 	}
 
