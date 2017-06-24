@@ -12,13 +12,14 @@ import net.mv.logging.ILogger;
 public class Log4JLogForwarder implements ILogger {
 
 	private final ILogger otherLogger;
-private Log4jv2RootLogger rootLogger =  Log4jv2RootLogger.getInstance();
+	private Log4jv2RootLogger rootLogger = Log4jv2RootLogger.getInstance();
 	/**
 	 * 
 	 * @param otherLogger
 	 *          The logger to forward the logs before throwing.
 	 */
-private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAULT);
+	private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAULT);
+
 	public Log4JLogForwarder(final ILogger otherLogger) {
 		if (otherLogger == null) {
 			throw new IllegalArgumentException("otherLogger must not be null!");
@@ -158,111 +159,116 @@ private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAUL
 	@Override
 	public void debug(Object message) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void debug(Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void debug(Object message, Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void info( Object message) {
+	public void info(Object message) {
 		rootLogger.info(message);
-		
-	//	log(throwingSource,Level.INFO, MARKER, message, null);
+
+		// log(throwingSource,Level.INFO, MARKER, message, null);
 	}
 
 	@Override
 	public void info(Throwable throwable) {
 		rootLogger.info(throwable);
-		
+
 	}
 
 	@Override
 	public void info(Object message, Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void warn(Object message) {
 		rootLogger.warn(message);
-		
+
 	}
 
 	@Override
 	public void warn(Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void warn(Object message, Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void error(Object message) {
 		rootLogger.error(message);
-		
+
 	}
 
 	@Override
 	public void error(Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void error(Object message, Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void fatal(Object message) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void fatal(Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void fatal(Object message, Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void trace(Throwable throwable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void hwInfo(Object message) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void hwFatal(Object message) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
+	public void trace(Object message) {
+		// TODO Auto-generated method stub
+
+	}
 
 }
