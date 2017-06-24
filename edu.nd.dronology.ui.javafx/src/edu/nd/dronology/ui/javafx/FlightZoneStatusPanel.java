@@ -66,8 +66,8 @@ public class FlightZoneStatusPanel {
 				writeText(10, true, flightPlan.getFlightID(), 5, rowCtr += 15);
 				if (flightPlan.getAssignedDrone() != null && flightPlan.getAssignedDrone().getDroneName() != null)
 					writeText(10, false, "Assigned to Drone: " + (flightPlan.getAssignedDrone()).getDroneName(), 5, rowCtr += 15);
-				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).getShortString(), 5, rowCtr += 15);
-				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).getShortString(), 5, rowCtr += 15);
+				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).toString(), 5, rowCtr += 15);
+				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).toString(), 5, rowCtr += 15);
 				writeText(10, false, "Remaining Waypoints: " + flightPlan.getNumberWayPoints(), 5, rowCtr += 15);
 				int volts = ((int) (flightPlan.getAssignedDrone().getBatteryStatus() * 100));
 				double dVolts = ((double) volts) / 100;
@@ -92,8 +92,8 @@ public class FlightZoneStatusPanel {
 				if (flightPlan.getAssignedDrone() != null && flightPlan.getAssignedDrone().getDroneName() != null)
 					writeText(10, false, "Awaiting permission to take off", 5, rowCtr += 15);
 				writeText(10, false, "Assigned to Drone: " + (flightPlan.getAssignedDrone()).getDroneName(), 5, rowCtr += 15);
-				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).getShortString(), 5, rowCtr += 15);
-				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).getShortString(), 5, rowCtr += 15);
+				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).toString(), 5, rowCtr += 15);
+				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).toString(), 5, rowCtr += 15);
 				writeText(10, false, "Remaining Waypoints: " + flightPlan.getNumberWayPoints(), 5, rowCtr += 15);
 				if (flightPlan.getStartTime() != -1) {
 					writeText(10, false, "Started at: " + df.format(flightPlan.getStartTime()), 5, rowCtr += 15);
@@ -123,8 +123,8 @@ public class FlightZoneStatusPanel {
 			try {
 				flightPlan = itr.next();
 				writeText(10, true, flightPlan.getFlightID(), 5, rowCtr += 15);
-				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).getShortString(), 5, rowCtr += 15);
-				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).getShortString(), 5, rowCtr += 15);
+				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).toString(), 5, rowCtr += 15);
+				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).toString(), 5, rowCtr += 15);
 				rowCtr += 10;
 			} catch (Exception e)// Exception is generic
 			{
@@ -150,8 +150,8 @@ public class FlightZoneStatusPanel {
 			try {
 				flightPlan = itr.next();
 				writeText(10, true, flightPlan.getFlightID(), 5, rowCtr += 15);
-				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).getShortString(), 5, rowCtr += 15);
-				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).getShortString(), 5, rowCtr += 15);
+				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).toString(), 5, rowCtr += 15);
+				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).toString(), 5, rowCtr += 15);
 				if (flightPlan.getEndTime() != -1)
 					writeText(10, false, "Completed at: " + df.format(flightPlan.getEndTime()), 5, rowCtr += 15);
 				rowCtr += 10;

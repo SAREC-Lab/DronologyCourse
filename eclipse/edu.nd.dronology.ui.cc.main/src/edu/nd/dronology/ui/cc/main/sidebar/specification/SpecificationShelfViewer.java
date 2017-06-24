@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
 import edu.nd.dronology.services.core.info.RemoteInfoObject;
@@ -179,7 +179,7 @@ public class SpecificationShelfViewer extends AbstractSidebarViewer<TypeSpecific
 					.getService(IDroneSetupRemoteService.class);
 
 			DroneInitializationInfo item = new DroneInitializationInfo(remoteItem.getName(), remoteItem.getName(),
-					new Coordinate(41760000, -86222901, 0));
+					new LlaCoordinate(41.760000, -86.222901, 0));
 			// "41760000", "-86222901", "0"
 			setupService.initializeDrones(item);
 		} catch (RemoteException | DronologyServiceException e) {

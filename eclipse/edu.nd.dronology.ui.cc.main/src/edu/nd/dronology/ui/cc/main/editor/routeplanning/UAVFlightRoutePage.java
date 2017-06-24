@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.ui.cc.images.ImageProvider;
 import edu.nd.dronology.ui.cc.images.StyleProvider;
@@ -26,8 +26,12 @@ import edu.nd.dronology.ui.cc.main.editor.base.AbstractUAVEditorPage;
 import edu.nd.dronology.ui.cc.main.editor.base.IUAVEditorPage;
 import edu.nd.dronology.ui.cc.util.controls.ControlCreationHelper;
 import edu.nd.dronology.ui.cc.util.managedcontrol.ManagedText;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> implements IUAVEditorPage<IFlightRoute> {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(UAVFlightRoutePage.class);
 
 	private ManagedText txtDesc;
 	private TableViewer coordinates;
@@ -85,7 +89,7 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				editor.getItem().addCoordinate(new Coordinate(0, 0, 0));
+				editor.getItem().addCoordinate(new LlaCoordinate(0, 0, 0));
 				coordinates.refresh();
 			}
 
@@ -96,13 +100,11 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				StructuredSelection sel = (StructuredSelection) coordinates.getSelection();
-				editor.getItem().removeCoordinate((Coordinate) sel.getFirstElement());
+				editor.getItem().removeCoordinate((LlaCoordinate) sel.getFirstElement());
 				coordinates.refresh();
 			}
 
 		});
-
-	
 
 		coordinates = new TableViewer(coordinateContainer, SWT.BORDER | SWT.FULL_SELECTION);
 		GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(coordinates.getTable());
@@ -143,7 +145,6 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 				removeCoordinate.setEnabled(coordinates.getTable().getSelectionIndex() != 0);
 			}
 		});
-		
 
 	}
 
@@ -156,7 +157,6 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 		return editor;
 	}
 
-
 	@Override
 	public void layout() {
 		container.layout();
@@ -166,6 +166,38 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 	@Override
 	public void refresh() {
 		coordinates.refresh();
+
+	}
+
+	public void setNewLatitude(LlaCoordinate oldCoordinate, Double i) {
+		int index = editor.getItem().removeCoordinate(oldCoordinate);
+		if (index != -1) {
+			LlaCoordinate newCoordinate = new LlaCoordinate(i, oldCoordinate.getLongitude(), oldCoordinate.getAltitude());
+			getEditor().getItem().addCoordinate(newCoordinate, index);
+		} else {
+			LOGGER.error("That should really not happen...");
+		}
+	}
+
+	public void setNewLongitude(LlaCoordinate oldCoordinate, Double i) {
+		int index = editor.getItem().removeCoordinate(oldCoordinate);
+		if (index != -1) {
+			LlaCoordinate newCoordinate = new LlaCoordinate(oldCoordinate.getLatitude(), i, oldCoordinate.getAltitude());
+			getEditor().getItem().addCoordinate(newCoordinate, index);
+		} else {
+			LOGGER.error("That should really not happen...");
+		}
+
+	}
+
+	public void setNewAltitude(LlaCoordinate oldCoordinate, Double i) {
+		int index = editor.getItem().removeCoordinate(oldCoordinate);
+		if (index != -1) {
+			LlaCoordinate newCoordinate = new LlaCoordinate(oldCoordinate.getLatitude(), oldCoordinate.getLongitude(), i);
+			getEditor().getItem().addCoordinate(newCoordinate, index);
+		} else {
+			LOGGER.error("That should really not happen...");
+		}
 
 	}
 
