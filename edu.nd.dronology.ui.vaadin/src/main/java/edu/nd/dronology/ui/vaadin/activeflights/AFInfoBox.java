@@ -1,6 +1,9 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.io.File;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.vaadin.teemu.switchui.Switch;
 
@@ -21,8 +24,13 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
+import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
  * 
@@ -32,6 +40,7 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 
 public class AFInfoBox extends CustomComponent{
 	private static final long serialVersionUID = -8541147696474050819L;
+	private BaseServiceProvider provider = MyUI.getProvider();
 	private boolean visible = false;
 	private boolean isChecked;
 	private String name;
@@ -195,6 +204,8 @@ public class AFInfoBox extends CustomComponent{
 				
 				yes.addClickListener( subEvent -> {
 					//TODO: assign the route to the drone
+					//Currently assigns the route without taking which drone into consideration
+					activate(selectedFlight);
 					UI.getCurrent().removeWindow(confirm);
 					UI.getCurrent().removeWindow(window);
 				});
@@ -361,4 +372,16 @@ public class AFInfoBox extends CustomComponent{
 		return this.visible;
 	}
 	
+	private void activate(FlightRouteInfo remoteItem) {
+		IFlightManagerRemoteService service;
+		try {
+			service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+			List<Coordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
+			Coordinate initPoint = coordds.remove(0);
+			service.planFlight(initPoint, coordds);
+		} catch (RemoteException | DronologyServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
