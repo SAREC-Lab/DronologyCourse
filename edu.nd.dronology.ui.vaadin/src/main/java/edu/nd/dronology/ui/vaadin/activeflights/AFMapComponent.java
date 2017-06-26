@@ -171,7 +171,7 @@ public class AFMapComponent extends CustomComponent {
 			LMarker marker = new LMarker(e.getValue().getLatitude()*.000001, e.getValue().getLongitude()*.000001);
 			marker.setId(e.getValue().getID());
 			marker.setIcon(drone_icon);
-			marker.setIconSize(new Point(30, 30));
+			marker.setIconSize(new Point(77, 33));
 			markers.add(marker);
 			leafletMap.addComponent(marker);
 		}
@@ -205,7 +205,7 @@ public class AFMapComponent extends CustomComponent {
 								LMarker newMarker = new LMarker(e1.getValue().getLatitude()*.000001, e1.getValue().getLongitude()*.000001);
 								newMarker.setId(e1.getValue().getID());
 								newMarker.setIcon(drone_icon);
-								newMarker.setIconSize(new Point(30, 30));
+								newMarker.setIconSize(new Point(77, 33));
 								markers.add(newMarker);
 								leafletMap.addComponent(newMarker);
 							}
