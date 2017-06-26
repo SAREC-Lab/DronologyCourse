@@ -15,11 +15,13 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 
 /**
@@ -165,8 +167,37 @@ public class AFInfoBox extends CustomComponent{
 			cancel.addClickListener( event -> {
 				UI.getCurrent().removeWindow(window);
 			});
-			frLayout.getControls().getInfoPanel().addListener(  ClickListener -> {
-				apply.setEnabled(true);
+			window.addClickListener( event -> {
+				if (frLayout.getControls().getInfoPanel().getIsRouteSelected())
+					apply.setEnabled(true);
+				else
+					apply.setEnabled(false);
+			});
+			apply.addClickListener( event -> {
+				Window confirm = new Window("Confirm");
+				VerticalLayout subContent = new VerticalLayout();
+				HorizontalLayout subButtons = new HorizontalLayout();
+				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
+				String routeName = selectedFlight.getName();
+				Label label = new Label("Are you sure you want " + this.name + " to follow the route " + routeName + "?");
+				Button yes = new Button("Yes");
+				Button no = new Button ("No");
+				subButtons.addComponents(yes, no);
+				subContent.addComponents(label, subButtons);
+				confirm.setContent(subContent);
+				confirm.setModal(true);
+				confirm.center();
+				UI.getCurrent().addWindow(confirm);
+				
+				no.addClickListener( subEvent -> {
+					UI.getCurrent().removeWindow(confirm);
+				});
+				
+				yes.addClickListener( subEvent -> {
+					//TODO: assign the route to the drone
+					UI.getCurrent().removeWindow(confirm);
+					UI.getCurrent().removeWindow(window);
+				});
 			});
 			buttons.addComponents(cancel, apply);
 			content.addComponents(frLayout, buttons);
@@ -302,10 +333,10 @@ public class AFInfoBox extends CustomComponent{
 		hoverSwitch.setValue(this.hoverInPlace);
 		if (this.hoverInPlace){
 			this.status = "Hovering";
-			statusInfo2.setValue("Status: " + status);
+			statusInfo2.setValue("Status: " );
 		} else {
-			this.status = "Enroute";
-			statusInfo2.setValue("Status: " + status);
+			this.status = "";
+			statusInfo2.setValue("Status: ");
 		}
 	}
 	
