@@ -36,4 +36,9 @@ public class FRTableDisplay {
 		});
 		grid.asSingleSelect();
 	}
+	
+	public void makeUneditable(MapMarkerUtilities mapMarkers) {
+		grid.getEditor().cancel();
+		grid.getEditor().setEnabled(false);
+	}
 }

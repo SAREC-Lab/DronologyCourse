@@ -6,13 +6,20 @@ import java.util.UUID;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
+import org.vaadin.addon.leaflet.LMarker.DragEndEvent;
+import org.vaadin.addon.leaflet.LMarker.DragEndListener;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
+import com.vaadin.shared.Registration;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Window;
+
+import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 
 /**
  * This is the class that contains all logic for plotting flight routes.
@@ -27,8 +34,10 @@ public class MapMarkerUtilities {
 		public void onClick(LeafletClickEvent event) {
 			LMarker leafletMarker = (LMarker)event.getSource();
 	    	for (int i = 0; i < mapPoints.size(); i++) {
-	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
+	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
 	    			mapPoints.remove(mapPoints.get(i));
+	    			pins.remove(pins.get(i));
+	    		}
 	    	}
 
 	    	map.removeComponent(leafletMarker);
@@ -37,17 +46,55 @@ public class MapMarkerUtilities {
 	    	grid.setItems(mapPoints);
 		}		
 	}
+	private class MarkerDragEndListener implements DragEndListener {
+
+		@Override
+		public void dragEnd(DragEndEvent event) {
+			LMarker leafletMarker = (LMarker)event.getSource();
+	    	int index = -1;
+	    	for (int i = 0; i < mapPoints.size(); i++) {
+	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
+	  				index = i;
+	    	}
+	    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
+	    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
+	    	removeAllLines(polylines);
+	    	polylines = drawLines(mapPoints);
+	    	grid.setItems(mapPoints);
+		}
+		
+	}
+	private class PolylineClickListener implements LeafletClickListener{
+
+		@Override
+		public void onClick(LeafletClickEvent event) {
+			LPolyline polyline = (LPolyline)event.getSource();
+			lineClicked = true;
+			for (int j = 0; j < polylines.size(); j++) {
+				if (polylines.get(j).getId().equals(polyline.getId())) {
+					lineIndex = j+1;
+				}
+			}
+			removeAllLines(polylines);
+		}
+	}
 	private LMap map;
+	private FRTableDisplay tableDisplay;
 	private Grid<WayPoint> grid;
+	private Window popup;
 	private ArrayList<WayPoint> mapPoints = new ArrayList<>();
 	private ArrayList<LPolyline> polylines = new ArrayList<>();
 	private ArrayList<LMarker> pins = new ArrayList<>();
+	private ArrayList<Registration> registeredListeners = new ArrayList<>();
 	private boolean lineClicked = false;
 	private int lineIndex = -1;
+	private boolean isEditable = false;
 	
-	public MapMarkerUtilities(LMap map, Grid<WayPoint> grid) {
+	public MapMarkerUtilities(LMap map, FRTableDisplay tableDisplay, Window popup) {
 		this.map = map;
-		this.grid = grid;
+		this.tableDisplay = tableDisplay;
+		this.grid = tableDisplay.getGrid();
+		this.popup = popup;
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
@@ -59,17 +106,26 @@ public class MapMarkerUtilities {
 	public WayPoint addNewPin(Point point, boolean lineClicked) {
 		WayPoint p = new WayPoint(point);
 		p.setId(UUID.randomUUID().toString());
+		
+		if (mapPoints.size() == 0) {
+			Notification.show("mapPoints starts out empty.");
+		}
+		
 		addPinForWayPoint(p);
 		
 		if (!lineClicked) {
 			mapPoints.add(p);
-		} else {
+		} 
+		else {
 			mapPoints.add(lineIndex, p);
 		}
 		
 		removeAllLines(polylines);
 		polylines = drawLines(mapPoints);
 		grid.setItems(mapPoints);
+		if (mapPoints.size() == 0) {
+			Notification.show("mapPoints is empty.");
+		}
 		
 		return p;
 	}
@@ -94,25 +150,17 @@ public class MapMarkerUtilities {
 		leafletMarker.setId(wayPoint.getId());
 		pins.add(leafletMarker);
 		
-    leafletMarker.addClickListener(new MarkerClickListener());
+		if (isEditable) {
+			leafletMarker.addClickListener(new MarkerClickListener());
     
-    /**
-     * Drag End Listener is a listener that updates the path if a waypoint is moved.
-     * The leafletMarker description is used to keep track of the previous point.
-     * @author Patrick Falvey
-     */
-    leafletMarker.addDragEndListener(event-> {
-    	int index = -1;
-    	for (int i = 0; i < mapPoints.size(); i++) {
-    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
-  				index = i;
-    	}
-    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
-    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
-    	removeAllLines(polylines);
-    	polylines = drawLines(mapPoints);
-    	grid.setItems(mapPoints);
-    });
+			/**
+			 * Drag End Listener is a listener that updates the path if a waypoint is moved.
+			 * The leafletMarker description is used to keep track of the previous point.
+			 * @author Patrick Falvey
+			 */
+			
+			leafletMarker.addDragEndListener(new MarkerDragEndListener());
+		}
 
 		map.addComponent(leafletMarker);
 	}
@@ -143,16 +191,9 @@ public class MapMarkerUtilities {
 			
 			polylines.add(polyline);
 			map.addComponent(polyline);
-			
-			polyline.addClickListener(event -> {
-				lineClicked = true;
-				for (int j = 0; j < polylines.size(); j++) {
-					if (polylines.get(j).getId().equals(polyline.getId())) {
-						lineIndex = j+1;
-	    			}
-				}
-				removeAllLines(polylines);
-			});
+			if (isEditable) {
+				polyline.addClickListener(new PolylineClickListener());
+			}
 		}
 		return polylines;
 	}
@@ -164,11 +205,33 @@ public class MapMarkerUtilities {
 	}
 
 	public void enableRouteEditing () {
+		isEditable = true;
+		for (int i = 0; i < pins.size(); i++) {
+			registeredListeners.add(pins.get(i).
+					addListener(LeafletClickEvent.class, new MarkerClickListener(), LeafletClickListener.METHOD));
+			registeredListeners.add(pins.get(i).
+					addListener(DragEndEvent.class, new MarkerDragEndListener(), DragEndListener.METHOD));
+		}
+		for (int i = 0; i < polylines.size(); i++) {
+			registeredListeners.add(polylines.get(i).
+					addListener(LeafletClickEvent.class, new PolylineClickListener(), LeafletClickListener.METHOD));
+		}
 		
+		registeredListeners.add(map.addClickListener(MapAddMarkerListener.getInstance(this, popup)));
+		tableDisplay.makeEditable(this);
 	}
 	
 	public void disableRouteEditing () {
-		
+		isEditable = false;
+		for (int i = 0; i < registeredListeners.size(); i++) {
+			registeredListeners.get(i).remove();
+		}
+		registeredListeners.clear();
+		tableDisplay.makeUneditable(this);
+	}
+	
+	public boolean isEditable () {
+		return isEditable;
 	}
 	
 	public void removeAllMarkers(ArrayList<LMarker> markers) {
