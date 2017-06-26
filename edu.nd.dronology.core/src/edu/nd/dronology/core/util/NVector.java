@@ -190,7 +190,7 @@ public class NVector {
 		NVector current = a;
 		while (current.distance(b) > stepDistance) {
 			current = NvecInterpolator.move(current, b, 1.0);
-			dist += 1;
+			dist += stepDistance;
 		}
 		dist += current.distance(b);
 		return dist;
