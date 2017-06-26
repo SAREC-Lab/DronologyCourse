@@ -1,6 +1,6 @@
 package edu.nd.dronology.services.core.info;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.util.NullUtil;
 
 public class DroneInitializationInfo extends RemoteInfoObject {
@@ -11,9 +11,9 @@ public class DroneInitializationInfo extends RemoteInfoObject {
 	 */
 	private static final long serialVersionUID = 3002533064742692033L;
 	private String type;
-	private Coordinate initialLocation;
+	private LlaCoordinate initialLocation;
 
-	public DroneInitializationInfo(String id, String type, Coordinate initialLocation) {
+	public DroneInitializationInfo(String id, String type, LlaCoordinate initialLocation) {
 		super(id, id);
 		NullUtil.checkNull(type, initialLocation);
 		this.type = type;
@@ -25,7 +25,7 @@ public class DroneInitializationInfo extends RemoteInfoObject {
 		return type;
 	}
 
-	public Coordinate getInitialLocation() {
+	public LlaCoordinate getInitialLocation() {
 		return initialLocation;
 	}
 

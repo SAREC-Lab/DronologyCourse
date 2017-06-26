@@ -1,23 +1,23 @@
 package edu.nd.dronology.core.simulator.simplesimulator;
 
 import edu.nd.dronology.core.simulator.IFlightSimulator;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 
-public class SimpleSimulator implements IFlightSimulator{
-	
-	
-	 FlightSimulator flightSimulator;
-	 DroneVoltageSimulator voltageSimulator;
-	 
-	public SimpleSimulator(){
-		flightSimulator=new FlightSimulator();
-		voltageSimulator=new DroneVoltageSimulator();
+public class SimpleSimulator implements IFlightSimulator {
+
+	FlightSimulator flightSimulator;
+	DroneVoltageSimulator voltageSimulator;
+
+	public SimpleSimulator(VirtualDrone drone) {
+		flightSimulator = new FlightSimulator(drone);
+		voltageSimulator = new DroneVoltageSimulator();
 	}
 
 	@Override
 	public void startBatteryDrain() {
 		voltageSimulator.startBatteryDrain();
-		
+
 	}
 
 	@Override
@@ -26,31 +26,31 @@ public class SimpleSimulator implements IFlightSimulator{
 	}
 
 	@Override
-	public void setFlightPath(Coordinate currentPosition, Coordinate targetCoordinates) {
+	public void setFlightPath(LlaCoordinate currentPosition, LlaCoordinate targetCoordinates) {
 		flightSimulator.setFlightPath(currentPosition, targetCoordinates);
-		
+
 	}
 
 	@Override
 	public void checkPoint() {
 		voltageSimulator.checkPoint();
-		
+
 	}
 
 	@Override
-	public boolean isDestinationReached(int distanceMovedPerTimeStep) {
+	public boolean isDestinationReached(double distanceMovedPerTimeStep) {
 		return flightSimulator.isDestinationReached(distanceMovedPerTimeStep);
 	}
 
 	@Override
 	public void stopBatteryDrain() {
-	voltageSimulator.startBatteryDrain();
-		
+		voltageSimulator.startBatteryDrain();
+
 	}
 
 	@Override
-	public boolean move(int step) {
-	return flightSimulator.move(step);
+	public boolean move(double step) {
+		return flightSimulator.move(step);
 	}
 
 }

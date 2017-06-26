@@ -146,22 +146,29 @@ public class Log4jv2RootLogger implements ILogger {
 
 	}
 
+	@Override
+	public void trace(Object message) {
+		for (ILoggerAppender appender : appenders) {
+			appender.warn(message);
+		}
+
+	}
+
 	public void removeAppender(ILoggerAppender appender) {
 		appenders.remove(appender);
 
 	}
 
-
 	@Override
 	public void hwInfo(Object message) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void hwFatal(Object message) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

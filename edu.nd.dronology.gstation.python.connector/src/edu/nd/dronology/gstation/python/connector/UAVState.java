@@ -2,10 +2,9 @@ package edu.nd.dronology.gstation.python.connector;
 
 import java.util.UUID;
 
-import edu.nd.dronology.core.util.Coordinate;
-import edu.nd.dronology.core.util.CoordinateConverter;
+import edu.nd.dronology.core.CoordinateChange;
 import edu.nd.dronology.core.util.LlaCoordinate;
-
+@CoordinateChange
 public final class UAVState {
 
 	// private static transient final ILogger LOGGER = LoggerProvider.getLogger(PythonDroneState.class);
@@ -55,20 +54,20 @@ public final class UAVState {
 		return id;
 	}
 
-	public Coordinate getLocation() {
-		return CoordinateConverter.toCoordiate(location);
+	public LlaCoordinate getLocation() {
+		return location;
 	}
 
-	public Coordinate getAttitude() {
-		return CoordinateConverter.toCoordiate(attitude);
+	public LlaCoordinate getAttitude() {
+		return attitude;
 	}
 
-	public Coordinate getVelocity() {
-		return CoordinateConverter.toCoordiate(velocity);
+	public LlaCoordinate getVelocity() {
+		return velocity;
 	}
 
-	public Coordinate getGimbalRotation() {
-		return CoordinateConverter.toCoordiate(gimbalRotation);
+	public LlaCoordinate getGimbalRotation() {
+		return gimbalRotation;
 	}
 
 	public double getBatteryVoltage() {
@@ -83,8 +82,8 @@ public final class UAVState {
 		return battery.getBatteryLevel();
 	}
 
-	public Coordinate getHome() {
-		return CoordinateConverter.toCoordiate(home);
+	public LlaCoordinate getHome() {
+		return home;
 	}
 
 	public String getStatus() {

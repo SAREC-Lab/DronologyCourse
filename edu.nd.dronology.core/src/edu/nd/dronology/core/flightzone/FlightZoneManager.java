@@ -11,7 +11,7 @@ import edu.nd.dronology.core.flight.Flights;
 import edu.nd.dronology.core.flight.IFlightDirector;
 import edu.nd.dronology.core.flight.IFlightPlan;
 import edu.nd.dronology.core.flight.internal.SoloDirector;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -52,7 +52,7 @@ public class FlightZoneManager implements Runnable {
 	 * @param start
 	 * @param wayPoints
 	 */
-	public void planFlight(String planName, Coordinate start, List<Coordinate> wayPoints) {
+	public void planFlight(String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
 		IFlightPlan flightPlan = FlightPlanFactory.create(planName, start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}

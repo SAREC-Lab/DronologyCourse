@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
@@ -107,7 +107,7 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 		IFlightRoute atm = FlightRoutePersistenceProvider.getInstance().loadItem(file.toURI().toURL());
 		FlightRouteInfo info = new FlightRouteInfo(atm.getName(), id);
 		info.setCategory(atm.getCategory());
-		for (Coordinate c : atm.getCoordinates()) {
+		for (LlaCoordinate c : atm.getCoordinates()) {
 			info.addCoordinate(c);
 		}
 

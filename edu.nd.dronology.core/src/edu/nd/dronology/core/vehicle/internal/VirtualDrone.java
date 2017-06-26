@@ -3,7 +3,7 @@ package edu.nd.dronology.core.vehicle.internal;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.simulator.IFlightSimulator;
 import edu.nd.dronology.core.simulator.SimulatorFactory;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.util.NullUtil;
@@ -31,18 +31,18 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	 */
 	public VirtualDrone(String drnName) {
 		super(drnName);
-		simulator = SimulatorFactory.getSimulator();
+		simulator = SimulatorFactory.getSimulator(this);
 		// voltageSimulator = new DroneVoltageSimulator();
 		// flightSimulator = new FlightSimulator(this);
 	}
 
 	@Override
-	public void takeOff(int targetAltitude) throws FlightZoneException {
+	public void takeOff(double targetAltitude) throws FlightZoneException {
 		simulator.startBatteryDrain();
 		droneStatus.updateBatteryLevel(simulator.getVoltage()); // Need more incremental drain!!
 		super.setCoordinates(droneStatus.getLatitude(), droneStatus.getLongitude(), targetAltitude);
 		try {
-			Thread.sleep(targetAltitude * 100); // Simulates attaining height. Later move to simulator.
+			Thread.sleep(new Double(targetAltitude).intValue() * 100); // Simulates attaining height. Later move to simulator.
 
 		} catch (InterruptedException e) {
 			LOGGER.error(e);
@@ -50,7 +50,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public void flyTo(Coordinate targetCoordinates) {
+	public void flyTo(LlaCoordinate targetCoordinates) {
 		NullUtil.checkNull(targetCoordinates);
 		// LOGGER.info("Flying to: "+ targetCoordinates.toString());
 		simulator.setFlightPath(currentPosition, targetCoordinates);
@@ -74,8 +74,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public boolean move(int i) { // ALSO NEEDS THINKING ABOUT FOR non-VIRTUAL
-		// System.out.println("Trying to move: " + droneName);
+	public boolean move(double i) { // ALSO NEEDS THINKING ABOUT FOR non-VIRTUAL
 		getBatteryStatus();
 		boolean moveStatus = simulator.move(2);
 		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());

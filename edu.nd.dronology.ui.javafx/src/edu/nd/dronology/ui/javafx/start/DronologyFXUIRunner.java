@@ -2,8 +2,9 @@ package edu.nd.dronology.ui.javafx.start;
 
 import java.util.ArrayList;
 
+import edu.nd.dronology.core.CoordinateChange;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
@@ -39,6 +40,8 @@ public class DronologyFXUIRunner {
 	 * @throws FlightZoneException
 	 * @throws InterruptedException
 	 */
+	
+	@CoordinateChange
 	public DronologyFXUIRunner(String[] args) throws FlightZoneException, InterruptedException {
 
 		LOGGER.info("Using '" + provider.getClass() + "' as service provider");
@@ -60,7 +63,7 @@ public class DronologyFXUIRunner {
 		// This example shows three flight plans loading.
 		// We need a middleware class that listens for a GUI to submit a new flight -- and then makes a call onto FlightManager
 		// to load it. (Here I assume I have THE single flightManager instance.
-		ArrayList<Coordinate> flight = guiProxyLoadOneFlight();
+		ArrayList<LlaCoordinate> flight = guiProxyLoadOneFlight();
 
 		IFlightRouteplanningRemoteService service;
 
@@ -89,36 +92,36 @@ public class DronologyFXUIRunner {
 	}
 
 	// Test load a flight
-	public ArrayList<Coordinate> guiProxyLoadOneFlight() {
-		ArrayList<Coordinate> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinate(42270485, -86200000, 10));
-		wayPoints.add(new Coordinate(42500000, -86150000, 10));
+	public ArrayList<LlaCoordinate> guiProxyLoadOneFlight() {
+		ArrayList<LlaCoordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new LlaCoordinate(42.270485, -86.200000, 10));
+		wayPoints.add(new LlaCoordinate(42.500000, -86.150000, 10));
 		return wayPoints;
 	}
 
 	// Test load a flight
-	public ArrayList<Coordinate> guiProxyLoadOneFlight2() {
-		ArrayList<Coordinate> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinate(41750881, -86180000, 10));
-		wayPoints.add(new Coordinate(42700000, -86200000, 10));
-		wayPoints.add(new Coordinate(42400000, -86165000, 10));
+	public ArrayList<LlaCoordinate> guiProxyLoadOneFlight2() {
+		ArrayList<LlaCoordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new LlaCoordinate(41.750881, -86.180000, 10));
+		wayPoints.add(new LlaCoordinate(42.700000, -86.200000, 10));
+		wayPoints.add(new LlaCoordinate(42.400000, -86.165000, 10));
 		return wayPoints;
 	}
 
-	public ArrayList<Coordinate> guiProxyLoadOneFlight3() {
-		ArrayList<Coordinate> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinate(41730893, -86172481, 10));
-		wayPoints.add(new Coordinate(41731316, -86242201, 15));
-		wayPoints.add(new Coordinate(41730893, -86172587, 20));
+	public ArrayList<LlaCoordinate> guiProxyLoadOneFlight3() {
+		ArrayList<LlaCoordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new LlaCoordinate(41.730893, -86.172481, 10));
+		wayPoints.add(new LlaCoordinate(41.731316, -86.242201, 15));
+		wayPoints.add(new LlaCoordinate(41.730893, -86.172587, 20));
 		return wayPoints;
 	}
 
 	// Test loads drones
 	public void guiProxy1Initialize() {
 		ArrayList<String[]> newDrones = new ArrayList<>();
-		String[] D1 = { "DRN1", "Iris3DR", "41760000", "-86222901", "0" };
-		String[] D2 = { "DRN2", "Iris3DR", "41750802", "-86202481", "10" };
-		String[] D3 = { "DRN3", "Iris3DR", "41740893", "-86182505", "0" };
+		String[] D1 = { "DRN1", "Iris3DR", "41.760000", "-86.222901", "0" };
+		String[] D2 = { "DRN2", "Iris3DR", "41.750802", "-86.202481", "10" };
+		String[] D3 = { "DRN3", "Iris3DR", "41.740893", "-86.182505", "0" };
 		newDrones.add(D1);
 		newDrones.add(D2);
 		newDrones.add(D3);

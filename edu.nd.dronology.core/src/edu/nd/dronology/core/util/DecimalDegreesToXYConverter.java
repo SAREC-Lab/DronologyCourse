@@ -19,16 +19,16 @@ public class DecimalDegreesToXYConverter {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DecimalDegreesToXYConverter.class);
 
 	ZoneBounds zoneBounds;
-	private long xRange = 0; // X coordinates in range of 0 to x
-	private long yRange = 0; // Y coordinates in range of 0 to y
+	private double xRange = 0; // X coordinates in range of 0 to x
+	private double yRange = 0; // Y coordinates in range of 0 to y
 	private double xScale = 0.0; // The scale that transforms longitude to x coordinates
 	private double yScale = 0.0; // The scale that transforms latitude to y coordinates
-	private long latitudeOffset = 0;
-	private long longitudeOffset = 0;
+	private double latitudeOffset = 0;
+	private double longitudeOffset = 0;
 	private int reservedLeftHandSpace = 0;
 
-	private long zoneXRange = 0l;
-	private long zoneYRange = 0l;
+	private double zoneXRange = 0d;
+	private double zoneYRange = 0d;
 
 	private static volatile DecimalDegreesToXYConverter INSTANCE = null;
 
@@ -59,13 +59,13 @@ public class DecimalDegreesToXYConverter {
 	 * @param ySize
 	 *          Height of window
 	 */
-	public void setUp(long xSize, long ySize, int reservedLeftHandSpace) {
+	public void setUp(double xSize, double ySize, int reservedLeftHandSpace) {
 		this.xRange = xSize;
 		this.yRange = ySize;
 		zoneBounds = ZoneBounds.getInstance();
 		zoneXRange = zoneBounds.getXRange();
 		zoneYRange = zoneBounds.getYRange();
-		xScale = (double) (xRange - reservedLeftHandSpace) / zoneXRange;
+		xScale = (xRange - reservedLeftHandSpace) / zoneXRange;
 		yScale = xScale; // (double)yRange/zoneYRange; @TD: Don't want to change scales and disproportionately stretch the map.
 		this.reservedLeftHandSpace = reservedLeftHandSpace;
 	}
@@ -85,7 +85,7 @@ public class DecimalDegreesToXYConverter {
 	 * @return X converted to decimal degrees
 	 * @throws FlightZoneException
 	 */
-	public long ConvertXCoordsToDecimalDegrees(int X) throws FlightZoneException {
+	public double ConvertXCoordsToDecimalDegrees(int X) throws FlightZoneException {
 		LOGGER.info("Start Convert X: ");
 		LOGGER.info("West Long: " + ZoneBounds.getInstance().getWestLongitude());
 		LOGGER.info("Eash Long: " + ZoneBounds.getInstance().getEastLongitude());
@@ -110,7 +110,7 @@ public class DecimalDegreesToXYConverter {
 	 * @return Y converted to decimal degrees
 	 * @throws FlightZoneException
 	 */
-	public long ConvertYCoordsToDecimalDegrees(int Y) throws FlightZoneException {
+	public double ConvertYCoordsToDecimalDegrees(int Y) throws FlightZoneException {
 		LOGGER.info("Start Convert Y: ");
 		LOGGER.info("North Latitude: " + ZoneBounds.getInstance().getNorthLatitude());
 		LOGGER.info("SOuth lat: " + ZoneBounds.getInstance().getSouthLatitude());
@@ -137,7 +137,7 @@ public class DecimalDegreesToXYConverter {
 	 * @return a point representing X,Y coordinates
 	 * @throws FlightZoneException
 	 */
-	public Point getPoint(long latitude, long longitude) throws FlightZoneException {
+	public Point getPoint(double latitude, double longitude) throws FlightZoneException {
 		if (passSetUpCheck()) {
 			Point point = new Point();
 			latitudeOffset = Math.abs(latitude - zoneBounds.getNorthLatitude());

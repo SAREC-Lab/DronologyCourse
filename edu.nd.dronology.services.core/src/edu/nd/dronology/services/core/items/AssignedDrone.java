@@ -1,25 +1,26 @@
 package edu.nd.dronology.services.core.items;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.CoordinateChange;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 public class AssignedDrone {
 
 	public final String droneName;
-	public Coordinate startCoordinate = new Coordinate(0, 0, 0);
+	public LlaCoordinate startCoordinate = new LlaCoordinate(0, 0, 0);
 
 	public AssignedDrone(String droneName) {
 		super();
 		this.droneName = droneName;
 	}
 
-	public Coordinate getStartCoordinate() {
+	public LlaCoordinate getStartCoordinate() {
 		return startCoordinate;
 	}
 
-	public void setStartCoordinate(long latitude, long longitude, int altitude) {
-		startCoordinate.setLatitude(latitude);
-		startCoordinate.setLongitude(longitude);
-		startCoordinate.setAltitude(altitude);
+	@CoordinateChange
+	public void setStartCoordinate(double latitude, double longitude, double altitude) {
+		startCoordinate = new LlaCoordinate(latitude, longitude, altitude);
+
 	}
 
 	@Override
@@ -51,6 +52,4 @@ public class AssignedDrone {
 		return droneName;
 	}
 
-	
-	
 }

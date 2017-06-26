@@ -1,12 +1,12 @@
 package edu.nd.dronology.ui.cc.main.monitoring;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 public class WrappedCoordinate {
 
-	private Coordinate coordinate;
+	private LlaCoordinate coordinate;
 
-	public WrappedCoordinate(Coordinate coordinate) {
+	public WrappedCoordinate(LlaCoordinate coordinate) {
 		this.coordinate = coordinate;
 	}
 

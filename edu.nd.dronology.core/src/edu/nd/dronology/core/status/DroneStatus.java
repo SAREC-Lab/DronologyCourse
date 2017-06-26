@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 public class DroneStatus implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3319827887969940655L;
-	private long latitude;
-	private long longitude;
-	private int altitude;
+	private double latitude;
+	private double longitude;
+	private double altitude;
 	private final String ID;
 	private double batteryLevel;
 	private double velocity;
@@ -52,7 +52,7 @@ public class DroneStatus implements Serializable {
 		return status;
 	}
 
-	public void updateCoordinates(long latitude, long longitude, int altitude) {
+	public void updateCoordinates(double latitude, double longitude, double altitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.altitude = altitude;
@@ -77,15 +77,15 @@ public class DroneStatus implements Serializable {
 		return 17 + ID.hashCode();
 	}
 
-	public long getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
 
-	public long getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
 
-	public int getAltitude() {
+	public double getAltitude() {
 		return altitude;
 	}
 
@@ -101,8 +101,8 @@ public class DroneStatus implements Serializable {
 		return info;
 	}
 
-	public Coordinate getCoordinates() {
-		return new Coordinate(latitude, longitude, altitude);
+	public LlaCoordinate getCoordinates() {
+		return new LlaCoordinate(latitude, longitude, altitude);
 	}
 
 	public void setVelocity(double velocity) {
