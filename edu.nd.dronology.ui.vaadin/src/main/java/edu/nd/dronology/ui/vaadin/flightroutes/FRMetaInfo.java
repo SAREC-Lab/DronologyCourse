@@ -30,6 +30,7 @@ public class FRMetaInfo extends CustomComponent {
 	String routeId; 
 	int numWaypoints;
 	CheckBox tableView;
+	Button editButton;
 	
 	public FRMetaInfo(FlightRouteInfo info){
 		
@@ -37,6 +38,7 @@ public class FRMetaInfo extends CustomComponent {
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
 		Label nameLabel;
+		
 		
 		content.setWidth("1075px");
 		content.setHeight("68px");
@@ -52,7 +54,7 @@ public class FRMetaInfo extends CustomComponent {
 			nameLabel = new Label("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoints)", ContentMode.HTML);
 		}
 		
-		Button editButton = new Button("Edit");
+		editButton = new Button("Edit");
 		Button deleteButton = new Button("Delete");
 		editButton.setWidth("55");
 		editButton.setHeight("28px");
@@ -112,5 +114,8 @@ public class FRMetaInfo extends CustomComponent {
 	}
 	public CheckBox getCheckBox(){
 		return tableView;
+	}
+	public Button getEditButton(){
+		return editButton;
 	}
 }

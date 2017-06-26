@@ -34,10 +34,7 @@ public class FRMainLayout extends CustomComponent {
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 		
-		
-		
-		//FRMetaInfo bar = new FRMetaInfo();
-		
+
 		FRMapComponent map = new FRMapComponent(
   		"VAADIN/sbtiles/{z}/{x}/{y}.png",
   		"South Bend");
@@ -59,7 +56,7 @@ public class FRMainLayout extends CustomComponent {
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<Coordinate> coords = flightInfo.getCoordinates();
 			
-			//also remove?
+			
 			map.display(flightInfo);
 			
 			long tempLong;
@@ -102,6 +99,7 @@ public class FRMainLayout extends CustomComponent {
 			}
 		});
 		
+	
     	content.addComponents(controls, map);
     	setCompositionRoot(content);
 	}

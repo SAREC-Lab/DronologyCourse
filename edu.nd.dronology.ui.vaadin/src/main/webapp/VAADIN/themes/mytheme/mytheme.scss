@@ -363,4 +363,28 @@ $valo-menu-background-color: #eee;
 		border-style: solid; 
 		background-color: #f2f2f2;
 	}
+	.bring_front{
+		z-index: 999;
+	}
+	.bring_back{
+		z-index: 0;
+	}
+	.edit_bar{
+		background-color: black;
+		color: white;
+		padding-right: 90px;
+		
+	}
+	.large_text{
+		padding-left: 20px;
+	}
+	.small_text{
+		font-size: 60%;
+		padding-top: 7px;
+		padding-right: 80px;
+	}
+	.cancel_button{
+		padding-left: 50px;
+	
+	}
 }
