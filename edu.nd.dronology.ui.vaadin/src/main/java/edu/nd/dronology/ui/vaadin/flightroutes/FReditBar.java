@@ -9,6 +9,10 @@ import com.vaadin.ui.Label;
 
 public class FReditBar extends CustomComponent{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2389713576038720628L;
 	HorizontalLayout totalLayout = new HorizontalLayout();
 	Button cancelButton = new Button("Cancel");
 	Button saveButton = new Button("Save");
