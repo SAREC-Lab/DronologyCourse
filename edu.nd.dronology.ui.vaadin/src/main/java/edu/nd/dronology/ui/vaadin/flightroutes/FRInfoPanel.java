@@ -53,6 +53,7 @@ public class FRInfoPanel extends CustomComponent {
 	private int numComponents;
 	ArrayList routeList;
 	FlightRouteInfo flight;
+	private boolean isRouteSelected = false;
 	
 	
 	public FRInfoPanel(){
@@ -109,6 +110,10 @@ public class FRInfoPanel extends CustomComponent {
 			
 		});
 		
+		routes.addLayoutClickListener( e-> {
+			isRouteSelected = true;
+		});
+		
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
 		
@@ -151,6 +156,14 @@ public class FRInfoPanel extends CustomComponent {
 	public FlightRouteInfo getFlight(int index){
 		flight = (FlightRouteInfo) routeList.get(index);
 		return flight;
+	}
+	
+	public boolean getIsRouteSelected(){
+		return isRouteSelected;
+	}
+	
+	public void setIsRouteSelected(boolean selected){
+		isRouteSelected = selected;
 	}
 
 }
