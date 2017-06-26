@@ -46,6 +46,7 @@ public class AFMapComponent extends CustomComponent {
 	private IFlightManagerRemoteService flightRouteService;
   private BaseServiceProvider provider = MyUI.getProvider();
   private ArrayList<ArrayList<LPolyline>> flightRoutes = new ArrayList<>();
+  private ArrayList<ArrayList<WayPoint>> wayPointLists = new ArrayList<>();
 	
   private MapMarkerUtilities utilities;
   
@@ -125,6 +126,7 @@ public class AFMapComponent extends CustomComponent {
 				}
 				ArrayList<LPolyline> polyLines = utilities.drawLines(wayPoints);
 				flightRoutes.add(polyLines);
+				wayPointLists.add(wayPoints);
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -142,6 +144,15 @@ public class AFMapComponent extends CustomComponent {
 				}
 				flightRoutes.clear();
 				this.addActiveFlightRoutes();	
+			}
+			//update dashed lines
+			drones = service.getDrones();
+			int index = 0;
+			for ( Entry<String, DroneStatus> e:drones.entrySet()){
+				if (e.getValue().getStatus().equals("FLYING")){
+					//insert drone into waypoint list after most visited waypoint list. While waypoint = visited {} waypointlist.add(drone)
+				}
+				
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
