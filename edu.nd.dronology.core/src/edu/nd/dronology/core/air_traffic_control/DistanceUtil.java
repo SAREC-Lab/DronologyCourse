@@ -1,6 +1,7 @@
 package edu.nd.dronology.core.air_traffic_control;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.util.NullUtil;
 
 public class DistanceUtil {
 
@@ -36,6 +37,23 @@ public class DistanceUtil {
 	public static double distance(LlaCoordinate currentPosition, LlaCoordinate targetPosition) {
 		return distance(currentPosition.getLatitude(), targetPosition.getLatitude(), currentPosition.getLongitude(),
 				targetPosition.getLongitude(), 0, 0);
+	}
+
+	public static double calculateTotalDistance(LlaCoordinate... coordinates) {
+		NullUtil.checkArrayNull(coordinates);
+		if (coordinates.length < 2) {
+			throw new IllegalArgumentException("At least 2 coordinates are required to calculate the distance between them!");
+		}
+		double totaldistance = 0;
+		for (int i = 0; i < coordinates.length; i++) {
+			LlaCoordinate current = coordinates[i];
+			if (coordinates.length < (i + 1)) {
+				break;
+			}
+			LlaCoordinate next = coordinates[i + 1];
+			totaldistance = distance(current, next);
+		}
+		return totaldistance;
 	}
 
 }

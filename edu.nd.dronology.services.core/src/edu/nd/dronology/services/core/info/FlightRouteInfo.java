@@ -16,6 +16,10 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	private List<MappingInfo> mappingInfos = new ArrayList<>();
 	private String category;
 	private List<LlaCoordinate> coordinates = new ArrayList<>();
+	private double lenght = 0;
+	private long dateCreated;
+	private long dateModified;
+	private double distance;
 
 	public FlightRouteInfo(String name, String id) {
 		super(name, id);
@@ -29,7 +33,7 @@ public class FlightRouteInfo extends RemoteInfoObject {
 		mappingInfos.add(mpInfo);
 
 	}
-	
+
 	public String getCategory() {
 		return category;
 	}
@@ -39,6 +43,14 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	}
 
+	public void setDateModified(long dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	public void setDateCreated(long dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
 	public List<LlaCoordinate> getCoordinates() {
 		return coordinates;
 	}
@@ -46,11 +58,30 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	public void addCoordinate(LlaCoordinate coordinate) {
 		coordinates.add(coordinate);
 	}
-	
+
 	public void rempoveCoordinate(LlaCoordinate coordinate) {
 		coordinates.remove(coordinate);
 	}
 
+	public double getLenght() {
+		return lenght;
+	}
 
+	public long getDateCreated() {
+		return dateCreated;
+	}
+
+	public long getDateModified() {
+		return dateModified;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+
+	}
+
+	// public void updateDistance() {
+	// //
+	// }
 
 }
