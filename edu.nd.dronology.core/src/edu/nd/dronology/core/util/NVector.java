@@ -171,7 +171,7 @@ public class NVector {
 	 *         altitude.
 	 */
 	public LlaCoordinate toLlaCoordinate() {
-		double lat = Math.asin(this.getZ());
+		double lat = Math.atan2(this.getZ(), Math.sqrt(this.getX() * this.getX() + this.getY() * this.getY()));
 		double lon = Math.atan2(this.getY(), this.getX());
 		return new LlaCoordinate(Math.toDegrees(lat), Math.toDegrees(lon), this.getAltitude());
 	}
