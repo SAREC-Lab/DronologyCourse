@@ -18,13 +18,12 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -38,7 +37,7 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
  *
  */
 
-public class AFInfoBox extends CustomComponent{
+public class AFInfoBox extends CustomComponent {
 	private static final long serialVersionUID = -8541147696474050819L;
 	private BaseServiceProvider provider = MyUI.getProvider();
 	private boolean visible = false;
@@ -47,12 +46,12 @@ public class AFInfoBox extends CustomComponent{
 	private String status;
 	private double batteryLife;
 	private String healthColor;
-	private long lat;
-	private long lon;
-	private int alt;
+	private double lat;
+	private double lon;
+	private double alt;
 	private double speed;
 	private boolean hoverInPlace;
-	
+
 	private CheckBox check = new CheckBox();
 	private Label statusInfo1 = new Label();
 	private Label statusInfo2 = new Label();
@@ -68,21 +67,23 @@ public class AFInfoBox extends CustomComponent{
 	private HorizontalLayout topContent = new HorizontalLayout();
 	private VerticalLayout middleContent = new VerticalLayout();
 	private HorizontalLayout bottomContent = new HorizontalLayout();
-	
+
 	/**
 	 * non default constructor
-	 * @param isChecked 
+	 * 
+	 * @param isChecked
 	 * @param name
 	 * @param status
 	 * @param batteryLife
-	 * @param healthColor 
+	 * @param healthColor
 	 * @param lat
 	 * @param lon
 	 * @param alt
 	 * @param speed
-	 * @param hoverInPlace 
+	 * @param hoverInPlace
 	 */
-	public AFInfoBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, long lat, long lon, int alt, double speed, boolean hoverInPlace){
+	public AFInfoBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat,
+			double lon, double alt, double speed, boolean hoverInPlace) {
 		this.isChecked = isChecked;
 		this.name = name;
 		this.status = status;
@@ -96,7 +97,7 @@ public class AFInfoBox extends CustomComponent{
 
 		this.addStyleName("info_box");
 		this.addStyleName("af_info_box");
-		
+
 		VerticalLayout statusContent = new VerticalLayout();
 		VerticalLayout bottomButtons = new VerticalLayout();
 		VerticalLayout bottomSwitch = new VerticalLayout();
@@ -107,16 +108,16 @@ public class AFInfoBox extends CustomComponent{
 		/**
 		 * top layer components
 		 */
-		
+
 		check.setValue(this.isChecked);
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-    FileResource resource = new FileResource(new File(basepath+"/VAADIN/img/drone_icon.png"));
-    Image droneImage = new Image();
-    droneImage.setSource(resource);
- 
-    statusInfo1.setValue(name);
-    statusInfo1.addStyleName("info_box_name");
-    statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
+		FileResource resource = new FileResource(new File(basepath + "/VAADIN/img/drone_icon.png"));
+		Image droneImage = new Image();
+		droneImage.setSource(resource);
+
+		statusInfo1.setValue(name);
+		statusInfo1.addStyleName("info_box_name");
+		statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
 		statusInfo2.setValue("Status: " + status);
 		this.batteryLife = Math.round(this.batteryLife * 100);
 		this.batteryLife = this.batteryLife / 100;
@@ -124,7 +125,8 @@ public class AFInfoBox extends CustomComponent{
 		statusContent.addComponents(statusInfo1, statusInfo2, statusInfo3);
 		statusContent.setSpacing(false);
 		health.setCaptionAsHtml(true);
-		health.setCaption( "<span style=\'color: " + this.healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml()  + "</span>");
+		health.setCaption(
+				"<span style=\'color: " + this.healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml() + "</span>");
 		if (this.healthColor.equals("green"))
 			health.setDescription("Normally Functionable");
 		else if (this.healthColor.equals("yellow"))
@@ -137,52 +139,52 @@ public class AFInfoBox extends CustomComponent{
 		topContent.setComponentAlignment(droneImage, Alignment.TOP_LEFT);
 		topContent.setComponentAlignment(statusContent, Alignment.TOP_LEFT);
 		topContent.setComponentAlignment(health, Alignment.TOP_RIGHT);
-		
+
 		/**
 		 * middle layer components
 		 */
-		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat * .000001) * 1000000.0) / 1000000.0));
-		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon * .000001) * 1000000.0) / 100000.0));
-		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + " meters");
+		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat) * 1000000.0) / 1000000.0));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon) * 1000000.0) / 100000.0));
+		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + " meters");
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
 		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
 		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
-		
+
 		/**
 		 * bottom layer components
 		 */
 		hoverSwitch.setValue(this.hoverInPlace);
-		hoverSwitch.addValueChangeListener( e -> {
+		hoverSwitch.addValueChangeListener(e -> {
 			this.setHoverInPlace(this.hoverSwitch.getValue());
 		});
 		Label caption = new Label("Hover in Place");
 		bottomSwitch.addComponents(caption, hoverSwitch);
-		
+
 		Button returnToHome = new Button("Return to Home");
 		Button assignNewRoute = new Button("Assign New Route");
 		returnToHome.setHeight("30px");
 		assignNewRoute.setHeight("30px");
-		
-		assignNewRoute.addClickListener( e-> {
+
+		assignNewRoute.addClickListener(e -> {
 			Window window = new Window("Assign New Route");
 			VerticalLayout content = new VerticalLayout();
 			FRMainLayout frLayout = new FRMainLayout();
 			HorizontalLayout buttons = new HorizontalLayout();
-			
+
 			Button cancel = new Button("Cancel");
 			Button apply = new Button("Apply");
 			apply.setEnabled(false);
-			cancel.addClickListener( event -> {
+			cancel.addClickListener(event -> {
 				UI.getCurrent().removeWindow(window);
 			});
-			window.addClickListener( event -> {
+			window.addClickListener(event -> {
 				if (frLayout.getControls().getInfoPanel().getIsRouteSelected())
 					apply.setEnabled(true);
 				else
 					apply.setEnabled(false);
 			});
-			apply.addClickListener( event -> {
+			apply.addClickListener(event -> {
 				Window confirm = new Window("Confirm");
 				VerticalLayout subContent = new VerticalLayout();
 				HorizontalLayout subButtons = new HorizontalLayout();
@@ -190,21 +192,21 @@ public class AFInfoBox extends CustomComponent{
 				String routeName = selectedFlight.getName();
 				Label label = new Label("Are you sure you want " + this.name + " to follow the route " + routeName + "?");
 				Button yes = new Button("Yes");
-				Button no = new Button ("No");
+				Button no = new Button("No");
 				subButtons.addComponents(yes, no);
 				subContent.addComponents(label, subButtons);
 				confirm.setContent(subContent);
 				confirm.setModal(true);
 				confirm.center();
 				UI.getCurrent().addWindow(confirm);
-				
-				no.addClickListener( subEvent -> {
+
+				no.addClickListener(subEvent -> {
 					UI.getCurrent().removeWindow(confirm);
 				});
-				
-				yes.addClickListener( subEvent -> {
-					//TODO: assign the route to the drone
-					//Currently assigns the route without taking which drone into consideration
+
+				yes.addClickListener(subEvent -> {
+					// TODO: assign the route to the drone
+					// Currently assigns the route without taking which drone into consideration
 					activate(selectedFlight);
 					UI.getCurrent().removeWindow(confirm);
 					UI.getCurrent().removeWindow(window);
@@ -212,83 +214,84 @@ public class AFInfoBox extends CustomComponent{
 			});
 			buttons.addComponents(cancel, apply);
 			content.addComponents(frLayout, buttons);
-			
+
 			window.setContent(content);
 			window.setModal(true);
 			window.setWidth(1296, Unit.PIXELS);
 			UI.getCurrent().addWindow(window);
 		});
-		
+
 		bottomButtons.addComponents(returnToHome, assignNewRoute);
 		bottomContent.addComponents(bottomSwitch, bottomButtons);
-		
+
 		mainContent.addComponents(topContent, middleContent, bottomContent);
 		mainContent.setSizeUndefined();
 		mainContent.setSpacing(false);
-		
+
 		middleContent.setVisible(visible);
 		bottomContent.setVisible(visible);
-		topContent.addLayoutClickListener(e->{
-				Component child = e.getChildComponent();
-				if(child == null || !child.getClass().getCanonicalName().equals("com.vaadin.ui.CheckBox")){
-					setBoxVisible(visible);
-			}	
+		topContent.addLayoutClickListener(e -> {
+			Component child = e.getChildComponent();
+			if (child == null || !child.getClass().getCanonicalName().equals("com.vaadin.ui.CheckBox")) {
+				setBoxVisible(visible);
+			}
 		});
 		setCompositionRoot(mainContent);
 	}
-	
-  /**
-   * default constructor
-   */
-	public AFInfoBox(){
+
+	/**
+	 * default constructor
+	 */
+	public AFInfoBox() {
 		this(false, "NAME/ID of UAV", "Status", 0, "green", 0, 0, 0, 0, false);
 	}
-	
-	public void setIsChecked(boolean isChecked){
+
+	public void setIsChecked(boolean isChecked) {
 		this.isChecked = isChecked;
 		check.setValue(this.isChecked);
 	}
-	
-	public boolean getIsChecked(){
+
+	public boolean getIsChecked() {
 		return this.isChecked;
 	}
-	
-	public void setName(String name){
+
+	public void setName(String name) {
 		this.name = name;
 		statusInfo1.setValue(name);
 	}
-	
-	public String getName(){
+
+	public String getName() {
 		return this.name;
 	}
-	
-	public void setStatus(String status){
+
+	public void setStatus(String status) {
 		this.status = status;
 		statusInfo2.setValue("Status: " + status);
 		if (this.status.equals("Hovering"))
-				this.hoverSwitch.setValue(true);
+			this.hoverSwitch.setValue(true);
 		else
 			this.hoverSwitch.setValue(false);
 	}
-	
-	public String getStatus(){
+
+	public String getStatus() {
 		return this.status;
 	}
-	
-	public void setBatteryLife(double batteryLife){
+
+	public void setBatteryLife(double batteryLife) {
 		this.batteryLife = batteryLife;
 		this.batteryLife = Math.round(this.batteryLife * 100);
 		this.batteryLife = this.batteryLife / 100;
 		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " %");
 	}
-	
-	public double getBatteryLife(){
+
+	public double getBatteryLife() {
 		return this.batteryLife;
 	}
-	
-	public void setHealthColor(String healthColor){
+
+	public void setHealthColor(String healthColor) {
 		this.healthColor = healthColor;
-		health.setCaption( "<span style=\'color: " + healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml()  + "</span>");
+		health.setCaption(
+				"<span style=\'color: " + healthColor + " !important;\'> " + VaadinIcons.CIRCLE.getHtml() + "</span>");
 		if (this.healthColor.equals("green"))
 			health.setDescription("Normally Functionable");
 		else if (this.healthColor.equals("yellow"))
@@ -296,89 +299,88 @@ public class AFInfoBox extends CustomComponent{
 		else if (this.healthColor.equals("red"))
 			health.setDescription("Needs Immediate Attention");
 	}
-	
-	public String getHealthColor(){
+
+	public String getHealthColor() {
 		return this.healthColor;
 	}
-	
-	public void setLat(long lat){
+
+	public void setLat(double lat) {
 		this.lat = lat;
-		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat * .000001) * 1000000.0) / 1000000.0));
+		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat) * 1000000.0) / 1000000.0));
 	}
-	
-	public Long getLat(){
+
+	public Double getLat() {
 		return this.lat;
 	}
-	
-	public void setLon(Long lon){
+
+	public void setLon(Double lon) {
 		this.lon = lon;
-		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon * .000001) * 1000000.0) / 1000000.0));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon) * 1000000.0) / 1000000.0));
 	}
-	
-	public double getLon(){
+
+	public double getLon() {
 		return this.lon;
 	}
-	
-	public void setAlt(int alt){
+
+	public void setAlt(double alt) {
 		this.alt = alt;
-		locationInfo3.setValue("Altitude:\t" + Integer.toString(this.alt) + " meters");
+		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + " meters");
 	}
-	
-	public int getAlt(){
+
+	public double getAlt() {
 		return this.alt;
 	}
-	
-	public void setSpeed(double speed){
+
+	public void setSpeed(double speed) {
 		this.speed = speed;
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
 		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
 	}
-	
-	public double getSpeed(){
+
+	public double getSpeed() {
 		return this.speed;
 	}
-	
-	public void setHoverInPlace(boolean hoverInPlace){
+
+	public void setHoverInPlace(boolean hoverInPlace) {
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
-		if (this.hoverInPlace){
+		if (this.hoverInPlace) {
 			this.status = "Hovering";
-			statusInfo2.setValue("Status: " );
+			statusInfo2.setValue("Status: ");
 		} else {
 			this.status = "";
 			statusInfo2.setValue("Status: ");
 		}
 	}
-	
-	public boolean getHoverInPlace(){
+
+	public boolean getHoverInPlace() {
 		return this.hoverInPlace;
 	}
-	
-	public void setBoxVisible(boolean visible){
-		if (visible){
+
+	public void setBoxVisible(boolean visible) {
+		if (visible) {
 			this.visible = false;
 			middleContent.setVisible(this.visible);
 			bottomContent.setVisible(this.visible);
-		}
-		else {
+		} else {
 			this.visible = true;
 			middleContent.setVisible(this.visible);
 			bottomContent.setVisible(this.visible);
-		}	
+		}
 	}
-	
-	public boolean getBoxVisible(){
+
+	public boolean getBoxVisible() {
 		return this.visible;
 	}
-	
+
 	private void activate(FlightRouteInfo remoteItem) {
 		IFlightManagerRemoteService service;
 		try {
 			service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-			List<Coordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
-			Coordinate initPoint = coordds.remove(0);
-			service.planFlight(initPoint, coordds);
+			List<LlaCoordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
+			LlaCoordinate initPoint = coordds.remove(0);
+			service.planFlight(remoteItem.getName(), initPoint, coordds);
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

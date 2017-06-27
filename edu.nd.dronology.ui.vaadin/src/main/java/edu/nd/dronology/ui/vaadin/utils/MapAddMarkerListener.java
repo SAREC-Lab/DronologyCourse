@@ -130,7 +130,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	private Component getComponentByCaption(HasComponents component, String caption) {
 		Iterator<Component> it = component.iterator();
 		while (it.hasNext()) {
-			Component l = (Component) it.next();
+			Component l = it.next();
 			if (caption.equals(l.getCaption()))
 				return l;
 			else if (l instanceof HasComponents)

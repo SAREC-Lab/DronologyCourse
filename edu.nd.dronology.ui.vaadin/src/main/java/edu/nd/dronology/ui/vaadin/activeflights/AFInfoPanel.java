@@ -110,7 +110,7 @@ public class AFInfoPanel extends CustomComponent{
 	
 	}
 	
-	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, long lat, long lon, int alt, double speed, boolean hoverInPlace){
+	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
 		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
 		content.addComponent(box);
 		numUAVs = content.getComponentCount() - 1;

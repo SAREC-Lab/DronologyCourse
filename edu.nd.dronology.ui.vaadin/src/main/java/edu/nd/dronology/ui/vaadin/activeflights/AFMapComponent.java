@@ -17,9 +17,11 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
+import com.vividsolutions.jts.geom.Coordinate;
 
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
@@ -113,14 +115,14 @@ public class AFMapComponent extends CustomComponent {
 		try {
 			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
 			for (FlightPlanInfo e:currentFlights){
-				List<Coordinate> coordinates = e.getWaypoints();
+				List<Waypoint> coordinates = e.getWaypoints();
 				ArrayList<WayPoint> wayPoints = new ArrayList<>();
-				Coordinate tempCoord = e.getStartLocation();
-				Point tempPoint = new Point(tempCoord.getLatitude()*.000001, tempCoord.getLongitude()*.000001);
+				LlaCoordinate tempCoord = e.getStartLocation();
+				Point tempPoint = new Point(tempCoord.getLatitude(), tempCoord.getLongitude());
 				WayPoint tempWayPoint = new WayPoint(tempPoint);
 				wayPoints.add(tempWayPoint);
-				for (Coordinate coord:coordinates){		
-					Point point = new Point(coord.getLatitude()*.000001, coord.getLongitude()*.000001);
+				for (Waypoint waypoint:coordinates){		
+					Point point = new Point(waypoint.getCoordinate().getLatitude(), waypoint.getCoordinate().getLongitude());
 					WayPoint wayPoint = new WayPoint(point);
 					wayPoints.add(wayPoint);
 				}
@@ -168,7 +170,7 @@ public class AFMapComponent extends CustomComponent {
 			e.printStackTrace();
 		}
 		for (Entry<String, DroneStatus> e:drones.entrySet()){
-			LMarker marker = new LMarker(e.getValue().getLatitude()*.000001, e.getValue().getLongitude()*.000001);
+			LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
 			marker.setId(e.getValue().getID());
 			marker.setIcon(drone_icon);
 			marker.setIconSize(new Point(77, 33));
@@ -187,8 +189,8 @@ public class AFMapComponent extends CustomComponent {
 					for (Entry<String, DroneStatus> e:drones.entrySet()){
 						if (marker.getId().equals(e.getValue().getID())){
 							Point temp = new Point();
-							temp.setLat(e.getValue().getLatitude()*.000001);
-							temp.setLon(e.getValue().getLongitude()*.000001);
+							temp.setLat(e.getValue().getLatitude());
+							temp.setLon(e.getValue().getLongitude());
 							marker.setPoint(temp);
 							exists = true;
 						}
@@ -202,7 +204,7 @@ public class AFMapComponent extends CustomComponent {
 									old = true;
 							}
 							if (!old){
-								LMarker newMarker = new LMarker(e1.getValue().getLatitude()*.000001, e1.getValue().getLongitude()*.000001);
+								LMarker newMarker = new LMarker(e1.getValue().getLatitude(), e1.getValue().getLongitude());
 								newMarker.setId(e1.getValue().getID());
 								newMarker.setIcon(drone_icon);
 								newMarker.setIconSize(new Point(77, 33));
@@ -221,7 +223,7 @@ public class AFMapComponent extends CustomComponent {
 							exists = true;
 					}
 					if (!exists){
-						LMarker marker = new LMarker(e.getValue().getLatitude()*.000001, e.getValue().getLongitude()*.000001);
+						LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
 						marker.setId(e.getValue().getID());
 						marker.setIcon(drone_icon);
 						marker.setIconSize(new Point(77, 33));
