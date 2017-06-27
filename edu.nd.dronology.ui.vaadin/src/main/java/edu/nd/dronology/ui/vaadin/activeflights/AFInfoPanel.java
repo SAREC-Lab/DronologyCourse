@@ -8,6 +8,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -205,8 +206,18 @@ public class AFInfoPanel extends CustomComponent{
 				}
 			}
 		} catch (RemoteException e1) {
+			try {
+				Notification.show("Reconnecting...");
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e) {
+				// TODO Auto-generated catch block
+				Notification.show("Reconnecting...");
+			}
+			Notification.show("Reconnecting...");
+			content.removeAllComponents();
+			numUAVs = 0;
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		}
 		/**
 		 * update current drones' status
@@ -227,8 +238,18 @@ public class AFInfoPanel extends CustomComponent{
 				}
 			}
 		} catch (RemoteException e1) {
+			try {
+				Notification.show("Reconnecting...");
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e) {
+				// TODO Auto-generated catch block
+				Notification.show("Reconnecting...");
+			}
+			Notification.show("Reconnecting...");
+			content.removeAllComponents();
+			numUAVs = 0;
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		}
 	}
 	

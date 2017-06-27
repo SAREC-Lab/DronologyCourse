@@ -16,6 +16,7 @@ import org.vaadin.addon.leaflet.shared.Point;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -133,8 +134,17 @@ public class AFMapComponent extends CustomComponent {
 				flightRoutes.add(polyLines);
 			}
 		} catch (RemoteException e) {
+			try {
+				Notification.show("Reconnecting...");
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				Notification.show("Reconnecting...");
+			}
+			Notification.show("Reconnecting...");
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -157,8 +167,17 @@ public class AFMapComponent extends CustomComponent {
 				this.addActiveFlightRoutes();
 			}
 		} catch (RemoteException e) {
+			try {
+				Notification.show("Reconnecting...");
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				Notification.show("Reconnecting...");
+			}
+			Notification.show("Reconnecting...");
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -191,8 +210,16 @@ public class AFMapComponent extends CustomComponent {
 		try {
 			drones = service.getDrones();
 		} catch (RemoteException e) {
+			try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				Notification.show("Reconnecting...");
+			}
+			Notification.show("Reconnecting...");
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		for (Entry<String, DroneStatus> e:drones.entrySet()){
 			LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
@@ -276,8 +303,17 @@ public class AFMapComponent extends CustomComponent {
 				remove.clear();
 			}
 		} catch (RemoteException e) {
+			try {
+				Notification.show("Reconnecting...");
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				Notification.show("Reconnecting...");
+			}
+			Notification.show("Reconnecting...");
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}	  
 	}
 }
