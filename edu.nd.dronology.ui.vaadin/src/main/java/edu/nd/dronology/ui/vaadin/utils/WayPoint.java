@@ -14,11 +14,14 @@ public class WayPoint {
 	private String latitude = "";
 	private String altitude = "";
 	private String approachingSpeed = "";
+	private boolean isreached;
 	
-	public WayPoint (Point point) {
+	public WayPoint (Point point, boolean isreached) {
 		longitude = Double.toString(point.getLon());
 		latitude = Double.toString(point.getLat());
+		this.isreached = isreached;
 	}
+	
 	public boolean isAtPoint(Point point) {
 		if (this.latitude.equals(Double.toString(point.getLat())) && this.longitude.equals(Double.toString(point.getLon()))) {
 			return true;
@@ -27,39 +30,54 @@ public class WayPoint {
 			return false;
 		}
 	}
+	
 	public Point toPoint() {
 		Point point = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
 		return point;
 	}
+	
 	public String getId() {
 		return id;
 	}
+	
 	public void setId(String id) {
 		this.id = id;
 	}
+	
 	public String getLongitude() {
 		return longitude;
 	}
+	
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
 	}
+	
 	public String getLatitude() {
 		return latitude;
 	}
+	
 	public void setLatitude(String latitude) {
 		this.latitude = latitude;
 	}
+	
 	public String getAltitude() {
 		return altitude;
 	}
+	
 	public void setAltitude(String altitude) {
 		this.altitude = altitude;
 	}
+	
 	public String getApproachingSpeed() {
 		return approachingSpeed;
 	}
+	
 	public void setApproachingSpeed(String approachingSpeed) {
 		this.approachingSpeed = approachingSpeed;
+	}
+	
+	public boolean isReached() {
+		return isreached;
 	}
 	
 }

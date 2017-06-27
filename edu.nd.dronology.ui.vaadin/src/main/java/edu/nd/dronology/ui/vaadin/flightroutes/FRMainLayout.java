@@ -75,7 +75,7 @@ public class FRMainLayout extends CustomComponent {
 				pt.setLat(coor.getLatitude());
 				pt.setLon(coor.getLongitude());
 
-				WayPoint way = new WayPoint(pt);
+				WayPoint way = new WayPoint(pt, false);
 
 				map.getUtils().addNewPinRemoveOld(pt, first);
 

@@ -104,7 +104,7 @@ public class MapMarkerUtilities {
 	}
 
 	public WayPoint addNewPin(Point point, boolean lineClicked) {
-		WayPoint p = new WayPoint(point);
+		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
 		
 		if (mapPoints.size() == 0) {
@@ -130,7 +130,7 @@ public class MapMarkerUtilities {
 		return p;
 	}
 	public WayPoint addNewPinRemoveOld(Point point, boolean first) {
-		WayPoint p = new WayPoint(point);
+		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
 		addPinForWayPoint(p);
 		
@@ -181,8 +181,38 @@ public class MapMarkerUtilities {
   	removeAllLines(polylines);
   	polylines = drawLines(mapPoints);
 	}
-	
 	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints) {
+		ArrayList<LPolyline> polylines = new ArrayList<>();
+
+		for (int i = 0; i < mapPoints.size() - 1; i++) {
+		WayPoint current =	mapPoints.get(i);
+			LPolyline polyline = new LPolyline(current.toPoint(), mapPoints.get(i + 1).toPoint());
+			polyline.setId(UUID.randomUUID().toString());
+			polyline.setWeight(current.isReached() ? 1 : 2);
+			polyline.setColor("#000");
+			if (current.isReached()) {
+				polyline.setDashArray("5 10");
+				polyline.setColor("#249b09");
+			}
+			else if(i>0 && mapPoints.get(i - 1).isReached()){
+				polyline.setColor("#249b09");
+			}
+			polylines.add(polyline);
+			map.addComponent(polyline);
+
+			polyline.addClickListener(event -> {
+				lineClicked = true;
+				for (int j = 0; j < polylines.size(); j++) {
+					if (polylines.get(j).getId().equals(polyline.getId())) {
+						lineIndex = j + 1;
+					}
+				}
+				removeAllLines(polylines);
+			});
+		}
+		return polylines;
+	}
+/*	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 		
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
@@ -196,7 +226,7 @@ public class MapMarkerUtilities {
 			}
 		}
 		return polylines;
-	}
+	}*/
 	
 	public void removeAllLines(ArrayList<LPolyline> polylines) {
 		for (int i = polylines.size() - 1; i >= 0; i--) {

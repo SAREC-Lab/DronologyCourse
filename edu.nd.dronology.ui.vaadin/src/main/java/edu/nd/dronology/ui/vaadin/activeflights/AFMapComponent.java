@@ -48,7 +48,7 @@ public class AFMapComponent extends CustomComponent {
 	private IFlightManagerRemoteService flightRouteService;
   private BaseServiceProvider provider = MyUI.getProvider();
   private ArrayList<ArrayList<LPolyline>> flightRoutes = new ArrayList<>();
-  private ArrayList<ArrayList<WayPoint>> wayPointLists = new ArrayList<>();
+  //private ArrayList<ArrayList<WayPoint>> wayPointLists = new ArrayList<>();
 	
   private MapMarkerUtilities utilities;
   
@@ -119,16 +119,18 @@ public class AFMapComponent extends CustomComponent {
 				ArrayList<WayPoint> wayPoints = new ArrayList<>();
 				LlaCoordinate tempCoord = e.getStartLocation();
 				Point tempPoint = new Point(tempCoord.getLatitude(), tempCoord.getLongitude());
-				WayPoint tempWayPoint = new WayPoint(tempPoint);
+				WayPoint tempWayPoint = new WayPoint(tempPoint,false);
 				wayPoints.add(tempWayPoint);
-				for (Waypoint waypoint:coordinates){		
-					Point point = new Point(waypoint.getCoordinate().getLatitude(), waypoint.getCoordinate().getLongitude());
-					WayPoint wayPoint = new WayPoint(point);
+				int i=0;
+				for (Waypoint coord:coordinates){
+					
+					Point point = new Point(coord.getCoordinate().getLatitude(), coord.getCoordinate().getLongitude());
+					WayPoint wayPoint = new WayPoint(point, nextReached(coordinates,i+1));
 					wayPoints.add(wayPoint);
+					i++;
 				}
 				ArrayList<LPolyline> polyLines = utilities.drawLines(wayPoints);
 				flightRoutes.add(polyLines);
-				wayPointLists.add(wayPoints);
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -136,8 +138,31 @@ public class AFMapComponent extends CustomComponent {
 		}
 	}
 	
+	private boolean nextReached(List<Waypoint> coordinates, int i) {
+		if (coordinates.size() <= i) {
+			return false;
+		}
+		Waypoint next = coordinates.get(i);
+		return next.isReached();
+	}
 	
-	public void updateActiveFlightRoutes(){
+	public void updateActiveFlightRoutes() {
+		try {
+			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
+			if (currentFlights.size() != flightRoutes.size() || true) {
+				for (ArrayList<LPolyline> e : flightRoutes) {
+					utilities.removeAllLines(e);
+				}
+				flightRoutes.clear();
+				this.addActiveFlightRoutes();
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/*public void updateActiveFlightRoutes(){
 		try {
 			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
 			if (currentFlights.size() != flightRoutes.size()){
@@ -160,7 +185,7 @@ public class AFMapComponent extends CustomComponent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	public void addDroneMarkers(){
 		try {

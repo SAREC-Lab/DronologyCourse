@@ -47,7 +47,7 @@ public class DistanceUtil {
 		double totaldistance = 0;
 		for (int i = 0; i < coordinates.length; i++) {
 			LlaCoordinate current = coordinates[i];
-			if (coordinates.length < (i + 1)) {
+			if (coordinates.length < (i + 2)) {
 				break;
 			}
 			LlaCoordinate next = coordinates[i + 1];
