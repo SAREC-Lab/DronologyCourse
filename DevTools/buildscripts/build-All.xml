@@ -13,6 +13,7 @@
 	
 	<target name="clean-resultdir">
 		<echo>Deleting jars from ${result.dirname} ...</echo>
+		<mkdir dir="${publish.dir}" />
 		<delete>
 			<fileset dir="${publish.dir}" includes="**/*.jar" />
 		</delete>

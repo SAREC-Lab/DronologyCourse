@@ -1,11 +1,13 @@
 package edu.nd.dronology.core.flight.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.IFlightPlan;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**
@@ -15,13 +17,13 @@ import edu.nd.dronology.core.vehicle.ManagedDrone;
  * @version 0.1
  *
  */
-public class FlightPlan implements IFlightPlan{
+public class FlightPlan implements IFlightPlan {
 	private static int flightNumber = 0;
 	private String flightID;
 
-	private List<Coordinate> wayPoints;
-	private Coordinate startLocation;
-	private Coordinate endLocation;
+	private List<Waypoint> wayPoints;
+	private LlaCoordinate startLocation;
+	private LlaCoordinate endLocation;
 	private Status status;
 	private ManagedDrone drone = null;
 
@@ -45,16 +47,24 @@ public class FlightPlan implements IFlightPlan{
 	 *          Starting coordinates
 	 * @param wayPoints
 	 */
-	public FlightPlan(Coordinate start, List<Coordinate> wayPoints) {
-		this.wayPoints = wayPoints;
+	public FlightPlan(String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
+		this.wayPoints = createWayPoints(wayPoints);
 		this.startLocation = start;
 		if (wayPoints.size() > 0) {
 			this.endLocation = wayPoints.get(wayPoints.size() - 1);
 		} else {
 			endLocation = startLocation;
 		}
-		this.flightID = "DF-" + Integer.toString(++flightNumber);
+		this.flightID = "DF-" + Integer.toString(++flightNumber) + " - " + planName;
 		status = Status.PLANNED;
+	}
+
+	private List<Waypoint> createWayPoints(List<LlaCoordinate> coordinates) {
+		List<Waypoint> waypoints = new ArrayList<>();
+		for (LlaCoordinate coordinate : coordinates) {
+			waypoints.add(new Waypoint(coordinate));
+		}
+		return waypoints;
 	}
 
 	/**
@@ -71,7 +81,7 @@ public class FlightPlan implements IFlightPlan{
 	 * @return Starting Coordinates
 	 */
 	@Override
-	public Coordinate getStartLocation() {
+	public LlaCoordinate getStartLocation() {
 		return startLocation;
 	}
 
@@ -80,7 +90,7 @@ public class FlightPlan implements IFlightPlan{
 	 * @return Ending Coordinates
 	 */
 	@Override
-	public Coordinate getEndLocation() {
+	public LlaCoordinate getEndLocation() {
 		return endLocation;
 	}
 
@@ -105,7 +115,7 @@ public class FlightPlan implements IFlightPlan{
 	 * @return true if drone is currently flying, false otherwise.
 	 * @throws FlightZoneException
 	 */
-	@Override 
+	@Override
 	public boolean setStatusToFlying(ManagedDrone drone) throws FlightZoneException {
 		if (status == Status.PLANNED) {
 			status = Status.FLYING;
@@ -151,10 +161,10 @@ public class FlightPlan implements IFlightPlan{
 	/**
 	 * Returns way points
 	 * 
-	 * @return List<Coordinates>
+	 * @return List<Waypoint>
 	 */
 	@Override
-	public List<Coordinate> getWayPoints() {
+	public List<Waypoint> getWayPoints() {
 		return Collections.unmodifiableList(wayPoints);
 	}
 

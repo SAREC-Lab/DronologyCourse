@@ -6,7 +6,8 @@ import org.eclipse.swt.graphics.Image;
 
 import edu.nd.dronology.core.flight.IFlightPlan;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.ui.cc.images.ImageProvider;
 
@@ -42,7 +43,9 @@ public class FlightManagerLabelProvider implements ILabelProvider {
 			return ImageProvider.IMG_DRONE_FLIGHTPLAN;
 
 		}
-		if (element instanceof Coordinate) {
+		if (element instanceof Waypoint) {
+			Waypoint wp = (Waypoint) element;
+			System.out.println(wp.isReached());
 			return ImageProvider.IMG_DRONE_WAYPOINT;
 		}
 		if (element instanceof WrappedCoordinate) {

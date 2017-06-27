@@ -3,7 +3,10 @@ package edu.nd.dronology.core.air_traffic_control;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.dronology.core.CoordinateChange;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Safety manager is responsible for monitoring drone positions to ensure minimum safety distance is not violated
@@ -12,15 +15,31 @@ import edu.nd.dronology.core.vehicle.ManagedDrone;
  *
  */
 public class DroneSeparationMonitor {
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSeparationMonitor.class);
+
+	private static volatile DroneSeparationMonitor INSTANCE = null;
+
 	private List<ManagedDrone> drones = new ArrayList<>();
-	private Long safetyZone; // Set arbitrarily for now.
+	private Double safetyZone; // Set arbitrarily for now.
 
 	/**
 	 * Construct the safety manager. SafetyZone size is hard coded at 10000 degree points.
 	 */
 	public DroneSeparationMonitor() {
 		drones = new ArrayList<>();
-		safetyZone = (long) 10000;
+		safetyZone = 10d;
+	}
+
+	public static DroneSeparationMonitor getInstance() {
+
+		if (INSTANCE == null) {
+			synchronized (DroneSeparationMonitor.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new DroneSeparationMonitor();
+				}
+			}
+		}
+		return INSTANCE;
 	}
 
 	/**
@@ -47,10 +66,13 @@ public class DroneSeparationMonitor {
 	 * 
 	 * @return distance remaining in degree points.
 	 */
-	public long getDistance(ManagedDrone drone1, ManagedDrone drone2) {
-		long longDelta = Math.abs(drone1.getLongitude() - drone2.getLongitude());
-		long latDelta = Math.abs(drone1.getLatitude() - drone2.getLatitude());
-		return (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
+	@CoordinateChange
+	public double getDistance(ManagedDrone drone1, ManagedDrone drone2) {
+		// long longDelta = Math.abs(drone1.getLongitude() - drone2.getLongitude());
+		// long latDelta = Math.abs(drone1.getLatitude() - drone2.getLatitude());
+		// return (long) Math.sqrt((Math.pow(longDelta, 2)) + (Math.pow(latDelta, 2)));
+		return DistanceUtil.distance(drone1.getLatitude(), drone2.getLatitude(), drone1.getLongitude(),
+				drone2.getLongitude(), 0, 0);
 	}
 
 	/**
@@ -61,17 +83,20 @@ public class DroneSeparationMonitor {
 	 * @return
 	 */
 	public boolean permittedToTakeOff(ManagedDrone managedDrone) {
+		double dronDistance = 0;
 		for (ManagedDrone drone2 : drones) {
-			if (!managedDrone.equals(drone2) && drone2.getFlightModeState().isFlying())
-				if (getDistance(managedDrone, drone2) < safetyZone * 1.5) // We
-					// require
-					// extra
-					// distance
-					// prior
-					// to
-					// takeoff
+			if (!managedDrone.equals(drone2) && drone2.getFlightModeState().isFlying()) {
+				dronDistance = getDistance(managedDrone, drone2);
+				if (dronDistance < safetyZone * 1.5) {
+					LOGGER.error("Safety Distance Violation - Drone not allowed to TakeOff! distance: " + dronDistance
+							+ " safety zone: " + safetyZone + " => " + dronDistance);
 					return false;
+				}
+			}
 		}
+
+		LOGGER.info(
+				"All clear - " + managedDrone.getDroneName() + " clearrance for take-off (dinstance: " + dronDistance + ")");
 		return true;
 	}
 
@@ -86,8 +111,8 @@ public class DroneSeparationMonitor {
 					// !drone2.isUnderSafetyDirectives()){
 					if (getDistance(drone, drone2) < safetyZone) {
 						// Do not remove even though not used right now.
-						double angle1 = PointDelta.computeAngle(drone.getCoordinates(), drone.getTargetCoordinates());
-						double angle2 = PointDelta.computeAngle(drone2.getCoordinates(), drone2.getTargetCoordinates());
+						// double angle1 = PointDelta.computeAngle(drone.getCoordinates(), drone.getTargetCoordinates());
+						// double angle2 = PointDelta.computeAngle(drone2.getCoordinates(), drone2.getTargetCoordinates());
 						// new Roundabout(drone, drone2);
 						// PLACEHOLDER FOR new avoidance strategy.
 					}

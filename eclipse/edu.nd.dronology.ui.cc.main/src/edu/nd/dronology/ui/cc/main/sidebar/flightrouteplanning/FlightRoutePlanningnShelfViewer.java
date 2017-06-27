@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.info.FlightRouteCategoryInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.info.RemoteInfoObject;
@@ -176,9 +176,9 @@ public class FlightRoutePlanningnShelfViewer extends AbstractSidebarViewer<Fligh
 			service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
 
-			List<Coordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
-			Coordinate initPoint = coordds.remove(0);
-			service.planFlight(initPoint, coordds);
+			List<LlaCoordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
+			LlaCoordinate initPoint = coordds.remove(0);
+			service.planFlight(remoteItem.getName(),initPoint, coordds);
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

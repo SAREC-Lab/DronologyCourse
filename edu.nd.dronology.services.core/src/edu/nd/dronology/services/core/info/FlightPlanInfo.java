@@ -3,29 +3,32 @@ package edu.nd.dronology.services.core.info;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 
 public class FlightPlanInfo extends RemoteInfoObject {
+
+	
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 256865471183839829L;
 	private String droneId;
-	private List<Coordinate> waypoints;
-	private Coordinate startLocation;
+	private List<Waypoint> waypoints;
+	private LlaCoordinate startLocation;
 	private long startTime;
 	private long endTime;
-	
+
 	public String getDroneId() {
 		return droneId;
 	}
 
-	public List<Coordinate> getWaypoints() {
+	public List<Waypoint> getWaypoints() {
 		return waypoints;
 	}
 
-	public Coordinate getStartLocation() {
+	public LlaCoordinate getStartLocation() {
 		return startLocation;
 	}
 
@@ -37,37 +40,34 @@ public class FlightPlanInfo extends RemoteInfoObject {
 		return endTime;
 	}
 
-
-
 	public FlightPlanInfo(String name, String id) {
 		super(name, id);
 	}
 
 	public void setDroneId(String droneId) {
-	this.droneId = droneId;
-		
+		this.droneId = droneId;
+
 	}
 
-	public void setWaypoints(List<Coordinate> waypoints) {
-		this.waypoints = new ArrayList(waypoints);
-		
+	public void setWaypoints(List<Waypoint> waypoints) {
+		this.waypoints = new ArrayList<>(waypoints);
+
 	}
 
-	public void setStartLocation(Coordinate startLocation) {
-	this.startLocation = startLocation;
-		
+	public void setStartLocation(LlaCoordinate startLocation) {
+		this.startLocation = startLocation;
+
 	}
 
 	public void setStartTime(long startTime) {
-		this.startTime=startTime;
-		
+		this.startTime = startTime;
+
 	}
 
 	public void setEndTime(long endTime) {
 		this.endTime = endTime;
-		
+
 	}
+
 	
-
-
 }

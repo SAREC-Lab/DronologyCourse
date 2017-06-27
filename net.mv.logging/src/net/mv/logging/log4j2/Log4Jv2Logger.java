@@ -21,6 +21,9 @@ public class Log4Jv2Logger implements ILogger {
 	private Log4JLogForwarder throwAdapter;
 	private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAULT);
 
+	final Level HW_INFO = Level.forName("HW_INFO", 60);
+	final Level HW_FATAL = Level.forName("HW_FATAL", 30);
+
 	public Log4Jv2Logger(final Class<?> clazz) {
 		this(clazz.getName(), clazz);
 		throwAdapter = new Log4JLogForwarder(this);
@@ -29,8 +32,7 @@ public class Log4Jv2Logger implements ILogger {
 	public Log4Jv2Logger(final String throwingSource, final Class<?> clazz) {
 		logger = org.apache.logging.log4j.LogManager.getLogger(clazz);
 		this.throwingSource = Log4Jv2Logger.class.getName();
-		log = new ExtendedLoggerWrapper((ExtendedLogger) logger, throwingSource,
-				StringFormatterMessageFactory.INSTANCE);
+		log = new ExtendedLoggerWrapper((ExtendedLogger) logger, throwingSource, StringFormatterMessageFactory.INSTANCE);
 
 	}
 
@@ -54,7 +56,7 @@ public class Log4Jv2Logger implements ILogger {
 	@Override
 	public void info(final Object message) {
 		log.logIfEnabled(throwingSource, Level.INFO, MARKER, message, null);
-		throwAdapter.info( message);
+		throwAdapter.info(message);
 	}
 
 	@Override
@@ -82,7 +84,7 @@ public class Log4Jv2Logger implements ILogger {
 	@Override
 	public void warn(final Object message, final Throwable throwable) {
 		log.logIfEnabled(throwingSource, Level.WARN, MARKER, message, throwable);
-		throwAdapter.warn( message, throwable);
+		throwAdapter.warn(message, throwable);
 	}
 
 	@Override
@@ -122,6 +124,19 @@ public class Log4Jv2Logger implements ILogger {
 		throwAdapter.fatal(throwable);
 	}
 
+	@Override
+	public void hwInfo(final Object message) {
+		Object logMessage = message.toString();
+		log.logIfEnabled(throwingSource, HW_INFO, MARKER, logMessage, null);
+		// throwAdapter.fatal(message);
+	}
+
+	@Override
+	public void hwFatal(final Object message) {
+		Object logMessage = message.toString();
+		log.logIfEnabled(throwingSource, HW_FATAL, MARKER, logMessage, null);
+		// throwAdapter.fatal(message);
+	}
 
 	public void throwTrace(Throwable throwable) throws Throwable {
 		throwAdapter.throwTrace(throwable);
@@ -139,31 +154,25 @@ public class Log4Jv2Logger implements ILogger {
 		throwAdapter.throwWarn(throwable);
 	}
 
-
 	public void throwError(Throwable throwable) throws Throwable {
 		throwAdapter.throwError(throwable);
 	}
-
 
 	public void throwFatal(Throwable throwable) throws Throwable {
 		throwAdapter.throwFatal(throwable);
 	}
 
-
 	public void throwTrace(RuntimeException runtimeException) {
 		throwAdapter.throwTrace(runtimeException);
 	}
-
 
 	public void throwDebug(RuntimeException runtimeException) {
 		throwAdapter.throwDebug(runtimeException);
 	}
 
-	
 	public void throwInfo(RuntimeException runtimeException) {
 		throwAdapter.throwInfo(runtimeException);
 	}
-
 
 	public void throwWarn(RuntimeException runtimeException) {
 		throwAdapter.throwWarn(runtimeException);
@@ -173,7 +182,6 @@ public class Log4Jv2Logger implements ILogger {
 		throwAdapter.throwError(runtimeException);
 	}
 
-
 	public void throwFatal(RuntimeException runtimeException) {
 		throwAdapter.throwFatal(runtimeException);
 	}
@@ -182,6 +190,12 @@ public class Log4Jv2Logger implements ILogger {
 	public void trace(Throwable throwable) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void trace(final Object message) {
+		log.logIfEnabled(throwingSource, Level.TRACE, MARKER, message, null);
+		throwAdapter.warn(message);
 	}
 
 }

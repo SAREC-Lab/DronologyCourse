@@ -1,0 +1,30 @@
+To run the current version of Dronology. 
+Go to edu.nd.dronology.services.launcher and invoke DronologyServiceRunner.java
+This will start up the services (note that you'll currently see errors as it starts up the Ground Station middleware, if the GroundStation is not running (you can ignore this for now)).
+
+There are several options for running a placeholder GUI.  The easiest one (with the least functionality too) can be invoked from:
+edu.nd.dronology.ui.javafx.start DronologyFXUIRunner.java
+
+
+
+To set up the GroundStation and the SITL drone simulator in a linux environment:
+Open a terminal and cd into Dronology/python/edu.nd.dronology.gstation.python/
+Run the bash script ./setup_SITL.sh
+This will install SITL and all of its dependencies, along with everything needed to run the GroundStation.
+You will have to enter the root password multiple times to allow the script to install everything.
+When the script completes, it will start the SITL drone simulator once to confirm everything is set up.
+When the mavproxy console opens, close the simulator by pressing Ctrl+C in the terminal window.
+
+To run the GroundStation in a linux environment:
+Open a terminal and cd into Dronology/python/edu.nd.dronology.gstation.python/
+Run the python file ./GroundStation.py
+The GroundStation will make connections to all of the configured drones, and start the SITL drone simulator if necessary.
+Connecting to the GroundStation from Dronology currently requires changing line 72 of edu.nd.dronology.gstation.python.connector/PythonBase.java to use the hostname of the GroundStation.
+Also, a flag somewhere in the code (I can't currently find the flag - [TODO: ask Michael Vierhauser]) must be set to connect Dronology to a Physical Drone, rather than the internal Virtual Drone.
+
+To close the GroundStation:
+Due to an infinite while loop in the GroundStation which does not respond to the SIGTERM signal for the process, currently the GroundStation does not properly close with the Ctrl+C shortcut.
+Instead, the GroundStation must be closed using a shell script, which force closes all python processes.
+To close the GroundStation, open another terminal and cd into Dronology/python/edu.nd.dronology.gstation.python/
+Run the bash script ./killPY.sh
+This will force close all python processes on the machine (including the GroundStation) and any instances of SITL (arducopter) that are running.

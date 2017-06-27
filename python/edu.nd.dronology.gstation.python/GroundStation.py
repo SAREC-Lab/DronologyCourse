@@ -9,12 +9,12 @@ class GroundStation():
 	def __init__(self,port,drones):
 		self.java = JavaComm(port)
 		self.java.setDataHandler(self.receivedData)
-		self.current_drone_id = 0
 		self.drones = {}
 		for drone in drones:
 			new_drone = DroneComm(drone['type'],drone['ConnectionData'])
-			self.drones[self.current_drone_id] = new_drone
-			self.current_drone_id = self.current_drone_id + 1
+			new_drone_id = new_drone.getID()
+			self.drones[new_drone_id] = new_drone
+		print "finished initializing drones..."
 		self.send_drone_list_cont_async()
 		self.java.startComm()
 	
@@ -40,6 +40,9 @@ class GroundStation():
 			drone.gotoLocation(coord)
 		elif command=="takeoff":
 			drone.takeoff(data['altitude'])
+		elif command=="setVelocity":
+			coord = CoordFromDict(data)
+			drone.setVelocity(coord)
 		elif command=="setGimbalRotation":
 			coord = CoordFromDict(data)
 			drone.setGimbalRotation(coord)
@@ -86,6 +89,8 @@ class GroundStation():
 			'type':'drone_list',
 			'data':drone_list,
 		}
+		#print "sending drone list: "
+		#print drone_list
 		self.java.send_dict_last(data)
 	
 	def send_drone_list_cont(self):
@@ -102,9 +107,18 @@ if __name__=="__main__":
 			'type':'SITL',
 			'ConnectionData':{
 				'inst':0,
-				'home':'41.732955,-86.180886,0,0',
+				'home':'41.519408,-86.239996,0,0',
 			},
 		},
 	]
+	#drones = [
+	#	{
+	#		'type':'physical',
+	#		'ConnectionData':{
+	#			'ConnectionString':'/dev/ttyUSB0',
+	#			'BaudRate':57600,
+	#		},
+	#	},
+	#]
 	comm = GroundStation(1234,drones)
 	

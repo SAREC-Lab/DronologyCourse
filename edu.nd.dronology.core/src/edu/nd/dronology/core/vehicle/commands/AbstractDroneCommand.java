@@ -11,8 +11,8 @@ import com.google.gson.GsonBuilder;
 public class AbstractDroneCommand implements IDroneCommand {
 
 	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
-			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).setVersion(1.0)
-			.serializeSpecialFloatingPointValues().create();
+			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
 
 	private final Map<String, Object> data = new HashMap<>();
 	private final String type = "command";
@@ -26,30 +26,12 @@ public class AbstractDroneCommand implements IDroneCommand {
 	}
 
 	@Override
-	public String toJsonString() {
-
-		return GSON.toJson(this);
-
-		// JSONObject rootObject = new JSONObject();
-		//// rootObject.put("type", "command");
-		// JSONObject dataObject = new JSONObject();
-		// dataObject.put("id", id);
-		// dataObject.put("command", command);
-		// JSONObject innerDataObject = new JSONObject();
-		// innerDataObject.putAll(data);
-		// dataObject.put("data", innerDataObject);
-		// rootObject.put("data", dataObject);
-
-		// try {
-		// StringWriter out = new StringWriter();
-		// rootObject.writeJSONString(out);
-		// String jsonText = out.toString();
-		//
-		// sendData(jsonText);
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
+	public String toString() {
+		return this.getClass().getSimpleName()+" ["+GSON.toJson(this)+"]";
 	}
-	// }
 
+	@Override
+	public String toJsonString() {
+		return GSON.toJson(this);
+	}
 }

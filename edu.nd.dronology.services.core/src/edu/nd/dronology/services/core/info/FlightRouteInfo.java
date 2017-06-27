@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 public class FlightRouteInfo extends RemoteInfoObject {
 
@@ -15,7 +15,7 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	private static final long serialVersionUID = -7327376857430499641L;
 	private List<MappingInfo> mappingInfos = new ArrayList<>();
 	private String category;
-	private List<Coordinate> coordinates = new ArrayList<>();
+	private List<LlaCoordinate> coordinates = new ArrayList<>();
 
 	public FlightRouteInfo(String name, String id) {
 		super(name, id);
@@ -39,15 +39,15 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	}
 
-	public List<Coordinate> getCoordinates() {
+	public List<LlaCoordinate> getCoordinates() {
 		return coordinates;
 	}
 
-	public void addCoordinate(Coordinate coordinate) {
+	public void addCoordinate(LlaCoordinate coordinate) {
 		coordinates.add(coordinate);
 	}
 	
-	public void rempoveCoordinate(Coordinate coordinate) {
+	public void rempoveCoordinate(LlaCoordinate coordinate) {
 		coordinates.remove(coordinate);
 	}
 

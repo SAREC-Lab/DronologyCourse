@@ -2,7 +2,7 @@ package edu.nd.dronology.core.util;
 
 public class DegreesFormatter {
 
-	public static String prettyFormatDegrees(Long degrees) {
+	public static String prettyFormatDegrees(Double degrees) {
 		boolean minus = false;
 		if (degrees < 0)
 			minus = true;

@@ -2,7 +2,7 @@ package edu.nd.dronology.core.vehicle;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 /**
  * iDrone interface
@@ -18,31 +18,31 @@ public interface IDrone {
 	 * 
 	 * @return latitude of drone
 	 */
-	public long getLatitude();
+	public double getLatitude();
 
 	/**
 	 * 
 	 * @return longitude of drone
 	 */
-	public long getLongitude();
+	public double getLongitude();
 
 	/**
 	 * 
 	 * @return altitude of drone
 	 */
-	public int getAltitude();
+	public double getAltitude();
 	
 	/**
 	 * Fly drone to target coordinates
 	 * @param targetCoordinates
 	 */
-	public void flyTo(Coordinate targetCoordinates);
+	public void flyTo(LlaCoordinate targetCoordinates);
 
 	/**
 	 * 
 	 * @return current coordinates
 	 */
-	public Coordinate getCoordinates();
+	public LlaCoordinate getCoordinates();
 
 	/**
 	 * 
@@ -60,7 +60,7 @@ public interface IDrone {
 	 * Takeoff.  Update status.
 	 * @throws FlightZoneException 
 	 */
-	void takeOff(int altitude) throws FlightZoneException;
+	void takeOff(double altitude) throws FlightZoneException;
 
 	/**
 	 * Sets drones coordinates
@@ -68,20 +68,24 @@ public interface IDrone {
 	 * @param lon Longitude
 	 * @param alt Altitude
 	 */
-	public void setCoordinates(long lat, long lon, int alt);
+	public void setCoordinates(double lat, double lon, double alt);
 	
 	public double getBatteryStatus();
 
-	public boolean move(int i);
+	public boolean move(double i);
 
 	public void setVoltageCheckPoint();
 
 	public boolean isDestinationReached(int distanceMovedPerTimeStep);
 
-	void setBaseCoordinates(Coordinate basePosition);
+	void setBaseCoordinates(LlaCoordinate basePosition);
 
-	public Coordinate getBaseCoordinates();
+	public LlaCoordinate getBaseCoordinates();
 	
+	public void setGroundSpeed(double speed);
 	
+	public void setVelocity(double x, double y, double z);
+
+	void setCoordinates(LlaCoordinate coordinate);
 
 }

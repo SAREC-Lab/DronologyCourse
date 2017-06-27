@@ -24,6 +24,18 @@
 	"type":"command",
 	"data":{
 		"id": 0,
+		"command":"setVelocity",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+{
+	"type":"command",
+	"data":{
+		"id": 0,
 		"command":"setGimbalRotation",
 		"data":{
 			"x": 0,

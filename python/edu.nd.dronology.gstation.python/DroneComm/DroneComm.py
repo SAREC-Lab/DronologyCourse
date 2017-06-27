@@ -24,6 +24,7 @@ class DroneComm(object):
 			print "WARNING: Unrecognized connection type: {type}".format(type=self.type)
 			print "WARNING: Defaulting to simulated drone"
 			self.Drone = SimDrone(self.ConnectionData)
+		print "drone initialized"
 		
 	
 	def gotoLocation(self,location):
@@ -40,6 +41,9 @@ class DroneComm(object):
 	
 	def getVelocity(self):
 		return self.Drone.getVelocity()
+	
+	def setVelocity(self,velocity):
+		self.Drone.setVelocity(velocity)
 	
 	def getGimbalRotation(self):
 		return self.Drone.getGimbalRotation()
@@ -95,6 +99,9 @@ class DroneComm(object):
 	def setMode(self,mode):
 		self.Drone.setMode(mode)
 	
+	def getID(self):
+		return self.Drone.getID()
+	
 	def step(self):
 		self.Drone.step()
 	
@@ -113,5 +120,6 @@ class DroneComm(object):
 			'groundspeed': self.getGroundspeed(),
 			'armed': self.getArmed(),
 			'mode': self.getMode(),
+			'id': self.getID(),
 		}
 	

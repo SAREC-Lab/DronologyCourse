@@ -22,7 +22,9 @@
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/json/json-20110217.jar"   todir="${build.dir}/lib" />
 
 		
-		
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/stateless/slf4j-api-1.7.25.jar"   todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/stateless/slf4j-simple-1.7.25.jar"   todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/stateless/stateless4j-2.5.0.jar"   todir="${build.dir}/lib" />
 		
 	</target> 
 

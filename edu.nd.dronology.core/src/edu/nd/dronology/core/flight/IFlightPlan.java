@@ -4,7 +4,8 @@ import java.util.List;
 
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 @Discuss(discuss="this interface is currently exposed - i.e. managed drone is exposed ")
 public interface IFlightPlan {
@@ -13,9 +14,9 @@ public interface IFlightPlan {
 
 	boolean setStatusToCompleted() throws FlightZoneException;
 
-	Coordinate getStartLocation();
+	LlaCoordinate getStartLocation();
 	
-	Coordinate getEndLocation();
+	LlaCoordinate getEndLocation();
 
 	void clearAssignedDrone();
 
@@ -23,7 +24,7 @@ public interface IFlightPlan {
 
 	boolean setStatusToFlying(ManagedDrone drone) throws FlightZoneException;
 
-	List<Coordinate> getWayPoints();
+	List<Waypoint> getWayPoints();
 
 	long getStartTime();
 

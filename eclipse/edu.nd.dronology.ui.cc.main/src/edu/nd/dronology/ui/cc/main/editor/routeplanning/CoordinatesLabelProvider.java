@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.ui.cc.images.ImageProvider;
 
 public class CoordinatesLabelProvider implements ITableLabelProvider {
@@ -43,11 +43,11 @@ public class CoordinatesLabelProvider implements ITableLabelProvider {
 
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
-		Coordinate cord = (Coordinate) element;
+		LlaCoordinate cord = (LlaCoordinate) element;
 		switch (columnIndex) {
-			case 0: return Long.toString(cord.getLatitude());
-			case 1: return Long.toString(cord.getLongitude());
-			case 2: return Long.toString(cord.getAltitude());
+			case 0: return Double.toString(cord.getLatitude());
+			case 1: return Double.toString(cord.getLongitude());
+			case 2: return Double.toString(cord.getAltitude());
 		
 			default:
 				return "-1";

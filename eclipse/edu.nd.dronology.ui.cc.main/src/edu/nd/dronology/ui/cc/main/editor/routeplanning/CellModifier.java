@@ -5,10 +5,14 @@ import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.TableItem;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 public class CellModifier extends TextCellEditor implements ICellModifier {
 
+
+	
 	private UAVFlightRoutePage page;
 
 	public CellModifier(UAVFlightRoutePage view) {
@@ -24,19 +28,19 @@ public class CellModifier extends TextCellEditor implements ICellModifier {
 
 	@Override
 	public Object getValue(Object elem, String colName) {
-		if (!(elem instanceof Coordinate)) {
+		if (!(elem instanceof LlaCoordinate)) {
 			return StringUtils.EMPTY;
 		}
-		Coordinate entry = (Coordinate) elem;
+		LlaCoordinate entry = (LlaCoordinate) elem;
 		int col = Integer.parseInt(colName);
 		if (col == 0) {
-			return Long.toString(entry.getLatitude());
+			return Double.toString(entry.getLatitude());
 		}
 		if (col == 1) {
-			return  Long.toString(entry.getLongitude());
+			return Double.toString(entry.getLongitude());
 		}
 		if (col == 2) {
-			return  Long.toString(entry.getAltitude());
+			return Double.toString(entry.getAltitude());
 		}
 		return -1;
 	}
@@ -44,25 +48,26 @@ public class CellModifier extends TextCellEditor implements ICellModifier {
 	@Override
 	public void modify(Object chanedElem, String column, Object newValue) {
 		TableItem item = (TableItem) chanedElem;
-		Coordinate e = (Coordinate) item.getData();
+		LlaCoordinate e = (LlaCoordinate) item.getData();
 		if (column.equals("0")) {
 			try {
-				Long i = Long.parseLong(newValue.toString());
-				e.setLatitude(i);
+				Double i = Double.parseDouble(newValue.toString());
+				// e.setLatitude(i);
+				page.setNewLatitude(e,i);
 			} catch (NumberFormatException ex) {
 				System.out.println("Not a number " + newValue);
 			}
 		} else if (column.equals("1")) {
 			try {
-				Long i =Long.parseLong(newValue.toString());
-				e.setLongitude(i);
+				Double i = Double.parseDouble(newValue.toString());
+				page.setNewLongitude(e,i);
 			} catch (NumberFormatException ex) {
 				System.out.println("Not a number " + newValue);
 			}
 		} else if (column.equals("2")) {
 			try {
-				Integer i = Integer.parseInt(newValue.toString());
-				e.setAltitude(i);
+				Double i = Double.parseDouble(newValue.toString());
+				page.setNewAltitude(e,i);
 			} catch (NumberFormatException ex) {
 				System.out.println("Not a number " + newValue);
 			}

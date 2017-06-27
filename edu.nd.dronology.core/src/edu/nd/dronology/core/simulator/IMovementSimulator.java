@@ -1,14 +1,15 @@
 package edu.nd.dronology.core.simulator;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 
 public interface IMovementSimulator {
 	
-	boolean move(int i);
-	void setFlightPath(Coordinate currentPosition, Coordinate targetCoordinates);
+	boolean move(double i);
+	void setFlightPath(LlaCoordinate currentPosition, LlaCoordinate targetCoordinates);
 
 	void checkPoint();
 
-	boolean isDestinationReached(int distanceMovedPerTimeStep);
+	boolean isDestinationReached(double distanceMovedPerTimeStep);
+	
 
 }

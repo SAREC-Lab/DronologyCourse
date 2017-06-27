@@ -11,7 +11,7 @@ import edu.nd.dronology.core.flight.Flights;
 import edu.nd.dronology.core.flight.IFlightDirector;
 import edu.nd.dronology.core.flight.IFlightPlan;
 import edu.nd.dronology.core.flight.internal.SoloDirector;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -31,7 +31,7 @@ public class FlightZoneManager implements Runnable {
 	 */
 	public FlightZoneManager() throws InterruptedException {
 		droneFleet = DroneFleetManager.getInstance();
-		safetyMgr = new DroneSeparationMonitor();
+		safetyMgr = DroneSeparationMonitor.getInstance();
 		flights = new Flights(safetyMgr);
 	}
 
@@ -52,8 +52,8 @@ public class FlightZoneManager implements Runnable {
 	 * @param start
 	 * @param wayPoints
 	 */
-	public void planFlight(Coordinate start, List<Coordinate> wayPoints) {
-		IFlightPlan flightPlan = FlightPlanFactory.create(start, wayPoints);
+	public void planFlight(String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
+		IFlightPlan flightPlan = FlightPlanFactory.create(planName, start, wayPoints);
 		flights.addNewFlight(flightPlan);
 	}
 
@@ -74,7 +74,8 @@ public class FlightZoneManager implements Runnable {
 	 * @throws FlightZoneException
 	 */
 	private void launchSingleDroneToWayPoints() throws FlightZoneException {
-		// Check to make sure that there is a pending flight plan and available drone.
+		// Check to make sure that there is a pending flight plan and available
+		// drone.
 		if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()) {
 			ManagedDrone drone = droneFleet.getAvailableDrone();
 			if (drone != null) {
@@ -82,21 +83,51 @@ public class FlightZoneManager implements Runnable {
 				IFlightPlan flightPlan = flights.getNextFlightPlan();
 				LOGGER.info(flightPlan.getFlightID());
 				IFlightDirector flightDirectives = new SoloDirector(drone);
+
 				flightDirectives.setWayPoints(flightPlan.getWayPoints());
 				drone.assignFlight(flightDirectives);
-				flightDirectives.flyToNextPoint();
+
 				drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
-				flightPlan.setStatusToFlying(drone);
+
+				// flightDirectives.flyToNextPoint();
+				// flightPlan.setStatusToFlying(drone);
 			}
 		}
+	}
+
+	private ManagedDrone launchSingleDrone() throws FlightZoneException {
+		// Check to make sure that there is a pending flight plan and available
+		// drone.
+		if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()) {
+			ManagedDrone drone = droneFleet.getAvailableDrone();
+			if (drone != null) {
+				safetyMgr.attachDrone(drone);
+				IFlightPlan flightPlan = flights.getNextFlightPlan();
+				LOGGER.info(flightPlan.getFlightID() + " assigned to " + drone.getDroneName());
+				IFlightDirector flightDirectives = new SoloDirector(drone);
+				flightDirectives.setWayPoints(flightPlan.getWayPoints());
+				drone.assignFlight(flightDirectives);
+				// this needs to be moved to launch....
+				flightPlan.setStatusToFlying(drone);
+				drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
+				return drone;
+			}
+		}
+		return null;
+
+	}
+
+	private void launchToWaypoint(ManagedDrone drone) throws FlightZoneException {
+		drone.getFlightDirective().flyToNextPoint();
+		// flightPlan.setStatusToFlying(drone);
+
 	}
 
 	/**
 	 * Main run routine -- called internally. Launches a new flight if viable, and checks for flights which have landed. Launched flights run autonomously at one thread per drone.
 	 */
-	@Override
-	@Discuss(discuss="change from thread to listener based")
-	public void run() {
+	@Discuss(discuss = "change from thread to listener based")
+	public void run2() {
 		while (true) {
 			// Launch new flight if feasible
 			int numberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
@@ -104,7 +135,7 @@ public class FlightZoneManager implements Runnable {
 				try {
 					launchSingleDroneToWayPoints();
 				} catch (FlightZoneException e) {
-				LOGGER.error(e);
+					LOGGER.error(e);
 				}
 			}
 			// Check if any flights have landed
@@ -116,6 +147,60 @@ public class FlightZoneManager implements Runnable {
 					LOGGER.error("Failed Check for takeoff readiness.", e1);
 				}
 			safetyMgr.checkForViolations(); // Used to run on its own thread!
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				LOGGER.error(e);
+			}
+		}
+	}
+
+	@Override
+	@Discuss(discuss = "change from thread to listener based")
+	public void run() {
+		while (true) {
+			ManagedDrone launched = null;
+			// Launch new flight if feasible
+			int numberOfLaunchedFlights = flights.getCurrentFlights().size() + flights.getAwaitingTakeOffFlights().size();
+
+			if (flights.hasPendingFlight() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
+				try {
+					launched = launchSingleDrone();
+				} catch (FlightZoneException e) {
+					LOGGER.error(e);
+				}
+
+				if (flights.hasAwaitingTakeOff()) {
+					LOGGER.info("Awaiting Takeoff:" + flights.getAwaitingTakeOffFlights().get(0).getFlightID());
+					try {
+						flights.checkForTakeOffReadiness(droneFleet);
+					} catch (FlightZoneException e1) {
+						LOGGER.error("Failed Check for takeoff readiness.", e1);
+					}
+				}
+
+//				try {
+//					if (launched != null) {
+//						launchToWaypoint(launched);
+//					}
+//				} catch (FlightZoneException e) {
+//					LOGGER.error(e);
+//				}
+
+			} if (flights.hasAwaitingTakeOff() && numberOfLaunchedFlights < flights.getMaximumNumberFlightsAllowed()) {
+				LOGGER.info("Awaiting Takeoff:" + flights.getAwaitingTakeOffFlights().get(0).getFlightID());
+				try {
+					flights.checkForTakeOffReadiness(droneFleet);
+				} catch (FlightZoneException e1) {
+					LOGGER.error("Failed Check for takeoff readiness.", e1);
+				}
+			}
+
+			// Check if any flights have landed
+			flights.checkForLandedFlights(droneFleet, safetyMgr);
+
+			safetyMgr.checkForViolations(); // Used to run on its own thread!
+
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {

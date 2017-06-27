@@ -3,7 +3,7 @@ package edu.nd.dronology.services.facades;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.instances.flightmanager.FlightManagerService;
@@ -40,8 +40,8 @@ public class FlightManagerServiceRemoteFacade extends AbstractRemoteFacade imple
 	}
 
 	@Override
-	public void planFlight(Coordinate coordinates, List<Coordinate> flight) throws RemoteException {
-		FlightManagerService.getInstance().planFlight(coordinates, flight);
+	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) throws RemoteException {
+		FlightManagerService.getInstance().planFlight(planName,coordinates, flight);
 
 	}
 

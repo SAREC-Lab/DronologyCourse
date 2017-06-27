@@ -31,9 +31,9 @@ import com.google.common.util.concurrent.RateLimiter;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flightzone.ZoneBounds;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.Coordinate;
 import edu.nd.dronology.core.util.DecimalDegreesToXYConverter;
 import edu.nd.dronology.core.util.DegreesFormatter;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -169,45 +169,42 @@ public class SimulatorControl2 extends Composite {
 
 		fxCanvas.redraw();
 		fxCanvas.layout();
-		
+
 		fxCanvas.addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseUp(MouseEvent e) {
 				// TODO Auto-generated method stub
-				//point = coordTransform.getPoint(droneStatus.getLatitude(), droneStatus.getLongitude());
+				// point = coordTransform.getPoint(droneStatus.getLatitude(), droneStatus.getLongitude());
 				System.out.println(MouseInfo.getPointerInfo().getLocation());
-				
+
 			}
-			
+
 			@Override
 			public void mouseDown(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		
-		
 
 	}
 
 	public void setupFlight() {
-		ArrayList<Coordinate> wayPoints = new ArrayList<>();
-		wayPoints.add(new Coordinate(42270485, -86200000, 10));
-		wayPoints.add(new Coordinate(42500000, -86150000, 10));
+		ArrayList<LlaCoordinate> wayPoints = new ArrayList<>();
+		wayPoints.add(new LlaCoordinate(42.270485, -86.200000, 10));
+		wayPoints.add(new LlaCoordinate(42.500000, -86.150000, 10));
 
 		try {
 			flightManagerService = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
 
-			flightManagerService.planFlight(wayPoints.get(0), wayPoints);
+			flightManagerService.planFlight("TESTPLAN", wayPoints.get(0), wayPoints);
 
 		} catch (Exception e) {
 			LOGGER.error(e);
@@ -248,30 +245,26 @@ public class SimulatorControl2 extends Composite {
 			coordTransform = DecimalDegreesToXYConverter.getInstance();
 
 			ZoneBounds zb = ZoneBounds.getInstance();
-			zb.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
+			// zb.setZoneBounds(41761022, -86243311, 41734699, -86168252, 100);
+			zb.setZoneBounds(41.519600, -86.240900, 41.518900, -86.238900, 100.00);
 			DecimalDegreesToXYConverter.getInstance().setUp(xRange, yRange, LeftDivider); // Setup happens only once. Must happen after Zonebounds are set.
 
-			String flightArea = "(" + DegreesFormatter.prettyFormatDegrees(zb.getNorthLatitude()) + ","
-					+ DegreesFormatter.prettyFormatDegrees(zb.getWestLongitude()) + ") - ("
-					+ DegreesFormatter.prettyFormatDegrees(zb.getSouthLatitude()) + ","
-					+ DegreesFormatter.prettyFormatDegrees(zb.getEastLongitude()) + ")";
+			String flightArea = "(" + (zb.getNorthLatitude()) + "," + zb.getWestLongitude() + ") - (" + zb.getSouthLatitude()
+					+ "," + zb.getEastLongitude() + ")";
 
 			lblBounds.setText("FlightZone: " + flightArea);
 			lblBounds.getParent().layout();
 
 			new AnimationTimerExt(250) {
-		
+
 				@Override
 				public void handle() {
 					loadDroneStatus();
-					
+
 				}
 			}.start();
 
 		});
-		
-		
-		
 
 	}
 
@@ -289,7 +282,7 @@ public class SimulatorControl2 extends Composite {
 			drones = setupService.getDrones();
 			// Create temporary Array Map of images to add.
 			Map<String, ImageView> imagesToAdd = new HashMap<>();
-			for (String droneID : drones.keySet()) { 
+			for (String droneID : drones.keySet()) {
 				// Get current coordinates for each drone
 				// These need to be transformed to x,y coordinates for the screen.
 				DroneStatus droneStatus = drones.get(droneID);
@@ -297,6 +290,8 @@ public class SimulatorControl2 extends Composite {
 
 				point = coordTransform.getPoint(droneStatus.getLatitude(), droneStatus.getLongitude());
 
+
+				
 				ImageView imgView;
 				if (!(allDroneImages.containsKey(droneID))) { // This drone is not known and must be added.
 					// System.out.println("Adding new Drone");

@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.fleet;
 
 import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.util.Coordinate;
+import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
@@ -26,10 +26,10 @@ public class VirtualDroneFleetFactory extends AbstractDroneFleetFactory {
 	}
 
 	@Override
-	public ManagedDrone initializeDrone(String droneID, String droneType, long latitude, long longitude, int altitude) throws DroneException {
+	public ManagedDrone initializeDrone(String droneID, String droneType, double latitude, double longitude, double altitude) throws DroneException {
 		IDrone drone = new VirtualDrone(createDroneID(droneID));
 		ManagedDrone managedDrone = new ManagedDrone(drone);
-		Coordinate currentPosition = new Coordinate(latitude, longitude, altitude);
+		LlaCoordinate currentPosition = new LlaCoordinate(latitude, longitude, altitude);
 		drone.setBaseCoordinates(currentPosition);
 		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		managedDrone.start();
