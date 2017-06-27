@@ -39,8 +39,9 @@ public class PythonBase2 implements IDroneCommandHandler {
 	public PythonBase2() {
 		try {
 
-			InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
-
+			//InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
+			InetAddress hostAddr = InetAddress.getByName("127.0.0.1");
+			
 			int port = 1234;
 			String hostStr = hostAddr.toString();
 
