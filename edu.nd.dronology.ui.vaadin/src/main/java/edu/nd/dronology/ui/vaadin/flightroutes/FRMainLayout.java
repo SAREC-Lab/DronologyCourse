@@ -48,10 +48,16 @@ public class FRMainLayout extends CustomComponent {
 			child.addStyleName("info_box_focus");
 			index = routes.getComponentIndex(child);
 
+			//removes old pins and polylines when switching routes
+			map.getUtils().removeAllMarkers(map.getUtils().getPins());
+			map.getUtils().removeAllLines(map.getUtils().getPolylines());
+			//to make sure the table is no longer bolded when switching routes without saving
+			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
+			
 			// gets FRInfoPanel component through FRControlsComponent, and flight info from accessor in FRInfoPanel
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<LlaCoordinate> coords = flightInfo.getCoordinates();
-
+			
 			map.display(flightInfo);
 
 			long tempLong;

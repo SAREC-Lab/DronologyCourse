@@ -108,7 +108,7 @@ public class MapMarkerUtilities {
 		p.setId(UUID.randomUUID().toString());
 		
 		if (mapPoints.size() == 0) {
-			Notification.show("mapPoints starts out empty.");
+			//Notification.show("mapPoints starts out empty.");
 		}
 		
 		addPinForWayPoint(p);
@@ -124,7 +124,7 @@ public class MapMarkerUtilities {
 		polylines = drawLines(mapPoints);
 		grid.setItems(mapPoints);
 		if (mapPoints.size() == 0) {
-			Notification.show("mapPoints is empty.");
+			//Notification.show("mapPoints is empty.");
 		}
 		
 		return p;
@@ -258,6 +258,8 @@ public class MapMarkerUtilities {
 		}
 		registeredListeners.clear();
 		tableDisplay.makeUneditable(this);
+		//map.setResponsive(false);
+		
 	}
 	
 	public boolean isEditable () {
@@ -297,7 +299,12 @@ public class MapMarkerUtilities {
 	public boolean getLineClicked () {
 		return lineClicked;
 	}
-	
+	public void clearMapPoints(){
+		mapPoints.clear();
+	}
+	public void clearMapPointsIndex(int index){
+		mapPoints.subList(index, mapPoints.size()).clear();
+	}
 	public void setLineClicked (boolean lineClicked) {
 		this.lineClicked = lineClicked;
 	}
