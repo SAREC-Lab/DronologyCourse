@@ -16,7 +16,6 @@ import org.vaadin.addon.leaflet.shared.Point;
 import com.vaadin.shared.Registration;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
 
 import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
@@ -107,10 +106,6 @@ public class MapMarkerUtilities {
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
 		
-		if (mapPoints.size() == 0) {
-			//Notification.show("mapPoints starts out empty.");
-		}
-		
 		addPinForWayPoint(p);
 		
 		if (!lineClicked) {
@@ -123,9 +118,6 @@ public class MapMarkerUtilities {
 		removeAllLines(polylines);
 		polylines = drawLines(mapPoints);
 		grid.setItems(mapPoints);
-		if (mapPoints.size() == 0) {
-			//Notification.show("mapPoints is empty.");
-		}
 		
 		return p;
 	}
@@ -259,7 +251,6 @@ public class MapMarkerUtilities {
 		registeredListeners.clear();
 		tableDisplay.makeUneditable(this);
 		//map.setResponsive(false);
-		
 	}
 	
 	public boolean isEditable () {

@@ -3,32 +3,21 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
-import org.vaadin.addon.leaflet.LeafletLayer;
 
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vividsolutions.jts.geom.Coordinate;
 
-import edu.nd.dronology.ui.vaadin.utils.Configuration;
-import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
-import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
@@ -38,7 +27,9 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
-import edu.nd.dronology.util.FileUtil;
+import edu.nd.dronology.ui.vaadin.utils.Configuration;
+import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
+import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
  * This is the map component for the Flight Routes UI
@@ -50,10 +41,10 @@ public class FRMapComponent extends CustomComponent {
 
 	private LMap leafletMap;
 
+	MapMarkerUtilities route;
 	FRTableDisplay tableDisplay = new FRTableDisplay();
 	VerticalLayout content = new VerticalLayout();
 	FRMetaInfo bar = new FRMetaInfo();
-	MapMarkerUtilities route;
 	FReditBar edit = new FReditBar();
 
 	public FRMapComponent(String tileDataURL, String name) {
@@ -70,6 +61,7 @@ public class FRMapComponent extends CustomComponent {
 		Window popup = createWayPointWindow();
 		route = new MapMarkerUtilities(leafletMap, tableDisplay, popup);
 
+		tableDisplay.setRoute(route);
 		tableDisplay.getGrid().addStyleName("fr_table_component");
 
 		LTileLayer tiles = new LTileLayer();
@@ -134,7 +126,8 @@ public class FRMapComponent extends CustomComponent {
 
 			if (tempBox.getValue()) {
 				displayTable();
-			} else {
+			} 
+			else {
 				displayNoTable();
 			}
 		});
