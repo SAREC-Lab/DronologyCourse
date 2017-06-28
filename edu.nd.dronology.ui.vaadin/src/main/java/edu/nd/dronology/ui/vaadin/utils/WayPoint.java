@@ -13,7 +13,7 @@ public class WayPoint {
 	private String longitude = "";
 	private String latitude = "";
 	private String altitude = "";
-	private String approachingSpeed = "";
+	private String transitSpeed = "";
 	private boolean isreached;
 	
 	public WayPoint (Point point, boolean isreached) {
@@ -68,12 +68,12 @@ public class WayPoint {
 		this.altitude = altitude;
 	}
 	
-	public String getApproachingSpeed() {
-		return approachingSpeed;
+	public String getTransitSpeed() {
+		return transitSpeed;
 	}
 	
-	public void setApproachingSpeed(String approachingSpeed) {
-		this.approachingSpeed = approachingSpeed;
+	public void setTransitSpeed(String transitSpeed) {
+		this.transitSpeed = transitSpeed;
 	}
 	
 	public boolean isReached() {

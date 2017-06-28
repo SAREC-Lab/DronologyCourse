@@ -17,7 +17,7 @@ public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
 	
 	public FRTableDisplay() {
-		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "approachingSpeed");
+		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "transitSpeed");
 	}
 	
 	public Grid<WayPoint> getGrid() {

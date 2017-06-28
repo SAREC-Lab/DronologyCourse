@@ -85,7 +85,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    		for (int i = 0; i < route.getMapPoints().size(); i++) {
 	    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
 	    				route.getMapPoints().get(i).setAltitude(altitude);
-	    				route.getMapPoints().get(i).setApproachingSpeed(transitSpeed);
+	    				route.getMapPoints().get(i).setTransitSpeed(transitSpeed);
 	    				route.getGrid().setItems(route.getMapPoints());
 	    			}
 	    		}
