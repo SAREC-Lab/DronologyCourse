@@ -1,5 +1,16 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.commons.lang.SerializationUtils;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.LeafletLayer;
@@ -9,13 +20,25 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vividsolutions.jts.geom.Coordinate;
 
-import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
+import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.services.core.items.IFlightRoute;
+import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
+import edu.nd.dronology.services.core.persistence.PersistenceException;
+import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.start.MyUI;
+import edu.nd.dronology.util.FileUtil;
 
 /**
  * This is the map component for the Flight Routes UI
@@ -24,7 +47,7 @@ import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
  */
 public class FRMapComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
-	
+
 	private LMap leafletMap;
 
 	FRTableDisplay tableDisplay = new FRTableDisplay();
@@ -36,161 +59,255 @@ public class FRMapComponent extends CustomComponent {
 	public FRMapComponent(String tileDataURL, String name) {
 		this.setWidth("100%");
 		addStyleName("map_component");
-		
+
 		leafletMap = new LMap();
 		leafletMap.addStyleName("fr_leaflet_map");
-		
+
 		Configuration configuration = Configuration.getInstance();
 		leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
 
 		Window popup = createWayPointWindow();
 		route = new MapMarkerUtilities(leafletMap, tableDisplay, popup);
-		
+
 		tableDisplay.getGrid().addStyleName("fr_table_component");
-		
+
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
-				
+
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
-		
+
 		route.disableRouteEditing();
-		
+
 		setCompositionRoot(content);
 		content.addComponents(leafletMap, tableDisplay.getGrid());
 	}
-	
+
 	private Window createWayPointWindow() {
 		HorizontalLayout buttons = new HorizontalLayout();
 		Button saveButton = new Button("Save");
 		Button cancelButton = new Button("Cancel");
 		buttons.addComponents(saveButton, cancelButton);
-		
+
 		VerticalLayout popupContent = new VerticalLayout();
 		TextField altitudeField = new TextField("Altitude: ");
 		TextField transitSpeedField = new TextField("Transit Speed: ");
-		
+
 		popupContent.addComponent(altitudeField);
 		popupContent.addComponent(transitSpeedField);
 		popupContent.addComponent(buttons);
-		
+
 		Window popup;
 		popup = new Window(null, popupContent);
-		
+
 		popup.setModal(true);
 		popup.setClosable(false);
 		popup.setResizable(false);
-		
+
 		return popup;
 	}
-	
-	public void display(){
-		//set bar fields
-		
+
+	public void display() {
+		// set bar fields
+
 		content.addComponent(bar);
 		content.addComponents(leafletMap, tableDisplay.getGrid());
 	}
-	public void display(FlightRouteInfo info){
-		
+
+	public void display(FlightRouteInfo info) {
+
 		route.disableRouteEditing();
-		
+
 		AbsoluteLayout layout = new AbsoluteLayout();
 		layout.setHeight("510px");
 		layout.setWidth("1075px");
-		
-		
+
 		FRMetaInfo selectedBar = new FRMetaInfo(info);
-		
+
 		FReditBar editBar = new FReditBar();
 		editBar.setStyleName("edit_bar");
 		CheckBox tempBox = selectedBar.getCheckBox();
 		Button edit = selectedBar.getEditButton();
-		
-		tempBox.addValueChangeListener(event->{
-			
-			if(tempBox.getValue()){
+
+		tempBox.addValueChangeListener(event -> {
+
+			if (tempBox.getValue()) {
 				displayTable();
-			}
-			else{
+			} else {
 				displayNoTable();
 			}
 		});
-		
+
 		leafletMap.setStyleName("bring_back");
-		
-		//enable editing
+
+		// enable editing
 		edit.addClickListener(event -> {
-			//Notification.show("run");
+			// Notification.show("run");
 			route.enableRouteEditing();
 			leafletMap.setEnabled(true);
 			editBar.addStyleName("bring_front");
 			editBar.setWidth("880px");
 			layout.addComponent(editBar, "top: 5px; left:95px");
-			
-			
+
 			leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 			tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
 		});
-		
-		
-		
+
 		Button cancel = editBar.getCancelButton();
 		cancel.addClickListener(event -> {
-			
+
 			route.disableRouteEditing();
-			
+
 			route.removeAllMarkers(route.getPins());
 			route.removeAllLines(route.getPolylines());
-			
+
 			int numberMapPoints = route.getMapPoints().size();
-			
-			
+
 			route.clearMapPointsIndex(info.getCoordinates().size());
 			route.getGrid().setItems(route.getMapPoints());
-			
-			//content.removeComponent(tableDisplay.getGrid());
-			//content.addComponent(tableDisplay.getGrid());
-			
+
+			// content.removeComponent(tableDisplay.getGrid());
+			// content.addComponent(tableDisplay.getGrid());
+
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
 		});
-		
+
 		Button save = editBar.getSaveButton();
 		save.addClickListener(event -> {
-			
-			//send info to dronology
-			
+
+			// send info to dronology
+
+			// Notification.show("got into save loop");
 			route.disableRouteEditing();
-			
+
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
-			
-			//route.removeAllMarkers(route.getPins());
+
+			ArrayList<WayPoint> newWaypoints = route.getMapPoints();
+			// Notification.show(String.valueOf(newWaypoints.size()));
+			// pass into dronology here?
+
+			FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+			ByteArrayInputStream inStream;
+			IFlightRoute froute;
+
+			IFlightRouteplanningRemoteService service;
+			BaseServiceProvider provider = MyUI.getProvider();
+			ArrayList routeList;
+
+			try {
+
+				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+						.getService(IFlightRouteplanningRemoteService.class);
+
+				// Collection<FlightRouteInfo> items = service.getItems();
+				// routeList = new ArrayList(items);
+
+				String id;
+				String name;
+
+				// get one flight route rather than all
+
+				// gets routes from dronology and requests their name/id
+
+				id = info.getId();
+				name = info.getName();
+
+				byte[] information = service.requestFromServer(id);
+				inStream = new ByteArrayInputStream(information);
+				froute = routePersistor.loadItem(inStream);
+
+				// service.createItem()
+
+				ArrayList<LlaCoordinate> oldCoords = new ArrayList(froute.getCoordinates());
+				for (LlaCoordinate cord : oldCoords) {
+					froute.removeCoordinate(cord);
+				}
+				// Notification.show(String.valueOf(route.getCoordinates().size()
+				// + String.valueOf(newWaypoints.size())));
+
+				for (WayPoint way : newWaypoints) {
+					double alt=0;
+					double lon=0;
+					double lat=0;
+					// problem is with getting double
+					try {
+						 lon = Double.parseDouble(way.getLongitude());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+					try {
+						 lat = Double.parseDouble(way.getLatitude());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+					try {
+						 alt = Double.parseDouble(way.getAltitude());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+
+					
+					froute.addCoordinate(new LlaCoordinate(lon, lat, alt));
+				}
+
+				// Notification.show(String.valueOf(route.getCoordinates().size()
+				// + String.valueOf(newWaypoints.size())));
+
+				// ByteArrayOutputStream out = new ByteArrayOutputStream();
+				// ObjectOutput os = new ObjectOutputStream(out);
+				// os.writeObject(froute);
+				// byte[] bytes = out.toByteArray();
+
+				// byte[] data = SerializationUtils.serialize((Serializable)
+				// froute);
+
+				ByteArrayOutputStream outs = new ByteArrayOutputStream();
+				routePersistor.saveItem(froute, outs);
+				byte[] bytes = outs.toByteArray();
+
+				service.transmitToServer(froute.getId(), bytes);
+
+				// Notification.show(String.valueOf(newWaypoints.size()));
+
+			} catch (DronologyServiceException | RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (PersistenceException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			// route.removeAllMarkers(route.getPins());
 		});
 		layout.addComponent(leafletMap, "top:5px; left:5px");
-	
-		
-		
+
 		content.removeAllComponents();
-		//content.addComponent(editBar);
+		// content.addComponent(editBar);
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
-		
+
 	}
-	public void displayNoTable(){
+
+	public void displayNoTable() {
 		content.removeComponent(tableDisplay.getGrid());
 	}
-	public void displayTable(){
+
+	public void displayTable() {
 		content.addComponent(tableDisplay.getGrid());
 	}
-	
+
 	public void setCenter(double centerLat, double centerLon) {
 		leafletMap.setCenter(41.68, -86.25);
 	}
@@ -198,26 +315,28 @@ public class FRMapComponent extends CustomComponent {
 	public void setZoomLevel(double zoomLevel) {
 		leafletMap.setZoomLevel(zoomLevel);
 	}
-	
+
 	public double getCenterLat() {
 		return leafletMap.getCenter().getLat();
 	}
-	
+
 	public double getCenterLon() {
 		return leafletMap.getCenter().getLon();
 	}
-	
+
 	public double getZoomLevel() {
 		return leafletMap.getZoomLevel();
 	}
-	
+
 	public LMap getMapInstance() {
 		return leafletMap;
 	}
-	public MapMarkerUtilities getUtils(){
+
+	public MapMarkerUtilities getUtils() {
 		return route;
 	}
-	public FRTableDisplay getTableDisplay(){
+
+	public FRTableDisplay getTableDisplay() {
 		return tableDisplay;
 	}
 

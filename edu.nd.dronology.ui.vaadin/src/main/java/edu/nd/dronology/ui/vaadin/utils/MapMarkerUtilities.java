@@ -308,5 +308,8 @@ public class MapMarkerUtilities {
 	public void setLineClicked (boolean lineClicked) {
 		this.lineClicked = lineClicked;
 	}
+	public void setAllItems(ArrayList<WayPoint> dronologyPoints){
+		grid.setItems(dronologyPoints);
+	}
 
 }

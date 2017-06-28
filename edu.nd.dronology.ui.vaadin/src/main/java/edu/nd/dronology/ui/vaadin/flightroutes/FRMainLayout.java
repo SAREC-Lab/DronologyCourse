@@ -25,7 +25,8 @@ public class FRMainLayout extends CustomComponent {
 	private FRControlsComponent controls = new FRControlsComponent();
 	WayPoint way;
 	ArrayList<WayPoint> waypoints;
-
+	ArrayList routeList;
+	
 	public FRMainLayout() {
 
 		addStyleName("main_layout");
@@ -47,7 +48,13 @@ public class FRMainLayout extends CustomComponent {
 			Component child = e.getChildComponent();
 			child.addStyleName("info_box_focus");
 			index = routes.getComponentIndex(child);
+			
+			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
+			List<LlaCoordinate> coords = flightInfo.getCoordinates();
+			
+			map.display(flightInfo);
 
+			
 			//removes old pins and polylines when switching routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
 			map.getUtils().removeAllLines(map.getUtils().getPolylines());
@@ -55,10 +62,12 @@ public class FRMainLayout extends CustomComponent {
 			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
 			
 			// gets FRInfoPanel component through FRControlsComponent, and flight info from accessor in FRInfoPanel
-			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
-			List<LlaCoordinate> coords = flightInfo.getCoordinates();
 			
-			map.display(flightInfo);
+			
+			//FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
+			//List<LlaCoordinate> coords = flightInfo.getCoordinates();
+			
+			//map.display(flightInfo);
 
 			long tempLong;
 			long tempLat;

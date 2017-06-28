@@ -82,6 +82,8 @@ public class FRInfoBox extends CustomComponent {
 		
 		setCompositionRoot(allContent);
 		
+		
+		
 	}
 	
 	//default if no parameters are passed
