@@ -18,6 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
+import edu.nd.dronology.services.core.persistence.PersistenceException;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
@@ -75,9 +76,21 @@ public class FRInfoPanel extends CustomComponent {
 				for(FlightRouteInfo e: items){
 					id = e.getId();
 					name = e.getName();
+					
 					addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
 					
 				}
+				
+				byte [] information = service.requestFromServer("length");
+				ByteArrayInputStream inStream = new ByteArrayInputStream(information);
+				try {
+					IFlightRoute route = routePersistor.loadItem(inStream);
+				} catch (PersistenceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				
 				
 			} catch (DronologyServiceException | RemoteException e1) {
 				// TODO Auto-generated catch block
@@ -112,6 +125,7 @@ public class FRInfoPanel extends CustomComponent {
 		
 		routes.addLayoutClickListener( e-> {
 			isRouteSelected = true;
+			
 		});
 		
 		buttons.addComponents(newRoute, popup);
@@ -132,6 +146,7 @@ public class FRInfoPanel extends CustomComponent {
 		FRInfoBox route = new FRInfoBox();
 		routes.addComponent(route);
 		numberRoutes += 1;
+		
 	}
 	
 	public void addRoute(String name, String ID, String created, String modified, String length){

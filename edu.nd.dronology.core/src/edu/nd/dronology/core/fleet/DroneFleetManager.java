@@ -76,7 +76,30 @@ public class DroneFleetManager {
 			return null;
 	}
 
-
+	public ManagedDrone getAvailableDrone(String designatedDroneId) {
+		synchronized (availableDrones) {
+			ManagedDrone found = null;
+			if (!availableDrones.isEmpty()) {
+				for (ManagedDrone d : availableDrones) {
+					if (d.getDroneName().equals(designatedDroneId)) {
+						found = d;
+						break;
+					}
+				}
+				if (found != null) {
+					boolean success = availableDrones.remove(found);
+					if (success) {
+						busyDrones.add(found);
+						return found;
+					} else {
+						LOGGER.error("Error when queuing uav '" + designatedDroneId + "'");
+					}
+				}
+				LOGGER.error("Error when retrieving uav '" + designatedDroneId + "'");
+			}
+			return null;
+		}
+	}
 
 	private void notifyListeners(boolean add, ManagedDrone managedDrone) {
 		// TODO Auto-generated method stub
@@ -105,7 +128,7 @@ public class DroneFleetManager {
 		notifyListeners(true, managedDrone);
 
 	}
-	
+
 	public void removeDrone(ManagedDrone managedDrone) throws DroneException {
 		ManagedDrone value = registeredDrones.remove(managedDrone.getDroneName());
 		if (value == null) {

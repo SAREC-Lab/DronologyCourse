@@ -54,7 +54,8 @@ public class FRMapComponent extends CustomComponent {
 				
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
-		route.enableRouteEditing();
+		
+		route.disableRouteEditing();
 		
 		setCompositionRoot(content);
 		content.addComponents(leafletMap, tableDisplay.getGrid());
@@ -92,6 +93,8 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public void display(FlightRouteInfo info){
 		
+		route.disableRouteEditing();
+		
 		AbsoluteLayout layout = new AbsoluteLayout();
 		layout.setHeight("510px");
 		layout.setWidth("1075px");
@@ -120,7 +123,7 @@ public class FRMapComponent extends CustomComponent {
 		edit.addClickListener(event -> {
 			//Notification.show("run");
 			route.enableRouteEditing();
-			
+			leafletMap.setEnabled(true);
 			editBar.addStyleName("bring_front");
 			editBar.setWidth("880px");
 			layout.addComponent(editBar, "top: 5px; left:95px");
@@ -131,29 +134,50 @@ public class FRMapComponent extends CustomComponent {
 		});
 		
 		
+		
 		Button cancel = editBar.getCancelButton();
 		cancel.addClickListener(event -> {
 			
 			route.disableRouteEditing();
-	
+			
+			route.removeAllMarkers(route.getPins());
+			route.removeAllLines(route.getPolylines());
+			
+			int numberMapPoints = route.getMapPoints().size();
+			
+			
+			route.clearMapPointsIndex(info.getCoordinates().size());
+			route.getGrid().setItems(route.getMapPoints());
+			
+			//content.removeComponent(tableDisplay.getGrid());
+			//content.addComponent(tableDisplay.getGrid());
+			
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
 			tableDisplay.getGrid().setStyleName("fr_table_component");
+			leafletMap.setEnabled(false);
 		});
 		
 		Button save = editBar.getSaveButton();
 		save.addClickListener(event -> {
 			
 			//send info to dronology
+			
 			route.disableRouteEditing();
+			
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
 			tableDisplay.getGrid().setStyleName("fr_table_component");
+			leafletMap.setEnabled(false);
+			
+			//route.removeAllMarkers(route.getPins());
 		});
 		layout.addComponent(leafletMap, "top:5px; left:5px");
 	
+		
+		
 		content.removeAllComponents();
 		//content.addComponent(editBar);
 		content.addComponent(selectedBar);
@@ -192,6 +216,9 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public MapMarkerUtilities getUtils(){
 		return route;
+	}
+	public FRTableDisplay getTableDisplay(){
+		return tableDisplay;
 	}
 
 }

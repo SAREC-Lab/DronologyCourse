@@ -31,12 +31,17 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 	}
 
 	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
-		serviceInstance.planFlight(planName,coordinates, flight);
+		serviceInstance.planFlight(planName, coordinates, flight);
 
 	}
 
 	public FlightInfo getFlightDetails() {
 		return serviceInstance.getFlightDetails();
+
+	}
+
+	public void planFlight(String uavid, String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
+		serviceInstance.planFlight(uavid, planName, coordinates, flight);
 
 	}
 
