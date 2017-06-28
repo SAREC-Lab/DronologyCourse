@@ -32,4 +32,6 @@ public interface IFlightPlan {
 	
 	int getNumberWayPoints();
 
+	String getDesignatedDroneId();
+
 }

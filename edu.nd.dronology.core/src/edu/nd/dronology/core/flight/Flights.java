@@ -109,11 +109,18 @@ public class Flights {
 	 * 
 	 * @return the next available flight plan
 	 */
-	public IFlightPlan getNextFlightPlan() {
+	public IFlightPlan activateNextFlightPlan() {
 		if (!pendingFlights.isEmpty()) {
 			IFlightPlan flightPlan = pendingFlights.remove(0);
 			awaitingTakeOffFlights.add(flightPlan);
 			return flightPlan;
+		}
+		return null;
+	}
+
+	public IFlightPlan getNextFlightPlan() {
+		if (!pendingFlights.isEmpty()) {
+			return pendingFlights.get(0);
 		}
 		return null;
 	}

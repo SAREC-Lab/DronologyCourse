@@ -68,8 +68,8 @@ public class DroneStatus implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ID: " + ID + " Pos: (" + latitude + "," + longitude + "," + altitude + ") " + " Vel: " + velocity
-				+ " Bat: " + batteryLevel + " --- " + this.status;
+		return "ID: " + ID + " Pos: (" + latitude + "," + longitude + "," + altitude + ") " + " Vel: " + velocity + " Bat: "
+				+ batteryLevel + " --- " + this.status;
 	}
 
 	@Override

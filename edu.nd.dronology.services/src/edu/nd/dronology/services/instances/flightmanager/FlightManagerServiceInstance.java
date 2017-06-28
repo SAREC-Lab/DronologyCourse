@@ -14,7 +14,7 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	private FlightZoneManager flightManager;
 
 	public FlightManagerServiceInstance() {
-		super(ServiceIds.SERVICE_FLIGHTMANAGER,"Flight Management");
+		super(ServiceIds.SERVICE_FLIGHTMANAGER, "Flight Management");
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 
 	@Override
 	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
-		flightManager.planFlight(planName,coordinates, flight);
+		flightManager.planFlight(planName, coordinates, flight);
 
 	}
 
@@ -57,6 +57,12 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	public FlightInfo getFlightDetails() {
 
 		return RemoteInfoFactory.createFlightInfo(flightManager.getFlights());
+
+	}
+
+	@Override
+	public void planFlight(String uavid, String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
+		flightManager.planFlight(uavid, planName, start, wayPoints);
 
 	}
 
