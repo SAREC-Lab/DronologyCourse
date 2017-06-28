@@ -60,20 +60,30 @@ public class NvecInterpolatorTest {
 	
 	@Test
 	public void testMove4() {
-		NVector current = new NVector(1, 0, 0, 0);
-//		NVector target = new LlaCoordinate(41.698810, -86.234221, 225.95).toNVector();
-//		NVector target = new LlaCoordinate(0, -90, 0.0).toNVector();
-		NVector target = new NVector(0, 1, 0, 0);
-		System.out.println("distance from 0,0 to 0, 90 is " + NVector.travelDistance(current, target) );
-		double distanceToTravel = 1609000; // meters
-		double tolerance = NvecInterpolator.TOLERANCE;
-		NVector nextPosition = NvecInterpolator.move(current, target, distanceToTravel);
-		
-		System.out.println(current.distance(nextPosition) - distanceToTravel);
-		double travelDist = NVector.travelDistance(current, nextPosition);
-		System.out.println("distance from current to next is " +  travelDist);
-		System.out.println("laser dist is different by " + (travelDist - distanceToTravel));
-		assertEquals(distanceToTravel, current.distance(nextPosition), 1.0);
-		assertEquals(0.0, nextPosition.getAltitude(), tolerance);
+		NVector current = new LlaCoordinate(0, 0, 50).toNVector();
+		NVector target = new LlaCoordinate(0, 1, 50).toNVector();
+		for (int i = 0; i < 55560; ++i) {
+			current = NvecInterpolator.move(current, target, 1.0);
+		}
+		assertEquals(0.0, current.distance(new LlaCoordinate(0, 0.5, 50).toNVector()), 2);
 	}
+
+//	@Test
+//	public void testMove4() {
+//		NVector current = new NVector(1, 0, 0, 0);
+////		NVector target = new LlaCoordinate(41.698810, -86.234221, 225.95).toNVector();
+////		NVector target = new LlaCoordinate(0, -90, 0.0).toNVector();
+//		NVector target = new NVector(0, 1, 0, 0);
+//		System.out.println("distance from 0,0 to 0, 90 is " + NVector.travelDistance(current, target) );
+//		double distanceToTravel = 1609000; // meters
+//		double tolerance = NvecInterpolator.TOLERANCE;
+//		NVector nextPosition = NvecInterpolator.move(current, target, distanceToTravel);
+//		
+//		System.out.println(current.distance(nextPosition) - distanceToTravel);
+//		double travelDist = NVector.travelDistance(current, nextPosition);
+//		System.out.println("distance from current to next is " +  travelDist);
+//		System.out.println("laser dist is different by " + (travelDist - distanceToTravel));
+//		assertEquals(distanceToTravel, current.distance(nextPosition), 1.0);
+//		assertEquals(0.0, nextPosition.getAltitude(), tolerance);
+//	}
 }
