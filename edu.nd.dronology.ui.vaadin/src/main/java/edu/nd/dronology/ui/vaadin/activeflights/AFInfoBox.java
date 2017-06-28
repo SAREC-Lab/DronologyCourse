@@ -205,6 +205,7 @@ public class AFInfoBox extends CustomComponent {
 				});
 
 				yes.addClickListener(subEvent -> {
+					
 					// TODO: assign the route to the drone
 					// Currently assigns the route without taking which drone into consideration
 					activate(selectedFlight);
@@ -380,7 +381,7 @@ public class AFInfoBox extends CustomComponent {
 			service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
 			List<LlaCoordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
 			LlaCoordinate initPoint = coordds.remove(0);
-			service.planFlight(remoteItem.getName(), initPoint, coordds);
+			service.planFlight(this.name, remoteItem.getName(), initPoint, coordds);
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
