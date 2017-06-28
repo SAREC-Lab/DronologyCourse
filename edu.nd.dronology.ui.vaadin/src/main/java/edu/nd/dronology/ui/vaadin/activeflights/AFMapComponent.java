@@ -175,16 +175,24 @@ public class AFMapComponent extends CustomComponent {
 				for (ArrayList<LPolyline> e : flightRoutes) {
 					utilities.removeAllLines(e);
 				}
-				flightRoutes.clear();
-				this.addActiveFlightRoutes();
-			}
-			if (wayPointMarkers.size() != flightRoutes.size()){
-				for (ArrayList<LMarker> e:wayPointMarkers){
-					utilities.removeAllMarkers(e);
+				if (wayPointMarkers.size() != currentFlights.size()){
+					for (ArrayList<LMarker> e:wayPointMarkers){
+						utilities.removeAllMarkers(e);
+					}
+					wayPointMarkers.clear();
 				}
-				wayPointMarkers.clear();
-				this.addActiveFlightRoutes();
 			}
+			flightRoutes.clear();
+				/*if (wayPointMarkers.size() != flightRoutes.size()){
+					for (ArrayList<LMarker> e:wayPointMarkers){
+						utilities.removeAllMarkers(e);
+					}
+					wayPointMarkers.clear();
+				}
+				flightRoutes.clear();*/
+				this.addActiveFlightRoutes();
+			//}
+			
 		} catch (RemoteException e) {
 			try {
 				Notification.show("Reconnecting...");
