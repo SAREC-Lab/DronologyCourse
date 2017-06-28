@@ -68,49 +68,7 @@ public class AFMapComponent extends CustomComponent {
 		//leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
 		
-		try {
-			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-			drones = service.getDrones();
-			if (drones.size() == 1){
-				this.setCenter(drones.entrySet().iterator().next().getValue().getLatitude(), drones.entrySet().iterator().next().getValue().getLongitude());
-				this.setZoomLevel(14);
-			}
-			else if (drones.size() > 1){
-				double avgLat = 0;
-				double avgLon = 0;
-				for (Entry<String, DroneStatus> e:drones.entrySet()){
-					avgLat += e.getValue().getLatitude();
-					avgLon += e.getValue().getLongitude();
-				}
-				avgLat /= (drones.size() * 1.0);
-				avgLon /= (drones.size() * 1.0);
-				this.setCenter(avgLat, avgLon);
-				double farthestLat = 0;
-				double farthestLon = 0;
-				for (Entry<String, DroneStatus> e:drones.entrySet()){
-					if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat){
-						farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
-					}
-					if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon){
-						farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
-					}
-				}
-				if (farthestLat == 0 && farthestLon == 0){
-					this.setZoomLevel(14);
-				}
-				else {
-					System.out.println(farthestLat + " " + farthestLon);
-					System.out.println(Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2) + 1));
-					this.setZoomLevel(Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2) + 1));
-				}
-			}
-		} catch (RemoteException | DronologyServiceException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		if (drones.size()<1){
-			leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-		}
+		setAverageCenter(false);
 		
 		VerticalLayout content = new VerticalLayout();
 		
@@ -123,6 +81,7 @@ public class AFMapComponent extends CustomComponent {
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -224,6 +183,10 @@ public class AFMapComponent extends CustomComponent {
 						utilities.removeAllMarkers(e);
 					}
 					wayPointMarkers.clear();
+					if (currentFlights.size() > 0)
+						this.setAverageCenter(true);
+					else
+						this.setAverageCenter(false);
 				}
 			}
 			flightRoutes.clear();
@@ -300,6 +263,10 @@ public class AFMapComponent extends CustomComponent {
 			markers.add(marker);
 			leafletMap.addComponent(marker);
 		}
+		if (currentFlights.size() > 0)
+			this.setAverageCenter(true);
+		else
+			this.setAverageCenter(false);
 	}
 	
 	public void updateDroneMarkers(){
@@ -333,6 +300,10 @@ public class AFMapComponent extends CustomComponent {
 								newMarker.setIconSize(new Point(77, 33));
 								markers.add(newMarker);
 								leafletMap.addComponent(newMarker);
+								if (currentFlights.size() > 0)
+									this.setAverageCenter(true);
+								else
+									this.setAverageCenter(false);
 							}
 						}
 					}
@@ -352,6 +323,10 @@ public class AFMapComponent extends CustomComponent {
 						marker.setIconSize(new Point(77, 33));
 						markers.add(marker);
 						leafletMap.addComponent(marker);
+						if (currentFlights.size() > 0)
+							this.setAverageCenter(true);
+						else
+							this.setAverageCenter(false);
 					}
 				}
 			}
@@ -370,6 +345,10 @@ public class AFMapComponent extends CustomComponent {
 				for (LMarker e:remove){
 					markers.remove(e);
 					leafletMap.removeComponent(e);
+					if (currentFlights.size() > 0)
+						this.setAverageCenter(true);
+					else
+						this.setAverageCenter(false);
 				}
 				remove.clear();
 			}
@@ -386,5 +365,115 @@ public class AFMapComponent extends CustomComponent {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}	  
+	}
+	
+	private void setAverageCenter(boolean withFlightRoutes){
+		Configuration configuration = Configuration.getInstance();
+		if (!withFlightRoutes){
+			try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				drones = service.getDrones();
+				if (drones.size() == 1){
+					for (Entry<String, DroneStatus> e:drones.entrySet()){
+						this.setCenter(e.getValue().getLatitude(), e.getValue().getLongitude());
+					}
+					this.setZoomLevel(14);
+				}
+				else if (drones.size() > 1){
+					double avgLat = 0;
+					double avgLon = 0;
+					for (Entry<String, DroneStatus> e:drones.entrySet()){
+						avgLat += e.getValue().getLatitude();
+						avgLon += e.getValue().getLongitude();
+					}
+					avgLat /= (drones.size() * 1.0);
+					avgLon /= (drones.size() * 1.0);
+					this.setCenter(avgLat, avgLon);
+					double farthestLat = 0;
+					double farthestLon = 0;
+					for (Entry<String, DroneStatus> e:drones.entrySet()){
+						if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat){
+							farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
+						}
+						if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon){
+							farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
+						}
+					}
+					if (farthestLat == 0 && farthestLon == 0){
+						this.setZoomLevel(14);
+					}
+					else {
+						this.setZoomLevel(Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2) + 1));
+					}
+				}
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if (drones.size()<1){
+				leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+				leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
+			}
+		}
+		else {
+			try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				drones = service.getDrones();
+				double avgLat = 0;
+				double avgLon = 0;
+				int numPoints = 0;
+				for (Entry<String, DroneStatus> e:drones.entrySet()){
+					avgLat += e.getValue().getLatitude();
+					avgLon += e.getValue().getLongitude();
+					numPoints++;
+				}
+				currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
+				for (FlightPlanInfo e:currentFlights){
+					List<Waypoint> coordinates = e.getWaypoints();
+					for (Waypoint coord:coordinates){
+						avgLat += coord.getCoordinate().getLatitude();
+						avgLon += coord.getCoordinate().getLongitude();
+						numPoints++;
+					}
+				}
+				avgLat /= (numPoints * 1.0);
+				avgLon /= (numPoints * 1.0);
+				this.setCenter(avgLat, avgLon);
+				double farthestLat = 0;
+				double farthestLon = 0;
+				for (Entry<String, DroneStatus> e:drones.entrySet()){
+					if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat){
+						farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
+					}
+					if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon){
+						farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
+					}
+				}
+				for (FlightPlanInfo e:currentFlights){
+					List<Waypoint> coordinates = e.getWaypoints();
+					for (Waypoint coord:coordinates){
+						if (Math.abs(coord.getCoordinate().getLatitude() - avgLat) > farthestLat){
+							farthestLat = Math.abs(coord.getCoordinate().getLatitude() - avgLat);
+						}
+						if (Math.abs(coord.getCoordinate().getLongitude() - avgLon) > farthestLon){
+							farthestLon = Math.abs(coord.getCoordinate().getLongitude() - avgLon);
+						}
+					}
+				}
+				if (farthestLat == 0 && farthestLon == 0){
+					this.setZoomLevel(14);
+				}
+				else {
+					this.setZoomLevel(Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2)));
+				}
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if (drones.size()<1){
+				leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+				leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
+			}
+		}
 	}
 }
