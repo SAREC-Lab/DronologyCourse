@@ -41,10 +41,13 @@ public class NvecInterpolator {
 	 *         path that goes from current to target
 	 */
 	public static NVector move(NVector current, NVector target, double metersToTravel) {
+		// a negative value for metersToTravel causes an infinite loop
+		if (metersToTravel < 0.0) {
+			throw new IllegalArgumentException();
+		}
 		if (current.distance(target) < metersToTravel) {
 			return target;
 		}
-
 		NVector lowBall = current;
 		NVector highBall = target;
 		NVector nextGuess = mid(lowBall, highBall);
