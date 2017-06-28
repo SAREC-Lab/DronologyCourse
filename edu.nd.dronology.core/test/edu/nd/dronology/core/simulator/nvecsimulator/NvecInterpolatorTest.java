@@ -60,12 +60,13 @@ public class NvecInterpolatorTest {
 	
 	@Test
 	public void testMove4() {
+//		55660.181728949785
 		NVector current = new LlaCoordinate(0, 0, 50).toNVector();
 		NVector target = new LlaCoordinate(0, 1, 50).toNVector();
-		for (int i = 0; i < 55560; ++i) {
+		for (int i = 0; i < 55660; ++i) {
 			current = NvecInterpolator.move(current, target, 1.0);
 		}
-		assertEquals(0.0, current.distance(new LlaCoordinate(0, 0.5, 50).toNVector()), 2);
+		assertEquals(0.18, current.distance(new LlaCoordinate(0, 0.5, 50).toNVector()), 0.01);
 	}
 
 //	@Test
