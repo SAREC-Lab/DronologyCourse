@@ -20,9 +20,6 @@ public class AFMainLayout extends CustomComponent {
 		CssLayout content = new CssLayout();
 		content.setSizeFull();	
 			
-			map.setCenter(41.68, -86.25);
-			map.setZoomLevel(13);
-			
 			content.addComponents(controls, map);
 			setCompositionRoot(content);
 	}

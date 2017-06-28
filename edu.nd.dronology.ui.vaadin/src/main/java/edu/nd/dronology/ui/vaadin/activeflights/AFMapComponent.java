@@ -65,8 +65,52 @@ public class AFMapComponent extends CustomComponent {
 		leafletMap = new LMap();
 		utilities = new MapMarkerUtilities(leafletMap);
 		Configuration configuration = Configuration.getInstance();
-		leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+		//leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
+		
+		try {
+			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+			drones = service.getDrones();
+			if (drones.size() == 1){
+				this.setCenter(drones.entrySet().iterator().next().getValue().getLatitude(), drones.entrySet().iterator().next().getValue().getLongitude());
+				this.setZoomLevel(14);
+			}
+			else if (drones.size() > 1){
+				double avgLat = 0;
+				double avgLon = 0;
+				for (Entry<String, DroneStatus> e:drones.entrySet()){
+					avgLat += e.getValue().getLatitude();
+					avgLon += e.getValue().getLongitude();
+				}
+				avgLat /= (drones.size() * 1.0);
+				avgLon /= (drones.size() * 1.0);
+				this.setCenter(avgLat, avgLon);
+				double farthestLat = 0;
+				double farthestLon = 0;
+				for (Entry<String, DroneStatus> e:drones.entrySet()){
+					if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat){
+						farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
+					}
+					if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon){
+						farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
+					}
+				}
+				if (farthestLat == 0 && farthestLon == 0){
+					this.setZoomLevel(14);
+				}
+				else {
+					System.out.println(farthestLat + " " + farthestLon);
+					System.out.println(Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2) + 1));
+					this.setZoomLevel(Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2) + 1));
+				}
+			}
+		} catch (RemoteException | DronologyServiceException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if (drones.size()<1){
+			leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+		}
 		
 		VerticalLayout content = new VerticalLayout();
 		
@@ -91,7 +135,7 @@ public class AFMapComponent extends CustomComponent {
 	}
 	
 	public void setCenter(double centerLat, double centerLon) {
-		leafletMap.setCenter(41.68, -86.25);
+		leafletMap.setCenter(centerLat, centerLon);
 	}
 
 	public void setZoomLevel(double zoomLevel) {
