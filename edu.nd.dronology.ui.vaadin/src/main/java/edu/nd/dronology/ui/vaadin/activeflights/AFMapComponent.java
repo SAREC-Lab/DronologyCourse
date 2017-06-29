@@ -64,11 +64,6 @@ public class AFMapComponent extends CustomComponent {
 		
 		leafletMap = new LMap();
 		utilities = new MapMarkerUtilities(leafletMap);
-		Configuration configuration = Configuration.getInstance();
-		//leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
-		
-		setAverageCenter(false);
 		
 		VerticalLayout content = new VerticalLayout();
 		
@@ -88,6 +83,7 @@ public class AFMapComponent extends CustomComponent {
 		}
 		addDroneMarkers();
 		addActiveFlightRoutes();
+		setAverageCenter(false);
 		
 		setCompositionRoot(content);  
 		content.addComponents(leafletMap);
@@ -263,10 +259,6 @@ public class AFMapComponent extends CustomComponent {
 			markers.add(marker);
 			leafletMap.addComponent(marker);
 		}
-		if (currentFlights.size() > 0)
-			this.setAverageCenter(true);
-		else
-			this.setAverageCenter(false);
 	}
 	
 	public void updateDroneMarkers(){
@@ -325,8 +317,10 @@ public class AFMapComponent extends CustomComponent {
 						leafletMap.addComponent(marker);
 						if (currentFlights.size() > 0)
 							this.setAverageCenter(true);
-						else
+						else{
 							this.setAverageCenter(false);
+							this.setAverageCenter(false);
+						}
 					}
 				}
 			}
@@ -379,7 +373,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					this.setZoomLevel(14);
 				}
-				else if (drones.size() > 1){
+				else if (drones.size() >= 1){
 					double avgLat = 0;
 					double avgLon = 0;
 					for (Entry<String, DroneStatus> e:drones.entrySet()){
@@ -388,6 +382,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					avgLat /= (drones.size() * 1.0);
 					avgLon /= (drones.size() * 1.0);
+					System.out.println(avgLat + " " + avgLon);
 					this.setCenter(avgLat, avgLon);
 					double farthestLat = 0;
 					double farthestLon = 0;
@@ -411,8 +406,8 @@ public class AFMapComponent extends CustomComponent {
 				e1.printStackTrace();
 			}
 			if (drones.size()<1){
-				leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-				leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
+				this.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+				this.setZoomLevel(configuration.getMapDefaultZoom());
 			}
 		}
 		else {
@@ -471,8 +466,8 @@ public class AFMapComponent extends CustomComponent {
 				e1.printStackTrace();
 			}
 			if (drones.size()<1){
-				leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-				leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
+				this.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+				this.setZoomLevel(configuration.getMapDefaultZoom());
 			}
 		}
 	}
