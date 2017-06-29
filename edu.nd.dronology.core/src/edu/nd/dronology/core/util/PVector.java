@@ -13,7 +13,7 @@ package edu.nd.dronology.core.util;
  * @author Michael Murphy
  *
  */ 
-public class PVector {
+public class PVector  extends AbstractPosition {
 	private double x;
 	private double y;
 	private double z;
@@ -137,5 +137,10 @@ public class PVector {
 		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z))
 			return false;
 		return true;
+	}
+
+	@Override
+	public PVector toPVector() {
+		return this;
 	}
 }

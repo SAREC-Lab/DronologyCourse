@@ -16,7 +16,7 @@ import edu.nd.dronology.core.simulator.nvecsimulator.NvecInterpolator;
  * @author Michael Murphy
  *
  */ 
-public class NVector {
+public class NVector extends AbstractPosition {
 
 	public static final double SEMI_MAJOR = 6378137.0;
 	public static final double SEMI_MINOR = 6356752.31;// 4245;

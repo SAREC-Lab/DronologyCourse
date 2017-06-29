@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Michael Murphy
  *
  */
-public class LlaCoordinate implements Serializable {
+public class LlaCoordinate  extends AbstractPosition  implements Serializable {
 
 	private static final long serialVersionUID = 1261660925357051253L;
 	@SerializedName("x")
@@ -151,6 +151,11 @@ public class LlaCoordinate implements Serializable {
 			throw new IllegalArgumentException("Invalid longitude");
 		}
 		return longitude;
+	}
+
+	@Override
+	public LlaCoordinate toLlaCoordinate() {
+		return this;
 	}
 
 }
