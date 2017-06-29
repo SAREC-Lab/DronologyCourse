@@ -249,19 +249,11 @@ public class FRMapComponent extends CustomComponent {
 					}
 
 					
-					froute.addCoordinate(new LlaCoordinate(lon, lat, alt));
+					froute.addCoordinate(new LlaCoordinate(lat, lon, alt));
+					
 				}
 
-				// Notification.show(String.valueOf(route.getCoordinates().size()
-				// + String.valueOf(newWaypoints.size())));
-
-				// ByteArrayOutputStream out = new ByteArrayOutputStream();
-				// ObjectOutput os = new ObjectOutputStream(out);
-				// os.writeObject(froute);
-				// byte[] bytes = out.toByteArray();
-
-				// byte[] data = SerializationUtils.serialize((Serializable)
-				// froute);
+				
 
 				ByteArrayOutputStream outs = new ByteArrayOutputStream();
 				routePersistor.saveItem(froute, outs);
@@ -277,10 +269,7 @@ public class FRMapComponent extends CustomComponent {
 			} catch (PersistenceException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			} 
 
 			// route.removeAllMarkers(route.getPins());
 		});
