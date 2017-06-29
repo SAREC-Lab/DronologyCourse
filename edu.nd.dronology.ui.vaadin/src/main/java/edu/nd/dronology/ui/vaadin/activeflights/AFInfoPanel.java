@@ -48,6 +48,7 @@ public class AFInfoPanel extends CustomComponent{
 		VerticalLayout sideBar = new VerticalLayout();
 		
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
+		AFMapViewOperations mapView = new AFMapViewOperations();
 		
 		emergency.addOnClickListener( e -> {
 			Component child = e.getChildComponent();
@@ -56,7 +57,7 @@ public class AFInfoPanel extends CustomComponent{
 			}
 		});
 
-		sideBar.addComponents(panel, emergency);
+		sideBar.addComponents(panel, mapView, emergency);
 		setCompositionRoot(sideBar);
 		
 		Button selectButton = new Button("Select all");
