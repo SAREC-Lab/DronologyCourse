@@ -6,6 +6,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -26,6 +27,11 @@ public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
 	ArrayList<WayPoint> mapPoints = new ArrayList<>();
 	MapMarkerUtilities route;
+	
+	TextField latitude = new TextField();
+	TextField longitude = new TextField();
+	TextField altitude = new TextField();
+	TextField transitSpeed = new TextField();
 	
 	public FRTableDisplay() {
 		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "transitSpeed");
@@ -77,17 +83,18 @@ public class FRTableDisplay {
 				UI.getCurrent().addWindow(deletePanel);
 			})
 		);
+	
+		
 	}
 	
 	public Grid<WayPoint> getGrid() {
 		return grid;
 	}
 	
+	
+	
+	
 	public void makeEditable(MapMarkerUtilities mapMarkers) {
-		TextField latitude = new TextField();
-		TextField longitude = new TextField();
-		TextField altitude = new TextField();
-		TextField transitSpeed = new TextField();
 		
 		grid.getColumn("latitude").setEditorComponent(latitude);
 		grid.getColumn("longitude").setEditorComponent(longitude);
@@ -96,12 +103,15 @@ public class FRTableDisplay {
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
 			mapMarkers.updatePinForWayPoint(event.getBean());
+			grid.getEditor().cancel();
+			
 		});
-		
 		
 		//grid.asSingleSelect();
 		
 	}
+	
+
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {
 		grid.getEditor().cancel();
