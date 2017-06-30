@@ -60,6 +60,9 @@ public class FRTableDisplay {
 
 				   	route.removeAllLines(route.getPolylines());
 				   	route.setPolylines(route.drawLines(route.getMapPoints()));
+				   	for(int i = 0; i < route.getPolylines().size(); i++){
+						route.getMap().addComponent(route.getPolylines().get(i));
+					}
 				   	grid.setItems(this.route.getMapPoints());
 				   	
 				   	UI.getCurrent().removeWindow(deletePanel);

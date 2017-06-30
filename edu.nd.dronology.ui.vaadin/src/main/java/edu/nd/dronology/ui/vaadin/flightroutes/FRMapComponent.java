@@ -152,8 +152,8 @@ public class FRMapComponent extends CustomComponent {
 
 			route.disableRouteEditing();
 
-			route.removeAllMarkers(route.getPins());
-			route.removeAllLines(route.getPolylines());
+			//route.removeAllMarkers(route.getPins());
+			//route.removeAllLines(route.getPolylines());
 
 			int numberMapPoints = route.getMapPoints().size();
 

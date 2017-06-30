@@ -123,6 +123,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
 				route.setPolylines(route.drawLines(route.getMapPoints()));
+				
 			}
 		}
 		for (int i = 0; i < route.getPins().size(); i++) {
@@ -130,6 +131,9 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getMap().removeComponent(route.getPins().get(i));
 				route.getPins().remove(route.getPins().get(i));
 			}
+		}
+		for(int i = 0; i < route.getPolylines().size(); i++){
+			route.getMap().addComponent(route.getPolylines().get(i));
 		}
 	}
 
