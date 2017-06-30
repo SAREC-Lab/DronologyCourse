@@ -40,14 +40,21 @@ public class FlightManagerServiceRemoteFacade extends AbstractRemoteFacade imple
 	}
 
 	@Override
-	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) throws RemoteException {
-		FlightManagerService.getInstance().planFlight(planName,coordinates, flight);
+	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight)
+			throws RemoteException {
+		FlightManagerService.getInstance().planFlight(planName, coordinates, flight);
 
 	}
 
 	@Override
 	public FlightInfo getFlightDetails() throws RemoteException {
 		return FlightManagerService.getInstance().getFlightDetails();
+	}
+
+	@Override
+	public void planFlight(String uavid, String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight)
+			throws RemoteException {
+		FlightManagerService.getInstance().planFlight(uavid, planName, coordinates, flight);
 	}
 
 }

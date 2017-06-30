@@ -24,9 +24,9 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSetupServiceInstance.class);
 
 	private FlightZoneManager flightManager;
+	private AbstractDroneFleetFactory physicalDroneFleetFactory;
 	private AbstractDroneFleetFactory droneFleetFactory;
 	private List<IDroneStatusChangeListener> listenerList = new ArrayList<>();
-	private static final boolean IS_PYHSICAL = false; 
 
 	public DroneSetupServiceInstance() {
 		super("DRONESETUP");
@@ -51,7 +51,7 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 
 	@Override
 	protected void doStartService() throws Exception {
-		if (IS_PYHSICAL) {
+		if (false) {
 			droneFleetFactory = PhysicalDroneFleetFactory.getInstance();
 		} else {
 			droneFleetFactory = VirtualDroneFleetFactory.getInstance();

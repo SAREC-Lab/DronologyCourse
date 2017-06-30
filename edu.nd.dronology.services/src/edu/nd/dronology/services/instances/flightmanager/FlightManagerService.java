@@ -19,7 +19,9 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 	public static FlightManagerService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (FlightManagerService.class) {
-				INSTANCE = new FlightManagerService();
+				if (INSTANCE == null) {
+					INSTANCE = new FlightManagerService();
+				}
 			}
 		}
 		return INSTANCE;
@@ -31,12 +33,17 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 	}
 
 	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
-		serviceInstance.planFlight(planName,coordinates, flight);
+		serviceInstance.planFlight(planName, coordinates, flight);
 
 	}
 
 	public FlightInfo getFlightDetails() {
 		return serviceInstance.getFlightDetails();
+
+	}
+
+	public void planFlight(String uavid, String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
+		serviceInstance.planFlight(uavid, planName, coordinates, flight);
 
 	}
 

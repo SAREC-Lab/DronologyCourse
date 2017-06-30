@@ -29,6 +29,7 @@ public class FlightPlan implements IFlightPlan {
 
 	private long startTime = -1;
 	private long endTime = -1;
+	private String uavid;
 
 	private enum Status {
 		PLANNED, FLYING, COMPLETED;
@@ -48,7 +49,12 @@ public class FlightPlan implements IFlightPlan {
 	 * @param wayPoints
 	 */
 	public FlightPlan(String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
+		this(null, planName, start, wayPoints);
+	}
+
+	public FlightPlan(String uavid, String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
 		this.wayPoints = createWayPoints(wayPoints);
+		this.uavid = uavid;
 		this.startLocation = start;
 		if (wayPoints.size() > 0) {
 			this.endLocation = wayPoints.get(wayPoints.size() - 1);
@@ -57,6 +63,7 @@ public class FlightPlan implements IFlightPlan {
 		}
 		this.flightID = "DF-" + Integer.toString(++flightNumber) + " - " + planName;
 		status = Status.PLANNED;
+
 	}
 
 	private List<Waypoint> createWayPoints(List<LlaCoordinate> coordinates) {
@@ -196,5 +203,10 @@ public class FlightPlan implements IFlightPlan {
 	@Override
 	public long getEndTime() {
 		return endTime;
+	}
+
+	@Override
+	public String getDesignatedDroneId() {
+		return uavid;
 	}
 }

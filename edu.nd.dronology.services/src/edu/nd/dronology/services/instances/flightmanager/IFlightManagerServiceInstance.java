@@ -13,4 +13,6 @@ public interface IFlightManagerServiceInstance extends IServiceInstance {
 
 	void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight);
 
+	public void planFlight(String uavid, String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight);
+
 }
