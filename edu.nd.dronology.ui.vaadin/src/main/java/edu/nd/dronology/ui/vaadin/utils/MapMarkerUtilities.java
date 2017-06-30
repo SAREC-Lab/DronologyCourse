@@ -43,6 +43,10 @@ public class MapMarkerUtilities {
 	    	removeAllLines(polylines);
 	    	polylines = drawLines(mapPoints);
 	    	grid.setItems(mapPoints);
+	    	for(int i = 0; i < polylines.size(); i++){
+				map.addComponent(polylines.get(i));
+			}
+	    	
 		}		
 	}
 	private class MarkerDragEndListener implements DragEndListener {
@@ -60,6 +64,9 @@ public class MapMarkerUtilities {
 	    	removeAllLines(polylines);
 	    	polylines = drawLines(mapPoints);
 	    	grid.setItems(mapPoints);
+	    	for(int i = 0; i < polylines.size(); i++){
+				map.addComponent(polylines.get(i));
+			}
 		}
 		
 	}
@@ -75,6 +82,7 @@ public class MapMarkerUtilities {
 				}
 			}
 			removeAllLines(polylines);
+			
 		}
 	}
 	private LMap map;
@@ -118,6 +126,9 @@ public class MapMarkerUtilities {
 		removeAllLines(polylines);
 		polylines = drawLines(mapPoints);
 		grid.setItems(mapPoints);
+		for(int i = 0; i < polylines.size(); i++){
+			map.addComponent(polylines.get(i));
+		}
 		
 		return p;
 	}
@@ -170,8 +181,8 @@ public class MapMarkerUtilities {
 				}
 			}
 		}
-  	removeAllLines(polylines);
-  	polylines = drawLines(mapPoints);
+		//removeAllLines(polylines);
+		//polylines = drawLines(mapPoints);
 	}
 	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
@@ -190,7 +201,7 @@ public class MapMarkerUtilities {
 				polyline.setColor("#249b09");
 			}
 			polylines.add(polyline);
-			map.addComponent(polyline);
+			//map.addComponent(polyline);
 
 			polyline.addClickListener(event -> {
 				lineClicked = true;
@@ -224,6 +235,7 @@ public class MapMarkerUtilities {
 		for (int i = polylines.size() - 1; i >= 0; i--) {
 			map.removeComponent(polylines.get(i));
 		}
+		polylines.clear();
 	}
 
 	public void enableRouteEditing () {

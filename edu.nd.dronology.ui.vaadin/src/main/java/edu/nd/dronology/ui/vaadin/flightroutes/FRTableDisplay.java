@@ -83,14 +83,21 @@ public class FRTableDisplay {
 	public void makeEditable(MapMarkerUtilities mapMarkers) {
 		TextField latitude = new TextField();
 		TextField longitude = new TextField();
+		TextField altitude = new TextField();
+		TextField transitSpeed = new TextField();
 		
 		grid.getColumn("latitude").setEditorComponent(latitude);
 		grid.getColumn("longitude").setEditorComponent(longitude);
+		grid.getColumn("altitude").setEditorComponent(altitude);
+		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
 			mapMarkers.updatePinForWayPoint(event.getBean());
 		});
-		grid.asSingleSelect();
+		
+		
+		//grid.asSingleSelect();
+		
 	}
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {

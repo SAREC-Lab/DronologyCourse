@@ -185,6 +185,22 @@ public class FRInfoPanel extends CustomComponent {
 	}
 
 	public FlightRouteInfo getFlight(int index) {
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+		
+		Collection<FlightRouteInfo> items;
+		try {
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			items = service.getItems();
+			routeList = new ArrayList(items);
+		} catch (RemoteException | DronologyServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//routeList = new ArrayList(items);
+		
 		flight = (FlightRouteInfo) routeList.get(index);
 		return flight;
 	}
