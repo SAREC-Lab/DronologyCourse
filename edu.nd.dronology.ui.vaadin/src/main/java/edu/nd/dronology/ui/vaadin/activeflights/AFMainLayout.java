@@ -1,6 +1,7 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 
 /**
@@ -19,6 +20,13 @@ public class AFMainLayout extends CustomComponent {
 		
 		CssLayout content = new CssLayout();
 		content.setSizeFull();	
+		
+		controls.getPanel().getMapView().addOnClickListener( e -> {
+			Component child = e.getChildComponent();
+			if (child.getCaption().equals("View All UAVs<br>on Map")){
+				map.setAverageCenter();
+			}
+		});
 			
 			content.addComponents(controls, map);
 			setCompositionRoot(content);

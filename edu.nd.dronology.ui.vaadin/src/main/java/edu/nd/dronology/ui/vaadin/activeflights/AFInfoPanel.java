@@ -32,6 +32,7 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
+	private AFMapViewOperations mapView = new AFMapViewOperations();
 	private Map<String, DroneStatus> drones;
 	private IDroneSetupRemoteService service;
   private BaseServiceProvider provider = MyUI.getProvider();
@@ -48,7 +49,7 @@ public class AFInfoPanel extends CustomComponent{
 		VerticalLayout sideBar = new VerticalLayout();
 		
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
-		AFMapViewOperations mapView = new AFMapViewOperations();
+		
 		
 		emergency.addOnClickListener( e -> {
 			Component child = e.getChildComponent();
@@ -110,6 +111,10 @@ public class AFInfoPanel extends CustomComponent{
 			e1.printStackTrace();
 		}
 	
+	}
+	
+	public AFMapViewOperations getMapView(){
+		return mapView;
 	}
 	
 	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
