@@ -2,6 +2,7 @@ package edu.nd.dronology.services.supervisor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 
 import edu.nd.dronology.services.core.util.DronologyConstants;
@@ -27,9 +28,8 @@ public class WorkspaceInitializer {
 		if (root == null) {
 			root = DronologyConstants.DEFAULT_ROOT_FOLDER;
 		}
-
-		root = root.replace("file:\\", "");
-
+		
+		root = root.replace("file:", "");
 		LOGGER.info("Server workspace root location is: '" + root + "'");
 
 		File f = new File(root);
@@ -57,7 +57,7 @@ public class WorkspaceInitializer {
 			return null;
 		}
 
-		return ws.getPath() + "\\" + DronologyConstants.DRONOLOGY_ROOT_FOLDER;
+		return Paths.get(ws.getPath(), DronologyConstants.DRONOLOGY_ROOT_FOLDER).toString();
 	}
 
 	public void prepareServerWorkspace(String workspace) throws DronologyServiceException {
@@ -97,15 +97,15 @@ public class WorkspaceInitializer {
 	}
 
 	String getFlightRouteLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_FLIGHTROUTE;
+		return Paths.get(root, DronologyConstants.FOLDER_FLIGHTROUTE).toString();
 	}
 	
 	public String getSimScenarioLocation() {
-		return root + "\\" + DronologyConstants.FOLDERN_SIM_SCENARIO;
+		return Paths.get(root, DronologyConstants.FOLDERN_SIM_SCENARIO).toString();
 	}
 	
 	public String getDroneSpecificationLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_SPECIFICATION;
+		return Paths.get(root, DronologyConstants.FOLDER_SPECIFICATION).toString();
 	}
 
 
@@ -130,7 +130,7 @@ public class WorkspaceInitializer {
 
 	private boolean importFlightPath(String fileName, byte[] content, boolean overwrite) {
 		String location = getFlightRouteLocation();
-		String fName = location + "\\" + fileName;
+		String fName = Paths.get(location, fileName).toString();
 		return importFile(fName, content, overwrite);
 
 	}

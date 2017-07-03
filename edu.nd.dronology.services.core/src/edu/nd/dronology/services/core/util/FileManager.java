@@ -2,6 +2,7 @@ package edu.nd.dronology.services.core.util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,7 +60,7 @@ public class FileManager {
 	public boolean saveByteArrayToFile(String id, byte[] content) {
 		LOGGER.info("File '" + id + "' received");
 		FileOutputStream stream = null;
-		String savelocation = path + "\\" + id + "." + extension;
+		String savelocation = Paths.get(path, id + "." + extension).toString();
 		File f = new File(savelocation);
 		if (f.exists()) {
 			LOGGER.info("Deleting old file");
