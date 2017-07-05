@@ -1,6 +1,8 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -156,6 +158,16 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setIsChecked(select);
 		}
+	}
+	
+	public List<String> getChecked(){
+		List<String> names = new ArrayList<>();
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (box.getIsChecked())
+				names.add(box.getName());
+		}
+		return names;
 	}
 	
 	public void setVisibility(boolean visible){

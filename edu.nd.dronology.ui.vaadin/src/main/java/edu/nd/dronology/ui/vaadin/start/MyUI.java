@@ -48,6 +48,7 @@ public class MyUI extends UI {
 			      	navigationBar.getAFLayout().getControls().getPanel().refreshDrones();
 			      	navigationBar.getAFLayout().getAFMap().updateDroneMarkers();
 			      	navigationBar.getAFLayout().getAFMap().updateActiveFlightRoutes();
+			      	navigationBar.getAFLayout().continueFollowing();
 			      });
 			    }
 			}, configuration.getRefreshRate(), configuration.getRefreshRate());

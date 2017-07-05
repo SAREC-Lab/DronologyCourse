@@ -253,6 +253,7 @@ public class AFInfoBox extends CustomComponent {
 	}
 
 	public boolean getIsChecked() {
+		this.isChecked = check.getValue();
 		return this.isChecked;
 	}
 

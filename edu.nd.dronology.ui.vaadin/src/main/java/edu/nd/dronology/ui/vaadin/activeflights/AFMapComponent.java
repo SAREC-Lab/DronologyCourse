@@ -434,7 +434,7 @@ public class AFMapComponent extends CustomComponent {
 				Point point = new Point(avgLat, avgLon);
 				double zoom;
 				if (farthestLat == 0 && farthestLon == 0){
-					zoom = 14;
+					zoom = 17;
 				}
 				else {
 					zoom = Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2));
