@@ -50,7 +50,7 @@ public class AFMapComponent extends CustomComponent {
   private BaseServiceProvider provider = MyUI.getProvider();
   private ArrayList<ArrayList<LPolyline>> flightRoutes = new ArrayList<>();
   private ArrayList<ArrayList<LMarker>> wayPointMarkers = new ArrayList<>();
-  //private ArrayList<ArrayList<WayPoint>> wayPointLists = new ArrayList<>();
+  private boolean follow = false;
 	
   private MapMarkerUtilities utilities;
   
@@ -139,7 +139,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					i++;
 				}
-				ArrayList<LPolyline> polyLines = utilities.drawLines(wayPoints);
+				ArrayList<LPolyline> polyLines = utilities.drawLines(wayPoints, true);
 				flightRoutes.add(polyLines);
 				if (wayPointMarkers.size() != currentFlights.size())
 					wayPointMarkers.add(wayPointMarker);
@@ -208,31 +208,6 @@ public class AFMapComponent extends CustomComponent {
 		}
 	}
 	
-	/*public void updateActiveFlightRoutes(){
-		try {
-			currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
-			if (currentFlights.size() != flightRoutes.size()){
-				for (ArrayList<LPolyline> e:flightRoutes){
-					utilities.removeAllLines(e);
-				}
-				flightRoutes.clear();
-				this.addActiveFlightRoutes();	
-			}
-			//update dashed lines
-			drones = service.getDrones();
-			int index = 0;
-			for ( Entry<String, DroneStatus> e:drones.entrySet()){
-				if (e.getValue().getStatus().equals("FLYING")){
-					//insert drone into waypoint list after most visited waypoint list. While waypoint = visited {} waypointlist.add(drone)
-				}
-				
-			}
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
-	
 	public void addDroneMarkers(){
 		try {
 			drones = service.getDrones();
@@ -255,6 +230,7 @@ public class AFMapComponent extends CustomComponent {
 			marker.setIconSize(new Point(77, 33));
 			markers.add(marker);
 			leafletMap.addComponent(marker);
+      this.setAverageCenter();
 		}
 	}
 	
@@ -407,6 +383,68 @@ public class AFMapComponent extends CustomComponent {
 				e1.printStackTrace();
 			}
 			if (drones.size()<1){
+				Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+				double zoom = configuration.getMapDefaultZoom();
+				leafletMap.setCenter(point, zoom);
+			}
+		
+	}
+	
+	public boolean getFollow(){
+		return this.follow;
+	}
+	
+	public void setFollow(boolean follow){
+		this.follow = follow;
+	}
+	
+	public void followDrones(List<String> names){
+		Configuration configuration = Configuration.getInstance();
+			try {
+				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+				drones = service.getDrones();
+				double avgLat = 0;
+				double avgLon = 0;
+				int numPoints = 0;
+				for (Entry<String, DroneStatus> e:drones.entrySet()){
+					for(String name:names){
+						if (e.getValue().getID().equals(name)){
+							avgLat += e.getValue().getLatitude();
+							avgLon += e.getValue().getLongitude();
+							numPoints++;
+						}
+					}
+				}
+				avgLat /= (numPoints * 1.0);
+				avgLon /= (numPoints * 1.0);
+				double farthestLat = 0;
+				double farthestLon = 0;
+				for (Entry<String, DroneStatus> e:drones.entrySet()){
+					for(String name:names){
+						if (e.getValue().getID().equals(name)){
+							if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat){
+								farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
+							}
+							if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon){
+								farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
+							}
+						}
+					}
+				}
+				Point point = new Point(avgLat, avgLon);
+				double zoom;
+				if (farthestLat == 0 && farthestLon == 0){
+					zoom = 14;
+				}
+				else {
+					zoom = Math.floor(Math.log10(180.0/Math.max(farthestLat, farthestLon)) / Math.log10(2));
+				}
+				leafletMap.setCenter(point, zoom);
+			} catch (RemoteException | DronologyServiceException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if (names.size()<1){
 				Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
 				double zoom = configuration.getMapDefaultZoom();
 				leafletMap.setCenter(point, zoom);

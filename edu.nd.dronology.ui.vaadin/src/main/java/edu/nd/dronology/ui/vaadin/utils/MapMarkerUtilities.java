@@ -41,7 +41,7 @@ public class MapMarkerUtilities {
 
 	    	map.removeComponent(leafletMarker);
 	    	removeAllLines(polylines);
-	    	polylines = drawLines(mapPoints);
+	    	polylines = drawLines(mapPoints, false);
 	    	grid.setItems(mapPoints);
 	    	for(int i = 0; i < polylines.size(); i++){
 				map.addComponent(polylines.get(i));
@@ -62,7 +62,7 @@ public class MapMarkerUtilities {
 	    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
 	    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
 	    	removeAllLines(polylines);
-	    	polylines = drawLines(mapPoints);
+	    	polylines = drawLines(mapPoints, false);
 	    	grid.setItems(mapPoints);
 	    	for(int i = 0; i < polylines.size(); i++){
 				map.addComponent(polylines.get(i));
@@ -124,7 +124,7 @@ public class MapMarkerUtilities {
 		}
 		
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints);
+		polylines = drawLines(mapPoints, false);
 		grid.setItems(mapPoints);
 		for(int i = 0; i < polylines.size(); i++){
 			map.addComponent(polylines.get(i));
@@ -142,7 +142,7 @@ public class MapMarkerUtilities {
 		}
 		mapPoints.add(p);
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints);
+		polylines = drawLines(mapPoints, false);
 		grid.setItems(mapPoints);
 		
 		return p;
@@ -184,7 +184,7 @@ public class MapMarkerUtilities {
 		//removeAllLines(polylines);
 		//polylines = drawLines(mapPoints);
 	}
-	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints) {
+	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, boolean drawOnMap) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
@@ -201,7 +201,8 @@ public class MapMarkerUtilities {
 				polyline.setColor("#249b09");
 			}
 			polylines.add(polyline);
-			//map.addComponent(polyline);
+			if (drawOnMap)
+				map.addComponent(polyline);
 
 			polyline.addClickListener(event -> {
 				lineClicked = true;

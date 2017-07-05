@@ -94,7 +94,7 @@ public class FRMainLayout extends CustomComponent {
 				first = false;
 			}
 
-			ArrayList<LPolyline> mapLines = map.getUtils().drawLines(waypoints);
+			ArrayList<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false);
 			
 			map.getUtils().setPolylines(mapLines);
 			for(int i = 0; i < mapLines.size(); i++){

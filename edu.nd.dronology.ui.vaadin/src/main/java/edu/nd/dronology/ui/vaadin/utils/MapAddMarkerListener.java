@@ -122,7 +122,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getMapPoints().remove(route.getMapPoints().get(i));
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
-				route.setPolylines(route.drawLines(route.getMapPoints()));
+				route.setPolylines(route.drawLines(route.getMapPoints(), false));
 				
 			}
 		}
