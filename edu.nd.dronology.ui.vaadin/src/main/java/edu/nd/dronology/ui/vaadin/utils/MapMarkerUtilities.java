@@ -35,6 +35,7 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 public class MapMarkerUtilities {
 	private class MarkerClickListener implements LeafletClickListener {
 
+		@Override
 		public void onClick(LeafletClickEvent event) {	
 			LMarker leafletMarker = (LMarker)event.getSource();
 			WayPoint w = null;
