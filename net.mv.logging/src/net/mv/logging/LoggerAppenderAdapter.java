@@ -116,4 +116,16 @@ public class LoggerAppenderAdapter implements ILoggerAppender {
 
 	}
 
+	@Override
+	public void missionInfo(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void missionError(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
