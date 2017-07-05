@@ -136,6 +136,8 @@ public class AFMapComponent extends CustomComponent {
 						marker.setIconSize(new Point(15,15));
 						wayPointMarker.add(marker);
 						leafletMap.addComponent(marker);
+						if (!follow)
+							this.setAverageCenter();
 					}
 					i++;
 				}
@@ -179,7 +181,8 @@ public class AFMapComponent extends CustomComponent {
 						utilities.removeAllMarkers(e);
 					}
 					wayPointMarkers.clear();
-					this.setAverageCenter();
+					if (!follow)
+						this.setAverageCenter();
 				}
 			}
 			flightRoutes.clear();
@@ -230,7 +233,8 @@ public class AFMapComponent extends CustomComponent {
 			marker.setIconSize(new Point(77, 33));
 			markers.add(marker);
 			leafletMap.addComponent(marker);
-      this.setAverageCenter();
+			if (!follow)
+      	this.setAverageCenter();
 		}
 	}
 	
@@ -265,7 +269,8 @@ public class AFMapComponent extends CustomComponent {
 								newMarker.setIconSize(new Point(77, 33));
 								markers.add(newMarker);
 								leafletMap.addComponent(newMarker);
-								this.setAverageCenter();
+								if (!follow)
+									this.setAverageCenter();
 							}
 						}
 					}
@@ -285,7 +290,8 @@ public class AFMapComponent extends CustomComponent {
 						marker.setIconSize(new Point(77, 33));
 						markers.add(marker);
 						leafletMap.addComponent(marker);
-						this.setAverageCenter();
+						if (!follow)
+							this.setAverageCenter();
 						
 					}
 				}
@@ -305,7 +311,8 @@ public class AFMapComponent extends CustomComponent {
 				for (LMarker e:remove){
 					markers.remove(e);
 					leafletMap.removeComponent(e);
-					this.setAverageCenter();
+					if (!follow)
+						this.setAverageCenter();
 				}
 				remove.clear();
 			}
