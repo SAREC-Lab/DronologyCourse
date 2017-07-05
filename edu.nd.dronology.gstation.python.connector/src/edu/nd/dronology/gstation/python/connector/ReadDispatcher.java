@@ -44,7 +44,6 @@ public class ReadDispatcher implements Runnable {
 			reader = new BufferedReader(new InputStreamReader(inputStream));
 			while (cont.get()) {
 				String line = reader.readLine();
-				line = reader.readLine();
 				if (line != null) {
 					// TODO: create the timestamp before deserializing the object....
 					try {
