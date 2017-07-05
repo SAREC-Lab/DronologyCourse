@@ -7,6 +7,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
 
+/**
+ * 
+ * @author Patrick Falvey
+ *
+ */
+
 public class AFMapViewOperations extends CustomComponent{
 
 	private static final long serialVersionUID = -2249802562670339842L;
