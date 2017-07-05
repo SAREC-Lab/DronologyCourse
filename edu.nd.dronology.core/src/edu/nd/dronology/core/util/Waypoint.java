@@ -14,6 +14,8 @@ public class Waypoint implements Serializable {
 	private final LlaCoordinate coordinate;
 	private boolean destinationReached = false;
 
+	private double approachingspeed = 0.0d;
+
 	public LlaCoordinate getCoordinate() {
 		return coordinate;
 	}
@@ -48,6 +50,14 @@ public class Waypoint implements Serializable {
 	public void reached(boolean reached) {
 		this.destinationReached = reached;
 
+	}
+
+	public double getApproachingspeed() {
+		return approachingspeed;
+	}
+
+	public void setApproachingspeed(double approachingspeed) {
+		this.approachingspeed = approachingspeed;
 	}
 
 }

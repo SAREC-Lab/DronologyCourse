@@ -39,31 +39,31 @@ public class FlightManagerContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getChildren(Object parentElement) {
 
-		if (parentElement == FLYING) {
-			return input.getCurrentFlights().toArray();
-		}
-
-		if (parentElement == PENDING) {
-			return input.getPendingFlights().toArray();
-		}
-
-		if (parentElement == AWAITING) {
-			return input.getAwaitingFlights().toArray();
-		}
-
-		if (parentElement == COMPLETED) {
-			return input.getCompletedFlights().toArray();
-		}
-
-		if (parentElement instanceof FlightPlanInfo) {
-
-			FlightPlanInfo fpInfo = (FlightPlanInfo) parentElement;
-
-			List elems = new ArrayList<>();
-			elems.add(new WrappedCoordinate(fpInfo.getStartLocation()));
-			elems.addAll(fpInfo.getWaypoints());
-			return elems.toArray();
-		}
+//		if (parentElement == FLYING) {
+//			return input.getCurrentFlights().toArray();
+//		}
+//
+//		if (parentElement == PENDING) {
+//			return input.getPendingFlights().toArray();
+//		}
+//
+//		if (parentElement == AWAITING) {
+//			return input.getAwaitingFlights().toArray();
+//		}
+//
+//		if (parentElement == COMPLETED) {
+//			return input.getCompletedFlights().toArray();
+//		}
+//
+//		if (parentElement instanceof FlightPlanInfo) {
+//
+//			FlightPlanInfo fpInfo = (FlightPlanInfo) parentElement;
+//
+//			List elems = new ArrayList<>();
+//			elems.add(new WrappedCoordinate(fpInfo.getStartLocation()));
+//			elems.addAll(fpInfo.getWaypoints());
+//			return elems.toArray();
+//		}
 
 		return new Object[0];
 

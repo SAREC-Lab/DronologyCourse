@@ -14,6 +14,7 @@ import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.util.NamedThreadFactory;
@@ -80,7 +81,7 @@ public class DispatchQueueManager {
 
 	private void registerNewDrone(String id, UAVState status) {
 		LOGGER.hwInfo("New drone registered with  '" + id + "' -> " + status.toString());
-		DroneInitializationInfo info = new DroneInitializationInfo(id, id, status.getLocation());
+		DroneInitializationInfo info = new DroneInitializationInfo(id, DroneMode.MODE_PHYSICAL,id, status.getLocation());
 		try {
 			DroneSetupService.getInstance().initializeDrones(info);
 		} catch (DronologyServiceException e) {

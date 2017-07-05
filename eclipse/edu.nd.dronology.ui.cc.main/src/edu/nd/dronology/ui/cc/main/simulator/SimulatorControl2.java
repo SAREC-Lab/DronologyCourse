@@ -37,6 +37,7 @@ import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.cc.images.StyleProvider;
 import edu.nd.dronology.ui.cc.main.DronologyMainActivator;
 import edu.nd.dronology.ui.cc.main.remote.ServiceProvider;
 import javafx.embed.swt.FXCanvas;
@@ -74,7 +75,7 @@ public class SimulatorControl2 extends Composite {
 
 	private static long xRange = 1100;
 	private static long yRange = 600;
-	private static int LeftDivider = 0;
+	private static int LeftDivider = 250;
 
 	private FXCanvas fxCanvas;
 
@@ -148,9 +149,18 @@ public class SimulatorControl2 extends Composite {
 		lblBounds.setText("FlightZone: -- not set --");
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 
-		fxCanvas = new FXCanvas(parent, SWT.BORDER);
+		
+		Composite mainContainer = new Composite(parent, SWT.FLAT);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(mainContainer);
+		GridDataFactory.fillDefaults().span(3, 1).grab(true, true).applyTo(mainContainer);
+		new DroneStatusViewer(mainContainer);
+		
+		
+		
+		
+		fxCanvas = new FXCanvas(mainContainer, SWT.BORDER);
 		GridLayoutFactory.fillDefaults().applyTo(fxCanvas);
-		GridDataFactory.fillDefaults().span(3, 1).grab(true, true).applyTo(fxCanvas);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fxCanvas);
 
 		root = new AnchorPane();
 		Scene scene = new Scene(root);
@@ -196,42 +206,42 @@ public class SimulatorControl2 extends Composite {
 	}
 
 	public void setupFlight() {
-		ArrayList<LlaCoordinate> wayPoints = new ArrayList<>();
-		wayPoints.add(new LlaCoordinate(42.270485, -86.200000, 10));
-		wayPoints.add(new LlaCoordinate(42.500000, -86.150000, 10));
-
-		try {
-			flightManagerService = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
-					.getService(IFlightManagerRemoteService.class);
-
-			flightManagerService.planFlight("TESTPLAN", wayPoints.get(0), wayPoints);
-
-		} catch (Exception e) {
-			LOGGER.error(e);
-		}
+//		ArrayList<LlaCoordinate> wayPoints = new ArrayList<>();
+//		wayPoints.add(new LlaCoordinate(42.270485, -86.200000, 10));
+//		wayPoints.add(new LlaCoordinate(42.500000, -86.150000, 10));
+//
+//		try {
+//			flightManagerService = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
+//					.getService(IFlightManagerRemoteService.class);
+//
+//			flightManagerService.planFlight("TESTPLAN", wayPoints);
+//
+//		} catch (Exception e) {
+//			LOGGER.error(e);
+//		}
 
 	}
 
 	// Test loads drones
 	public void setup() {
-		ArrayList<String[]> newDrones = new ArrayList<>();
-		String[] D1 = { "DRN1", "Iris3DR", "41760000", "-86222901", "0" };
-		String[] D2 = { "DRN2", "Iris3DR", "41750802", "-86202481", "10" };
-		String[] D3 = { "DRN3", "Iris3DR", "41740893", "-86182505", "0" };
-		newDrones.add(D1);
-		// newDrones.add(D2);
-		// newDrones.add(D3);
-
-		try {
-
-			setupService = (IDroneSetupRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
-					.getService(IDroneSetupRemoteService.class);
-
-			setupService.initializeDrones(newDrones, false);
-
-		} catch (Exception e) {
-			LOGGER.error(e);
-		}
+//		ArrayList<String[]> newDrones = new ArrayList<>();
+//		String[] D1 = { "DRN1", "Iris3DR", "41760000", "-86222901", "0" };
+//		String[] D2 = { "DRN2", "Iris3DR", "41750802", "-86202481", "10" };
+//		String[] D3 = { "DRN3", "Iris3DR", "41740893", "-86182505", "0" };
+//		newDrones.add(D1);
+//		// newDrones.add(D2);
+//		// newDrones.add(D3);
+//
+//		try {
+//
+//			setupService = (IDroneSetupRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
+//					.getService(IDroneSetupRemoteService.class);
+//
+//			setupService.initializeDrones(newDrones, false);
+//
+//		} catch (Exception e) {
+//			LOGGER.error(e);
+//		}
 
 		// DronologySetupDronesAccessPoint setup = DronologySetupDronesAccessPoint.getInstance();
 		// setup.initializeDrones(newDrones, false);

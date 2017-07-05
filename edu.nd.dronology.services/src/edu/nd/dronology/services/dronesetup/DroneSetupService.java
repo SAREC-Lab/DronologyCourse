@@ -33,10 +33,7 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 		return new DroneSetupServiceInstance();
 	}
 
-	public void initializeDrones(List<String[]> newDrones, boolean b) throws DronologyServiceException {
-		serviceInstance.initializeDrones(newDrones, b);
 
-	}
 
 	public Map<String, DroneStatus> getDrones() {
 		return serviceInstance.getDrones();

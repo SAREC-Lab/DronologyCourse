@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteCategoryInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.info.RemoteInfoObject;
@@ -46,8 +47,6 @@ public class FlightRoutePlanningnShelfViewer extends AbstractSidebarViewer<Fligh
 		createContents();
 	}
 
-
-
 	@Override
 	protected void doOpen(ISelection selection) {
 		StructuredSelection sel = (StructuredSelection) selection;
@@ -55,8 +54,8 @@ public class FlightRoutePlanningnShelfViewer extends AbstractSidebarViewer<Fligh
 			return;
 		}
 
-	
-		DronologyMainActivator.getDefault().getEventBroker().post(EventConstants.FLIGHTROUTE_OPEN, sel.getFirstElement());
+		DronologyMainActivator.getDefault().getEventBroker().post(EventConstants.FLIGHTROUTE_OPEN,
+				sel.getFirstElement());
 
 	}
 
@@ -178,8 +177,13 @@ public class FlightRoutePlanningnShelfViewer extends AbstractSidebarViewer<Fligh
 
 			List<LlaCoordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
 			LlaCoordinate initPoint = coordds.remove(0);
-			service.planFlight(remoteItem.getName(),initPoint, coordds);
-		} catch (RemoteException | DronologyServiceException e) {
+			List<Waypoint> waypoints = new ArrayList<>();
+			for (LlaCoordinate c : coordds) {
+				waypoints.add(new Waypoint(c));
+			}
+
+			service.planFlight(remoteItem.getName(), waypoints);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
