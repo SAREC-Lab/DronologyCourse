@@ -1,5 +1,6 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
+import java.awt.MouseInfo;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
@@ -14,8 +15,13 @@ import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.shared.Registration;
+import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.PopupView;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
@@ -29,24 +35,49 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 public class MapMarkerUtilities {
 	private class MarkerClickListener implements LeafletClickListener {
 
-		@Override
-		public void onClick(LeafletClickEvent event) {
+		public void onClick(LeafletClickEvent event) {	
 			LMarker leafletMarker = (LMarker)event.getSource();
+			WayPoint w = null;
+			
 	    	for (int i = 0; i < mapPoints.size(); i++) {
 	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
-	    			mapPoints.remove(mapPoints.get(i));
-	    			pins.remove(pins.get(i));
+	    			w = mapPoints.get(i);
 	    		}
 	    	}
-
-	    	map.removeComponent(leafletMarker);
-	    	removeAllLines(polylines);
-	    	polylines = drawLines(mapPoints, false);
-	    	grid.setItems(mapPoints);
-	    	for(int i = 0; i < polylines.size(); i++){
-				map.addComponent(polylines.get(i));
-			}
 	    	
+			Button toDelete = new Button("Remove Waypoint");
+			VerticalLayout content = new VerticalLayout();
+			PopupView popup = new PopupView(null, content);
+			
+			toDelete.addClickListener(e -> {
+				popup.setPopupVisible(false);
+		    	for (int i = 0; i < mapPoints.size(); i++) {
+		    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
+		    			mapPoints.remove(mapPoints.get(i));
+		    			pins.remove(pins.get(i));
+		    		}
+		    	}
+		    	
+		    	map.removeComponent(leafletMarker);
+				removeAllLines(polylines);
+				polylines = drawLines(mapPoints, true);
+				grid.setItems(mapPoints);
+			});
+			
+			content.addComponent(new Label("Latitude: " + w.getLatitude()));
+			content.addComponent(new Label("Longitude: " + w.getLongitude()));
+			content.addComponent(new Label("Altitude: "  + w.getAltitude()));
+			content.addComponent(new Label("Transit Speed: " + w.getTransitSpeed()));
+			content.addComponent(toDelete);
+			
+			popup.setPopupVisible(true);
+			popup.addStyleName("bring_front");
+			
+			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 100) + "px;left:" 
+					+ String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 240) + "px");
+
+			map.addComponent(popup);
+
 		}		
 	}
 	private class MarkerDragEndListener implements DragEndListener {
@@ -96,12 +127,14 @@ public class MapMarkerUtilities {
 	private boolean lineClicked = false;
 	private int lineIndex = -1;
 	private boolean isEditable = false;
+	private AbsoluteLayout layout;
 	
-	public MapMarkerUtilities(LMap map, FRTableDisplay tableDisplay, Window popup) {
+	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window popup) {
 		this.map = map;
 		this.tableDisplay = tableDisplay;
 		this.grid = tableDisplay.getGrid();
 		this.popup = popup;
+		this.layout = layout;
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
@@ -124,11 +157,8 @@ public class MapMarkerUtilities {
 		}
 		
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints, false);
+		polylines = drawLines(mapPoints, true);
 		grid.setItems(mapPoints);
-		for(int i = 0; i < polylines.size(); i++){
-			map.addComponent(polylines.get(i));
-		}
 		
 		return p;
 	}
@@ -181,8 +211,6 @@ public class MapMarkerUtilities {
 				}
 			}
 		}
-		//removeAllLines(polylines);
-		//polylines = drawLines(mapPoints);
 	}
 	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, boolean drawOnMap) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();

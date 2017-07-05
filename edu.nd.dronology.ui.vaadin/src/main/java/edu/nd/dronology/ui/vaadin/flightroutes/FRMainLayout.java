@@ -9,7 +9,6 @@ import org.vaadin.addon.leaflet.shared.Point;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.nd.dronology.core.util.LlaCoordinate;

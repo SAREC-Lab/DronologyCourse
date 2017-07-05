@@ -2,7 +2,6 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -44,6 +43,7 @@ public class FRMapComponent extends CustomComponent {
 	MapMarkerUtilities route;
 	FRTableDisplay tableDisplay = new FRTableDisplay();
 	VerticalLayout content = new VerticalLayout();
+	AbsoluteLayout mapAndPopup = new AbsoluteLayout();
 	FRMetaInfo bar = new FRMetaInfo();
 	FReditBar edit = new FReditBar();
 
@@ -59,8 +59,9 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
 
 		Window popup = createWayPointWindow();
-		route = new MapMarkerUtilities(leafletMap, tableDisplay, popup);
+		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup);
 
+		mapAndPopup.addComponent(leafletMap);
 		tableDisplay.setRoute(route);
 		tableDisplay.getGrid().addStyleName("fr_table_component");
 
@@ -69,11 +70,12 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
+		content.addComponent(mapAndPopup);
 
 		route.disableRouteEditing();
 
 		setCompositionRoot(content);
-		content.addComponents(leafletMap, tableDisplay.getGrid());
+		content.addComponents(tableDisplay.getGrid());
 	}
 
 	private Window createWayPointWindow() {
@@ -102,13 +104,13 @@ public class FRMapComponent extends CustomComponent {
 
 	public void display() {
 		// set bar fields
-
+		mapAndPopup.setHeight("510px");
+		mapAndPopup.setWidth("1075px");
 		content.addComponent(bar);
-		content.addComponents(leafletMap, tableDisplay.getGrid());
+		content.addComponents(mapAndPopup, tableDisplay.getGrid());
 	}
 
 	public void display(FlightRouteInfo info) {
-
 		route.disableRouteEditing();
 
 		AbsoluteLayout layout = new AbsoluteLayout();
@@ -252,9 +254,7 @@ public class FRMapComponent extends CustomComponent {
 					froute.addCoordinate(new LlaCoordinate(lat, lon, alt));
 					
 				}
-
 				
-
 				ByteArrayOutputStream outs = new ByteArrayOutputStream();
 				routePersistor.saveItem(froute, outs);
 				byte[] bytes = outs.toByteArray();
@@ -273,7 +273,7 @@ public class FRMapComponent extends CustomComponent {
 
 			// route.removeAllMarkers(route.getPins());
 		});
-		layout.addComponent(leafletMap, "top:5px; left:5px");
+		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
 		// content.addComponent(editBar);
@@ -321,5 +321,4 @@ public class FRMapComponent extends CustomComponent {
 	public FRTableDisplay getTableDisplay() {
 		return tableDisplay;
 	}
-
 }
