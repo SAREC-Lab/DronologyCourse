@@ -114,9 +114,9 @@ def main():
     drones = [(DRONE_TYPE_SITL_VRTL, core.ResponsiveDrone, {'instance': 0, 'home': (41.519408, -86.239996, 0, 0)}),
               (DRONE_TYPE_SITL_VRTL, core.ResponsiveDrone, {'instance': 1, 'home': (41.514408, -86.239996, 0, 0)})]
     # drones = [{'type': 'physical', 'ConnectionData': {'ConnectionString': '/dev/ttyUSB0', 'BaudRate': 57600, }, }, ]
-    comm = ControlStation(1234, drones)
-    signal.signal(signal.SIGTERM, lambda: comm.stop())
-    comm.start()
+    ctrl = ControlStation(1234, drones)
+    signal.signal(signal.SIGTERM, lambda: ctrl.stop())
+    ctrl.start()
 
 
 if __name__ == "__main__":

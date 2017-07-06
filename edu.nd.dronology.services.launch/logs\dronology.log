@@ -1843,3 +1843,27 @@ java.net.SocketException: Connection reset
 2017-07-06 10:57:23.807 [INFO ] setCommandHandler    |edu.nd.dronology.core.fleet.RuntimeDroneTypes:89 | Drone command handler set: class edu.nd.dronology.gstation.python.connector.PythonBase2
 2017-07-06 10:57:23.807 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.ReadDispatcher:43 | Read-Dispatcher started
 2017-07-06 10:57:23.807 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.WriteDispatcher:38 | Write-Dispatcher started
+2017-07-06 12:51:22.608 [INFO ] initialize           |edu.nd.dronology.services.remote.rmi.AbstractRMIRemoteObject:46 | >> Binding 'Remote' established on port 9898
+2017-07-06 12:51:22.617 [INFO ] prepareRoot          |edu.nd.dronology.services.supervisor.WorkspaceInitializer:33 | Server workspace root location is: '/Users/seanbayley/Desktop/git/Dronology/dronology-workspace'
+2017-07-06 12:51:22.618 [INFO ] prepareRoot          |edu.nd.dronology.services.supervisor.WorkspaceInitializer:36 | Absolute path is: '/Users/seanbayley/Desktop/git/Dronology/dronology-workspace'
+2017-07-06 12:51:22.630 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'froute' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/flightroute]
+2017-07-06 12:51:22.644 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'specification' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/specifications]
+2017-07-06 12:51:22.647 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'sim' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/simscenario]
+2017-07-06 12:51:22.650 [INFO ] <init>               |edu.nd.dronology.gstation.python.connector.PythonBase2:47 | Connecting to Python base /127.0.0.1@1234
+2017-07-06 12:51:22.692 [INFO ] setCommandHandler    |edu.nd.dronology.core.fleet.RuntimeDroneTypes:89 | Drone command handler set: class edu.nd.dronology.gstation.python.connector.PythonBase2
+2017-07-06 12:51:22.692 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.ReadDispatcher:43 | Read-Dispatcher started
+2017-07-06 12:51:22.692 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.WriteDispatcher:38 | Write-Dispatcher started
+2017-07-06 12:51:22.762 [INFO ] setBaseCoordinates   |edu.nd.dronology.core.vehicle.AbstractDrone:87 | Base Coordinate of Drone 'VRTL_1 set to 'LlaCoordinate(0.000000, 0.000000, 0.000000)
+2017-07-06 12:51:22.762 [INFO ] start                |edu.nd.dronology.core.vehicle.ManagedDrone:204 | Starting Drone 'VRTL_1'
+2017-07-06 14:03:12.318 [INFO ] initialize           |edu.nd.dronology.services.remote.rmi.AbstractRMIRemoteObject:46 | >> Binding 'Remote' established on port 9898
+2017-07-06 14:03:12.327 [INFO ] prepareRoot          |edu.nd.dronology.services.supervisor.WorkspaceInitializer:33 | Server workspace root location is: '/Users/seanbayley/Desktop/git/Dronology/dronology-workspace'
+2017-07-06 14:03:12.327 [INFO ] prepareRoot          |edu.nd.dronology.services.supervisor.WorkspaceInitializer:36 | Absolute path is: '/Users/seanbayley/Desktop/git/Dronology/dronology-workspace'
+2017-07-06 14:03:12.341 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'froute' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/flightroute]
+2017-07-06 14:03:12.355 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'specification' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/specifications]
+2017-07-06 14:03:12.358 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'sim' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/simscenario]
+2017-07-06 14:03:12.361 [INFO ] <init>               |edu.nd.dronology.gstation.python.connector.PythonBase2:47 | Connecting to Python base /127.0.0.1@1234
+2017-07-06 14:03:12.405 [INFO ] setCommandHandler    |edu.nd.dronology.core.fleet.RuntimeDroneTypes:89 | Drone command handler set: class edu.nd.dronology.gstation.python.connector.PythonBase2
+2017-07-06 14:03:12.405 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.WriteDispatcher:38 | Write-Dispatcher started
+2017-07-06 14:03:12.405 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.ReadDispatcher:43 | Read-Dispatcher started
+2017-07-06 14:03:12.476 [INFO ] setBaseCoordinates   |edu.nd.dronology.core.vehicle.AbstractDrone:87 | Base Coordinate of Drone 'VRTL_1 set to 'LlaCoordinate(0.000000, 0.000000, 0.000000)
+2017-07-06 14:03:12.476 [INFO ] start                |edu.nd.dronology.core.vehicle.ManagedDrone:204 | Starting Drone 'VRTL_1'

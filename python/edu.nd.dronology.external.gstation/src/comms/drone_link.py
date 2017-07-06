@@ -13,10 +13,6 @@ class Drone(object):
         self.vehicle = None
         self.strategy = None
 
-        for k in DRONE_ATTRS:
-            if k not in self.__dict__:
-                self.__dict__[k] = 0
-
     def connect(self):
         raise NotImplementedError
 
@@ -25,6 +21,45 @@ class Drone(object):
 
     def on_command(self, cmd, **kwargs):
         self.strategy.respond(cmd, self.vehicle, **kwargs)
+
+    def get_location(self):
+        return {'x': 0, 'y': 0, 'z': 0}
+
+    def get_attitude(self):
+        return {'x': 0, 'y': 0, 'z': 0}
+
+    def get_velocity(self):
+        return {'x': 0, 'y': 0, 'z': 0}
+
+    def get_gimbal_rotation(self):
+        return {'x': 0, 'y': 0, 'z': 0}
+
+    def get_battery_status(self):
+        return {'voltage': 12.5, 'current': 0, 'level': 100}
+
+    def get_home_location(self):
+        return {'x': 0, 'y': 0, 'z': 0}
+
+    def get_current_status(self):
+        return 'STANDBY'
+
+    def get_heading(self):
+        return '0'
+
+    def get_is_armable(self):
+        return False
+
+    def get_is_armed(self):
+        return False
+
+    def get_air_speed(self):
+        return 0
+
+    def get_ground_speed(self):
+        return 0
+
+    def get_mode(self):
+        return 'GUIDED'
 
     def set_id(self, d_id):
         self.id = d_id
@@ -36,7 +71,22 @@ class Drone(object):
         self.strategy = strategy
 
     def report(self):
-        return {k: self.__dict__[k] for k in DRONE_ATTRS}
+        return {
+            D_ATTR_LOC: self.get_location(),
+            D_ATTR_ATTITUDE: self.get_attitude(),
+            D_ATTR_VEL: self.get_velocity(),
+            D_ATTR_GMBL_ROT: self.get_gimbal_rotation(),
+            D_ATTR_BTRY: self.get_battery_status(),
+            D_ATTR_HOME_LOC: self.get_home_location(),
+            D_ATTR_STATUS: self.get_current_status(),
+            D_ATTR_HEADING: self.get_heading(),
+            D_ATTR_IS_ARMABLE: self.get_is_armable(),
+            D_ATTR_GRNDSPEED: self.get_ground_speed(),
+            D_ATTR_AIRSPEED: self.get_air_speed(),
+            D_ATTR_IS_ARMED: self.get_is_armed(),
+            D_ATTR_MODE: self.get_mode(),
+            D_ATTR_ID: self.get_id()
+        }
 
 
 class SITLDrone(Drone):
@@ -59,7 +109,9 @@ class VirtualSITL(SITLDrone):
         port = SITL_PORT + instance * 10
         self.ip = ip
         self.port = port
+        self.connect_port = '127.0.0.1:' + str(14550 + 10 * instance)
         self.baud = baud
+        self.home = home
         self.sitl_args = ['../resources/startSITL.sh',
                           ip,
                           str(self.port),
@@ -74,7 +126,7 @@ class VirtualSITL(SITLDrone):
     def connect(self):
         subprocess.call(self.sitl_args)
         time.sleep(1)
-        self.vehicle = dronekit.connect('{}:{}'.format(self.ip, self.port), wait_ready=True, baud=self.baud)
+        self.vehicle = dronekit.connect(self.connect_port, wait_ready=True, baud=self.baud)
         self.set_id('VRTL_{}'.format(int(self.vehicle.parameters['SYSID_THISMAV'])))
 
 
@@ -102,6 +154,13 @@ def close_sitl_connections():
     if os.path.exists('.sitl_temp'):
         shutil.rmtree('.sitl_temp')
 
-    pids = map(int, subprocess.check_output(['pgrep', 'arducopter']).split())
-    for pid in pids:
-        os.kill(pid, signal.SIGINT)
+    try:
+        pids = map(int, subprocess.check_output(['pgrep', 'arducopter']).split())
+        for pid in pids:
+            os.kill(pid, signal.SIGINT)
+    except subprocess.CalledProcessError:
+        print('no sitl links found, exiting...')
+
+
+if __name__ == '__main__':
+    close_sitl_connections()
