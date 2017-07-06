@@ -2,6 +2,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.util.ArrayList;
 
+import com.vaadin.event.Action.Container;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -33,6 +34,7 @@ public class FRTableDisplay {
 	TextField transitSpeed = new TextField();
 	
 	public FRTableDisplay() {
+		grid.getColumns().stream().forEach(c -> c.setSortable(false));
 		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "transitSpeed");
 		grid.addColumn(event -> "Delete",
 			new ButtonRenderer<WayPoint> (clickEvent -> {
