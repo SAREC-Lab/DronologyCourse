@@ -9,14 +9,10 @@ arr = np.array
 
 class Position(object):
     def distance(self, other):
-        x1, y1, z1, depth1 = self.to_nvector().as_array()
-        x2, y2, z2, depth2 = other.to_nvector().as_array()
+        p1 = self.to_pvector().as_array().astype(np.double)
+        p2 = other.to_pvector().as_array().astype(np.double)
 
-        n1 = arr([x1, y1, z1]).reshape(-1, 1)
-        n2 = arr([x2, y2, z2]).reshape(-1, 1)
-
-        dist = nv.n_EA_E_and_n_EB_E2p_AB_E(n1, n2, z_EA=depth1, z_EB=depth2).ravel()
-        dist = np.sum(np.sqrt(dist ** 2))
+        dist = np.sqrt(np.sum((p1 - p2) ** 2))
 
         return dist
 

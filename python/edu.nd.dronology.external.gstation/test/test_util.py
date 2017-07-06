@@ -17,7 +17,7 @@ class TestDistance(unittest.TestCase):
         b = util.LlaCoordinate(41.698808, -86.234222, 261.9)
 
         dist = a.distance(b)
-        self.assertAlmostEqual(91.44, dist, places=2)
+        self.assertAlmostEqual(91.44, dist, places=1)
 
 
 if __name__ == '__main__':
