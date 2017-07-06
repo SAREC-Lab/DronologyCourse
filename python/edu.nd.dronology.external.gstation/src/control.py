@@ -4,14 +4,16 @@ import threading
 import time
 import mission
 import json
+import argparse
+import importlib
 from common import *
-from comms.dronology_link_ import DronologyLink
+from comms.dronology_link import DronologyLink
 from comms import drone_link
 
 
 
 class ControlStation:
-    def __init__(self, port, mission_type=mission.SAR, ardupath=ARDUPATH, **kwargs):
+    def __init__(self, mission_type=mission.SAR, port=1234, ardupath=ARDUPATH, **kwargs):
         self.mission = mission_type(ardupath=ardupath, **kwargs)
         self.java_link = DronologyLink(port=port)
         # self.java.setDataHandler(self.on_receive)
@@ -65,11 +67,31 @@ class ControlStation:
             print "Data: {data}".format(data=data)
 
 
+def parse_mission_type(arg):
+    """
+    example usage:
+        python control.py -m "mission.SAR -n 4"
+    """
+    toks = arg.split('.')
+    mod_name, mission_type = toks[:2]
+    mod = importlib.import_module(mod_name)
+
+    mission_ = getattr(mod, mission_type)
+
+    return mission_
+
+
 def main():
-    drones = [(DRONE_TYPE_SITL_VRTL, {'instance': 0, 'home': (41.519408, -86.239996, 0, 0)}),
-              (DRONE_TYPE_SITL_VRTL, {'instance': 1, 'home': (41.514408, -86.239996, 0, 0)})]
+    # drones = [(DRONE_TYPE_SITL_VRTL, {'instance': 0, 'home': (41.519408, -86.239996, 0, 0)}),
+    #           (DRONE_TYPE_SITL_VRTL, {'instance': 1, 'home': (41.514408, -86.239996, 0, 0)})]
     # drones = [{'type': 'physical', 'ConnectionData': {'ConnectionString': '/dev/ttyUSB0', 'BaudRate': 57600, }, }, ]
-    ctrl = ControlStation(1234, drones)
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-ap', dest='ardu_path', required=True, type=str)
+    ap.add_argument('-p', '--port', default=1234, type=int)
+    ap.add_argument('-m', '--mission', default=mission.SAR, type=parse_mission_type, help=parse_mission_type.__doc__)
+    args = ap.parse_args()
+
+    ctrl = ControlStation(mission_type=args.mission, ardupath=args.ardu_path, port=args.port)
     signal.signal(signal.SIGTERM, lambda: ctrl.stop())
     ctrl.start()
 

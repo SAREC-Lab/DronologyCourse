@@ -6,11 +6,14 @@ import matplotlib.path as mpl_path
 
 arr = np.array
 
+NV_A = 6378137.0
+NV_F = 0.0033528113303304963
+
 
 class Position(object):
     def distance(self, other):
-        p1 = self.to_pvector().as_array().astype(np.double)
-        p2 = other.to_pvector().as_array().astype(np.double)
+        p1 = self.to_pvector().as_array()
+        p2 = other.to_pvector().as_array()
 
         dist = np.sqrt(np.sum((p1 - p2) ** 2))
 
@@ -42,14 +45,12 @@ class Position(object):
 
 class LlaCoordinate(Position):
     def __init__(self, latitude, longitude, altitude):
-        self.lat = latitude
-        self.lon = longitude
-        self.alt = altitude
+        self.lla = arr([latitude, longitude, altitude]).astype(np.float64)
 
     def to_nvector(self):
-        x, y, z = nv.lat_lon2n_E(np.deg2rad(self.lat), np.deg2rad(self.lon)).ravel()
+        x, y, z = nv.lat_lon2n_E(*map(np.deg2rad, self.lla[:-1])).ravel()
 
-        return NVector(x, y, z, -self.alt)
+        return NVector(x, y, z, -self.lla[-1])
 
     def to_pvector(self):
         return self.to_nvector().to_pvector()
@@ -58,41 +59,38 @@ class LlaCoordinate(Position):
         return self
 
     def as_array(self):
-        return arr([self.lat, self.lon, self.alt])
+        return self.lla
 
 
 class NVector(Position):
     def __init__(self, x, y, z, depth):
-        self.x = x
-        self.y = y
-        self.z = z
+        self.n_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
         self.depth = depth
 
     def to_nvector(self):
         return self
 
     def to_pvector(self):
-        x, y, z = nv.n_EB_E2p_EB_E(arr([self.x, self.y, self.z]).reshape(-1, 1), depth=self.depth).ravel()
+        x, y, z = nv.n_EB_E2p_EB_E(self.n_EB_E, depth=self.depth, a=NV_A, f=NV_F).ravel()
 
         return PVector(x, y, z)
 
     def to_lla(self):
-        lat, lon = nv.n_E2lat_lon(arr([self.x, self.y, self.z]).reshape(-1, 1))
+        lat, lon = nv.n_E2lat_lon(self.n_EB_E)
 
         return LlaCoordinate(np.rad2deg(lat), np.rad2deg(lon), -self.depth)
 
     def as_array(self):
-        return arr([self.x, self.y, self.z, self.depth])
+        x, y, z = self.n_EB_E.ravel()
+        return arr([x, y, z, self.depth])
 
 
 class PVector(Position):
     def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
+        self.p_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
 
     def to_nvector(self):
-        (x, y, z), depth = nv.p_EB_E2n_EB_E(arr([self.x, self.y, self.z]).reshape(-1, 1))
+        (x, y, z), depth = nv.p_EB_E2n_EB_E(self.p_EB_E, a=NV_A, f=NV_F)
 
         return NVector(x, y, z, depth)
 
@@ -103,8 +101,7 @@ class PVector(Position):
         return self.to_nvector().to_lla()
 
     def as_array(self):
-        return arr([self.x, self.y, self.z])
-
+        return self.p_EB_E.ravel()
 
 
 def get_search_path(vertices):

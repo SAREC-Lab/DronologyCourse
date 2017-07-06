@@ -1,4 +1,5 @@
 import util
+import argparse
 from common import *
 from comms import drone_link
 
@@ -7,9 +8,8 @@ _default_drone_specs = (DRONE_TYPE_SITL_VRTL, {'instance': 0, D_ATTR_HOME_LOC: (
 
 
 class Mission(object):
-    def __init__(self, drone_specs=_default_drone_specs, ardupath=ARDUPATH, responsiveness=RESPOND_ALL, **kwargs):
+    def __init__(self, drone_specs=_default_drone_specs, ardupath=ARDUPATH, **kwargs):
         self.ardupath = ardupath
-        self.responsiveness = responsiveness
         self.drones = {}
 
         for i, (d_type, d_kwargs) in enumerate(drone_specs):
@@ -53,12 +53,10 @@ _default_sar_bounds = ((41.519367, -86.240419),
 
 
 class SAR(Mission):
-    def __init__(self, n_drones=1, responsiveness=RESPOND_CRITICAL_ONLY, **kwargs):
-        self.n_drones = n_drones
-        self.responsiveness = responsiveness
+    def __init__(self, **kwargs):
         super(SAR, self).__init__(**kwargs)
 
-    def start_mission(self, bounds=_default_sar_bounds, last_known_location=None):
+    def start_mission(self, bounds=_default_sar_bounds, last_known_location=None, responsiveness=RESPOND_CRITICAL_ONLY):
         raise NotImplementedError
 
     def pause_mission(self):
@@ -69,4 +67,3 @@ class SAR(Mission):
 
     def on_command(self, cmd):
         pass
-
