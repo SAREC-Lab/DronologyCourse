@@ -1833,3 +1833,13 @@ java.net.SocketException: Connection reset
 2017-07-05 12:01:51.723 [INFO ] setCommandHandler    |edu.nd.dronology.core.fleet.RuntimeDroneTypes:89 | Drone command handler set: class edu.nd.dronology.gstation.python.connector.PythonBase2
 2017-07-05 12:01:51.723 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.WriteDispatcher:38 | Write-Dispatcher started
 2017-07-05 12:01:51.723 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.ReadDispatcher:43 | Read-Dispatcher started
+2017-07-06 10:57:23.714 [INFO ] initialize           |edu.nd.dronology.services.remote.rmi.AbstractRMIRemoteObject:46 | >> Binding 'Remote' established on port 9898
+2017-07-06 10:57:23.729 [INFO ] prepareRoot          |edu.nd.dronology.services.supervisor.WorkspaceInitializer:33 | Server workspace root location is: '/Users/seanbayley/Desktop/git/Dronology/dronology-workspace'
+2017-07-06 10:57:23.729 [INFO ] prepareRoot          |edu.nd.dronology.services.supervisor.WorkspaceInitializer:36 | Absolute path is: '/Users/seanbayley/Desktop/git/Dronology/dronology-workspace'
+2017-07-06 10:57:23.743 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'froute' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/flightroute]
+2017-07-06 10:57:23.757 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'specification' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/specifications]
+2017-07-06 10:57:23.760 [INFO ] loadFiles            |edu.nd.dronology.services.core.util.FileManager:74 | Loading Files | extension:'sim' path: [/Users/seanbayley/Desktop/git/Dronology/dronology-workspace/simscenario]
+2017-07-06 10:57:23.762 [INFO ] <init>               |edu.nd.dronology.gstation.python.connector.PythonBase2:47 | Connecting to Python base /127.0.0.1@1234
+2017-07-06 10:57:23.807 [INFO ] setCommandHandler    |edu.nd.dronology.core.fleet.RuntimeDroneTypes:89 | Drone command handler set: class edu.nd.dronology.gstation.python.connector.PythonBase2
+2017-07-06 10:57:23.807 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.ReadDispatcher:43 | Read-Dispatcher started
+2017-07-06 10:57:23.807 [INFO ] run                  |edu.nd.dronology.gstation.python.connector.WriteDispatcher:38 | Write-Dispatcher started

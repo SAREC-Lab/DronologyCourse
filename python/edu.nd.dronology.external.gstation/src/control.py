@@ -22,13 +22,13 @@ class ControlStation:
             drone.set_strategy(d_strat)
             self.drones[drone.get_id()] = drone
 
-        self.java_comm_worker = threading.Thread(target=self.send_drone_list_cont)
-        self.java_comm_worker_is_running = False
+        self.java_worker = threading.Thread(target=self.send_drone_list_cont)
+        self.java_worker_is_running = False
 
     def start(self):
         self.java_link.start()
-        self.java_comm_worker_is_running = True
-        self.java_comm_worker.start()
+        self.java_worker_is_running = True
+        self.java_worker.start()
 
     def stop(self):
         # self.java.close() # need to clean this up somehow
@@ -36,8 +36,8 @@ class ControlStation:
         for drone in self.drones.values():
             drone.disconnect()
 
-        self.java_comm_worker_is_running = False
-        self.java_comm_worker.join()
+        self.java_worker_is_running = False
+        self.java_worker.join()
 
         drone_link.close_sitl_connections()
         sys.exit(0)
@@ -48,7 +48,7 @@ class ControlStation:
         :param delay:
         :return:
         """
-        while self.java_comm_worker_is_running:
+        while self.java_worker_is_running:
             drone_list = {}
             for drone_id, drone in self.drones.items():
                 drone_list[str(drone_id)] = drone.report()
@@ -111,7 +111,8 @@ class ControlStation:
 
 
 def main():
-    drones = [(DRONE_TYPE_SITL_VRTL, core.ResponsiveDrone, {'instance': 0, 'home': (41.519408, -86.239996, 0, 0)})]
+    drones = [(DRONE_TYPE_SITL_VRTL, core.ResponsiveDrone, {'instance': 0, 'home': (41.519408, -86.239996, 0, 0)}),
+              (DRONE_TYPE_SITL_VRTL, core.ResponsiveDrone, {'instance': 1, 'home': (41.514408, -86.239996, 0, 0)})]
     # drones = [{'type': 'physical', 'ConnectionData': {'ConnectionString': '/dev/ttyUSB0', 'BaudRate': 57600, }, }, ]
     comm = ControlStation(1234, drones)
     signal.signal(signal.SIGTERM, lambda: comm.stop())

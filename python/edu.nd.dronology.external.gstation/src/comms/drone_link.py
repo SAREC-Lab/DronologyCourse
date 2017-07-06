@@ -75,7 +75,7 @@ class VirtualSITL(SITLDrone):
         subprocess.call(self.sitl_args)
         time.sleep(1)
         self.vehicle = dronekit.connect('{}:{}'.format(self.ip, self.port), wait_ready=True, baud=self.baud)
-        self.set_id(self.vehicle.parameters['SYSID_THISMAV'])
+        self.set_id('VRTL_{}'.format(int(self.vehicle.parameters['SYSID_THISMAV'])))
 
 
 class PhysicalSITL(SITLDrone):
@@ -86,7 +86,7 @@ class PhysicalSITL(SITLDrone):
 
     def connect(self):
         self.vehicle = dronekit.connect(self.ip, wait_ready=True, baud=self.baud)
-        self.set_id(self.vehicle.parameters['SYSID_THISMAV'])
+        self.set_id('PHYS_{}'.format(int(self.vehicle.parameters['SYSID_THISMAV'])))
 
 
 def make_drone_link(drone_type, **kwargs):
