@@ -83,7 +83,7 @@ class NVector(Position):
     def to_lla(self):
         lat, lon = nv.n_E2lat_lon(arr([self.x, self.y, self.z]).reshape(-1, 1))
 
-        return np.rad2deg(lat), np.rad2deg(lon), -self.depth
+        return LlaCoordinate(np.rad2deg(lat), np.rad2deg(lon), -self.depth)
 
     def as_array(self):
         return arr([self.x, self.y, self.z, self.depth])
@@ -105,7 +105,6 @@ class PVector(Position):
 
     def to_lla(self):
         return self.to_nvector().to_lla()
-
 
     def as_array(self):
         return arr([self.x, self.y, self.z])
