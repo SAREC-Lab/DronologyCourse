@@ -20,9 +20,12 @@ DRONE_ATTRS = ['location', 'attitude', 'velocity', 'gimbalRotation', 'battery', 
                'airspeed', 'groundspeed', 'armed', 'mode', 'id']
 
 ARDUPATH = os.path.join('/Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
-DRONE_TYPE_SITL_PHYS = 'sitl_physical'
-DRONE_TYPE_SITL_VRTL = 'sitl_sim'
+DRONE_TYPE_SITL_PHYS = 'PHYS'
+DRONE_TYPE_SITL_VRTL = 'VRTL'
 DRONE_TYPE_HTTP = 'http'
 DRONE_TYPE_SIM = 'simulated'
+
+RESPOND_ALL = 'all'
+RESPOND_CRITICAL_ONLY = 'critical'
 
 SITL_PORT = 5760
