@@ -15,7 +15,7 @@ export PATH=/usr/lib/ccache:$PATH
 mkdir .sitl_temp
 cd .sitl_temp
 
-echo -dmS ArduCopter ../${ardupath}/build/sitl/bin/arducopter -S -I${instance} --home ${home} --model + --speedup ${speed} --rate ${rate} --defaults ../${ardupath}/Tools/autotest/default_params/copter.parm
-screen -dmS ArduCopter ../${ardupath}/build/sitl/bin/arducopter -S -I${instance} --home ${home} --model + --speedup ${speed} --rate ${rate} --defaults ../${ardupath}/Tools/autotest/default_params/copter.parm
+echo -dmS ArduCopter ${ardupath}/build/sitl/bin/arducopter -S -I${instance} --home ${home} --model + --speedup ${speed} --rate ${rate} --defaults ${ardupath}/Tools/autotest/default_params/copter.parm
+screen -dmS ArduCopter ${ardupath}/build/sitl/bin/arducopter -S -I${instance} --home ${home} --model + --speedup ${speed} --rate ${rate} --defaults ${ardupath}/Tools/autotest/default_params/copter.parm
 
 cd ..

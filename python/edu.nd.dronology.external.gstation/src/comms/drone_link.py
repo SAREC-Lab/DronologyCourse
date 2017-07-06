@@ -54,7 +54,7 @@ class VirtualSITL(SITLDrone):
     def __init__(self,
                  ip='tcp:127.0.0.1',
                  instance=0,
-                 ardupath=os.path.join('..', 'resources', 'ardupilot'),
+                 ardupath=ARDUPATH,
                  speed=1, rate=10, home=(41.732955, -86.180886, 0, 0), baud=115200):
         port = SITL_PORT + instance * 10
         self.ip = ip

@@ -9,14 +9,15 @@ from comms.dronology_link_ import DronologyLink
 from comms import drone_link
 
 
+
 class ControlStation:
-    def __init__(self, port, drone_specs):
+    def __init__(self, port, drone_specs, ardupath=ARDUPATH):
         self.java_link = DronologyLink(port=port)
         # self.java.setDataHandler(self.on_receive)
 
         self.drones = {}
         for d_type, d_strat, d_kwargs in drone_specs:
-            drone = drone_link.make_drone_link(d_type, **d_kwargs)
+            drone = drone_link.make_drone_link(d_type, ardupath=ardupath, **d_kwargs)
             drone.connect()
             drone.set_strategy(d_strat)
             self.drones[drone.get_id()] = drone

@@ -1,3 +1,7 @@
+import os
+
+ARDUPATH = os.path.join('/Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
+
 DRONE_ATTRS = ['location', 'attitude', 'velocity', 'gimbalRotation', 'battery', 'home', 'status', 'heading', 'armable',
                'airspeed', 'groundspeed', 'armed', 'mode', 'id']
 
