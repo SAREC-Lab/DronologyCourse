@@ -171,6 +171,7 @@ $valo-menu-background-color: #eee;
 		border-style: solid;
 		border-width: 5px; 
 		border-color: #000000;
+		z-index: 0 !important;
 	}
 	.fr_table_component {
 		height: calc(#{$fr-table-height} - 6px) !important;
@@ -364,7 +365,7 @@ $valo-menu-background-color: #eee;
 		background-color: #f2f2f2;
 	}
 	.bring_front{
-		z-index: 999;
+		z-index: 999 !important;
 	}
 	.bring_back{
 		z-index: 0;

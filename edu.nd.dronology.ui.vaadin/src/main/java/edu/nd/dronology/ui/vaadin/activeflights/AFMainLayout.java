@@ -1,6 +1,10 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import com.vaadin.ui.CustomComponent;
+
+import java.util.List;
+
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 
 /**
@@ -19,9 +23,27 @@ public class AFMainLayout extends CustomComponent {
 		
 		CssLayout content = new CssLayout();
 		content.setSizeFull();	
+		
+		controls.getPanel().getMapView().getViewButton().addClickListener( e -> {
+				map.setFollow(false);
+				map.setAverageCenter();
+		});
+			
+		controls.getPanel().getMapView().getFollowButton().addClickListener(e -> {
+			map.setFollow(true);
+			List<String> names = controls.getPanel().getChecked();
+			map.followDrones(names);	
+		});
 			
 			content.addComponents(controls, map);
 			setCompositionRoot(content);
+	}
+	
+	public void continueFollowing(){
+		if (map.getFollow()){
+			List<String> names = controls.getPanel().getChecked();
+			map.followDrones(names);
+		}
 	}
 	
 	public AFControlsComponent getControls(){

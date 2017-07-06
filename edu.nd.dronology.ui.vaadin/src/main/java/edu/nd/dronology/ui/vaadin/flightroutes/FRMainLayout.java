@@ -3,6 +3,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.Component;
@@ -61,7 +62,7 @@ public class FRMainLayout extends CustomComponent {
 			
 			//removes old pins and polylines when switching routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-			map.getUtils().removeAllLines(map.getUtils().getPolylines());
+			
 			//to make sure the table is no longer bolded when switching routes without saving
 			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
 			
@@ -84,12 +85,6 @@ public class FRMainLayout extends CustomComponent {
 			// trying to convert to waypoint
 			for (LlaCoordinate coor : coords) {
 
-				// // Convert to point
-				// tempLong = coor.getLongitude();
-				// tempLat = coor.getLatitude();
-				//
-				// double doubleLong = tempLong * .000001;
-				// double doubleLat = tempLat * .000001;
 
 				pt.setLat(coor.getLatitude());
 				pt.setLon(coor.getLongitude());
@@ -102,7 +97,12 @@ public class FRMainLayout extends CustomComponent {
 				first = false;
 			}
 
-			map.getUtils().drawLines(waypoints);
+			ArrayList<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false);
+			
+			map.getUtils().setPolylines(mapLines);
+			for(int i = 0; i < mapLines.size(); i++){
+				map.getUtils().getMap().addComponent(mapLines.get(i));
+			}
 
 			numComponents = routes.getComponentCount();
 			// when one route is clicked, the others go back to default background color

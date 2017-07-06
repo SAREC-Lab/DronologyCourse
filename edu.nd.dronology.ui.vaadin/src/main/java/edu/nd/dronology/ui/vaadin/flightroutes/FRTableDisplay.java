@@ -27,6 +27,11 @@ public class FRTableDisplay {
 	ArrayList<WayPoint> mapPoints = new ArrayList<>();
 	MapMarkerUtilities route;
 	
+	TextField latitude = new TextField();
+	TextField longitude = new TextField();
+	TextField altitude = new TextField();
+	TextField transitSpeed = new TextField();
+	
 	public FRTableDisplay() {
 		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "transitSpeed");
 		grid.addColumn(event -> "Delete",
@@ -59,7 +64,10 @@ public class FRTableDisplay {
 			    	}
 
 				   	route.removeAllLines(route.getPolylines());
-				   	route.setPolylines(route.drawLines(route.getMapPoints()));
+				   	route.setPolylines(route.drawLines(route.getMapPoints(), false));
+				   	for(int i = 0; i < route.getPolylines().size(); i++){
+						route.getMap().addComponent(route.getPolylines().get(i));
+					}
 				   	grid.setItems(this.route.getMapPoints());
 				   	
 				   	UI.getCurrent().removeWindow(deletePanel);
@@ -81,16 +89,18 @@ public class FRTableDisplay {
 	}
 	
 	public void makeEditable(MapMarkerUtilities mapMarkers) {
-		TextField latitude = new TextField();
-		TextField longitude = new TextField();
 		
 		grid.getColumn("latitude").setEditorComponent(latitude);
 		grid.getColumn("longitude").setEditorComponent(longitude);
+		grid.getColumn("altitude").setEditorComponent(altitude);
+		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
 			mapMarkers.updatePinForWayPoint(event.getBean());
+			grid.getEditor().cancel();
 		});
-		grid.asSingleSelect();
+		
+		//grid.asSingleSelect();
 	}
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {

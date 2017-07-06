@@ -1,6 +1,8 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -32,6 +34,7 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
+	private AFMapViewOperations mapView = new AFMapViewOperations();
 	private Map<String, DroneStatus> drones;
 	private IDroneSetupRemoteService service;
   private BaseServiceProvider provider = MyUI.getProvider();
@@ -48,7 +51,7 @@ public class AFInfoPanel extends CustomComponent{
 		VerticalLayout sideBar = new VerticalLayout();
 		
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
-		AFMapViewOperations mapView = new AFMapViewOperations();
+		
 		
 		emergency.addOnClickListener( e -> {
 			Component child = e.getChildComponent();
@@ -112,6 +115,10 @@ public class AFInfoPanel extends CustomComponent{
 	
 	}
 	
+	public AFMapViewOperations getMapView(){
+		return mapView;
+	}
+	
 	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
 		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
 		content.addComponent(box);
@@ -151,6 +158,16 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setIsChecked(select);
 		}
+	}
+	
+	public List<String> getChecked(){
+		List<String> names = new ArrayList<>();
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (box.getIsChecked())
+				names.add(box.getName());
+		}
+		return names;
 	}
 	
 	public void setVisibility(boolean visible){
