@@ -34,7 +34,11 @@ public class FRMainLayout extends CustomComponent {
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 
-		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend");
+		FRMapComponent map = new FRMapComponent(
+				"VAADIN/sbtiles/{z}/{x}/{y}.png",
+				"South Bend",
+				"VAADIN/sateltiles/{z}/{x}/{y}.png",
+				"Satellite");
 		map.setCenter(41.68, -86.25);
 		map.setZoomLevel(13);
 

@@ -34,6 +34,9 @@
   "data": {
     "v3": {
       "mbtiles": "south-bend_indiana.mbtiles"
+    },
+    "satellite": {
+      "mbtiles": "flying_field_satellite.mbtiles"
     }
   }
 }

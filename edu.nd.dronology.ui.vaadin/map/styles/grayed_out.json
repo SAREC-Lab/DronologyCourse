@@ -12,10 +12,22 @@
       "openmaptiles": {
         "type": "vector",
         "url": "http://192.168.99.100:8080/data/v3.json"
-      }
+      },
+	  "satellitemaptiles": {
+	    "type": "raster",
+	    "url": "http://192.168.99.100:8080/data/satellite.json"
+	  }
     },
     "glyphs": "http://192.168.99.100:8080/fonts/{fontstack}/{range}.pbf",
     "layers": [
+    	{
+		  "id": "satellitelayer",
+		  "type": "raster",
+		  "source": "satellitemaptiles",
+		  "layout": {
+			"visibility": "visible"
+		  }
+		},
       {
         "id": "background",
         "type": "background",

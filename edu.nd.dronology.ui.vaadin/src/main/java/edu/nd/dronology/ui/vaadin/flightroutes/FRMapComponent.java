@@ -47,7 +47,7 @@ public class FRMapComponent extends CustomComponent {
 	FRMetaInfo bar = new FRMetaInfo();
 	FReditBar edit = new FReditBar();
 
-	public FRMapComponent(String tileDataURL, String name) {
+	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
 		addStyleName("map_component");
 
@@ -66,8 +66,12 @@ public class FRMapComponent extends CustomComponent {
 
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
+		
+		LTileLayer satelliteTiles = new LTileLayer();
+		satelliteTiles.setUrl(satelliteTileDataURL);
 
 		leafletMap.addBaseLayer(tiles, name);
+		leafletMap.addOverlay(satelliteTiles, satelliteLayerName);
 		leafletMap.zoomToContent();
 
 		route.disableRouteEditing();
