@@ -6,8 +6,11 @@ import matplotlib.path as mpl_path
 
 arr = np.array
 
-NV_A = 6378137.0
-NV_F = 0.0033528113303304963
+SEMI_MAJOR = np.float64(6378137.0)
+SEMI_MINOR = np.float64(6356752.31)
+
+NV_A = SEMI_MAJOR
+NV_F = 1 - (SEMI_MINOR / SEMI_MAJOR)
 
 
 class Position(object):
@@ -15,7 +18,10 @@ class Position(object):
         p1 = self.to_pvector().as_array()
         p2 = other.to_pvector().as_array()
 
-        dist = np.sqrt(np.sum((p1 - p2) ** 2))
+        resid = p1 - p2
+        resid_sq = resid ** 2
+        resid_sq_sum = resid_sq.sum()
+        dist = np.sqrt(resid_sq_sum)
 
         return dist
 
@@ -48,7 +54,7 @@ class LlaCoordinate(Position):
         self.lla = arr([latitude, longitude, altitude]).astype(np.float64)
 
     def to_nvector(self):
-        x, y, z = nv.lat_lon2n_E(*map(np.deg2rad, self.lla[:-1])).ravel()
+        x, y, z = nv.lat_lon2n_E(*map(lambda a: np.float64(np.deg2rad(a)), self.lla[:-1])).ravel()
 
         return NVector(x, y, z, -self.lla[-1])
 
