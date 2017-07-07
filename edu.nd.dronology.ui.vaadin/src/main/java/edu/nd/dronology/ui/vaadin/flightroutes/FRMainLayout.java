@@ -6,12 +6,14 @@ import java.util.List;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.shared.Point;
 
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
@@ -27,6 +29,7 @@ public class FRMainLayout extends CustomComponent {
 	WayPoint way;
 	ArrayList<WayPoint> waypoints;
 	ArrayList routeList;
+	FRMapComponent map;
 	
 	public FRMainLayout() {
 
@@ -46,6 +49,26 @@ public class FRMainLayout extends CustomComponent {
 		VerticalLayout routes;
 
 		routes = controls.getInfoPanel().getRoutes();
+		
+		Button tempDraw = controls.getInfoPanel().getDrawButton();
+		tempDraw.addClickListener(e -> {
+			map.enableEdit();
+			//map.display();
+			map.getUtils().removeAllMarkers(map.getUtils().getPins());
+			map.getUtils().removeAllLines(map.getUtils().getPolylines());
+			map.getUtils().getMapPoints().clear();
+			FlightRouteInfo drone = controls.getInfoPanel().getRoute();
+			
+			int numCoords = drone.getCoordinates().size();
+			String droneName = controls.getInfoPanel().getName();
+			map.displayByName(drone, droneName, numCoords);
+			
+			Point pt = new Point(0,0);
+			WayPoint way = new WayPoint(pt, true);
+			map.getTableDisplay().getGrid().setItems();
+			map.enableEdit();
+			
+		});
 
 		map.display();
 		// adds click listener to route list
@@ -123,5 +146,8 @@ public class FRMainLayout extends CustomComponent {
 
 	public int getIndex() {
 		return index;
+	}
+	public FRMapComponent getMap(){
+		return map;
 	}
 }

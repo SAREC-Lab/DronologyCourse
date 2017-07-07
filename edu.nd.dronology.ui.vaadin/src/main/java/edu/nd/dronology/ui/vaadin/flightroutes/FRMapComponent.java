@@ -45,7 +45,9 @@ public class FRMapComponent extends CustomComponent {
 	VerticalLayout content = new VerticalLayout();
 	AbsoluteLayout mapAndPopup = new AbsoluteLayout();
 	FRMetaInfo bar = new FRMetaInfo();
-	FReditBar edit = new FReditBar();
+	//FReditBar edit = new FReditBar();
+	FReditBar editBar = new FReditBar();
+	AbsoluteLayout layout;
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
@@ -117,7 +119,7 @@ public class FRMapComponent extends CustomComponent {
 	public void display(FlightRouteInfo info) {
 		route.disableRouteEditing();
 
-		AbsoluteLayout layout = new AbsoluteLayout();
+		layout = new AbsoluteLayout();
 		layout.setHeight("510px");
 		layout.setWidth("1075px");
 
@@ -285,7 +287,183 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponents(layout, tableDisplay.getGrid());
 
 	}
+public void displayByName(FlightRouteInfo info, String routeName, int numCoords) {
+		
+		
+		route.disableRouteEditing();
 
+		layout = new AbsoluteLayout();
+		layout.setHeight("510px");
+		layout.setWidth("1075px");
+
+		FRMetaInfo selectedBar = new FRMetaInfo(routeName, numCoords);
+
+		editBar = new FReditBar();
+		editBar.setStyleName("edit_bar");
+		CheckBox tempBox = selectedBar.getCheckBox();
+		Button edit = selectedBar.getEditButton();
+
+		tempBox.addValueChangeListener(event -> {
+
+			if (tempBox.getValue()) {
+				displayTable();
+			} 
+			else {
+				displayNoTable();
+			}
+		});
+
+		leafletMap.setStyleName("bring_back");
+
+		// enable editing
+		edit.addClickListener(event -> {
+			// Notification.show("run");
+			route.enableRouteEditing();
+			leafletMap.setEnabled(true);
+			editBar.addStyleName("bring_front");
+			editBar.setWidth("880px");
+			layout.addComponent(editBar, "top: 5px; left:95px");
+
+			leafletMap.addStyleName("fr_leaflet_map_edit_mode");
+			tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
+		});
+
+		Button cancel = editBar.getCancelButton();
+		cancel.addClickListener(event -> {
+
+			route.disableRouteEditing();
+
+			//route.removeAllMarkers(route.getPins());
+			//route.removeAllLines(route.getPolylines());
+
+			int numberMapPoints = route.getMapPoints().size();
+
+			route.clearMapPointsIndex(info.getCoordinates().size());
+			route.getGrid().setItems(route.getMapPoints());
+
+			// content.removeComponent(tableDisplay.getGrid());
+			// content.addComponent(tableDisplay.getGrid());
+
+			layout.removeComponent(editBar);
+			leafletMap.setStyleName("fr_leaflet_map");
+			leafletMap.addStyleName("bring_back");
+			tableDisplay.getGrid().setStyleName("fr_table_component");
+			leafletMap.setEnabled(false);
+		});
+
+		Button save = editBar.getSaveButton();
+		save.addClickListener(event -> {
+
+			// send info to dronology
+
+			// Notification.show("got into save loop");
+			route.disableRouteEditing();
+
+			layout.removeComponent(editBar);
+			leafletMap.setStyleName("fr_leaflet_map");
+			leafletMap.addStyleName("bring_back");
+			tableDisplay.getGrid().setStyleName("fr_table_component");
+			leafletMap.setEnabled(false);
+
+			ArrayList<WayPoint> newWaypoints = route.getMapPoints();
+			// Notification.show(String.valueOf(newWaypoints.size()));
+			// pass into dronology here?
+
+			FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+			ByteArrayInputStream inStream;
+			IFlightRoute froute;
+
+			IFlightRouteplanningRemoteService service;
+			BaseServiceProvider provider = MyUI.getProvider();
+			ArrayList routeList;
+
+			try {
+
+				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+						.getService(IFlightRouteplanningRemoteService.class);
+
+				// Collection<FlightRouteInfo> items = service.getItems();
+				// routeList = new ArrayList(items);
+
+				String id;
+				String name;
+
+				// get one flight route rather than all
+
+				// gets routes from dronology and requests their name/id
+
+				id = info.getId();
+				name = info.getName();
+
+				byte[] information = service.requestFromServer(id);
+				inStream = new ByteArrayInputStream(information);
+				froute = routePersistor.loadItem(inStream);
+
+				
+				// service.createItem()
+
+				ArrayList<LlaCoordinate> oldCoords = new ArrayList(froute.getCoordinates());
+				for (LlaCoordinate cord : oldCoords) {
+					froute.removeCoordinate(cord);
+				}
+				// Notification.show(String.valueOf(route.getCoordinates().size()
+				// + String.valueOf(newWaypoints.size())));
+
+				for (WayPoint way : newWaypoints) {
+					double alt=0;
+					double lon=0;
+					double lat=0;
+					// problem is with getting double
+					try {
+						 lon = Double.parseDouble(way.getLongitude());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+					try {
+						 lat = Double.parseDouble(way.getLatitude());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+					try {
+						 alt = Double.parseDouble(way.getAltitude());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+
+					
+					froute.addCoordinate(new LlaCoordinate(lat, lon, alt));
+					
+				}
+				
+				
+				ByteArrayOutputStream outs = new ByteArrayOutputStream();
+				routePersistor.saveItem(froute, outs);
+				byte[] bytes = outs.toByteArray();
+
+				service.transmitToServer(froute.getId(), bytes);
+				
+
+				// Notification.show(String.valueOf(newWaypoints.size()));
+
+			} catch (DronologyServiceException | RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (PersistenceException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
+
+			// route.removeAllMarkers(route.getPins());
+		});
+		layout.addComponent(mapAndPopup, "top:5px; left:5px");
+
+		content.removeAllComponents();
+		// content.addComponent(editBar);
+		content.addComponent(selectedBar);
+		content.addComponents(layout, tableDisplay.getGrid());
+
+		
+	}
 	public void displayNoTable() {
 		content.removeComponent(tableDisplay.getGrid());
 	}
@@ -324,5 +502,19 @@ public class FRMapComponent extends CustomComponent {
 
 	public FRTableDisplay getTableDisplay() {
 		return tableDisplay;
+	}
+	public void enableEdit(){
+	
+		
+		route.enableRouteEditing();
+		leafletMap.setEnabled(true);
+		editBar.addStyleName("bring_front");
+		editBar.setWidth("880px");
+		layout.addComponent(editBar, "top: 5px; left:95px");
+
+		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
+		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
+		
+		
 	}
 }

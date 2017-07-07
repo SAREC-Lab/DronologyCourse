@@ -1,9 +1,12 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
+import java.awt.Component;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
@@ -57,6 +60,10 @@ public class FRInfoPanel extends CustomComponent {
 	ArrayList routeList;
 	FlightRouteInfo flight;
 	private boolean isRouteSelected = false;
+	Button drawButton;
+	Collection<FlightRouteInfo> items;
+	FlightRouteInfo drone;
+	
 
 	public FRInfoPanel() {
 
@@ -68,7 +75,7 @@ public class FRInfoPanel extends CustomComponent {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 
-			Collection<FlightRouteInfo> items = service.getItems();
+			items = service.getItems();
 			routeList = new ArrayList(items);
 
 			String id;
@@ -88,19 +95,6 @@ public class FRInfoPanel extends CustomComponent {
 					e1.printStackTrace();
 				}
 
-				/*
-				//service.createItem()
-				
-				ArrayList<LlaCoordinate> oldCoords = new ArrayList(route.getCoordinates());
-				for (LlaCoordinate cord : oldCoords) {
-					route.removeCoordinate(cord);
-				}
-				
-				for(.cord.){
-					route.addCoordinate(new LlaCoordinate(latitude, longitude, altitude));
-				}
-				service.transmitToServer(route.getId(), route.toString().getBytes());
-				*/
 				
 				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
 
@@ -121,16 +115,41 @@ public class FRInfoPanel extends CustomComponent {
 
 		VerticalLayout popupContent = new VerticalLayout();
 
-		TextField inputField = new TextField();
-		inputField.addValueChangeListener(e -> {
-			routeInputName = inputField.getValue();
-			Notification.show(routeInputName);
-			addRoute(routeInputName, "41342", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
-		});
-
-		popupContent.addComponent(inputField);
-
+		FRNewRoute display = new FRNewRoute();
+		popupContent.addComponent(display);
 		PopupView popup = new PopupView(null, popupContent);
+		
+		drawButton = display.getDrawButton();
+		TextField inputField = display.getInputField();
+		drawButton.addClickListener(e -> {
+			routeInputName = inputField.getValue();
+			addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
+			//have addroute auto send info to dronology?
+			
+			drone = addRouteDronology(routeInputName);
+			
+			//because dronology takes some time
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			refreshRoutes();
+			
+			int index = getRouteNumber(drone);
+			//Notification.show(String.valueOf(index));
+			
+			routes.getComponent(index).addStyleName("info_box_focus");
+			
+			
+			
+			
+			
+			
+			
+		});
 
 		newRoute.addClickListener(e -> {
 			popup.setPopupVisible(true);
@@ -194,6 +213,10 @@ public class FRInfoPanel extends CustomComponent {
 					.getService(IFlightRouteplanningRemoteService.class);
 			items = service.getItems();
 			routeList = new ArrayList(items);
+			
+			if(index == routeList.size()){
+				index--;
+			}
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -212,5 +235,139 @@ public class FRInfoPanel extends CustomComponent {
 	public void setIsRouteSelected(boolean selected) {
 		isRouteSelected = selected;
 	}
+	public FlightRouteInfo addRouteDronology(String name){
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+		FlightRouteInfo tempRoute = null;
+		
+		try {
+			
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			
+			FlightRouteInfo newRoute = service.createItem();
+			String id = newRoute.getId();
+			IFlightRoute froute;
+			
+			
+			byte[] information = service.requestFromServer(id);
+			inStream = new ByteArrayInputStream(information);
+			froute = routePersistor.loadItem(inStream);
+			froute.setName(name);
+			
+			
+			ByteArrayOutputStream outs = new ByteArrayOutputStream();
+			routePersistor.saveItem(froute, outs);
+			byte[] bytes = outs.toByteArray();
+			service.transmitToServer(froute.getId(), bytes);
+			
+			
+			tempRoute = newRoute;
+			//tempRoute = getRouteByName(name);
+			
+		} catch (RemoteException | DronologyServiceException | PersistenceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return tempRoute;
+	}
+	public Button getDrawButton(){
+		return drawButton;
+	}
+	public void refreshRoutes(){
+		
+		
+		routes.removeAllComponents();
+		
+		IFlightRouteplanningRemoteService nservice;
+		BaseServiceProvider provider = MyUI.getProvider();
+		
+		try {
+			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			Collection<FlightRouteInfo> nitems = nservice.getItems();
+			routeList = new ArrayList(nitems);
+			
+			
+			for (FlightRouteInfo e : nitems) {
+				String id = e.getId();
+				String name = e.getName();
+				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+			}
+			//Notification.show(String.valueOf(items.size()));
+			
+			
+		} catch (RemoteException | DronologyServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+	}
+	public int getRouteNumber(FlightRouteInfo info){
+
+		
+		IFlightRouteplanningRemoteService nservice;
+		BaseServiceProvider provider = MyUI.getProvider();
+		
+		try {
+			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			Collection<FlightRouteInfo> nitems = nservice.getItems();
+			routeList = new ArrayList(nitems);
+			
+			int counter = 0;
+			for (FlightRouteInfo e : nitems) {
+				if(info.equals(e)){
+					return counter;
+					
+				}
+				counter++;
+			}
+			//Notification.show(String.valueOf(items.size()));
+			
+			
+		} catch (RemoteException | DronologyServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+	}
+public FlightRouteInfo getRouteByName(String name){
+
+		
+		IFlightRouteplanningRemoteService nservice;
+		BaseServiceProvider provider = MyUI.getProvider();
+		
+		try {
+			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			Collection<FlightRouteInfo> nitems = nservice.getItems();
+			routeList = new ArrayList(nitems);
+			
+			
+			for (FlightRouteInfo e : nitems) {
+				if(e.getName().equals(name)){
+					return e;
+					
+				}
+				
+			}
+			//Notification.show(String.valueOf(items.size()));
+			
+			
+		} catch (RemoteException | DronologyServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		FlightRouteInfo empty = null;
+		return empty;
+	}
+	public FlightRouteInfo getRoute(){
+		return drone;		
+	}
+	public String getName(){
+		return routeInputName;
+	}
+	
 }
