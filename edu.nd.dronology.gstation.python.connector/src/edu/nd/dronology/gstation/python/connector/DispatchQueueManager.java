@@ -1,5 +1,6 @@
 package edu.nd.dronology.gstation.python.connector;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +11,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
+import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -20,10 +26,11 @@ import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
+
 /**
- *  The {@link DispatchQueueManager} handles both <i>incoming</i> and <i>outgoing</i> queues. </br> 
- * 	Incoming queues contain {@link UAVState} received from the UAV to be dispatched to the {@link PhysicalDrone}.<br>
- * 	The outgoing queue contains {@link IDroneCommand}s being sent to the UAV.
+ * The {@link DispatchQueueManager} handles both <i>incoming</i> and <i>outgoing</i> queues. </br>
+ * Incoming queues contain {@link UAVState} received from the UAV to be dispatched to the {@link PhysicalDrone}.<br>
+ * The outgoing queue contains {@link IDroneCommand}s being sent to the UAV.
  * 
  * @author Michael Vierhauser
  *
@@ -34,9 +41,15 @@ public class DispatchQueueManager {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DispatchQueueManager.class);
 
+	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
+			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).setVersion(1.0)
+			.serializeSpecialFloatingPointValues().create();
+
 	private static final int NUM_THREADS = 20;
 	private static final ExecutorService SERVICE_EXECUTOR = Executors.newFixedThreadPool(NUM_THREADS,
 			new NamedThreadFactory("Dispatch-Threads"));
+
+	private static final boolean USE_MONITORING = false;
 
 	Map<String, BlockingQueue<UAVState>> queueMap = new ConcurrentHashMap<>();
 	List<StatusDispatchThread> dispatchThreads = new ArrayList<>();
@@ -60,7 +73,7 @@ public class DispatchQueueManager {
 	}
 
 	public void postDroneStatusUpdate(String id, UAVState status) {
-	
+
 		synchronized (queueMap) {
 			boolean success = false;
 			if (queueMap.containsKey(id)) {
@@ -75,13 +88,15 @@ public class DispatchQueueManager {
 				LOGGER.hwFatal("Buffer overflow! '" + id + "'");
 			}
 		}
-		
+		if (USE_MONITORING) {
+			UAVMonitoringManager.getInstance().notify(id, GSON.toJson(status));
+		}
 
 	}
 
 	private void registerNewDrone(String id, UAVState status) {
 		LOGGER.hwInfo("New drone registered with  '" + id + "' -> " + status.toString());
-		DroneInitializationInfo info = new DroneInitializationInfo(id, DroneMode.MODE_PHYSICAL,id, status.getLocation());
+		DroneInitializationInfo info = new DroneInitializationInfo(id, DroneMode.MODE_PHYSICAL, id, status.getLocation());
 		try {
 			DroneSetupService.getInstance().initializeDrones(info);
 		} catch (DronologyServiceException e) {
