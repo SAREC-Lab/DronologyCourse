@@ -148,10 +148,3 @@ def make_drone_link(drone_type, **kwargs):
         return PhysicalSITL(**kwargs)
     else:
         pass  # warn
-
-
-
-
-
-if __name__ == '__main__':
-    close_sitl_connections()

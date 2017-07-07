@@ -1,5 +1,14 @@
 import os
 
+STATUS_EXIT = 0
+STATUS_RESET = 1
+
+CMD_TYPE_ERROR = 'error'
+
+CMD_RESET = 'reset'
+
+ERROR_CONN_RESET = {'type': CMD_TYPE_ERROR, 'data': {'id': None, 'command': CMD_RESET, 'data': None}}
+
 D_ATTR_LOC = 'location'
 D_ATTR_ATTITUDE = 'attitude'
 D_ATTR_VEL = 'velocity'

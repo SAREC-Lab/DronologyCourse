@@ -7,6 +7,7 @@ import signal
 import numpy as np
 import nvector as nv
 import matplotlib.path as mpl_path
+from threading import Timer
 
 
 arr = np.array
@@ -71,6 +72,7 @@ class Earth:
         return N
 
 
+# noinspection PyPep8Naming
 class Position(object):
     def to_lla(self):
         pass
@@ -133,7 +135,6 @@ class Position(object):
 
         # TODO: do we just multiply the deriv by t and add it to original?
 
-
     def distance(self, other):
         p1 = self.to_pvector().as_array()
         p2 = other.to_pvector().as_array()
@@ -164,6 +165,7 @@ class Position(object):
         return False
 
 
+# noinspection PyPep8Naming
 class Lla(Position):
     def __init__(self, latitude, longitude, altitude):
         self.lla = arr([latitude, longitude, altitude]).astype(np.float64)
@@ -204,6 +206,7 @@ class Lla(Position):
         return self.lla
 
 
+# noinspection PyPep8Naming
 class Nvector(Position):
     def __init__(self, x, y, z, depth):
         self.n_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
@@ -239,6 +242,7 @@ class Nvector(Position):
         return arr([x, y, z, self.depth])
 
 
+# noinspection PyPep8Naming
 class Pvector(Position):
     def __init__(self, x, y, z):
         self.p_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
@@ -267,6 +271,32 @@ class Pvector(Position):
         self.p_EB_E.ravel()
 
 
+class RepeatedTimer(object):
+    def __init__(self, interval, function, *args, **kwargs):
+        self._timer     = None
+        self.interval   = interval
+        self.function   = function
+        self.args       = args
+        self.kwargs     = kwargs
+        self.is_running = False
+        self.start()
+
+    def _run(self):
+        self.is_running = False
+        self.start()
+        self.function(*self.args, **self.kwargs)
+
+    def start(self):
+        if not self.is_running:
+            self._timer = Timer(self.interval, self._run)
+            self._timer.start()
+            self.is_running = True
+
+    def stop(self):
+        self._timer.cancel()
+        self.is_running = False
+
+
 def clean_up_run():
     if os.path.exists('.sitl_temp'):
         shutil.rmtree('.sitl_temp')
@@ -277,9 +307,9 @@ def clean_up_run():
             os.kill(pid, signal.SIGINT)
     except subprocess.CalledProcessError:
         print('no sitl links found')
-
+    #
     try:
-        pids = map(int, subprocess.check_output(['pgrep', 'python']).split())
+        pids = map(int, subprocess.check_output(['pgrep', '-f', '/usr/local/bin/mavproxy.py']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
     except subprocess.CalledProcessError:

@@ -1,72 +1,89 @@
+import multiprocessing as mp
 import threading
 import socket
-import os
 import Queue
+import errno
+import json
+from common import *
 
 
 class DronologyLink:
-    def __init__(self, host='127.0.0.1', port=1234):
+    def __init__(self, in_queue, host='127.0.0.1', port=1234):
         self.host = host
         self.port = port
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        self.accept_worker = None
-        self.recv_worker = None
-        self.send_worker = None
-
-        self.out_queue = Queue.Queue()
-
+        self.sock = None
+        self.conn = None
         self.is_alive = True
-        self.is_connected = False
-
-        self.client = None
+        self.in_queue = in_queue
+        self.out_queue = None
+        self.recv_message_buffer = ''
+        self.worker = None
+        self.exit_status = STATUS_EXIT
 
     def start(self):
-        self.recv_worker = threading.Thread(target=self._receive).start()
-        self.send_worker = threading.Thread(target=self._send).start()
-        self.accept_worker = threading.Thread(target=self._accept).start()
+        threading.Thread(target=self._accept).start()
 
     def stop(self):
-        self.out_queue.join()
+        self.worker.join()
 
-        self.sock.close()
-        del self.sock
-        self.client.close()
-        del self.client
+        if self.sock:
+            self.sock.close()
 
-        self.is_alive = False
-        self.accept_worker.join()
-        self.recv_worker.join()
-        self.send_worker.join()
+        if self.conn:
+            self.conn.close()
 
     def send(self, msg):
-        self.out_queue.put(msg)
+        if self.out_queue is not None:
+            self.out_queue.put(msg)
 
     def _accept(self):
+        self.is_alive = True
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.host, self.port))
         self.sock.listen(0)
-        client, _ = self.sock.accept()
-        self.client = client
+        try:
+            client, _ = self.sock.accept()
+        except KeyboardInterrupt:
+            self.stop()
+            return
+        print('dronology connection established...')
+        self.conn = client
+        self.conn.settimeout(0.1)
+        self.worker = threading.Thread(target=self._work)
+        self.out_queue = mp.Queue()
+        self.worker.start()
 
-    def _receive(self):
-        msg_buffer = ""
+    def _work(self):
         while self.is_alive:
-            if self.client is not None:
-                msg = self.client.recv(1024)
-                if os.linesep in msg:
-                    msg_end, msg = msg.split(os.linesep)
-                    msg_buffer += msg_end
-                    # TODO: send this message to groundstation
+            try:
+                try:
+                    msg = self.out_queue.get_nowait()
+                    self.conn.send(msg)
+                    self.conn.send(os.linesep)
+                except Queue.Empty:
+                    pass
 
-                    # now, clear the buffer
-                    msg_buffer = ""
+                try:
+                    msg = self.conn.recv(4096)
+                    if os.linesep in msg:
+                        msg_end, msg = msg.split(os.linesep)
+                        self.recv_message_buffer += msg_end
+                        # TODO: send this message to groundstation
+                        self.in_queue.put(self.recv_message_buffer)
+                        # now, clear the buffer
+                        self.recv_message_buffer = ""
 
-                msg_buffer += msg
+                    self.recv_message_buffer += msg
+                except socket.timeout:
+                    pass
+            except socket.error as e:
+                print(e)
+                if e.errno == errno.ECONNRESET:
+                    self.in_queue.put(json.dumps(ERROR_CONN_RESET))
+                    self.exit_status = STATUS_RESET
+                self.is_alive = False
+            except KeyboardInterrupt:
+                self.is_alive = False
 
-    def _send(self):
-        while self.is_alive:
-            if self.client is not None:
-                msg = self.out_queue.get()
-                self.client.send(msg)
-                self.client.send(os.linesep)
+
 
