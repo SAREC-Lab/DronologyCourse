@@ -97,7 +97,7 @@ public class DroneFleetManager {
 						LOGGER.error("Error when queuing uav '" + designatedDroneId + "'");
 					}
 				}
-			//	LOGGER.error("Error when retrieving uav '" + designatedDroneId + "'");
+				//LOGGER.error("Error when retrieving uav '" + designatedDroneId + "'");
 			}
 			return null;
 		}

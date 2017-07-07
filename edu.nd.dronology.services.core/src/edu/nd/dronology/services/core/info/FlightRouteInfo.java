@@ -14,6 +14,10 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	private static final long serialVersionUID = -7327376857430499641L;
 	private String category;
 	private List<Waypoint> waypoints = new ArrayList<>();
+	private double lenght = 0;
+	private long dateCreated;
+	private long dateModified;
+	private double distance;
 
 	public FlightRouteInfo(String name, String id) {
 		super(name, id);
@@ -30,7 +34,16 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	public List<Waypoint> getWaypoints() {
 		return Collections.unmodifiableList(waypoints);
+    
+	public void setDateModified(long dateModified) {
+		this.dateModified = dateModified;
 	}
+
+	public void setDateCreated(long dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+
 
 	public void addWaypoint(Waypoint waypoint) {
 		waypoints.add(waypoint);
@@ -39,5 +52,24 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	public void removeWaypoint(Waypoint waypoint) {
 		waypoints.remove(waypoint);
 	}
+
+
+	public double getLenght() {
+		return lenght;
+	}
+
+	public long getDateCreated() {
+		return dateCreated;
+	}
+
+	public long getDateModified() {
+		return dateModified;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+
+	}
+
 
 }

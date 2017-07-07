@@ -1,6 +1,9 @@
 package edu.nd.dronology.services.instances.flightroute;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import edu.nd.dronology.core.air_traffic_control.DistanceUtil;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
@@ -112,6 +116,15 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 			info.addWaypoint(waypoint);
 		}
 
+		BasicFileAttributes attr = Files.readAttributes(Paths.get(file.toURI()), BasicFileAttributes.class);
+		if (atm.getCoordinates().size() > 1) {
+			info.setDistance(DistanceUtil.calculateTotalDistance(atm.getCoordinates().toArray(new LlaCoordinate[0])));
+		} else {
+			info.setDistance(0);
+		}
+		info.setDateCreated(attr.creationTime().toMillis());
+		info.setDateModified(attr.lastModifiedTime().toMillis());
+    
 		return info;
 	}
 
@@ -144,6 +157,7 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 	@Override
 	public FlightRouteInfo getItem(String name) throws DronologyServiceException {
 		for (FlightRouteInfo item : itemmap.values()) {
+			System.out.println(item.getName());
 			if (item.getName().equals(name)) {
 				return item;
 			}

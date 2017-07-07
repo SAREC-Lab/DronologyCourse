@@ -1,0 +1,42 @@
+{
+  "options": {
+    "paths": {
+      "root": "/usr/src/app/node_modules/tileserver-gl-styles",
+      "fonts": "/data/fonts",
+      "styles": "/data/styles",
+      "mbtiles": "/data"
+    }
+  },
+  "styles": {
+    "klokantech-basic": {
+      "style": "klokantech-basic.json",
+      "tilejson": {
+        "bounds": [
+          -86.545,
+          41.461,
+          -85.696,
+          41.929
+        ]
+      }
+    },
+    "customized": {
+      "style": "grayed_out.json",
+      "tilejson": {
+        "bounds": [
+          -86.545,
+          41.461,
+          -85.696,
+          41.929
+        ]
+      }
+    }
+  },
+  "data": {
+    "v3": {
+      "mbtiles": "south-bend_indiana.mbtiles"
+    },
+    "satellite": {
+      "mbtiles": "flying_field_satellite.mbtiles"
+    }
+  }
+}
