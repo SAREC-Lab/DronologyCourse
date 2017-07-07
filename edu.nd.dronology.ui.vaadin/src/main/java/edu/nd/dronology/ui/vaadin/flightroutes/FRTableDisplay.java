@@ -7,7 +7,6 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -79,7 +78,6 @@ public class FRTableDisplay {
 				   	route.setPolylines(route.drawLines(route.getMapPoints(), false));
 				   	for(int i = 0; i < route.getPolylines().size(); i++){
 						route.getMap().addComponent(route.getPolylines().get(i));
-						Notification.show("adds lines back to map");
 					}
 
 					for (int i = 0; i < this.route.getMapPoints().size(); i++) {
