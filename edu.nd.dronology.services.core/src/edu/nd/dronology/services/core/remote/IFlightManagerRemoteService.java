@@ -37,8 +37,5 @@ public interface IFlightManagerRemoteService extends IRemoteableService {
 
 	FlightInfo getFlightInfo(String uavId) throws RemoteException, Exception;
 
-	@Discuss(discuss = "change from coordinates to real route....")
-	void planFlight(String uavid, String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints)
-			throws RemoteException;
 
 }
