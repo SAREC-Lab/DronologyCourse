@@ -14,17 +14,6 @@ NV_F = 1 - (SEMI_MINOR / SEMI_MAJOR)
 
 
 class Position(object):
-    def distance(self, other):
-        p1 = self.to_pvector().as_array()
-        p2 = other.to_pvector().as_array()
-
-        resid = p1 - p2
-        resid_sq = resid ** 2
-        resid_sq_sum = resid_sq.sum()
-        dist = np.sqrt(resid_sq_sum)
-
-        return dist
-
     def to_lla(self):
         pass
 
@@ -37,6 +26,17 @@ class Position(object):
     def as_array(self):
         pass
 
+    def distance(self, other):
+        p1 = self.to_pvector().as_array()
+        p2 = other.to_pvector().as_array()
+
+        resid = p1 - p2
+        resid_sq = resid ** 2
+        resid_sum_sq = resid_sq.sum()
+        dist = np.sqrt(resid_sum_sq)
+
+        return dist
+
     def coerce(self, other):
         if isinstance(other, Position):
             if isinstance(self, LlaCoordinate):
@@ -48,13 +48,21 @@ class Position(object):
         else:
             return other
 
+    # noinspection PyTypeChecker
+    def __eq__(self, other):
+        other_ = self.coerce(other)
+        if isinstance(other_, self.__class__):
+            return np.isclose(self.as_array(), other_.as_array()).all()
+        return False
+
 
 class LlaCoordinate(Position):
     def __init__(self, latitude, longitude, altitude):
         self.lla = arr([latitude, longitude, altitude]).astype(np.float64)
 
     def to_nvector(self):
-        x, y, z = nv.lat_lon2n_E(*map(lambda a: np.float64(np.deg2rad(a)), self.lla[:-1])).ravel()
+        lat, lon = map(lambda a: np.float64(np.deg2rad(a)), self.lla[:-1])
+        x, y, z = nv.lat_lon2n_E(lat, lon).ravel()
 
         return NVector(x, y, z, -self.lla[-1])
 
