@@ -42,7 +42,7 @@ public class FileManager {
 	public byte[] getFileAsByteArray(String fileId) throws DronologyServiceException {
 		LOGGER.info("File '" + fileId + "' requested");
 
-		String savelocation = path + "\\" + fileId + "." + extension;
+		String savelocation = path + File.separator + fileId + "." + extension;
 		File f = new File(savelocation);
 		if (!f.exists()) {
 			LOGGER.info("File not found: " + savelocation);
@@ -59,7 +59,7 @@ public class FileManager {
 	public boolean saveByteArrayToFile(String id, byte[] content) {
 		LOGGER.info("File '" + id + "' received");
 		FileOutputStream stream = null;
-		String savelocation = path + "\\" + id + "." + extension;
+		String savelocation = path + File.separator + id + "." + extension;
 		File f = new File(savelocation);
 		if (f.exists()) {
 			LOGGER.info("Deleting old file");

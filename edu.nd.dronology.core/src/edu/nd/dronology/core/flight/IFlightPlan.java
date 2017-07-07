@@ -9,6 +9,8 @@ import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 @Discuss(discuss="this interface is currently exposed - i.e. managed drone is exposed ")
 public interface IFlightPlan {
+	
+	
 
 	ManagedDrone getAssignedDrone();
 
@@ -33,5 +35,7 @@ public interface IFlightPlan {
 	int getNumberWayPoints();
 
 	String getDesignatedDroneId();
+
+	boolean isCompleted();
 
 }

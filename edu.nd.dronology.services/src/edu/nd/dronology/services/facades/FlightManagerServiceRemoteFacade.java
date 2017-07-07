@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.instances.flightmanager.FlightManagerService;
@@ -40,21 +41,32 @@ public class FlightManagerServiceRemoteFacade extends AbstractRemoteFacade imple
 	}
 
 	@Override
-	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight)
-			throws RemoteException {
-		FlightManagerService.getInstance().planFlight(planName, coordinates, flight);
+	public FlightInfo getFlightInfo(String uavId) throws RemoteException, Exception {
+		return FlightManagerService.getInstance().getFlightInfo(uavId);
+	}
+
+	@Override
+	public void planFlight(String uavid, String planName, List<Waypoint> waypoints) throws Exception {
+		FlightManagerService.getInstance().planFlight(uavid, planName, waypoints);
 
 	}
 
 	@Override
-	public FlightInfo getFlightDetails() throws RemoteException {
-		return FlightManagerService.getInstance().getFlightDetails();
+	public void planFlight(String planName, List<Waypoint> waypoints) throws Exception {
+		FlightManagerService.getInstance().planFlight(planName, waypoints);
+
 	}
 
 	@Override
-	public void planFlight(String uavid, String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight)
-			throws RemoteException {
-		FlightManagerService.getInstance().planFlight(uavid, planName, coordinates, flight);
+	public void returnToHome(String uavid) throws RemoteException, Exception {
+		FlightManagerService.getInstance().returnToHome(uavid);
+
+	}
+
+	@Override
+	public void pauseFlight(String uavid) throws RemoteException, Exception {
+		FlightManagerService.getInstance().pauseFlight(uavid);
+
 	}
 
 }

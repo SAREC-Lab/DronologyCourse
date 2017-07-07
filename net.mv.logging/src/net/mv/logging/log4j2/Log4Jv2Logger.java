@@ -20,9 +20,15 @@ public class Log4Jv2Logger implements ILogger {
 	private org.apache.logging.log4j.Logger logger;
 	private Log4JLogForwarder throwAdapter;
 	private static Marker MARKER = MarkerManager.getMarker(LogFactory.FACTORY_DEFAULT);
-
+	private static Marker MARKER_MISSION = MarkerManager.getMarker("MISSION");
+	
+	
+	
 	final Level HW_INFO = Level.forName("HW_INFO", 60);
 	final Level HW_FATAL = Level.forName("HW_FATAL", 30);
+	
+	final Level MISSION_INFO = Level.forName("MISSION_INFO", 80);
+	final Level MISSION_ERROR = Level.forName("MISSION_ERROR", 70);
 
 	public Log4Jv2Logger(final Class<?> clazz) {
 		this(clazz.getName(), clazz);
@@ -135,6 +141,20 @@ public class Log4Jv2Logger implements ILogger {
 	public void hwFatal(final Object message) {
 		Object logMessage = message.toString();
 		log.logIfEnabled(throwingSource, HW_FATAL, MARKER, logMessage, null);
+		// throwAdapter.fatal(message);
+	}
+	
+	@Override
+	public void missionInfo(final Object message) {
+		Object logMessage = message.toString();
+		log.logIfEnabled(throwingSource, MISSION_INFO, MARKER_MISSION, logMessage, null);
+		// throwAdapter.fatal(message);
+	}
+	
+	@Override
+	public void missionError(final Object message) {
+		Object logMessage = message.toString();
+		log.logIfEnabled(throwingSource, MISSION_ERROR, MARKER_MISSION, logMessage, null);
 		// throwAdapter.fatal(message);
 	}
 

@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
@@ -107,22 +108,9 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 		IFlightRoute atm = FlightRoutePersistenceProvider.getInstance().loadItem(file.toURI().toURL());
 		FlightRouteInfo info = new FlightRouteInfo(atm.getName(), id);
 		info.setCategory(atm.getCategory());
-		for (LlaCoordinate c : atm.getCoordinates()) {
-			info.addCoordinate(c);
+		for (Waypoint waypoint : atm.getWaypoints()) {
+			info.addWaypoint(waypoint);
 		}
-
-		// Set<String> elementids = new HashSet<>();
-		// for (ISAMArtifactMapping mapping : atm.getArtifactMappings()) {
-		// for (IMappedItem itm : mapping.getMappedItems()) {
-		// elementids.add(itm.getItemId());
-		// }
-		//
-		// MappingInfo mpInfo = new MappingInfo(mapping.getName(), elementids);
-		// info.addMappingInfo(mpInfo);
-		// }
-		// if (atm.getRMMId() != null) {
-		// rmmMapping.put(atm.getRMMId(), info);
-		// }
 
 		return info;
 	}

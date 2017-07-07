@@ -271,4 +271,16 @@ public class Log4JLogForwarder implements ILogger {
 
 	}
 
+	@Override
+	public void missionInfo(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void missionError(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

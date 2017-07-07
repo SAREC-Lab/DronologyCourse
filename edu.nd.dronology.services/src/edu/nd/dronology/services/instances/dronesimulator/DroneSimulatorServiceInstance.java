@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.info.SimulatorScenarioCategoryInfo;
 import edu.nd.dronology.services.core.info.SimulatorScenarioInfo;
@@ -138,17 +140,25 @@ public class DroneSimulatorServiceInstance extends AbstractFileTransmitServiceIn
 			throw new DronologyServiceException("Scenario '" + scenario.getId() + "' not found");
 		}
 		for (AssignedDrone drone : item.getAssignedDrones()) {
-			DroneSetupService.getInstance()
-					.initializeDrones(new DroneInitializationInfo(drone.getName(), drone.getName(), drone.getStartCoordinate()));
+			DroneSetupService.getInstance().initializeDrones(new DroneInitializationInfo(drone.getName(),
+					DroneMode.MODE_VIRTUAL, drone.getName(), drone.getStartCoordinate()));
 		}
 
 		for (String path : item.getAssignedFlightPaths()) {
 
 			FlightRouteInfo info = FlightRouteplanningService.getInstance().getItem(path);
 
-			List<LlaCoordinate> coordds = new ArrayList<>(info.getCoordinates());
-			LlaCoordinate initPoint = coordds.remove(0);
-			FlightManagerService.getInstance().planFlight(info.getName(),initPoint, coordds);
+			List<Waypoint> coordds = new ArrayList<>(info.getWaypoints());
+			List<Waypoint> waypoints = new ArrayList<>();
+			for (Waypoint c : coordds) {
+				waypoints.add(c);
+			}
+			try {
+				FlightManagerService.getInstance().planFlight(info.getName(), waypoints);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}

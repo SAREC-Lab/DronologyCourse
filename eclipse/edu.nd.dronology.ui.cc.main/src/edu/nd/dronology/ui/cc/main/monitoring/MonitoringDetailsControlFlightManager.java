@@ -89,17 +89,17 @@ public class MonitoringDetailsControlFlightManager extends Composite {
 
 	public void refresh() {
 
-		try {
-			IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider()
-					.getRemoteManager().getService(IFlightManagerRemoteService.class);
-
-			FlightInfo flightInfo = service.getFlightDetails();
-			viewer.setInput(flightInfo);
-
-		} catch (Exception e) {
-			LOGGER.error(e);
-			viewer.setInput("");
-		}
+//		try {
+//			IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider()
+//					.getRemoteManager().getService(IFlightManagerRemoteService.class);
+//
+//			FlightInfo flightInfo = service.getFlightDetails();
+//			viewer.setInput(flightInfo);
+//
+//		} catch (Exception e) {
+//			LOGGER.error(e);
+//			viewer.setInput("");
+//		}
 
 	}
 

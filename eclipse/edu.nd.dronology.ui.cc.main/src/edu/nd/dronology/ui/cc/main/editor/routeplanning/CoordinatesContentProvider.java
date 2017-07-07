@@ -9,7 +9,7 @@ public class CoordinatesContentProvider implements IStructuredContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		IFlightRoute info = (IFlightRoute) inputElement;
-		return info.getCoordinates().toArray();
+		return info.getWaypoints().toArray();
 	}
 
 }
