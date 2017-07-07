@@ -136,8 +136,8 @@ public class DroneStatusViewer extends Composite {
 					.getRemoteManager().getService(IFlightManagerRemoteService.class);
 
 			List<Waypoint> wayPoints = new ArrayList<>();
-			for (LlaCoordinate crd : toAssign.getCoordinates()) {
-				wayPoints.add(new Waypoint(crd));
+			for (Waypoint crd : toAssign.getWaypoints()) {
+				wayPoints.add((crd));
 			}
 
 			service.planFlight(droneStatus.getID(), toAssign.getName(), wayPoints);

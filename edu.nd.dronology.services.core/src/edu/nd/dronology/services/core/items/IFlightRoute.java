@@ -3,6 +3,7 @@ package edu.nd.dronology.services.core.items;
 import java.util.List;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 
 public interface IFlightRoute extends IPersistableItem {
 	String getDescription();
@@ -13,12 +14,16 @@ public interface IFlightRoute extends IPersistableItem {
 
 	String getCategory();
 
-	void addCoordinate(LlaCoordinate coordinate);
+	List<Waypoint> getWaypoints();
 
-	List<LlaCoordinate> getCoordinates();
+	void addWaypoint(Waypoint waypoint);
 
-	int removeCoordinate(LlaCoordinate coordinate);
+	void setTakeoffAltitude(double altitude);
 
-	void addCoordinate(LlaCoordinate coordinate, int index);
+	void addWaypoint(Waypoint waypoint, int index);
+
+	int removeWaypoint(Waypoint waypoint);
+
+	Waypoint removeWaypoint(int index);
 
 }

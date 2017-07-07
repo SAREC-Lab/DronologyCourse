@@ -148,10 +148,10 @@ public class DroneSimulatorServiceInstance extends AbstractFileTransmitServiceIn
 
 			FlightRouteInfo info = FlightRouteplanningService.getInstance().getItem(path);
 
-			List<LlaCoordinate> coordds = new ArrayList<>(info.getCoordinates());
+			List<Waypoint> coordds = new ArrayList<>(info.getWaypoints());
 			ArrayList waypoints = new ArrayList<>();
-			for (LlaCoordinate c : coordds) {
-				waypoints.add(new Waypoint(c));
+			for (Waypoint c : coordds) {
+				waypoints.add(c);
 			}
 			try {
 				FlightManagerService.getInstance().planFlight(info.getName(), waypoints);

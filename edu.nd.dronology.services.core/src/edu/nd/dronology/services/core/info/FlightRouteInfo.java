@@ -1,11 +1,10 @@
 package edu.nd.dronology.services.core.info;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 
 public class FlightRouteInfo extends RemoteInfoObject {
 
@@ -13,23 +12,13 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	 * 
 	 */
 	private static final long serialVersionUID = -7327376857430499641L;
-	private List<MappingInfo> mappingInfos = new ArrayList<>();
 	private String category;
-	private List<LlaCoordinate> coordinates = new ArrayList<>();
+	private List<Waypoint> waypoints = new ArrayList<>();
 
 	public FlightRouteInfo(String name, String id) {
 		super(name, id);
 	}
 
-	public Collection<MappingInfo> getArtifactMappings() {
-		return Collections.unmodifiableCollection(mappingInfos);
-	}
-
-	public void addMappingInfo(MappingInfo mpInfo) {
-		mappingInfos.add(mpInfo);
-
-	}
-	
 	public String getCategory() {
 		return category;
 	}
@@ -39,18 +28,16 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	}
 
-	public List<LlaCoordinate> getCoordinates() {
-		return coordinates;
+	public List<Waypoint> getWaypoints() {
+		return Collections.unmodifiableList(waypoints);
 	}
 
-	public void addCoordinate(LlaCoordinate coordinate) {
-		coordinates.add(coordinate);
-	}
-	
-	public void rempoveCoordinate(LlaCoordinate coordinate) {
-		coordinates.remove(coordinate);
+	public void addWaypoint(Waypoint waypoint) {
+		waypoints.add(waypoint);
 	}
 
-
+	public void removeWaypoint(Waypoint waypoint) {
+		waypoints.remove(waypoint);
+	}
 
 }

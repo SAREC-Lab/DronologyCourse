@@ -175,11 +175,11 @@ public class FlightRoutePlanningnShelfViewer extends AbstractSidebarViewer<Fligh
 			service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
 
-			List<LlaCoordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
-			LlaCoordinate initPoint = coordds.remove(0);
+			List<Waypoint> coordds = new ArrayList<>(remoteItem.getWaypoints());
+			Waypoint initPoint = coordds.remove(0);
 			List<Waypoint> waypoints = new ArrayList<>();
-			for (LlaCoordinate c : coordds) {
-				waypoints.add(new Waypoint(c));
+			for (Waypoint c : coordds) {
+				waypoints.add(c);
 			}
 
 			service.planFlight(remoteItem.getName(), waypoints);
