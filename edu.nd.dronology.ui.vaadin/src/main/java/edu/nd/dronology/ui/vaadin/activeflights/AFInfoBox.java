@@ -62,6 +62,8 @@ public class AFInfoBox extends CustomComponent {
 	private Label locationInfo3 = new Label();
 	private Label locationInfo4 = new Label();
 	private Switch hoverSwitch = new Switch();
+	private Button returnToHome = new Button("Return to Home");
+	private Button assignNewRoute = new Button("Assign New Route");
 
 	private VerticalLayout mainContent = new VerticalLayout();
 	private HorizontalLayout topContent = new HorizontalLayout();
@@ -161,8 +163,7 @@ public class AFInfoBox extends CustomComponent {
 		Label caption = new Label("Hover in Place");
 		bottomSwitch.addComponents(caption, hoverSwitch);
 
-		Button returnToHome = new Button("Return to Home");
-		Button assignNewRoute = new Button("Assign New Route");
+		
 		returnToHome.setHeight("30px");
 		assignNewRoute.setHeight("30px");
 
@@ -374,6 +375,14 @@ public class AFInfoBox extends CustomComponent {
 
 	public boolean getBoxVisible() {
 		return this.visible;
+	}
+	
+	public Button getHomeButton(){
+		return this.returnToHome;
+	}
+	
+	public Button getRouteButton(){
+		return this.assignNewRoute;
 	}
 
 	private void activate(FlightRouteInfo remoteItem) {

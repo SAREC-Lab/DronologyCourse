@@ -1,8 +1,10 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
+import java.awt.MouseInfo;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,12 +13,22 @@ import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
+import org.vaadin.addon.leaflet.LeafletClickEvent;
+import org.vaadin.addon.leaflet.LeafletClickListener;
+import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
+import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.PopupView;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -51,6 +63,7 @@ public class AFMapComponent extends CustomComponent {
   private ArrayList<ArrayList<LPolyline>> flightRoutes = new ArrayList<>();
   private ArrayList<ArrayList<LMarker>> wayPointMarkers = new ArrayList<>();
   private boolean follow = false;
+	private AbsoluteLayout layout = new AbsoluteLayout();
 	
   private MapMarkerUtilities utilities;
   
@@ -72,6 +85,7 @@ public class AFMapComponent extends CustomComponent {
 
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.zoomToContent();
+		leafletMap.addStyleName("bring_back");
 
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
@@ -84,9 +98,13 @@ public class AFMapComponent extends CustomComponent {
 		addDroneMarkers();
 		addActiveFlightRoutes();
 		this.setAverageCenter();
-		
+		double screenHeight = UI.getCurrent().getPage().getBrowserWindowHeight();
+		int layoutHeight = (int) Math.rint(screenHeight * 0.9);
+		layout.setHeight(Integer.toString(layoutHeight) + "px");
+		layout.addComponent(leafletMap);
+		content.addComponent(layout);
 		setCompositionRoot(content);  
-		content.addComponents(leafletMap);
+		//content.addComponents(leafletMap);
 	}
 	
 	public void setCenter(double centerLat, double centerLon) {
@@ -231,6 +249,7 @@ public class AFMapComponent extends CustomComponent {
 			marker.setId(e.getValue().getID());
 			marker.setIcon(droneIcon);
 			marker.setIconSize(new Point(77, 33));
+			marker.addMouseOverListener( new DroneMouseListener());
 			markers.add(marker);
 			leafletMap.addComponent(marker);
 			if (!follow)
@@ -267,6 +286,7 @@ public class AFMapComponent extends CustomComponent {
 								newMarker.setId(e1.getValue().getID());
 								newMarker.setIcon(droneIcon);
 								newMarker.setIconSize(new Point(77, 33));
+								newMarker.addMouseOverListener( new DroneMouseListener());
 								markers.add(newMarker);
 								leafletMap.addComponent(newMarker);
 								if (!follow)
@@ -288,6 +308,7 @@ public class AFMapComponent extends CustomComponent {
 						marker.setId(e.getValue().getID());
 						marker.setIcon(droneIcon);
 						marker.setIconSize(new Point(77, 33));
+						marker.addMouseOverListener( new DroneMouseListener());
 						markers.add(marker);
 						leafletMap.addComponent(marker);
 						if (!follow)
@@ -456,6 +477,46 @@ public class AFMapComponent extends CustomComponent {
 				double zoom = configuration.getMapDefaultZoom();
 				leafletMap.setCenter(point, zoom);
 			}
-		
 	}
+
+	
+	private class DroneMouseListener implements LeafletMouseOverListener {
+
+		@Override
+		public void onMouseOver(LeafletMouseOverEvent event) {
+			// TODO Auto-generated method stub
+			LMarker leafletMarker = (LMarker)event.getSource();
+			VerticalLayout content = new VerticalLayout();
+			PopupView popup = new PopupView(null, content);
+			
+			try {
+				drones = service.getDrones();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			for (Entry<String, DroneStatus> e:drones.entrySet()){
+				if (e.getValue().getID().equals(leafletMarker.getId())){
+					AFInfoBox box = new AFInfoBox(false, e.getValue().getID(), e.getValue().getStatus(), e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(), e.getValue().getAltitude(), e.getValue().getVelocity(), false);
+					box.setBoxVisible(false);
+					box.addStyleName("af_info_box");
+					box.getRouteButton().addClickListener( click -> {
+						popup.setPopupVisible(false);
+					});
+					box.getHomeButton().addClickListener( click -> {
+						popup.setPopupVisible(false);
+					});
+					content.addComponent(box);
+				}
+			}
+			
+			popup.setPopupVisible(true);
+			popup.addStyleName("bring_front");
+			
+			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150) + "px;left:" 
+					+ String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+		}
+	}
+	
 }
