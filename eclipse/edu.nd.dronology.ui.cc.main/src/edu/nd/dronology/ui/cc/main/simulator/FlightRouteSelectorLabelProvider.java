@@ -41,7 +41,7 @@ public class FlightRouteSelectorLabelProvider implements ITableLabelProvider {
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		FlightRouteInfo info = (FlightRouteInfo) element;
-		return info.getName() + " -- Waypoints:" + info.getCoordinates().size();
+		return info.getName() + " -- Waypoints:" + info.getWaypoints().size();
 	}
 
 }

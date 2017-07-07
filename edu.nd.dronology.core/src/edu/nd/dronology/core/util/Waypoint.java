@@ -20,6 +20,10 @@ public class Waypoint implements Serializable {
 		return coordinate;
 	}
 
+	public Waypoint() {
+		coordinate = new LlaCoordinate(0, 0, 0);
+	}
+
 	public Waypoint(LlaCoordinate coordinate) {
 		super();
 		NullUtil.checkNull(coordinate);
