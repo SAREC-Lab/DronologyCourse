@@ -46,7 +46,7 @@ public class FRMapComponent extends CustomComponent {
 	AbsoluteLayout mapAndPopup = new AbsoluteLayout();
 	FRMetaInfo bar = new FRMetaInfo();
 	FReditBar editBar = new FReditBar();
-	AbsoluteLayout layout;
+	AbsoluteLayout layout = new AbsoluteLayout();
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
@@ -261,7 +261,7 @@ public class FRMapComponent extends CustomComponent {
 
 	}
 	
-	public void displayByName(FlightRouteInfo info, String routeName, int numCoords) {
+	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName) {
 			
 		route.disableRouteEditing();
 
@@ -269,7 +269,13 @@ public class FRMapComponent extends CustomComponent {
 		layout.setHeight("510px");
 		layout.setWidth("1075px");
 
-		FRMetaInfo selectedBar = new FRMetaInfo(routeName, numCoords);
+		FRMetaInfo selectedBar;
+		
+		if(whichName){
+			selectedBar = new FRMetaInfo(routeName, numCoords);
+		}else{
+			selectedBar = new FRMetaInfo(info);
+		}
 
 		editBar = new FReditBar();
 		editBar.setStyleName("edit_bar");

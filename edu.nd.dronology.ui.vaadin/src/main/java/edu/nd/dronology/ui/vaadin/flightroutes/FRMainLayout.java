@@ -61,7 +61,7 @@ public class FRMainLayout extends CustomComponent {
 			
 			int numCoords = drone.getCoordinates().size();
 			String droneName = controls.getInfoPanel().getName();
-			map.displayByName(drone, droneName, numCoords);
+			map.displayByName(drone, droneName, numCoords, true);
 			
 			Point pt = new Point(0,0);
 			WayPoint way = new WayPoint(pt, true);
@@ -80,7 +80,7 @@ public class FRMainLayout extends CustomComponent {
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<LlaCoordinate> coords = flightInfo.getCoordinates();
 			
-			map.display(flightInfo);
+			map.displayByName(flightInfo, "not used", 0, false);
 
 			
 			//removes old pins and polylines when switching routes
