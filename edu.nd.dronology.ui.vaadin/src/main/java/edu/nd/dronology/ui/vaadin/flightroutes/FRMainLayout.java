@@ -89,14 +89,6 @@ public class FRMainLayout extends CustomComponent {
 			//to make sure the table is no longer bolded when switching routes without saving
 			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
 			
-			// gets FRInfoPanel component through FRControlsComponent, and flight info from accessor in FRInfoPanel
-			
-			
-			//FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
-			//List<LlaCoordinate> coords = flightInfo.getCoordinates();
-			
-			//map.display(flightInfo);
-
 			long tempLong;
 			long tempLat;
 			int numComponents;
@@ -143,7 +135,6 @@ public class FRMainLayout extends CustomComponent {
 	public FRControlsComponent getControls() {
 		return controls;
 	}
-
 	public int getIndex() {
 		return index;
 	}

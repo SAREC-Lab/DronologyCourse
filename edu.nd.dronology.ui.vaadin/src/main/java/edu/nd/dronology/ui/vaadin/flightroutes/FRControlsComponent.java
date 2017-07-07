@@ -1,7 +1,5 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
-import com.vaadin.ui.Button;
-
 import com.vaadin.ui.CustomComponent;
 
 /**
@@ -16,14 +14,9 @@ public class FRControlsComponent extends CustomComponent {
 	public FRControlsComponent() {
 		this.setWidth("100%");
 		addStyleName("controls_component");
-		
-		
 		setCompositionRoot(information);
-		
 	}
 	public FRInfoPanel getInfoPanel(){
 		return information;
 	}
-	
-	
 }
