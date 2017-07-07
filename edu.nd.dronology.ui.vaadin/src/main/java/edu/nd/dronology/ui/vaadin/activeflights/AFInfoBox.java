@@ -166,6 +166,31 @@ public class AFInfoBox extends CustomComponent {
 		
 		returnToHome.setHeight("30px");
 		assignNewRoute.setHeight("30px");
+		
+		returnToHome.addClickListener( e -> {
+			Window confirm = new Window("Confirm");
+			VerticalLayout subContent = new VerticalLayout();
+			HorizontalLayout subButtons = new HorizontalLayout();
+			Label label = new Label("Are you sure you want to send " + this.name + " to its home?");
+			Button yes = new Button("Yes");
+			Button no = new Button("No");
+			
+			yes.addClickListener(subEvent -> {
+				UI.getCurrent().removeWindow(confirm);
+			});
+			
+			no.addClickListener(subEvent -> {
+				UI.getCurrent().removeWindow(confirm);
+			});
+			
+			subButtons.addComponents(yes, no);
+			subContent.addComponents(label, subButtons);
+			confirm.setContent(subContent);
+			confirm.setModal(true);
+			confirm.center();
+			UI.getCurrent().addWindow(confirm);
+			
+		});
 
 		assignNewRoute.addClickListener(e -> {
 			Window window = new Window("Assign New Route");
@@ -206,9 +231,6 @@ public class AFInfoBox extends CustomComponent {
 				});
 
 				yes.addClickListener(subEvent -> {
-					
-					// TODO: assign the route to the drone
-					// Currently assigns the route without taking which drone into consideration
 					activate(selectedFlight);
 					UI.getCurrent().removeWindow(confirm);
 					UI.getCurrent().removeWindow(window);
