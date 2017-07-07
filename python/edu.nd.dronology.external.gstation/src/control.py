@@ -6,24 +6,26 @@ import mission
 import json
 import argparse
 import importlib
+import util
 from common import *
 from comms.dronology_link import DronologyLink
 from comms import drone_link
 
 
-
 class ControlStation:
-    def __init__(self, mission_type=mission.SAR, port=1234, ardupath=ARDUPATH, **kwargs):
+    def __init__(self, mission_type=mission.SAR, port=1234, ardupath=ARDUPATH, delay=1.0, **kwargs):
         self.mission = mission_type(ardupath=ardupath, **kwargs)
         self.java_link = DronologyLink(port=port)
         # self.java.setDataHandler(self.on_receive)
-        self.java_worker = threading.Thread(target=self.send_drone_list_cont)
+        self.java_worker = threading.Thread(target=lambda: self.send_drone_list_cont(delay=delay))
         self.java_worker_is_running = False
 
     def start(self):
+        print('control station finished setup...')
         self.java_link.start()
         self.java_worker_is_running = True
         self.java_worker.start()
+        self.mission.start()
 
     def stop(self):
         # self.java.close() # need to clean this up somehow
@@ -34,8 +36,8 @@ class ControlStation:
         self.java_worker_is_running = False
         self.java_worker.join()
 
-        drone_link.close_sitl_connections()
-        sys.exit(0)
+        util.clean_up_run()
+        sys.exit(1)
 
     def send_drone_list_cont(self, delay=1.0):
         """
@@ -86,9 +88,10 @@ def main():
     #           (DRONE_TYPE_SITL_VRTL, {'instance': 1, 'home': (41.514408, -86.239996, 0, 0)})]
     # drones = [{'type': 'physical', 'ConnectionData': {'ConnectionString': '/dev/ttyUSB0', 'BaudRate': 57600, }, }, ]
     ap = argparse.ArgumentParser()
-    ap.add_argument('-ap', dest='ardu_path', required=True, type=str)
-    ap.add_argument('-p', '--port', default=1234, type=int)
+    ap.add_argument('-ap', dest='ardu_path', required=True, type=str, help='path to ardupilot folder')
+    ap.add_argument('-p', '--port', default=1234, type=int, help='port to connect to dronology')
     ap.add_argument('-m', '--mission', default=mission.SAR, type=parse_mission_type, help=parse_mission_type.__doc__)
+    ap.add_argument('-d', '--delay', default=1.0, type=float, help='time to wait before sending drone updates')
     args = ap.parse_args()
 
     ctrl = ControlStation(mission_type=args.mission, ardupath=args.ardu_path, port=args.port)
@@ -100,5 +103,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        drone_link.close_sitl_connections()
-        sys.exit(0)
+        util.clean_up_run()
+        sys.exit(1)

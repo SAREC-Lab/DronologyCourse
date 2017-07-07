@@ -16,16 +16,17 @@ D_ATTR_MODE = 'mode'
 D_ATTR_ID = 'id'
 
 # TODO: use the definitions above
-DRONE_ATTRS = ['location', 'attitude', 'velocity', 'gimbalRotation', 'battery', 'home', 'status', 'heading', 'armable',
-               'airspeed', 'groundspeed', 'armed', 'mode', 'id']
+DRONE_ATTRS = [D_ATTR_LOC, D_ATTR_ATTITUDE, D_ATTR_VEL, D_ATTR_GMBL_ROT, D_ATTR_BTRY, D_ATTR_HOME_LOC,
+               D_ATTR_STATUS, D_ATTR_HEADING, D_ATTR_IS_ARMABLE, D_ATTR_AIRSPEED, D_ATTR_GRNDSPEED, D_ATTR_IS_ARMED,
+               D_ATTR_MODE, D_ATTR_ID]
 
-ARDUPATH = os.path.join('/Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
+ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
 DRONE_TYPE_SITL_PHYS = 'PHYS'
 DRONE_TYPE_SITL_VRTL = 'VRTL'
 DRONE_TYPE_HTTP = 'http'
 DRONE_TYPE_SIM = 'simulated'
 
 RESPOND_ALL = 'all'
-RESPOND_CRITICAL_ONLY = 'critical'
+RESPOND_CRITICAL = 'critical'
 
 SITL_PORT = 5760

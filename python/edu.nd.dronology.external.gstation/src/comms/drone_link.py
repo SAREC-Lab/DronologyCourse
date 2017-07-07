@@ -150,16 +150,7 @@ def make_drone_link(drone_type, **kwargs):
         pass  # warn
 
 
-def close_sitl_connections():
-    if os.path.exists('.sitl_temp'):
-        shutil.rmtree('.sitl_temp')
 
-    try:
-        pids = map(int, subprocess.check_output(['pgrep', 'arducopter']).split())
-        for pid in pids:
-            os.kill(pid, signal.SIGINT)
-    except subprocess.CalledProcessError:
-        print('no sitl links found, exiting...')
 
 
 if __name__ == '__main__':
