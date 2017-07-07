@@ -49,12 +49,7 @@ public class FRInfoPanel extends CustomComponent {
 	private VerticalLayout routes = new VerticalLayout();
 	private HorizontalLayout buttons = new HorizontalLayout();
 	private String routeInputName;
-
-	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
-	ByteArrayInputStream inStream;
-
 	private IFlightRoute route;
-
 	private int index;
 	private int numComponents;
 	ArrayList routeList;
@@ -63,6 +58,9 @@ public class FRInfoPanel extends CustomComponent {
 	Button drawButton;
 	Collection<FlightRouteInfo> items;
 	FlightRouteInfo drone;
+	
+	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+	ByteArrayInputStream inStream;
 	
 
 	public FRInfoPanel() {
@@ -95,9 +93,7 @@ public class FRInfoPanel extends CustomComponent {
 					e1.printStackTrace();
 				}
 
-				
 				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
-
 			}
 
 		} catch (DronologyServiceException | RemoteException e1) {
@@ -124,8 +120,7 @@ public class FRInfoPanel extends CustomComponent {
 		drawButton.addClickListener(e -> {
 			routeInputName = inputField.getValue();
 			addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
-			//have addroute auto send info to dronology?
-			
+						
 			drone = addRouteDronology(routeInputName);
 			
 			//because dronology takes some time
@@ -141,45 +136,30 @@ public class FRInfoPanel extends CustomComponent {
 			int index = getRouteNumber(drone);
 			//Notification.show(String.valueOf(index));
 			
-			routes.getComponent(index).addStyleName("info_box_focus");
-			
-			
-			
-			
-			
-			
-			
+			routes.getComponent(index).addStyleName("info_box_focus");			
+						
 		});
 
 		newRoute.addClickListener(e -> {
 			popup.setPopupVisible(true);
-
 		});
 
 		routes.addLayoutClickListener(e -> {
 			isRouteSelected = true;
-
 		});
 
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
 
-		// Button filter = new Button("Filter");
-		// filter.setWidth("68px");
-		//
-		// buttons.addComponents(filter);
-
 		totalLayout.addComponents(buttons, routes);
 
 		setCompositionRoot(panel);
-
 	}
 
 	public void addRoute() {
 		FRInfoBox route = new FRInfoBox();
 		routes.addComponent(route);
 		numberRoutes += 1;
-
 	}
 
 	public void addRoute(String name, String ID, String created, String modified, String length) {
@@ -187,7 +167,6 @@ public class FRInfoPanel extends CustomComponent {
 		routes.addComponent(route);
 		numberRoutes += 1;
 	}
-
 	public boolean removeBox(String name) {
 		for (int i = 0; i < numberRoutes; i++) {
 			FRInfoBox route = (FRInfoBox) routes.getComponent(i);
@@ -198,11 +177,9 @@ public class FRInfoPanel extends CustomComponent {
 		}
 		return false;
 	}
-
 	public VerticalLayout getRoutes() {
 		return routes;
 	}
-
 	public FlightRouteInfo getFlight(int index) {
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
@@ -221,8 +198,6 @@ public class FRInfoPanel extends CustomComponent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//routeList = new ArrayList(items);
 		
 		flight = (FlightRouteInfo) routeList.get(index);
 		return flight;
@@ -263,7 +238,7 @@ public class FRInfoPanel extends CustomComponent {
 			
 			
 			tempRoute = newRoute;
-			//tempRoute = getRouteByName(name);
+			
 			
 		} catch (RemoteException | DronologyServiceException | PersistenceException e) {
 			// TODO Auto-generated catch block
@@ -276,7 +251,6 @@ public class FRInfoPanel extends CustomComponent {
 		return drawButton;
 	}
 	public void refreshRoutes(){
-		
 		
 		routes.removeAllComponents();
 		
@@ -295,8 +269,6 @@ public class FRInfoPanel extends CustomComponent {
 				String name = e.getName();
 				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
 			}
-			//Notification.show(String.valueOf(items.size()));
-			
 			
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
@@ -305,7 +277,6 @@ public class FRInfoPanel extends CustomComponent {
 
 	}
 	public int getRouteNumber(FlightRouteInfo info){
-
 		
 		IFlightRouteplanningRemoteService nservice;
 		BaseServiceProvider provider = MyUI.getProvider();
@@ -323,10 +294,7 @@ public class FRInfoPanel extends CustomComponent {
 					
 				}
 				counter++;
-			}
-			//Notification.show(String.valueOf(items.size()));
-			
-			
+			}	
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -334,7 +302,6 @@ public class FRInfoPanel extends CustomComponent {
 		return 0;
 	}
 public FlightRouteInfo getRouteByName(String name){
-
 		
 		IFlightRouteplanningRemoteService nservice;
 		BaseServiceProvider provider = MyUI.getProvider();
@@ -343,18 +310,13 @@ public FlightRouteInfo getRouteByName(String name){
 			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 			Collection<FlightRouteInfo> nitems = nservice.getItems();
-			routeList = new ArrayList(nitems);
-			
+			routeList = new ArrayList(nitems);			
 			
 			for (FlightRouteInfo e : nitems) {
 				if(e.getName().equals(name)){
-					return e;
-					
-				}
-				
+					return e;			
+				}			
 			}
-			//Notification.show(String.valueOf(items.size()));
-			
 			
 		} catch (RemoteException | DronologyServiceException e) {
 			// TODO Auto-generated catch block

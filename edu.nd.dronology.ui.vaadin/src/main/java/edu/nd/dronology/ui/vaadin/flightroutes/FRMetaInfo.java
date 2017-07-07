@@ -32,89 +32,16 @@ public class FRMetaInfo extends CustomComponent {
 	CheckBox tableView;
 	Button editButton;
 	
-	public FRMetaInfo(FlightRouteInfo info){
-		
-		HorizontalLayout content = new HorizontalLayout();
-		HorizontalLayout buttons = new HorizontalLayout();
-		VerticalLayout controls = new VerticalLayout();
-		Label nameLabel;
-		
-		
-		content.setWidth("1075px");
-		content.setHeight("68px");
-		
-		routeName = info.getName();
-		routeId = info.getId();
-		numWaypoints = info.getCoordinates().size();
-		
-		if(numWaypoints == 1){
-			nameLabel = new Label("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoint)", ContentMode.HTML);
-		}
-		else{
-			nameLabel = new Label("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoints)", ContentMode.HTML);
-		}
-		
-		editButton = new Button("Edit");
-		Button deleteButton = new Button("Delete");
-		editButton.setWidth("55");
-		editButton.setHeight("28px");
-		deleteButton.setWidth("58");
-		deleteButton.setHeight("28px");
-		
-		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/editButtonFull.PNG"));
-		FileResource deleteIcon = new FileResource(new File(basepath+"/VAADIN/img/deleteButtonFull.PNG"));
-		
-		editButton.setIcon(editIcon);
-		deleteButton.setIcon(deleteIcon);
-		
-		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		
-		
-		tableView = new CheckBox("Table View");
-		tableView.setHeight("23px");
-		content.setStyleName("route_meta_info");
-		
-		tableView.setValue(true);
-		
-		buttons.addComponents(editButton, deleteButton);
-		controls.addComponents(buttons, tableView);
-		content.addComponents(nameLabel, controls);
-		content.setComponentAlignment(controls, Alignment.MIDDLE_RIGHT);
-		content.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
-		
-		setCompositionRoot(content);
-		
-	}
-	
-	public FRMetaInfo(){
-		
-		HorizontalLayout information = new HorizontalLayout();
-		routeName = "No Route Selected";
-		Label nameLabel = new Label(routeName);
-		
-		information.setStyleName("route_meta_info");
-		information.setWidth("1075px");
-		information.setHeight("68px");
-		
-		information.addComponent(nameLabel);
-		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
-		setCompositionRoot(information);
-		
-	}
 	public FRMetaInfo(String name, int numCoords){
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
 		Label nameLabel;
 		
-		
 		content.setWidth("1075px");
 		content.setHeight("68px");
 		
 		routeName = name;
-		
 		numWaypoints = numCoords;
 		
 		if(numWaypoints == 1){
@@ -140,8 +67,7 @@ public class FRMetaInfo extends CustomComponent {
 		
 		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		
-		
+			
 		tableView = new CheckBox("Table View");
 		tableView.setHeight("23px");
 		content.setStyleName("route_meta_info");
@@ -156,9 +82,29 @@ public class FRMetaInfo extends CustomComponent {
 		
 		setCompositionRoot(content);
 		
-	
+	}
+	public FRMetaInfo(FlightRouteInfo info){	
+		
+		this(info.getName(), info.getCoordinates().size());
 		
 	}
+	
+	public FRMetaInfo(){
+		
+		HorizontalLayout information = new HorizontalLayout();
+		routeName = "No Route Selected";
+		Label nameLabel = new Label(routeName);
+		
+		information.setStyleName("route_meta_info");
+		information.setWidth("1075px");
+		information.setHeight("68px");
+		
+		information.addComponent(nameLabel);
+		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
+		setCompositionRoot(information);
+		
+	}
+	
 	public void setName(String name){
 		routeName = name; 
 	}

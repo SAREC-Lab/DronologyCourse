@@ -9,6 +9,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public class FRNewRoute extends CustomComponent{
 	
+	private static final long serialVersionUID = 6262120678931967634L;
+	
 	Label directions = new Label("Please enter a route name");
 	TextField inputField = new TextField();
 	Button cancelButton = new Button("Cancel");
