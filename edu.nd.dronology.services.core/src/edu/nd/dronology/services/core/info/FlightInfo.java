@@ -10,33 +10,26 @@ public class FlightInfo extends RemoteInfoObject {
 	 * 
 	 */
 	private static final long serialVersionUID = 256865471183839829L;
-	private List<FlightPlanInfo> currentFlights = Collections.emptyList();
+	private FlightPlanInfo currentFlight = null;
 	private List<FlightPlanInfo> pending = Collections.emptyList();
-	private List<FlightPlanInfo> awaiting = Collections.emptyList();
 	private List<FlightPlanInfo> completed = Collections.emptyList();
 
 	public FlightInfo(String name, String id) {
 		super(name, id);
-		currentFlights = new ArrayList<>();
 		pending = new ArrayList<>();
-		awaiting = new ArrayList<>();
 		completed = new ArrayList<>();
 	}
 
-	public void addCurrentFlight(FlightPlanInfo planInfo) {
-		currentFlights.add(planInfo);
+	public void setCurrentFlight(FlightPlanInfo currentFlight) {
+		this.currentFlight = currentFlight;
 	}
 
-	public List<FlightPlanInfo> getCurrentFlights() {
-		return currentFlights;
+	public FlightPlanInfo getCurrentFlights() {
+		return currentFlight;
 	}
 
 	public List<FlightPlanInfo> getPendingFlights() {
 		return pending;
-	}
-
-	public List<FlightPlanInfo> getAwaitingFlights() {
-		return awaiting;
 	}
 
 	public List<FlightPlanInfo> getCompletedFlights() {
@@ -48,14 +41,10 @@ public class FlightInfo extends RemoteInfoObject {
 
 	}
 
-	public void addAwaitingTakeoff(FlightPlanInfo planInfo) {
-		awaiting.add(planInfo);
-
-	}
-
 	public void addCompleted(FlightPlanInfo planInfo) {
 		completed.add(planInfo);
 
 	}
+
 
 }

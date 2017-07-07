@@ -15,6 +15,7 @@ import java.util.Set;
 
 import edu.nd.dronology.core.air_traffic_control.DistanceUtil;
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractFileTransmitServiceInstance;
@@ -111,8 +112,8 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 		IFlightRoute atm = FlightRoutePersistenceProvider.getInstance().loadItem(file.toURI().toURL());
 		FlightRouteInfo info = new FlightRouteInfo(atm.getName(), id);
 		info.setCategory(atm.getCategory());
-		for (LlaCoordinate c : atm.getCoordinates()) {
-			info.addCoordinate(c);
+		for (Waypoint waypoint : atm.getWaypoints()) {
+			info.addWaypoint(waypoint);
 		}
 
 		BasicFileAttributes attr = Files.readAttributes(Paths.get(file.toURI()), BasicFileAttributes.class);
@@ -123,6 +124,7 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 		}
 		info.setDateCreated(attr.creationTime().toMillis());
 		info.setDateModified(attr.lastModifiedTime().toMillis());
+    
 		return info;
 	}
 

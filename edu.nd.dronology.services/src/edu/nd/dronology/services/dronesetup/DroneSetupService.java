@@ -22,7 +22,9 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 	public static DroneSetupService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (DroneSetupService.class) {
-				INSTANCE = new DroneSetupService();
+				if (INSTANCE == null) {
+					INSTANCE = new DroneSetupService();
+				}
 			}
 		}
 		return INSTANCE;
@@ -31,11 +33,6 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 	@Override
 	protected IDroneSetupServiceInstance initServiceInstance() {
 		return new DroneSetupServiceInstance();
-	}
-
-	public void initializeDrones(List<String[]> newDrones, boolean b) throws DronologyServiceException {
-		serviceInstance.initializeDrones(newDrones, b);
-
 	}
 
 	public Map<String, DroneStatus> getDrones() {
@@ -49,12 +46,12 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 
 	public void addDroneStatusChangeListener(IDroneStatusChangeListener listener) {
 		serviceInstance.addDroneStatusChangeListener(listener);
-		
+
 	}
 
 	public void removeDroneStatusChangeListener(IDroneStatusChangeListener listener) {
 		serviceInstance.removeDroneStatusChangeListener(listener);
-		
+
 	}
 
 }

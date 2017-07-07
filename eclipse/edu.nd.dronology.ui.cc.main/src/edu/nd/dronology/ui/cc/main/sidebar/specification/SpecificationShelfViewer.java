@@ -178,10 +178,10 @@ public class SpecificationShelfViewer extends AbstractSidebarViewer<TypeSpecific
 			setupService = (IDroneSetupRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IDroneSetupRemoteService.class);
 
-			DroneInitializationInfo item = new DroneInitializationInfo(remoteItem.getName(), remoteItem.getName(),
-					new LlaCoordinate(41.760000, -86.222901, 0));
-			// "41760000", "-86222901", "0"
-			setupService.initializeDrones(item);
+//			DroneInitializationInfo item = new DroneInitializationInfo(remoteItem.getName(), remoteItem.getName(),
+//					new LlaCoordinate(41.760000, -86.222901, 0));
+//			// "41760000", "-86222901", "0"
+//			setupService.initializeDrones(item);
 		} catch (RemoteException | DronologyServiceException e) {
 			new ExtendedErrorDialog(Display.getDefault().getActiveShell(), "Error when adding Drone",
 					"Error when adding Drone", e.getMessage()).open();

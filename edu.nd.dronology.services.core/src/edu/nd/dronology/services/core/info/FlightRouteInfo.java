@@ -1,11 +1,10 @@
 package edu.nd.dronology.services.core.info;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 
 public class FlightRouteInfo extends RemoteInfoObject {
 
@@ -13,9 +12,8 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	 * 
 	 */
 	private static final long serialVersionUID = -7327376857430499641L;
-	private List<MappingInfo> mappingInfos = new ArrayList<>();
 	private String category;
-	private List<LlaCoordinate> coordinates = new ArrayList<>();
+	private List<Waypoint> waypoints = new ArrayList<>();
 	private double lenght = 0;
 	private long dateCreated;
 	private long dateModified;
@@ -23,15 +21,6 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	public FlightRouteInfo(String name, String id) {
 		super(name, id);
-	}
-
-	public Collection<MappingInfo> getArtifactMappings() {
-		return Collections.unmodifiableCollection(mappingInfos);
-	}
-
-	public void addMappingInfo(MappingInfo mpInfo) {
-		mappingInfos.add(mpInfo);
-
 	}
 
 	public String getCategory() {
@@ -43,6 +32,9 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	}
 
+	public List<Waypoint> getWaypoints() {
+		return Collections.unmodifiableList(waypoints);
+    
 	public void setDateModified(long dateModified) {
 		this.dateModified = dateModified;
 	}
@@ -51,17 +43,16 @@ public class FlightRouteInfo extends RemoteInfoObject {
 		this.dateCreated = dateCreated;
 	}
 
-	public List<LlaCoordinate> getCoordinates() {
-		return coordinates;
+
+
+	public void addWaypoint(Waypoint waypoint) {
+		waypoints.add(waypoint);
 	}
 
-	public void addCoordinate(LlaCoordinate coordinate) {
-		coordinates.add(coordinate);
+	public void removeWaypoint(Waypoint waypoint) {
+		waypoints.remove(waypoint);
 	}
 
-	public void rempoveCoordinate(LlaCoordinate coordinate) {
-		coordinates.remove(coordinate);
-	}
 
 	public double getLenght() {
 		return lenght;
@@ -80,8 +71,5 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	}
 
-	// public void updateDistance() {
-	// //
-	// }
 
 }
