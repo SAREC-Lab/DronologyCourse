@@ -2,7 +2,6 @@ package edu.nd.dronology.services.instances.flightmanager;
 
 import java.util.List;
 
-import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.core.flightzone.FlightZoneManager2;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
@@ -48,6 +47,14 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	}
 
 	@Override
+	public FlightInfo getFlightDetails() {
+
+		// return
+		// RemoteInfoFactory.createFlightInfo(flightManager.getFlights());
+		return null;
+	}
+
+	@Override
 	public void planFlight(String uavid, String planName, List<Waypoint> waypoints) throws Exception {
 		flightManager.planFlight(uavid, planName, waypoints);
 
@@ -74,12 +81,6 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	@Override
 	public FlightInfo getFlightInfo(String uavId) {
 		return FlightInfoCreator.createInfo(uavId);
-	}
-
-	@Override
-	public void planFlight(String uavid, String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
-		flightManager.planFlight(uavid, planName, start, wayPoints);
-
 	}
 
 }
