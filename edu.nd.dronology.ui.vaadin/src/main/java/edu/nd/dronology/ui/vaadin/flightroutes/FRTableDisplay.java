@@ -2,15 +2,17 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.util.ArrayList;
 
-import com.vaadin.event.Action.Container;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.components.grid.SingleSelectionModel;
 import com.vaadin.ui.renderers.ButtonRenderer;
 
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
@@ -35,7 +37,15 @@ public class FRTableDisplay {
 	
 	public FRTableDisplay() {
 		grid.getColumns().stream().forEach(c -> c.setSortable(false));
-		grid.setColumnOrder("id", "latitude", "longitude", "altitude", "transitSpeed");
+		grid.getColumns().stream().forEach(c -> {
+			if (c.getCaption().equals("Id") || c.getCaption().equals("Reached")) {
+				grid.removeColumn(c);
+			}
+			else if (c.getCaption().equals("Order")) {
+				c.setCaption("#");
+			}
+		});
+		grid.setColumnOrder("order", "latitude", "longitude", "altitude", "transitSpeed");
 		grid.addColumn(event -> "Delete",
 			new ButtonRenderer<WayPoint> (clickEvent -> {
 				Window deletePanel = new Window(" ");
@@ -69,10 +79,16 @@ public class FRTableDisplay {
 				   	route.setPolylines(route.drawLines(route.getMapPoints(), false));
 				   	for(int i = 0; i < route.getPolylines().size(); i++){
 						route.getMap().addComponent(route.getPolylines().get(i));
+						Notification.show("adds lines back to map");
 					}
+
+					for (int i = 0; i < this.route.getMapPoints().size(); i++) {
+						this.route.getMapPoints().get(i).setOrder(i + 1);
+					}
+					
 				   	grid.setItems(this.route.getMapPoints());
 				   	
-				   	UI.getCurrent().removeWindow(deletePanel);
+				   	UI.getCurrent().removeWindow(deletePanel);				   	
 				});
 					
 				no.addClickListener(event -> {
@@ -91,7 +107,6 @@ public class FRTableDisplay {
 	}
 	
 	public void makeEditable(MapMarkerUtilities mapMarkers) {
-		
 		grid.getColumn("latitude").setEditorComponent(latitude);
 		grid.getColumn("longitude").setEditorComponent(longitude);
 		grid.getColumn("altitude").setEditorComponent(altitude);
@@ -103,6 +118,13 @@ public class FRTableDisplay {
 		});
 		
 		//grid.asSingleSelect();
+
+		grid.setSelectionMode(SelectionMode.SINGLE);
+		
+		SingleSelectionModel<WayPoint> singleSelect =
+			      (SingleSelectionModel<WayPoint>) grid.getSelectionModel();
+			// disallow empty selection
+			singleSelect.setDeselectAllowed(true);
 	}
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {

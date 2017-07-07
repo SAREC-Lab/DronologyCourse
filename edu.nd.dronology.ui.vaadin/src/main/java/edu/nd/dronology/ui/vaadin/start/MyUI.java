@@ -35,6 +35,7 @@ public class MyUI extends UI {
 			provider.init("localhost", 9898);
 			NavigationBar navigationBar = new NavigationBar();
 			setContent(navigationBar);
+			
 			navigationBar.setSizeFull();
 			/**
 			 * update drone information every second

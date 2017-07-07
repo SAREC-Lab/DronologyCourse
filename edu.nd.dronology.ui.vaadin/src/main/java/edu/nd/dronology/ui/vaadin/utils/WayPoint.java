@@ -15,6 +15,7 @@ public class WayPoint {
 	private String altitude = "";
 	private String transitSpeed = "";
 	private boolean isreached;
+	private int order = 0;
 	
 	public WayPoint (Point point, boolean isreached) {
 		longitude = Double.toString(point.getLon());
@@ -80,4 +81,11 @@ public class WayPoint {
 		return isreached;
 	}
 	
+	public void setOrder(int order) { 
+		this.order = order;
+	}
+	
+	public int getOrder() {
+		return order;
+	}
 }

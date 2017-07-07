@@ -63,6 +63,10 @@ public class MapMarkerUtilities {
 				removeAllLines(polylines);
 				polylines = drawLines(mapPoints, true);
 				grid.setItems(mapPoints);
+				
+				for (int i = 0; i < mapPoints.size(); i++) {
+					mapPoints.get(i).setOrder(i + 1);
+				}
 			});
 			
 			content.addComponent(new Label("Latitude: " + w.getLatitude()));
@@ -78,7 +82,6 @@ public class MapMarkerUtilities {
 					+ String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 240) + "px");
 
 			map.addComponent(popup);
-
 		}		
 	}
 	private class MarkerDragEndListener implements DragEndListener {
@@ -100,8 +103,8 @@ public class MapMarkerUtilities {
 				map.addComponent(polylines.get(i));
 			}
 		}
-		
 	}
+	
 	private class PolylineClickListener implements LeafletClickListener{
 
 		@Override
@@ -157,6 +160,10 @@ public class MapMarkerUtilities {
 			mapPoints.add(lineIndex, p);
 		}
 		
+		for (int i = 0; i < mapPoints.size(); i++) {
+			mapPoints.get(i).setOrder(i + 1);
+		}
+		
 		removeAllLines(polylines);
 		polylines = drawLines(mapPoints, true);
 		grid.setItems(mapPoints);
@@ -175,6 +182,10 @@ public class MapMarkerUtilities {
 		removeAllLines(polylines);
 		polylines = drawLines(mapPoints, false);
 		grid.setItems(mapPoints);
+		
+		for (int i = 0; i < mapPoints.size(); i++) {
+			mapPoints.get(i).setOrder(i + 1);
+		}
 		
 		return p;
 	}
