@@ -117,8 +117,9 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 		}
 
 		BasicFileAttributes attr = Files.readAttributes(Paths.get(file.toURI()), BasicFileAttributes.class);
-		if (atm.getCoordinates().size() > 1) {
-			info.setDistance(DistanceUtil.calculateTotalDistance(atm.getCoordinates().toArray(new LlaCoordinate[0])));
+		if (atm.getWaypoints().size() > 1) {
+		//	info.setDistance(DistanceUtil.calculateTotalDistance(atm.getCoordinates().toArray(new LlaCoordinate[0])));
+			info.setDistance(0);
 		} else {
 			info.setDistance(0);
 		}
