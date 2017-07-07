@@ -39,9 +39,9 @@ class Position(object):
 
     def coerce(self, other):
         if isinstance(other, Position):
-            if isinstance(self, LlaCoordinate):
+            if isinstance(self, Lla):
                 return other.to_lla()
-            elif isinstance(self, NVector):
+            elif isinstance(self, Nvec):
                 return other.to_nvector()
             else:
                 return other.to_pvector()
@@ -56,15 +56,35 @@ class Position(object):
         return False
 
 
-class LlaCoordinate(Position):
+class Lla(Position):
     def __init__(self, latitude, longitude, altitude):
         self.lla = arr([latitude, longitude, altitude]).astype(np.float64)
 
-    def to_nvector(self):
-        lat, lon = map(lambda a: np.float64(np.deg2rad(a)), self.lla[:-1])
-        x, y, z = nv.lat_lon2n_E(lat, lon).ravel()
+    def get_latitude(self, as_rad=False):
+        lat = self.lla[0]
+        if as_rad:
+            lat = np.deg2rad(lat)
 
-        return NVector(x, y, z, -self.lla[-1])
+        return lat
+
+    def get_longitude(self, as_rad=False):
+        lon = self.lla[1]
+        if as_rad:
+            lon = np.deg2rad(lon)
+
+        return lon
+
+    def get_altitude(self):
+        return self.lla[-1]
+
+    def to_nvector(self):
+        lat = self.get_latitude(as_rad=True)
+        lon = self.get_longitude(as_rad=True)
+        alt = self.get_altitude()
+        n_EB_E = nv.lat_lon2n_E(lat, lon)
+        x, y, z = n_EB_E.ravel()
+
+        return Nvec(x, y, z, -alt)
 
     def to_pvector(self):
         return self.to_nvector().to_pvector()
@@ -76,10 +96,22 @@ class LlaCoordinate(Position):
         return self.lla
 
 
-class NVector(Position):
+class Nvec(Position):
     def __init__(self, x, y, z, depth):
         self.n_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
         self.depth = depth
+
+    def get_x(self):
+        return self.n_EB_E[0, 0]
+
+    def get_y(self):
+        return self.n_EB_E[1, 0]
+
+    def get_z(self):
+        return self.n_EB_E[2, 0]
+
+    def get_depth(self):
+        return self.depth
 
     def to_nvector(self):
         return self
@@ -87,26 +119,35 @@ class NVector(Position):
     def to_pvector(self):
         x, y, z = nv.n_EB_E2p_EB_E(self.n_EB_E, depth=self.depth, a=NV_A, f=NV_F).ravel()
 
-        return PVector(x, y, z)
+        return Pvec(x, y, z)
 
     def to_lla(self):
         lat, lon = nv.n_E2lat_lon(self.n_EB_E)
 
-        return LlaCoordinate(np.rad2deg(lat), np.rad2deg(lon), -self.depth)
+        return Lla(np.rad2deg(lat), np.rad2deg(lon), -self.depth)
 
     def as_array(self):
         x, y, z = self.n_EB_E.ravel()
         return arr([x, y, z, self.depth])
 
 
-class PVector(Position):
+class Pvec(Position):
     def __init__(self, x, y, z):
         self.p_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
+
+    def get_x(self):
+        return self.p_EB_E[0, 0]
+
+    def get_y(self):
+        return self.p_EB_E[1, 0]
+
+    def get_z(self):
+        return self.p_EB_E[2, 0]
 
     def to_nvector(self):
         (x, y, z), depth = nv.p_EB_E2n_EB_E(self.p_EB_E, a=NV_A, f=NV_F)
 
-        return NVector(x, y, z, depth)
+        return Nvec(x, y, z, depth)
 
     def to_pvector(self):
         return self
