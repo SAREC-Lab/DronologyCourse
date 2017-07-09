@@ -1,7 +1,5 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
-import java.awt.Panel;
-
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;

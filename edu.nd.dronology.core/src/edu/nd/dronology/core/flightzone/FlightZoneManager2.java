@@ -229,8 +229,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 	}
 
 	/**
-	 * Checks if the next pending flight is able to takeoff. Currently takeoff
-	 * occurs in order of pending list.
+	 * Checks if the next pending flight is able to takeoff. Currently takeoff occurs in order of pending list.
 	 * 
 	 * @param droneFleet
 	 * @throws FlightZoneException
@@ -243,7 +242,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 			ManagedDrone drone = awaitingFlightPlan.getAssignedDrone();
 			if (safetyMgr.permittedToTakeOff(drone)) {
 				// LOGGER.info(drone.getDroneName() + " taking off");
-				drone.setTargetAltitude(awaitingFlightPlan.getStartLocation().getAltitude());
+				drone.setTargetAltitude(awaitingFlightPlan.getTakeoffAltitude());
 				drone.takeOff();
 				activeUAVS.incrementAndGet();
 				awaitingTakeOffFlights.remove(awaitingFlightPlan);

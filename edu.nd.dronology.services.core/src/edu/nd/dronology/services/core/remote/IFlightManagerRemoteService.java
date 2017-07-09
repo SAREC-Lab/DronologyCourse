@@ -1,12 +1,12 @@
 package edu.nd.dronology.services.core.remote;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.List;
 
-import edu.nd.dronology.core.Discuss;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 
 /**
  * 
@@ -15,7 +15,7 @@ import edu.nd.dronology.services.core.info.FlightInfo;
  */
 public interface IFlightManagerRemoteService extends IRemoteableService {
 
-	//public FlightInfo getFlightDetails() throws RemoteException;
+	// public FlightInfo getFlightDetails() throws RemoteException;
 
 	// @Deprecated
 	// void planFlight(String planName, LlaCoordinate coordinates,
@@ -32,10 +32,11 @@ public interface IFlightManagerRemoteService extends IRemoteableService {
 	void planFlight(String uavid, String planName, List<Waypoint> wayPoints) throws RemoteException, Exception;
 
 	void returnToHome(String iavid) throws RemoteException, Exception;
-	
+
 	void pauseFlight(String iavid) throws RemoteException, Exception;
 
 	FlightInfo getFlightInfo(String uavId) throws RemoteException, Exception;
 
+	Collection<FlightPlanInfo> getCurrentFlights() throws RemoteException;  
 
 }

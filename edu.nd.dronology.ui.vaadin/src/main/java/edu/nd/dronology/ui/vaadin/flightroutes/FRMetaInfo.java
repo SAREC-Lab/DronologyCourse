@@ -11,7 +11,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -85,7 +84,7 @@ public class FRMetaInfo extends CustomComponent {
 	}
 	public FRMetaInfo(FlightRouteInfo info){	
 		
-		this(info.getName(), info.getCoordinates().size());
+		this(info.getName(), info.getWaypoints().size());
 		
 	}
 	

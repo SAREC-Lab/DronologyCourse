@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
@@ -18,6 +19,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.services.core.persistence.FlightRoutePersistenceProvider;
@@ -29,6 +31,7 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
  * This is the map component for the Flight Routes UI
@@ -68,7 +71,7 @@ public class FRMapComponent extends CustomComponent {
 
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
-		
+
 		LTileLayer satelliteTiles = new LTileLayer();
 		satelliteTiles.setUrl(satelliteTileDataURL);
 
@@ -115,9 +118,9 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponents(mapAndPopup, tableDisplay.getGrid());
 	}
 
-		
+	@WaypointReplace
 	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName) {
-			
+
 		route.disableRouteEditing();
 
 		layout = new AbsoluteLayout();
@@ -125,10 +128,10 @@ public class FRMapComponent extends CustomComponent {
 		layout.setWidth("1075px");
 
 		FRMetaInfo selectedBar;
-		
-		if(whichName){
+
+		if (whichName) {
 			selectedBar = new FRMetaInfo(routeName, numCoords);
-		}else{
+		} else {
 			selectedBar = new FRMetaInfo(info);
 		}
 
@@ -141,8 +144,7 @@ public class FRMapComponent extends CustomComponent {
 
 			if (tempBox.getValue()) {
 				displayTable();
-			} 
-			else {
+			} else {
 				displayNoTable();
 			}
 		});
@@ -169,7 +171,7 @@ public class FRMapComponent extends CustomComponent {
 
 			int numberMapPoints = route.getMapPoints().size();
 
-			route.clearMapPointsIndex(info.getCoordinates().size());
+			route.clearMapPointsIndex(info.getWaypoints().size());
 			route.getGrid().setItems(route.getMapPoints());
 
 			layout.removeComponent(editBar);
@@ -190,8 +192,8 @@ public class FRMapComponent extends CustomComponent {
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
 
-			ArrayList<WayPoint> newWaypoints = route.getMapPoints();
-			
+			List<WayPoint> newWaypoints = route.getMapPoints();
+
 			FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 			ByteArrayInputStream inStream;
 			IFlightRoute froute;
@@ -205,7 +207,6 @@ public class FRMapComponent extends CustomComponent {
 				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 						.getService(IFlightRouteplanningRemoteService.class);
 
-				
 				String id;
 				String name;
 
@@ -217,35 +218,35 @@ public class FRMapComponent extends CustomComponent {
 				inStream = new ByteArrayInputStream(information);
 				froute = routePersistor.loadItem(inStream);
 
-				ArrayList<LlaCoordinate> oldCoords = new ArrayList(froute.getCoordinates());
-				for (LlaCoordinate cord : oldCoords) {
-					froute.removeCoordinate(cord);
+				ArrayList<Waypoint> oldCoords = new ArrayList(froute.getWaypoints());
+				for (Waypoint cord : oldCoords) {
+					froute.removeWaypoint(cord);
 				}
 
 				for (WayPoint way : newWaypoints) {
-					double alt=0;
-					double lon=0;
-					double lat=0;
+					double alt = 0;
+					double lon = 0;
+					double lat = 0;
 					// problem is with getting double
 					try {
-						 lon = Double.parseDouble(way.getLongitude());
+						lon = Double.parseDouble(way.getLongitude());
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					}
 					try {
-						 lat = Double.parseDouble(way.getLatitude());
+						lat = Double.parseDouble(way.getLatitude());
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					}
 					try {
-						 alt = Double.parseDouble(way.getAltitude());
+						alt = Double.parseDouble(way.getAltitude());
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					}
 
-					froute.addCoordinate(new LlaCoordinate(lat, lon, alt));
+					froute.addWaypoint(new Waypoint(new LlaCoordinate(lat, lon, alt)));
 				}
-				
+
 				ByteArrayOutputStream outs = new ByteArrayOutputStream();
 				routePersistor.saveItem(froute, outs);
 				byte[] bytes = outs.toByteArray();
@@ -260,7 +261,7 @@ public class FRMapComponent extends CustomComponent {
 			} catch (PersistenceException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			} 
+			}
 
 			// route.removeAllMarkers(route.getPins());
 		});
@@ -272,6 +273,7 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponents(layout, tableDisplay.getGrid());
 
 	}
+
 	public void displayNoTable() {
 		content.removeComponent(tableDisplay.getGrid());
 	}
@@ -311,8 +313,9 @@ public class FRMapComponent extends CustomComponent {
 	public FRTableDisplay getTableDisplay() {
 		return tableDisplay;
 	}
-	public void enableEdit(){
-	
+
+	public void enableEdit() {
+
 		route.enableRouteEditing();
 		leafletMap.setEnabled(true);
 		editBar.addStyleName("bring_front");
@@ -321,6 +324,6 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
-		
+
 	}
 }

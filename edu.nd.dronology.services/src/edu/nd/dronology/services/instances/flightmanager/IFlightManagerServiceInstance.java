@@ -1,10 +1,12 @@
 package edu.nd.dronology.services.instances.flightmanager;
 
+import java.util.Collection;
 import java.util.List;
 
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IServiceInstance;
 import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 
 public interface IFlightManagerServiceInstance extends IServiceInstance {
 
@@ -20,5 +22,6 @@ public interface IFlightManagerServiceInstance extends IServiceInstance {
 
 	public FlightInfo getFlightInfo(String uavId);
 
+	Collection<FlightPlanInfo> getCurrentFlights();
 
 }

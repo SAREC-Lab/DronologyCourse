@@ -1,11 +1,13 @@
 package edu.nd.dronology.services.facades;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.List;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.instances.flightmanager.FlightManagerService;
 import edu.nd.dronology.services.remote.AbstractRemoteFacade;
@@ -67,6 +69,11 @@ public class FlightManagerServiceRemoteFacade extends AbstractRemoteFacade imple
 	public void pauseFlight(String uavid) throws RemoteException, Exception {
 		FlightManagerService.getInstance().pauseFlight(uavid);
 
+	}
+
+	@Override
+	public Collection<FlightPlanInfo> getCurrentFlights() throws RemoteException {
+		return FlightManagerService.getInstance().getCurrentFlights();
 	}
 
 }

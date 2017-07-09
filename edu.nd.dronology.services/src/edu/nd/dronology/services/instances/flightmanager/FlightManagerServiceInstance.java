@@ -1,11 +1,13 @@
 package edu.nd.dronology.services.instances.flightmanager;
 
+import java.util.Collection;
 import java.util.List;
 
 import edu.nd.dronology.core.flightzone.FlightZoneManager2;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
 import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.util.ServiceIds;
 
 public class FlightManagerServiceInstance extends AbstractServiceInstance implements IFlightManagerServiceInstance {
@@ -81,6 +83,11 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	@Override
 	public FlightInfo getFlightInfo(String uavId) {
 		return FlightInfoCreator.createInfo(uavId);
+	}
+
+	@Override
+	public Collection<FlightPlanInfo> getCurrentFlights() {
+		return FlightInfoCreator.getCurrenctFlights();
 	}
 
 }
