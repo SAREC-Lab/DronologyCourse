@@ -13,6 +13,8 @@ import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
+import org.vaadin.addon.leaflet.LeafletClickEvent;
+import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
 import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
@@ -20,7 +22,9 @@ import org.vaadin.addon.leaflet.shared.Point;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
@@ -148,6 +152,7 @@ public class AFMapComponent extends CustomComponent {
 						LMarker marker = new LMarker(point);
 						marker.setIcon(dotIcon);
 						marker.setIconSize(new Point(15, 15));
+						marker.addMouseOverListener( new WaypointMouseListener());
 						wayPointMarker.add(marker);
 						leafletMap.addComponent(marker);
 						if (!follow)
@@ -512,4 +517,45 @@ public class AFMapComponent extends CustomComponent {
 		}
 	}
 
+	private class WaypointMouseListener implements LeafletMouseOverListener {
+
+		@Override
+		public void onMouseOver(LeafletMouseOverEvent event) {	
+			LMarker leafletMarker = (LMarker)event.getSource();
+
+			VerticalLayout content = new VerticalLayout();
+			PopupView popup = new PopupView(null, content);
+			
+			try {
+				currentFlights = flightRouteService.getCurrentFlights();
+				for (FlightPlanInfo e : currentFlights) {
+					List<Waypoint> coordinates = e.getWaypoints();
+					for (Waypoint coord : coordinates) {
+						if (coord.getCoordinate().getLatitude() == leafletMarker.getPoint().getLat() && coord.getCoordinate().getLongitude() == leafletMarker.getPoint().getLon()) {
+							content.addComponent(new Label("Latitude: " + coord.getCoordinate().getLatitude()));
+							content.addComponent(new Label("Longitude: " + coord.getCoordinate().getLongitude()));
+							content.addComponent(new Label("Altitude: "  + coord.getCoordinate().getAltitude()));
+							content.addComponent(new Label("Transit Speed: " + coord.getApproachingspeed()));
+						}
+					}
+				}
+			}catch (RemoteException e) {
+				try {
+					Notification.show("Reconnecting...");
+					service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+					flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
+							.getService(IFlightManagerRemoteService.class);
+				} catch (RemoteException | DronologyServiceException e1) {
+					Notification.show("Reconnecting...");
+				}
+				Notification.show("Reconnecting...");
+			}
+	
+			popup.setPopupVisible(true);
+			popup.addStyleName("bring_front");
+			
+			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150)
+			+ "px;left:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+		}		
+	}
 }
