@@ -175,6 +175,14 @@ public class AFInfoBox extends CustomComponent {
 
 			yes.addClickListener(subEvent -> {
 				UI.getCurrent().removeWindow(confirm);
+				IFlightManagerRemoteService service;
+				try {
+					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+					service.returnToHome(this.name);
+				} catch (Exception exc) {
+					exc.printStackTrace();
+				}
+				
 			});
 
 			no.addClickListener(subEvent -> {
@@ -187,6 +195,7 @@ public class AFInfoBox extends CustomComponent {
 			confirm.setModal(true);
 			confirm.center();
 			UI.getCurrent().addWindow(confirm);
+			
 
 		});
 
