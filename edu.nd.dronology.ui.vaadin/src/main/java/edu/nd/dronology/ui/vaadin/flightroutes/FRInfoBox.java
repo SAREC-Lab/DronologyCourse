@@ -44,6 +44,7 @@ public class FRInfoBox extends CustomComponent {
 
 		VerticalLayout routeDescription = new VerticalLayout();
 		routeDescription.addStyleName("detailed_info_well");
+		
 		HorizontalLayout titleBar = new HorizontalLayout();
 		VerticalLayout allContent = new VerticalLayout();
 		
@@ -77,9 +78,6 @@ public class FRInfoBox extends CustomComponent {
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
-		
-		
-		
 	}
 	
 	//default if no parameters are passed

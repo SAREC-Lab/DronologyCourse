@@ -32,6 +32,7 @@ public class FRMetaInfo extends CustomComponent {
 	Button editButton;
 	
 	public FRMetaInfo(String name, int numCoords){
+		//used if route is selected
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
@@ -89,7 +90,7 @@ public class FRMetaInfo extends CustomComponent {
 	}
 	
 	public FRMetaInfo(){
-		
+		//used if no route selected
 		HorizontalLayout information = new HorizontalLayout();
 		routeName = "No Route Selected";
 		Label nameLabel = new Label(routeName);
@@ -101,7 +102,6 @@ public class FRMetaInfo extends CustomComponent {
 		information.addComponent(nameLabel);
 		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
 		setCompositionRoot(information);
-		
 	}
 	
 	public void setName(String name){

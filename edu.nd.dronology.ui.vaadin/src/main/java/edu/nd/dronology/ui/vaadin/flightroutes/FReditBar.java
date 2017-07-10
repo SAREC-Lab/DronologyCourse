@@ -7,9 +7,6 @@ import com.vaadin.ui.Label;
 
 public class FReditBar extends CustomComponent{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2389713576038720628L;
 	HorizontalLayout totalLayout = new HorizontalLayout();
 	Button cancelButton = new Button("Cancel");
@@ -22,12 +19,10 @@ public class FReditBar extends CustomComponent{
 		
 		textLabel.setStyleName("large_text");
 		smallText.setStyleName("small_text");
-		//cancelButton.setStyleName("cancel_button");
 		
 		cancelButton.setHeight("25px");
 		saveButton.setHeight("25px");
 		totalLayout.addComponents(textLabel, smallText, cancelButton, saveButton);
-		//totalLayout.setWidth("500px");
 		setCompositionRoot(totalLayout);
 	}
 	public Button getCancelButton(){

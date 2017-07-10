@@ -61,9 +61,7 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("fr_leaflet_map");
 
 		Configuration configuration = Configuration.getInstance();
-		//leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-		//leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
-
+	
 		Window popup = createWayPointWindow();
 		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup);
 
@@ -79,7 +77,6 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.addOverlay(satelliteTiles, satelliteLayerName);
-		//leafletMap.zoomToContent();
 		content.addComponent(mapAndPopup);
 
 		route.disableRouteEditing();
@@ -88,7 +85,6 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponents(tableDisplay.getGrid());
 		
 		this.setRouteCenter();
-		
 		
 	}
 
@@ -117,7 +113,7 @@ public class FRMapComponent extends CustomComponent {
 	}
 
 	public void display() {
-		// set bar fields
+		//displays when no route is selected
 		mapAndPopup.setHeight("510px");
 		mapAndPopup.setWidth("1075px");
 		content.addComponent(bar);
@@ -126,7 +122,8 @@ public class FRMapComponent extends CustomComponent {
 
 	@WaypointReplace
 	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName) {
-
+		//displays with selected route info
+		
 		route.disableRouteEditing();
 
 		layout = new AbsoluteLayout();
@@ -143,12 +140,13 @@ public class FRMapComponent extends CustomComponent {
 
 		editBar = new FReditBar();
 		editBar.setStyleName("edit_bar");
-		CheckBox tempBox = selectedBar.getCheckBox();
+		CheckBox tableBox = selectedBar.getCheckBox();
 		Button edit = selectedBar.getEditButton();
+		
+		//to hide the table 
+		tableBox.addValueChangeListener(event -> {
 
-		tempBox.addValueChangeListener(event -> {
-
-			if (tempBox.getValue()) {
+			if (tableBox.getValue()) {
 				displayTable();
 			} else {
 				displayNoTable();
@@ -159,7 +157,6 @@ public class FRMapComponent extends CustomComponent {
 
 		// enable editing
 		edit.addClickListener(event -> {
-			// Notification.show("run");
 			route.enableRouteEditing();
 			leafletMap.setEnabled(true);
 			editBar.addStyleName("bring_front");
@@ -172,11 +169,8 @@ public class FRMapComponent extends CustomComponent {
 
 		Button cancel = editBar.getCancelButton();
 		cancel.addClickListener(event -> {
-
 			route.disableRouteEditing();
-
 			int numberMapPoints = route.getMapPoints().size();
-
 			route.clearMapPointsIndex(info.getWaypoints().size());
 			route.getGrid().setItems(route.getMapPoints());
 
@@ -208,6 +202,7 @@ public class FRMapComponent extends CustomComponent {
 			BaseServiceProvider provider = MyUI.getProvider();
 			ArrayList routeList;
 
+			//sends the information to dronology to be saved
 			try {
 
 				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
@@ -228,12 +223,12 @@ public class FRMapComponent extends CustomComponent {
 				for (Waypoint cord : oldCoords) {
 					froute.removeWaypoint(cord);
 				}
-
+				
 				for (WayPoint way : newWaypoints) {
 					double alt = 0;
 					double lon = 0;
 					double lat = 0;
-					// problem is with getting double
+				
 					try {
 						lon = Double.parseDouble(way.getLongitude());
 					} catch (NumberFormatException e) {
@@ -249,8 +244,9 @@ public class FRMapComponent extends CustomComponent {
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					}
-
+					
 					froute.addWaypoint(new Waypoint(new LlaCoordinate(lat, lon, alt)));
+					
 				}
 
 				ByteArrayOutputStream outs = new ByteArrayOutputStream();
@@ -259,25 +255,23 @@ public class FRMapComponent extends CustomComponent {
 
 				service.transmitToServer(froute.getId(), bytes);
 
-				// Notification.show(String.valueOf(newWaypoints.size()));
 
 			} catch (DronologyServiceException | RemoteException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (PersistenceException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
-			// route.removeAllMarkers(route.getPins());
 		});
+		
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
-		// content.addComponent(editBar);
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
-
+		
+		tableDisplay.setGrid(route.getMapPoints());
+		
 	}
 
 	public void displayNoTable() {
@@ -333,6 +327,7 @@ public class FRMapComponent extends CustomComponent {
 
 	}
 	public void setRouteCenter(){
+		//calculates the mean point and sets the route
 		double meanLat = 0;
 		double meanLon = 0;
 		int numberPoints;
@@ -342,7 +337,6 @@ public class FRMapComponent extends CustomComponent {
 		
 		List<WayPoint> currentWayPoints = route.getMapPoints();
 		numberPoints = route.getMapPoints().size();
-		//Notification.show(String.valueOf(numberPoints));
 		
 		for(WayPoint p: currentWayPoints){
 				meanLat += Double.valueOf(p.getLatitude());
@@ -352,6 +346,7 @@ public class FRMapComponent extends CustomComponent {
 		meanLat /= (numberPoints * 1.0);
 		meanLon /= (numberPoints * 1.0);
 		
+		//finds farthest latitude and longitude from mean
 		for(WayPoint p: currentWayPoints){
 			if((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)){
 				farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
@@ -360,8 +355,6 @@ public class FRMapComponent extends CustomComponent {
 				farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
 			}
 		}  
-		
-		Notification.show(String.valueOf(farthestLat) + " " + String.valueOf(farthestLon));
 		
 		Point centerPoint = new Point(meanLat, meanLon);
 		if(farthestLat == 0 && farthestLon == 0){

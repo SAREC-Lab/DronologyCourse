@@ -22,116 +22,109 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
  * 
  * @author Jinghui Cheng
  */
+
 public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	private int index;
 	private FRControlsComponent controls = new FRControlsComponent();
-	WayPoint way;
-	ArrayList<WayPoint> waypoints;
-	ArrayList routeList;
-	FRMapComponent map;
+	private WayPoint way;
+	private FRMapComponent map;
+	private VerticalLayout routeLayout;
 
-	
 	@WaypointReplace
 	public FRMainLayout() {
 
 		addStyleName("main_layout");
-
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 
 		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend",
 				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite");
 		
-		
 		map.setCenter(41.68, -86.25);
 		map.setZoomLevel(13);
 
-		VerticalLayout routes;
+		routeLayout = controls.getInfoPanel().getRoutes();
 
-		routes = controls.getInfoPanel().getRoutes();
-
-		Button tempDraw = controls.getInfoPanel().getDrawButton();
-		tempDraw.addClickListener(e -> {
+		//this defines the add new route button and adds a click listener
+		Button drawRoute = controls.getInfoPanel().getDrawButton();
+		drawRoute.addClickListener(e -> {
 			map.enableEdit();
-			// map.display();
+			//to get rid of points and lines from previous routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
 			map.getUtils().removeAllLines(map.getUtils().getPolylines());
 			map.getUtils().getMapPoints().clear();
+			
+			//displays the drone information in the info bar
 			FlightRouteInfo drone = controls.getInfoPanel().getRoute();
-
 			int numCoords = drone.getWaypoints().size();
 			String droneName = controls.getInfoPanel().getName();
 			map.displayByName(drone, droneName, numCoords, true);
-
+			
 			Point pt = new Point(0, 0);
-			WayPoint way = new WayPoint(pt, true);
+			way = new WayPoint(pt, true);
+			
 			map.getTableDisplay().getGrid().setItems();
 			map.enableEdit();
 
 		});
 
 		map.display();
+		
 		// adds click listener to route list
-		routes.addLayoutClickListener(e -> {
+		routeLayout.addLayoutClickListener(e -> {
 			
+			//gets box of route info and changes its style to show that it is selected
 			Component child = e.getChildComponent();
 			child.addStyleName("info_box_focus");
-			index = routes.getComponentIndex(child);
+			index = routeLayout.getComponentIndex(child);
 
+			//gets the flight info for that route
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
-			List<Waypoint> coords = flightInfo.getWaypoints();
-
-			// removes old pins and polylines when switching routes
+			List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
+			
+			// removes old pins, polylines, and style when switching routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-
-			// to make sure the table is no longer bolded when switching routes without saving
 			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
 
-			long tempLong;
-			long tempLat;
 			int numComponents;
 			boolean first = true;
 
 			List<WayPoint> waypoints = new ArrayList<>();
 			Point pt = new Point();
-
-			// trying to convert to waypoint
-			for (Waypoint coor : coords) {
+			
+			//iterates through the flight info and adds to internal waypoints list
+			for (Waypoint coor : flightWaypoints) {
 
 				pt.setLat(coor.getCoordinate().getLatitude());
 				pt.setLon(coor.getCoordinate().getLongitude());
-
+				
 				WayPoint way = new WayPoint(pt, false);
-
+				way.setAltitude("wow");
 				map.getUtils().addNewPinRemoveOld(pt, first);
 
 				waypoints.add(way);
 				first = false;
 			}
 
+			//adds the lines to the map
 			List<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false);
-
 			map.getUtils().setPolylines(mapLines);
 			for (int i = 0; i < mapLines.size(); i++) {
 				map.getUtils().getMap().addComponent(mapLines.get(i));
 			}
 
-			numComponents = routes.getComponentCount();
+			numComponents = routeLayout.getComponentCount();
+			
 			// when one route is clicked, the others go back to default background color
 			for (int i = 0; i < numComponents; i++) {
 				if (i != index) {
-					routes.getComponent(i).removeStyleName("info_box_focus");
+					routeLayout.getComponent(i).removeStyleName("info_box_focus");
 				}
-			}
-			
+			}	
 			map.setRouteCenter();
-			
-			map.displayByName(flightInfo, "not used", 0, false);
-			
+			map.displayByName(flightInfo, null, 0, false);
 		});
-
-		
 		
 		content.addComponents(controls, map);
 		setCompositionRoot(content);

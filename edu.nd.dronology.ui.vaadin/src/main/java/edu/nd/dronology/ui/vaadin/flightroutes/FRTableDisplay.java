@@ -1,12 +1,14 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -44,6 +46,9 @@ public class FRTableDisplay {
 				c.setCaption("#");
 			}
 		});
+		
+		
+		
 		grid.setColumnOrder("order", "latitude", "longitude", "altitude", "transitSpeed");
 		grid.addColumn(event -> "Delete",
 			new ButtonRenderer<WayPoint> (clickEvent -> {
@@ -85,7 +90,7 @@ public class FRTableDisplay {
 					}
 					
 				   	grid.setItems(this.route.getMapPoints());
-				   	
+				   	grid.setItems(route.getMapPoints());
 				   	UI.getCurrent().removeWindow(deletePanel);				   	
 				});
 					
@@ -132,5 +137,8 @@ public class FRTableDisplay {
 	
 	public void setRoute(MapMarkerUtilities route) {
 		this.route = route;
+	}
+	public void setGrid(List<WayPoint> points){
+		grid.setItems(points);
 	}
 }

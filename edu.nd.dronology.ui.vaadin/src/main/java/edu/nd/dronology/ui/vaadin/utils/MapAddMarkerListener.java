@@ -95,6 +95,8 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    	else {
 	    		Notification.show(caption);
 	    	}
+	    	
+	    	//Notification.show(route.getMapPoints().get(0).getAltitude());
 		});
 		
 		cancelButton.addClickListener(event -> {

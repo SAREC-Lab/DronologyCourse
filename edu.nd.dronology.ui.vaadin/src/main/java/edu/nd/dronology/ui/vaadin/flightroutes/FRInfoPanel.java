@@ -37,27 +37,22 @@ public class FRInfoPanel extends CustomComponent {
 
 	private int numberRoutes;
 	private Panel panel = new Panel();
-
-	// total layout is made up of the title/buttons on top and the routes on the
-	// bottom
 	private VerticalLayout totalLayout = new VerticalLayout();
 	private VerticalLayout routes = new VerticalLayout();
 	private HorizontalLayout buttons = new HorizontalLayout();
 	private String routeInputName;
 	private IFlightRoute route;
 	private int index;
-	private int numComponents;
-	ArrayList routeList;
-	FlightRouteInfo flight;
+	private ArrayList routeList;
+	private FlightRouteInfo flight;
 	private boolean isRouteSelected = false;
-	Button drawButton;
-	Collection<FlightRouteInfo> items;
-	FlightRouteInfo drone;
+	private Button drawButton;
+	private Collection<FlightRouteInfo> items;
+	private FlightRouteInfo drone;
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
 	
-
 	public FRInfoPanel() {
 
 		IFlightRouteplanningRemoteService service;
@@ -84,7 +79,6 @@ public class FRInfoPanel extends CustomComponent {
 				try {
 					route = routePersistor.loadItem(inStream);
 				} catch (PersistenceException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -92,10 +86,10 @@ public class FRInfoPanel extends CustomComponent {
 			}
 
 		} catch (DronologyServiceException | RemoteException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
+		
+		//top bar of panel
 		panel.setCaption(numberRoutes + " Routes in database");
 		panel.setContent(totalLayout);
 		panel.addStyleName("fr_info_panel");
@@ -106,6 +100,7 @@ public class FRInfoPanel extends CustomComponent {
 
 		VerticalLayout popupContent = new VerticalLayout();
 
+		//popup box to input new route info
 		FRNewRoute display = new FRNewRoute();
 		popupContent.addComponent(display);
 		PopupView popup = new PopupView(null, popupContent);
@@ -113,24 +108,23 @@ public class FRInfoPanel extends CustomComponent {
 		drawButton = display.getDrawButton();
 		TextField inputField = display.getInputField();
 		drawButton.addClickListener(e -> {
+			
 			routeInputName = inputField.getValue();
 			addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
-						
+			
+			//sends route to dronology
 			drone = addRouteDronology(routeInputName);
 			
 			//because dronology takes some time
 			try {
 				Thread.sleep(4000);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			
 			refreshRoutes();
 			
-			int index = getRouteNumber(drone);
-			//Notification.show(String.valueOf(index));
-			
+			index = getRouteNumber(drone);
 			routes.getComponent(index).addStyleName("info_box_focus");			
 						
 		});
@@ -145,7 +139,6 @@ public class FRInfoPanel extends CustomComponent {
 
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
-
 		totalLayout.addComponents(buttons, routes);
 
 		setCompositionRoot(panel);
@@ -176,6 +169,7 @@ public class FRInfoPanel extends CustomComponent {
 		return routes;
 	}
 	public FlightRouteInfo getFlight(int index) {
+		//gets arrayList of different routes and returns the one specified by index
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 		
@@ -190,7 +184,6 @@ public class FRInfoPanel extends CustomComponent {
 				index--;
 			}
 		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -206,9 +199,11 @@ public class FRInfoPanel extends CustomComponent {
 		isRouteSelected = selected;
 	}
 	public FlightRouteInfo addRouteDronology(String name){
+		//sends a route to dronology to be saved, and returns the flight route info
+		
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-		FlightRouteInfo tempRoute = null;
+		FlightRouteInfo routeInformation = null;
 		
 		try {
 			
@@ -218,48 +213,42 @@ public class FRInfoPanel extends CustomComponent {
 			FlightRouteInfo newRoute = service.createItem();
 			String id = newRoute.getId();
 			IFlightRoute froute;
-			
-			
+				
 			byte[] information = service.requestFromServer(id);
 			inStream = new ByteArrayInputStream(information);
 			froute = routePersistor.loadItem(inStream);
 			froute.setName(name);
 			
-			
 			ByteArrayOutputStream outs = new ByteArrayOutputStream();
 			routePersistor.saveItem(froute, outs);
 			byte[] bytes = outs.toByteArray();
-			service.transmitToServer(froute.getId(), bytes);
-			
-			
-			tempRoute = newRoute;
-			
+			service.transmitToServer(froute.getId(), bytes);	
+			routeInformation = newRoute;	
 			
 		} catch (RemoteException | DronologyServiceException | PersistenceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return tempRoute;
+		return routeInformation;
 	}
 	public Button getDrawButton(){
 		return drawButton;
 	}
 	public void refreshRoutes(){
-		
+		//makes sure routes are updated by removing and re-adding routes
 		routes.removeAllComponents();
 		
-		IFlightRouteplanningRemoteService nservice;
+		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 		
 		try {
-			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
-			Collection<FlightRouteInfo> nitems = nservice.getItems();
-			routeList = new ArrayList(nitems);
+			Collection<FlightRouteInfo> items = service.getItems();
+			routeList = new ArrayList(items);
 			
-			
-			for (FlightRouteInfo e : nitems) {
+			for (FlightRouteInfo e : items) {
 				String id = e.getId();
 				String name = e.getName();
 				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
@@ -272,49 +261,46 @@ public class FRInfoPanel extends CustomComponent {
 
 	}
 	public int getRouteNumber(FlightRouteInfo info){
-		
-		IFlightRouteplanningRemoteService nservice;
+		//given the route information, returns the index of the route
+		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 		
 		try {
-			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
-			Collection<FlightRouteInfo> nitems = nservice.getItems();
-			routeList = new ArrayList(nitems);
+			Collection<FlightRouteInfo> items = service.getItems();
+			routeList = new ArrayList(items);
 			
 			int counter = 0;
-			for (FlightRouteInfo e : nitems) {
+			for (FlightRouteInfo e : items) {
 				if(info.equals(e)){
-					return counter;
-					
+					return counter;		
 				}
 				counter++;
 			}	
 		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
 	}
 public FlightRouteInfo getRouteByName(String name){
-		
-		IFlightRouteplanningRemoteService nservice;
+		//given the name of the route, returns the route info
+		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 		
 		try {
-			nservice = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
-			Collection<FlightRouteInfo> nitems = nservice.getItems();
-			routeList = new ArrayList(nitems);			
+			Collection<FlightRouteInfo> items = service.getItems();
+			routeList = new ArrayList(items);			
 			
-			for (FlightRouteInfo e : nitems) {
+			for (FlightRouteInfo e : items) {
 				if(e.getName().equals(name)){
 					return e;			
 				}			
 			}
 			
 		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		FlightRouteInfo empty = null;
