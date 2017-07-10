@@ -16,8 +16,6 @@ import edu.nd.dronology.services.core.util.DronologyServiceException;
  */
 public interface IDroneSetupRemoteService extends IRemoteableService {
 
-	@Deprecated
-	void initializeDrones(List<String[]> newDrones, boolean b) throws RemoteException, DronologyServiceException;
 
 	@Deprecated
 	Map<String, DroneStatus> getDrones() throws RemoteException;

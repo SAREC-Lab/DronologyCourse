@@ -1,0 +1,391 @@
+// If you edit this file you need to compile the theme. See README.md for details.
+
+// Global variable overrides. Must be declared before importing Valo.
+
+$v-app-loading-text: "Dronology";
+
+$v-font-family: "Roboto", sans-serif;
+$v-font-weight: 400;
+$v-font-weight--header: 400;
+$v-background-color: #fff;
+$v-focus-color: #000040;
+$v-focus-style: none;
+$v-luminance-threshold: 180;
+$v-border: 2px solid v-shade;
+$v-border-radius: 6px;
+$v-bevel: false;
+$v-gradient: false;
+$v-shadow: false;
+$v-textfield-bevel: false;
+$v-textfield-shadow: false;
+$v-link-text-decoration: false;
+$v-selection-overlay-padding-horizontal: 0;
+$v-selection-overlay-padding-vertical: 6px;
+$v-selection-item-height: 30px;
+$v-selection-item-border-radius: 0;
+$valo-menu-background-color: #eee;
+
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+
+@import "../valo/valo.scss";
+
+@mixin mytheme {
+	@include valo;
+	
+	//Custom variables
+	$screen-width: 1440px;
+	$controls-width: 360px;
+	$screen-height: 90vh;
+	$fr-map-height: 55vh;
+	$fr-table-height: 35vh;
+	
+	$color-dark-5: #000040;
+	$color-dark-4: #224080;
+	$color-dark-1: #999999;
+	$color-light-5: #ffffff;
+	$color-light-4: #f5f5f5;
+	$color-light-3: #eeeeee;
+	$color-light-2: #d0d0d0;
+	
+	$color-warning-main: #f0ad4e;
+	$color-warning-main-border: #eea236;
+	$color-warning-hover: #ec971f;
+	$color-warning-hover-border: #d58512;
+	
+	$color-danger-main: #d9534f;
+	$color-danger-main-border: #d43f3a;
+	$color-danger-hover: #c9302c;
+	$color-danger-hover-border: #ac2925;
+		
+	//Custom styles
+	.v-button:focus,
+	.v-nativebutton:focus {
+		outline: none;
+	}
+	.button_warning {
+		color: $color-light-5;
+		background-color: $color-warning-main;
+		border-color: $color-warning-main-border;
+		border-width: 1px;
+	}
+	.button_warning:focus,
+	.button_warning.focus {
+		color: $color-light-5;
+		background-color: $color-warning-main;
+		border-color: $color-warning-main-border;
+	}
+	.button_warning:hover {
+		color: $color-light-5;
+		background-color: $color-warning-hover;
+		border-color: $color-warning-hover-border;
+	}
+
+	.btn-danger {
+		color: $color-light-5;
+		background-color: $color-danger-main;
+		border-color: $color-danger-main-border;
+		border-width: 1px;
+	}
+	.btn-danger:focus,
+	.btn-danger.focus {
+		color: $color-light-5;
+		background-color: $color-danger-main;
+		border-color: $color-danger-main-border;
+	}
+	.btn-danger:hover {
+		color: $color-light-5;
+		background-color: $color-danger-hover;
+		border-color: $color-danger-hover-border;
+	}
+	
+	.main_layout {
+		max-width: $screen-width;
+		left: 0;
+		right: 0;
+		margin: auto;
+	}
+	.v-leaflet {
+		height: $screen-height;
+	}
+	.controls_component {
+		width: $controls-width !important;
+		height: $screen-height;
+	}
+	.map_component {
+		width: calc(100% - #{$controls-width}) !important;
+		padding-left: 6px;
+	}
+
+	.control_panel {
+		border-radius: 0;
+		border: 0;
+		background-color: $color-light-4;
+		.v-panel-caption {
+			background-image: -webkit-linear-gradient(top, $color-dark-4 0%, $color-dark-4 100%);
+			background-image: linear-gradient(to bottom, $color-dark-4 0%, $color-dark-4 100%);
+			background-color: $color-dark-4;
+			color: $color-light-5;
+			border-radius: 0;
+			border: 0;
+		}
+	}
+	.info_box {
+		border: 1px solid $color-light-2;
+		border-radius: 4px;
+		padding: 6px;
+		font-size: 12px;
+		
+		.v-layout {
+			width: 100%;
+		}
+
+		.info_box_name {
+			font-weight: bold;
+			font-size: 14px;
+		}
+		.detailed_info_well {
+			width: calc(100% - 20px) !important;
+			line-height:120%;
+			border-radius: 15px;
+			background-color: $color-light-5;
+			padding: 3px !important;
+			margin: 4px 10px;
+			font-size: 12px;
+			
+			.v-slot {
+				text-align: center;
+			}
+		}
+	}
+	
+	.info_box_focus {
+		background-color: #91b3ea;
+	}
+
+	.fr_leaflet_map {
+		height: $fr-map-height !important;
+	}
+	.fr_leaflet_map_edit_mode {
+		height: $fr-map-height !important;
+		border-style: solid;
+		border-width: 5px; 
+		border-color: #000000;
+		z-index: 0 !important;
+	}
+	.fr_table_component {
+		height: calc(#{$fr-table-height} - 6px) !important;
+		width: 100% !important;
+	}
+	.fr_table_component_edit_mode {
+		height: calc(#{$fr-table-height} - 6px) !important;
+		width: 100% !important;
+		border-width: 5px;
+		border-style: solid; 
+		border-color: #000000;
+	}
+	.fr_info_panel {
+		height: $screen-height;
+		.v-panel-captionwrap {
+		}
+		.v-panel-content {
+			> .v-layout {
+				padding-top: 5px;
+			}
+		}
+		.v-slot-fr_new_route_button_area {
+			position: fixed;
+			top: 63px;
+		}
+		.fr_new_route_button {
+			font-size: 11px;
+			padding: 0 8px;
+			height: 26px;
+			top: -8px;
+			left: 230px;
+		}
+	}
+	.fr_info_box {
+		.info_box_name {
+			padding-left: 6px;
+		}
+		.v-button-icon-only {
+			width: 25px;
+			height: 25px;
+		}
+		.v-slot-icon-only {
+			float: right;
+			margin: 0 2px;
+		}
+	}
+
+	.af_info_panel {
+		height: calc(#{$screen-height} - 106px);
+		.v-margin-top {
+			padding-top:0px;
+		}
+	}
+	.af_emergency_operations {
+		height: 100px;
+		border: 1px solid $color-dark-1;
+		padding: 3px 8px !important;
+		
+		> .v-slot:first-of-type {
+			font-weight: bold;
+		}
+		> .v-slot:last-of-type {
+			text-align: center;
+		}
+		
+		.v-nativebutton {
+			width: 145px !important;
+			font-size: 14px;
+			text-align: center;
+			margin: 2px 8px;
+		}
+	}
+	.af_uav_list_controls {
+		float: right;
+		height: 20px;
+	}
+
+	.af_info_box {
+		.af_info_top_content {
+			width: 100%;
+			line-height: 150%;
+			
+			.v-image {
+				width: 50px;
+				padding: 10px 0;
+			}
+		
+			> .v-slot,
+			> .v-expand > .v-slot {
+				padding: 3px;
+			}
+		
+			> .v-slot.v-align-right {
+				display: block;
+				float: right;
+			}
+		}
+		
+		.af_info_bottom_content {
+			width: 100% !important;
+			padding: 4px 10px;
+			
+			> .v-slot:first-of-type {
+				width: 105px;
+			}
+			> .v-slot:last-of-type {
+				width: 170px;
+				padding-left: 20px;
+				border-left: 1px solid $color-light-2;
+			}
+			
+			.v-button {
+				width: 100%;
+				height: 90% !important;
+			}
+		}
+	}
+
+	.v-margin-top {
+		padding-top:0px;
+	}
+	.v-margin-right {
+		padding-right:0px;
+	}
+	.v-margin-bottom {
+		padding-bottom:0px;
+	}
+	.v-margin-left {
+		padding-left:0px;
+	}
+	.v-spacing {
+		width: 6px;
+		height: 6px;
+	}
+
+	.v-verticallayout-card, .v-horizontallayout-card {
+		border-radius: 0;
+	}
+
+	.v-menubar {
+		background-color: $color-dark-5;
+		color: $color-light-5;
+		border-radius: 0px;
+		border: 0px;
+		height: 45px;
+		line-height: 45px;
+		
+		> .v-menubar-menuitem {
+			border-radius: 0px;
+			border: 0px;
+			
+			&:first-child {
+				border-radius: 0px;
+				border: 0px;
+			}
+			
+			&:last-child {
+				border-radius: 0px;
+				border: 0px;
+			}
+			.v-icon {
+				width: 28px;
+				padding: 0 6px 4px 6px;
+				-webkit-filter: invert(100%);
+			}
+		}
+		
+		> .v-menubar-menuitem-active {
+			background-color: $color-light-3;
+			color: $color-dark-5;
+			
+			.v-icon {
+				-webkit-filter: invert(0%);
+			}
+		}
+	
+		&:focus {
+			outline: none;
+		}
+	}
+
+	.small_button_link {
+		font-size: 11px;
+		text-decoration: underline;
+		height: 20px;
+		padding: 3px 6px;
+	}
+	.route_meta_info{
+		border-width: 2px;
+		border-style: solid; 
+		background-color: #f2f2f2;
+	}
+	.bring_front{
+		z-index: 999 !important;
+	}
+	.bring_back{
+		z-index: 0;
+	}
+	.edit_bar{
+		background-color: black;
+		color: white;
+		padding-right: 90px;
+		
+	}
+	.large_text{
+		padding-left: 20px;
+	}
+	.small_text{
+		font-size: 60%;
+		padding-top: 7px;
+		padding-right: 80px;
+	}
+	.cancel_button{
+		padding-left: 50px;
+	
+	}
+}

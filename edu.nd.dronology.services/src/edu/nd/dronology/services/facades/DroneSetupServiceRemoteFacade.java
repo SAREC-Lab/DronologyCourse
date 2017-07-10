@@ -43,11 +43,6 @@ public class DroneSetupServiceRemoteFacade extends AbstractRemoteFacade implemen
 
 	}
 
-	@Override
-	public void initializeDrones(List<String[]> newDrones, boolean b) throws RemoteException, DronologyServiceException {
-		DroneSetupService.getInstance().initializeDrones(newDrones, b);
-
-	}
 
 	@Override
 	public Map<String, DroneStatus> getDrones() throws RemoteException {

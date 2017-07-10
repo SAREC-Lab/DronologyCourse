@@ -24,8 +24,8 @@ public class ReadDispatcher implements Runnable {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(ReadDispatcher.class);
 
 	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
-			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).setVersion(1.0)
-			.serializeSpecialFloatingPointValues().create();
+			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
 	private BufferedReader reader;
 
 	public ReadDispatcher(Socket pythonSocket) {
@@ -45,7 +45,8 @@ public class ReadDispatcher implements Runnable {
 			while (cont.get()) {
 				String line = reader.readLine();
 				if (line != null) {
-					// TODO: create the timestamp before deserializing the object....
+					// TODO: create the timestamp before deserializing the
+					// object....
 					try {
 						UAVMessage message = GSON.fromJson(line, UAVMessage.class);
 						message.timestamp();

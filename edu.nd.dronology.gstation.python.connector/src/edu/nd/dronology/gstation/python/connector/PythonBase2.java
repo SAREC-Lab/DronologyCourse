@@ -39,15 +39,17 @@ public class PythonBase2 implements IDroneCommandHandler {
 	public PythonBase2() {
 		try {
 
+			//InetAddress hostAddr = InetAddress.getByName("dewey.cse.nd.edu");
+			//InetAddress hostAddr = InetAddress.getByName("10.13.59.197");
 			InetAddress hostAddr = InetAddress.getByName("127.0.0.1");
-
+			
 			int port = 1234;
 			String hostStr = hostAddr.toString();
 
 			LOGGER.info("Connecting to Python base " + hostStr + "@" + port);
 			pythonSocket = new Socket();
-			pythonSocket.connect(new InetSocketAddress(hostAddr, port), 50000);
-			pythonSocket.setSoTimeout(200000);
+			pythonSocket.connect(new InetSocketAddress(hostAddr, port), 5000);
+			pythonSocket.setSoTimeout(20000);
 
 			LOGGER.hwInfo("Connected to " + pythonSocket.getInetAddress().toString() + "@" + pythonSocket.getPort());
 			readDispatcher = new ReadDispatcher(pythonSocket);

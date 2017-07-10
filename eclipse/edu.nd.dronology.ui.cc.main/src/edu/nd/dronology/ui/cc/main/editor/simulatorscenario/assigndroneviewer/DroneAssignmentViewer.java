@@ -79,8 +79,8 @@ public class DroneAssignmentViewer extends LeftToRightDragAndDropViewer<ISimulat
 		setCordDialog.open();
 
 		try {
-			elem.setStartCoordinate(Long.parseLong(setCordDialog.getLatitude()), Long.parseLong(setCordDialog.getLongitude()),
-					Integer.parseInt(setCordDialog.getAltitude()));
+			elem.setStartCoordinate(Double.parseDouble(setCordDialog.getLatitude()), Double.parseDouble(setCordDialog.getLongitude()),
+					Double.parseDouble(setCordDialog.getAltitude()));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}

@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.items.IFlightRoute;
 import edu.nd.dronology.ui.cc.images.ImageProvider;
 import edu.nd.dronology.ui.cc.images.StyleProvider;
@@ -89,7 +90,7 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				editor.getItem().addCoordinate(new LlaCoordinate(0, 0, 0));
+				editor.getItem().addWaypoint(new Waypoint());
 				coordinates.refresh();
 			}
 
@@ -100,7 +101,7 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				StructuredSelection sel = (StructuredSelection) coordinates.getSelection();
-				editor.getItem().removeCoordinate((LlaCoordinate) sel.getFirstElement());
+				editor.getItem().removeWaypoint((Waypoint) sel.getFirstElement());
 				coordinates.refresh();
 			}
 
@@ -169,32 +170,35 @@ public class UAVFlightRoutePage extends AbstractUAVEditorPage<IFlightRoute> impl
 
 	}
 
-	public void setNewLatitude(LlaCoordinate oldCoordinate, Double i) {
-		int index = editor.getItem().removeCoordinate(oldCoordinate);
+	public void setNewLatitude(Waypoint oldWaypoint, Double i) {
+		int index = editor.getItem().removeWaypoint(oldWaypoint);
+		LlaCoordinate oldCoordiate = oldWaypoint.getCoordinate();
 		if (index != -1) {
-			LlaCoordinate newCoordinate = new LlaCoordinate(i, oldCoordinate.getLongitude(), oldCoordinate.getAltitude());
-			getEditor().getItem().addCoordinate(newCoordinate, index);
+			LlaCoordinate newCoordinate = new LlaCoordinate(i, oldCoordiate.getLongitude(), oldCoordiate.getAltitude());
+			getEditor().getItem().addWaypoint(new Waypoint(newCoordinate), index);
 		} else {
 			LOGGER.error("That should really not happen...");
 		}
 	}
 
-	public void setNewLongitude(LlaCoordinate oldCoordinate, Double i) {
-		int index = editor.getItem().removeCoordinate(oldCoordinate);
+	public void setNewLongitude(Waypoint oldWaypoint, Double i) {
+		LlaCoordinate oldCoordiate = oldWaypoint.getCoordinate();
+		int index = editor.getItem().removeWaypoint(oldWaypoint);
 		if (index != -1) {
-			LlaCoordinate newCoordinate = new LlaCoordinate(oldCoordinate.getLatitude(), i, oldCoordinate.getAltitude());
-			getEditor().getItem().addCoordinate(newCoordinate, index);
+			LlaCoordinate newCoordinate = new LlaCoordinate(oldCoordiate.getLatitude(), i, oldCoordiate.getAltitude());
+			getEditor().getItem().addWaypoint(new Waypoint(newCoordinate), index);
 		} else {
 			LOGGER.error("That should really not happen...");
 		}
 
 	}
 
-	public void setNewAltitude(LlaCoordinate oldCoordinate, Double i) {
-		int index = editor.getItem().removeCoordinate(oldCoordinate);
+	public void setNewAltitude(Waypoint oldWaypoint, Double i) {
+		LlaCoordinate oldCoordiate = oldWaypoint.getCoordinate();
+		int index = editor.getItem().removeWaypoint(oldWaypoint);
 		if (index != -1) {
-			LlaCoordinate newCoordinate = new LlaCoordinate(oldCoordinate.getLatitude(), oldCoordinate.getLongitude(), i);
-			getEditor().getItem().addCoordinate(newCoordinate, index);
+			LlaCoordinate newCoordinate = new LlaCoordinate(oldCoordiate.getLatitude(), oldCoordiate.getLongitude(), i);
+			getEditor().getItem().addWaypoint(new Waypoint(newCoordinate), index);
 		} else {
 			LOGGER.error("That should really not happen...");
 		}

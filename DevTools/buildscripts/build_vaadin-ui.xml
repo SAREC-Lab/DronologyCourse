@@ -1,0 +1,112 @@
+<project name="build-vaadinui" default="build">
+	<import file="./buildutils.xml" />
+
+
+	<target name="build">
+		<property name="result.filename" value="${jar.core}" />
+		<property name="build.dir" value="${tmp.dir}/build" />
+		<echo>Output set to: ${tmp.dir}</echo>
+		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
+
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare" inheritall="true" />
+		<antcall target="copy-source" inheritall="true" />
+
+		<antcall target="copy-libs" inheritall="true" />
+		<antcall target="copy-vaadin-libs" inheritall="true" />
+		<antcall target="-copy-core" inheritall="true" />
+		<antcall target="-copy-service-core" inheritall="true" />
+		<antcall target="-copy-logger" inheritall="true" />
+		<antcall target="-copy-util" inheritall="true" />
+
+		<antcall target="compile" inheritall="true" />
+	<!--	<antcall target="build-war" inheritall="true" />-->
+		<!--<antcall target="cleanup" inheritall="true" />-->
+
+		<!--<antcall target="copy-libs" inheritall="true" />
+		
+		
+	-->
+
+
+
+	</target>
+	
+	
+	<target name="build-war">
+
+	   <war destfile="fax.war" webxml="${web.dir}/web.xml">
+	      <fileset dir="${web.dir}/WebContent">
+	         <include name="**/*.*"/>
+	      </fileset>
+	      
+	      <lib dir="thirdpartyjars">
+	         <exclude name="portlet.jar"/>
+	      </lib>
+	      
+	      <classes dir="${build.dir}/web"/>
+	   </war>
+	   
+	</target>
+	
+	
+	
+	
+	
+	
+
+	<target name="copy-vaadin-libs">
+
+		<echo>Copying library files from : ${src.dir}  ${build.dir}/lib</echo>
+
+		<!--<copy file="${sourceCodeDir}/lib/at.jku.ase.logging.jar" todir="${result.dirname}/build/lib" />
+			<copy file="${sourceCodeDir}/lib/log4j-1.2.16.jar" todir="${result.dirname}/build/lib" />-->
+
+
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/vaadin-server-8.0.6.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/javax.servlet-api-3.0.1.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/v-leaflet-2.0.0.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/vaadin-shared-8.0.6.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/jts-1.13.jar" todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../DevTools/libs/vaadin/switch-3.0.0.jar" todir="${build.dir}/lib" />
+		 
+	</target>
+
+
+
+
+
+	<target name="publish-jar">
+		<copy file="${tmp.dir}\jar\${result.filename}" tofile="${publish.dir}\${result.filename}" overwrite="true" />
+	</target>
+
+	<target name="copy-source">
+		<!-- Copy required files -->
+		<echo>copy: ${src.dir} to : ${build.dir}/src  </echo>
+
+
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../edu.nd.dronology.ui.vaadin/src/main/java" />
+
+		</copy>
+
+
+	</target>
+
+	<target name="compile">
+		<!-- Compile files -->
+		<path id="classpath">
+			<fileset dir="${build.dir}/lib" includes="*.jar" />
+		</path>
+		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
+			<compilerarg line="-g" />
+
+			<include name="edu/nd/dronology/ui/**/*.java" />
+
+			<exclude name="edu/nd/dronology/core/test/controller/CoordinateTransformationTest.java" />
+
+
+		</javac>
+	</target>
+
+</project>

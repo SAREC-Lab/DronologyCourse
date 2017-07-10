@@ -8,11 +8,11 @@ import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.fleet.AbstractDroneFleetFactory;
 import edu.nd.dronology.core.fleet.PhysicalDroneFleetFactory;
 import edu.nd.dronology.core.fleet.VirtualDroneFleetFactory;
-import edu.nd.dronology.core.flightzone.FlightZoneManager;
 import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.listener.IDroneStatusChangeListener;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.util.NullUtil;
@@ -23,9 +23,9 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSetupServiceInstance.class);
 
-	private FlightZoneManager flightManager;
+	
 	private AbstractDroneFleetFactory physicalDroneFleetFactory;
-	private AbstractDroneFleetFactory droneFleetFactory;
+	private AbstractDroneFleetFactory virtualDroneFleetFactory;
 	private List<IDroneStatusChangeListener> listenerList = new ArrayList<>();
 
 	public DroneSetupServiceInstance() {
@@ -51,11 +51,8 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 
 	@Override
 	protected void doStartService() throws Exception {
-		if (false) {
-			droneFleetFactory = PhysicalDroneFleetFactory.getInstance();
-		} else {
-			droneFleetFactory = VirtualDroneFleetFactory.getInstance();
-		}
+		physicalDroneFleetFactory = PhysicalDroneFleetFactory.getInstance();
+		virtualDroneFleetFactory = VirtualDroneFleetFactory.getInstance();
 	}
 
 	@Override
@@ -64,22 +61,7 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 
 	}
 
-	@Override
-	public void initializeDrones(List<String[]> newDrones, boolean physical) throws DronologyServiceException {
-		for (String[] newDrone : newDrones) {
-			String droneID = newDrone[0];
-			String droneType = newDrone[1];
-			long latitude = Long.parseLong(newDrone[2]);
-			long longitude = Long.parseLong(newDrone[3]);
-			int altitude = Integer.parseInt(newDrone[4]);
-			try {
-				droneFleetFactory.initializeDrone(droneID, droneType, latitude, longitude, altitude);
-			} catch (DroneException e) {
-				throw new DronologyServiceException(e.getMessage());
-			}
-		}
 
-	}
 
 	@Override
 	public Map<String, DroneStatus> getDrones() {
@@ -100,7 +82,14 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	}
 
 	private void doInitDrone(DroneInitializationInfo di) throws DroneException {
-		droneFleetFactory.initializeDrone(di.getId(), di.getType(), di.getInitialLocation());
+		if(di.getMode() == DroneMode.MODE_PHYSICAL){
+			physicalDroneFleetFactory.initializeDrone(di.getId(), di.getType(), di.getInitialLocation());
+		}
+		else{
+			virtualDroneFleetFactory.initializeDrone(di.getId(), di.getType(), di.getInitialLocation());
+		}
+		
+		
 		DroneStatus drStat = DroneCollectionStatus.getInstance().getDrone(di.getId());
 		notifyDroneStatusChange(drStat);
 	}

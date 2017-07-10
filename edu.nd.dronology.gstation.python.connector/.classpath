@@ -6,10 +6,11 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="external/json-simple-1.1.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.libs"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.mv.logging"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.services"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.services.core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.mv.logging"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.monitoring"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

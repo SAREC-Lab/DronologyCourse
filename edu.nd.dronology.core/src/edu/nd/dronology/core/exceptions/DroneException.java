@@ -4,7 +4,7 @@ package edu.nd.dronology.core.exceptions;
  * @author Michael
  *
  */
-public class DroneException extends Throwable {
+public class DroneException extends Exception {
 	/**
 	 * 
 	 */

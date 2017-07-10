@@ -46,7 +46,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 			// droneID = baseStation.getNewDroneID();
 			droneID = drnName;
 			baseStation.setStatusCallbackListener(droneID, this);
-		} catch (Exception | DroneException e) {
+		} catch (Exception e) {
 			LOGGER.error(e);
 		}
 		// createDispatchThread
@@ -95,10 +95,14 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	@Override
 	public LlaCoordinate getCoordinates() {
 
-		// IDroneAttribute<Coordinate> location = baseStation.getAttribute(droneID, IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
+		// IDroneAttribute<Coordinate> location =
+		// baseStation.getAttribute(droneID,
+		// IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
 		// Coordinate coordinate = location.getValue();
-		// LOGGER.info("Coordinates retrieved: (" + Long.toString(coordinate.getLatitude()) + ","
-		// + Long.toString(coordinate.getLongitude()) + "," + Integer.toString(coordinate.getAltitude()) + ")");
+		// LOGGER.info("Coordinates retrieved: (" +
+		// Long.toString(coordinate.getLatitude()) + ","
+		// + Long.toString(coordinate.getLongitude()) + "," +
+		// Integer.toString(coordinate.getAltitude()) + ")");
 		// return coordinate;
 		return droneStatus.getCoordinates();
 	}
@@ -135,7 +139,8 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 		return droneStatus.getBatteryLevel();
 
-		// IDroneAttribute<Double> attribute = baseStation.getAttribute(droneID, IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
+		// IDroneAttribute<Double> attribute = baseStation.getAttribute(droneID,
+		// IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
 		// Double level = attribute.getValue();
 		// LOGGER.info("Battery LeveL :" +level);
 		// return level;

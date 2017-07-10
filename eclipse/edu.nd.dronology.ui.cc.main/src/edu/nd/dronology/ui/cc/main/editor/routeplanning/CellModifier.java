@@ -6,8 +6,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.TableItem;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
-import net.mv.logging.ILogger;
-import net.mv.logging.LoggerProvider;
+import edu.nd.dronology.core.util.Waypoint;
 
 public class CellModifier extends TextCellEditor implements ICellModifier {
 
@@ -48,7 +47,7 @@ public class CellModifier extends TextCellEditor implements ICellModifier {
 	@Override
 	public void modify(Object chanedElem, String column, Object newValue) {
 		TableItem item = (TableItem) chanedElem;
-		LlaCoordinate e = (LlaCoordinate) item.getData();
+		Waypoint e = (Waypoint) item.getData();
 		if (column.equals("0")) {
 			try {
 				Double i = Double.parseDouble(newValue.toString());

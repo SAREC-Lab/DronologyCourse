@@ -1,8 +1,10 @@
 package edu.nd.dronology.services.instances.flightmanager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.base.AbstractServerService;
 import edu.nd.dronology.services.core.info.FlightInfo;
 
@@ -32,19 +34,31 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 		return new FlightManagerServiceInstance();
 	}
 
-	public void planFlight(String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
-		serviceInstance.planFlight(planName, coordinates, flight);
+	public FlightInfo getFlightInfo(String uavId) {
+		return serviceInstance.getFlightInfo(uavId);
 
 	}
 
-	public FlightInfo getFlightDetails() {
-		return serviceInstance.getFlightDetails();
+	public void planFlight(String uavid, String planName, List<Waypoint> waypoints) throws Exception {
+		serviceInstance.planFlight(uavid, planName, waypoints);
 
 	}
 
-	public void planFlight(String uavid, String planName, LlaCoordinate coordinates, List<LlaCoordinate> flight) {
-		serviceInstance.planFlight(uavid, planName, coordinates, flight);
+	public void planFlight(String planName, List<Waypoint> waypoints) throws Exception {
+		serviceInstance.planFlight(planName, waypoints);
 
 	}
+
+	public void returnToHome(String uavid) throws Exception {
+		serviceInstance.returnToHome(uavid);
+
+	}
+
+	public void pauseFlight(String uavid) throws Exception {
+		serviceInstance.pauseFlight(uavid);
+
+	}
+
+
 
 }
