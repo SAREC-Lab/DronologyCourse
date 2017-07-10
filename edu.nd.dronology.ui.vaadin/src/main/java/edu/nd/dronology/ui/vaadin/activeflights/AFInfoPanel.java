@@ -67,7 +67,7 @@ public class AFInfoPanel extends CustomComponent{
 					for (int i = 0; i < checked.size() - 1; i++){
 						drones += checked.get(i) + ", ";
 					}
-					message = "Are you sure you want to send " + drones + "and " + checked.get(checked.size()-1) + "to their homes?";
+					message = "Are you sure you want to send " + drones + "and " + checked.get(checked.size()-1) + " to their homes?";
 				}
 			}
 			else {
