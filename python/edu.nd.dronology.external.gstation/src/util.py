@@ -8,7 +8,9 @@ import numpy as np
 import nvector as nv
 import matplotlib.path as mpl_path
 from threading import Timer
+import log_util
 
+_LOG = log_util.get_logger('default_file')
 
 arr = np.array
 
@@ -74,18 +76,6 @@ class Earth:
 
 # noinspection PyPep8Naming
 class Position(object):
-    def to_lla(self):
-        pass
-
-    def to_nvector(self):
-        raise NotImplementedError
-
-    def to_pvector(self):
-        raise NotImplementedError
-
-    def _as_array(self):
-        raise NotImplementedError
-
     def as_array(self, flat=True):
         a = self._as_array()
         if not flat:
@@ -93,7 +83,7 @@ class Position(object):
 
         return a
 
-    def update(self, v_EB_N, t=1.0):
+    def update(self, v_EB_N, t=0.1):
         """
         Given a position and NED, we *might* be able to use equations 12, 14, 15 to determine an exact solution
         for an updated position at some point in the future.
@@ -115,11 +105,13 @@ class Position(object):
         R_NE = np.transpose(R_EN)
         v_EB_E = np.dot(R_NE, v_EB_N)
 
-        temp = column_vector([1, 0, 0])
+        # TODO: the next two equations are broken... cross products are hard.
+        temp = column_vector([0, 0, 1])
+        # temp = [0, 0, 1]
         # Equation 9
-        v_EB_E_east = np.cross(v_EB_E, temp)
+        v_EB_E_east = np.cross(v_EB_E.ravel(), temp.ravel())
         # Equation 10
-        v_EB_E_north = np.cross(v_EB_E_east, temp)
+        v_EB_E_north = np.cross(v_EB_E_east, temp.ravel())
 
         lla = self.to_lla()
         lat = lla.get_latitude()
@@ -127,13 +119,21 @@ class Position(object):
         v_EB_E_north_scaled = v_EB_E_north / Earth.meridional_radius_curvature(lat)
         v_EB_E_east_scaled = v_EB_E_east / Earth.transverse_radius_curvature(lat)
         # Equation 12: the angular velocity in E
-        omega_EL_E = np.cross(n_EB_E, (v_EB_E_north_scaled + v_EB_E_east_scaled))
+        omega_EL_E = np.cross(n_EB_E.ravel(), (v_EB_E_north_scaled + v_EB_E_east_scaled))
 
         # Equation 14: derivative wrt time
-        n_EB_E_prime = np.cross(omega_EL_E, n_EB_E)
-        h_B_prime = np.dot(n_EB_E, v_EB_E)
+        n_EB_E_prime = np.cross(omega_EL_E, n_EB_E.ravel())
+        h_B_prime = np.dot(n_EB_E.ravel(), v_EB_E)
 
-        # TODO: do we just multiply the deriv by t and add it to original?
+        update_n_EB_E = n_EB_E_prime * t
+        update_h_B = h_B_prime * t
+
+        new_x, new_y, new_z = n_EB_E.ravel() + update_n_EB_E
+        new_depth = h_B + update_h_B[0]
+
+        new_self = Nvector(new_x, new_y, new_z, new_depth)
+
+        return self.coerce(new_self)
 
     def distance(self, other):
         p1 = self.to_pvector().as_array()
@@ -163,6 +163,18 @@ class Position(object):
         if isinstance(other_, self.__class__):
             return np.isclose(self.as_array(), other_.as_array()).all()
         return False
+
+    def to_lla(self):
+        raise NotImplementedError
+
+    def to_nvector(self):
+        raise NotImplementedError
+
+    def to_pvector(self):
+        raise NotImplementedError
+
+    def _as_array(self):
+        raise NotImplementedError
 
 
 # noinspection PyPep8Naming
@@ -268,16 +280,16 @@ class Pvector(Position):
         return self.to_nvector().to_lla()
 
     def _as_array(self):
-        self.p_EB_E.ravel()
+        return self.p_EB_E.ravel()
 
 
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
-        self._timer     = None
-        self.interval   = interval
-        self.function   = function
-        self.args       = args
-        self.kwargs     = kwargs
+        self._timer = None
+        self.interval = interval
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
         self.is_running = False
         self.start()
 
@@ -299,21 +311,24 @@ class RepeatedTimer(object):
 
 def clean_up_run():
     if os.path.exists('.sitl_temp'):
+        _LOG.info('deleting temporary sitl directory')
         shutil.rmtree('.sitl_temp')
 
     try:
         pids = map(int, subprocess.check_output(['pgrep', 'arducopter']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
+        _LOG.warn('ArduCopter processes failed to shut down gracefully.')
     except subprocess.CalledProcessError:
-        print('no sitl links found')
+        _LOG.debug('no sitl links found')
     #
     try:
         pids = map(int, subprocess.check_output(['pgrep', '-f', '/usr/local/bin/mavproxy.py']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
+        _LOG.warn('MavProxy processes failed to shut down gracefully.')
     except subprocess.CalledProcessError:
-        print('no python processes found')
+        _LOG.debug('no python processes found')
 
 
 if __name__ == '__main__':

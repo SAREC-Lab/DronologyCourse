@@ -1,13 +1,10 @@
 import os
+import json
 
-STATUS_EXIT = 0
-STATUS_RESET = 1
+MISSION = 'mission'
+DRONOLOGY_LINK = 'dronology'
+CONTROL_STATION = 'control'
 
-CMD_TYPE_ERROR = 'error'
-
-CMD_RESET = 'reset'
-
-ERROR_CONN_RESET = {'type': CMD_TYPE_ERROR, 'data': {'id': None, 'command': CMD_RESET, 'data': None}}
 
 D_ATTR_LOC = 'location'
 D_ATTR_ATTITUDE = 'attitude'
@@ -39,3 +36,43 @@ RESPOND_ALL = 'all'
 RESPOND_CRITICAL = 'critical'
 
 SITL_PORT = 5760
+
+
+CMD_TYPE_ERROR = 'error'
+CMD_RESET = 'reset'
+
+ERROR_CONN_RESET = {'type': CMD_TYPE_ERROR, 'data': {'id': None, 'command': CMD_RESET, 'data': None}}
+
+
+class Command(object):
+
+    def __init__(self, origin, destination, payload):
+        self.orig = origin
+        self.dest = destination
+        self.payload = payload
+
+    def get_origin(self):
+        return self.orig
+
+    def get_destination(self):
+        return self.dest
+
+    def get_payload(self):
+        return self.payload
+
+
+class DronologyCommand(Command):
+
+    def __init__(self, data):
+        super(DronologyCommand, self).__init__(DRONOLOGY_LINK, MISSION, data)
+
+    @classmethod
+    def from_string(cls, msg):
+        d_msg = json.loads(msg)
+        cls(d_msg['data'])
+
+
+class ExitCommand(Command):
+
+    def __init__(self, origin, destination):
+        super(ExitCommand, self).__init__(origin, destination, None)

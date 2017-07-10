@@ -3,6 +3,15 @@ import util
 import numpy as np
 
 
+class TestPosition(unittest.TestCase):
+    def test_update(self):
+        a = util.Lla(41.697987, -86.233922, 261.9)
+        ned = np.array([[91.44], [0], [0]])
+        a_new = a.update(ned, t=1.0)
+
+        print(a_new.as_array())
+
+
 class TestNVector(unittest.TestCase):
     def test_to_pvector(self):
         nvec = util.Nvector(0, 1, 0, 0)

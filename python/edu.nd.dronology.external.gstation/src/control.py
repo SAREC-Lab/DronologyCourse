@@ -9,73 +9,75 @@ import importlib
 import util
 import atexit
 import Queue
+import log_util
 from common import *
 from comms.dronology_link import DronologyLink
 
 
+_LOG = log_util.get_logger('default_file')
+
+
 class ControlStation:
+    _STATUS_ALIVE = 0
+    _STATUS_DEAD = 1
+    _STATUS_WAITING = 2
+
     def __init__(self, mission_type=mission.SAR, port=1234, ardupath=ARDUPATH, report_freq=1.0, **kwargs):
-        self.mission = mission_type(ardupath=ardupath, **kwargs)
         self.report_freq = report_freq
         self.in_msg_queue = Queue.Queue()
+        self.mission = mission_type(self.in_msg_queue, ardupath=ardupath, **kwargs)
         self.dronology_link = DronologyLink(self.in_msg_queue, port=port)
-        self.send_worker = None
-        self.recv_worker = None
-        self.monitor_worker = None
+        self._worker = threading.Thread(target=self._work)
+        self._status = self._STATUS_WAITING
+
+    def is_alive(self):
+        return self._status != self._STATUS_DEAD
 
     def start(self):
         self.dronology_link.start()
-        print('dronology link waiting for connection...')
+        _LOG.info('control waiting for dronology connection.')
         self.mission.start()
-        print('mission loaded, starting workers...')
-        self.monitor_worker = util.RepeatedTimer(0.1, self._monitor, self, self.mission, self.dronology_link)
-        self.send_worker = util.RepeatedTimer(self.report_freq, self._send, self.mission, self.dronology_link)
-        self.recv_worker = util.RepeatedTimer(0.1, self._recv, self.mission, self.in_msg_queue)
+        _LOG.info('mission loaded, starting workers.')
+        self._status = self._STATUS_ALIVE
+        self._worker.start()
+
+    def _work(self):
+        while self._status == self._STATUS_ALIVE:
+            drone_list = {}
+            for drone_id, drone in self.mission.get_drones().items():
+                drone_list[str(drone_id)] = drone.report()
+
+            out_msg = json.dumps({'type': 'drone_list', 'data': drone_list})
+            self.dronology_link.send(out_msg)
+
+            try:
+                in_msg = self.in_msg_queue.get(timeout=0.25)
+                self.in_msg_queue.task_done()
+
+                if not isinstance(in_msg, Command):
+                    _LOG.warn('invalid command received: {}'.format(in_msg))
+                elif isinstance(in_msg, ExitCommand):
+                    _LOG.warn('received an exit command from {}'.format(in_msg.get_origin()))
+                    self._status = self._STATUS_DEAD
+                else:
+                    if in_msg.get_destination() == MISSION:
+                        self.mission.on_command(in_msg)
+
+            except Queue.Empty:
+                pass
+
+        _LOG.info('shutting down...')
 
     def stop(self):
-        self.recv_worker.stop()
-        self.send_worker.stop()
-        self.monitor_worker.stop()
+        if self._status != self._STATUS_WAITING:
+            self._worker.join()
+
+        self._status = self._STATUS_DEAD
+        _LOG.info('control worker joined.')
         self.dronology_link.stop()
+        _LOG.info('dronology link stopped.')
         self.mission.stop()
-
-    @staticmethod
-    def _monitor(control_station, m_mission, m_dr_link):
-        if not m_dr_link.is_alive or not m_mission.is_alive:
-            if m_dr_link.exit_status == STATUS_EXIT:
-                print('dronology link closed successfully, exiting...')
-                ControlStation.stop(control_station)
-            elif m_dr_link.exit_status == STATUS_RESET:
-                print('dronology link closed due to an error, resetting...')
-                # print('waiting for sockets to close...')
-                # m_dr_link.stop()
-                # m_dr_link.start()
-                #
-                # time.sleep(10)
-                # m_mission.on_command({'type': })
-                # control_station.monitor_worker.start()
-                ControlStation.stop(control_station)
-            else:
-                print('dronology link closed for an unexpected reason...')
-                ControlStation.stop(control_station)
-
-    @staticmethod
-    def _send(m_mission, m_dr_link):
-        drone_list = {}
-        for drone_id, drone in m_mission.get_drones().items():
-            drone_list[str(drone_id)] = drone.report()
-
-        out_msg = json.dumps({'type': 'drone_list', 'data': drone_list})
-        m_dr_link.send(out_msg)
-
-    @staticmethod
-    def _recv(m_mission, m_msg_queue):
-        try:
-            in_msg = m_msg_queue.get_nowait()
-            cmd = json.loads(in_msg)
-            m_mission.on_command(cmd)
-        except Queue.Empty:
-            pass
+        _LOG.info('mission link stopped.')
 
 
 def shutdown(control_station):
@@ -107,9 +109,18 @@ def main():
     ap.add_argument('-rf', '--report_freq', default=1.0, type=float, help='how frequently drone updates should be sent')
     args = ap.parse_args()
 
+    _LOG.info('STARTING NEW MISSION.')
     ctrl = ControlStation(mission_type=args.mission, ardupath=args.ardu_path, port=args.port)
     atexit.register(shutdown, control_station=ctrl)
-    ctrl.start()
+    try:
+        ctrl.start()
+        while ctrl.is_alive():
+            time.sleep(5)
+    except KeyboardInterrupt:
+        _LOG.warn('keyboard interrupt, shutting down.')
+    _LOG.info('control station is shutting down all modules.')
+    ctrl.stop()
+    _LOG.info('MISSION ENDED.')
 
 
 if __name__ == "__main__":
