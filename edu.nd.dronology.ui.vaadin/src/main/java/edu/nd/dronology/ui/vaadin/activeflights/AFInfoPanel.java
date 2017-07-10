@@ -10,13 +10,17 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
@@ -52,13 +56,64 @@ public class AFInfoPanel extends CustomComponent{
 		
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
 		
-		
-		emergency.addOnClickListener( e -> {
-			Component child = e.getChildComponent();
-			if (child.getCaption().equals("All UAVs Hover in Place")){
-				this.setAllToHover();
+		emergency.getHome().addClickListener( e-> {
+			List<String> checked = this.getChecked();
+			String message = "";
+			if (checked.size() > 0){
+				if (checked.size() == 1)
+					message = "Are you sure you want to send " + checked.get(0) + " to its home?";
+				else{
+					String drones = "";
+					for (int i = 0; i < checked.size() - 1; i++){
+						drones += checked.get(i) + ", ";
+					}
+					message = "Are you sure you want to send " + drones + "and " + checked.get(checked.size()-1) + "to their homes?";
+				}
 			}
+			else {
+				message = "Are you sure to send all UAVs to their homes?";
+			}
+			Window confirm = new Window("Confirm");
+			VerticalLayout subContent = new VerticalLayout();
+			HorizontalLayout subButtons = new HorizontalLayout();
+			Label label = new Label(message);
+			Button yes = new Button("Yes");
+			Button no = new Button("No");
+			
+			yes.addClickListener(subEvent -> {
+				UI.getCurrent().removeWindow(confirm);
+				IFlightManagerRemoteService service;
+				try {
+					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+					if (checked.size() > 0){
+						for (int i = 0; i < checked.size(); i++)
+							service.returnToHome(checked.get(i));
+					}
+					else {
+						for (int i = 1; i < numUAVs + 1; i++){
+							AFInfoBox box = (AFInfoBox) content.getComponent(i);
+							service.returnToHome(box.getName());
+						}
+					}
+				} catch (Exception exc) {
+					exc.printStackTrace();
+				}
+				
+			});
+
+			no.addClickListener(subEvent -> {
+				UI.getCurrent().removeWindow(confirm);
+			});
+			
+			subButtons.addComponents(yes, no);
+			subContent.addComponents(label, subButtons);
+			confirm.setContent(subContent);
+			confirm.setModal(true);
+			confirm.center();
+			UI.getCurrent().addWindow(confirm);
+			
 		});
+
 
 		sideBar.addComponents(panel, mapView, emergency);
 		setCompositionRoot(sideBar);

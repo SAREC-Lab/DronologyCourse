@@ -194,8 +194,7 @@ public class AFInfoBox extends CustomComponent {
 			confirm.setContent(subContent);
 			confirm.setModal(true);
 			confirm.center();
-			UI.getCurrent().addWindow(confirm);
-			
+			UI.getCurrent().addWindow(confirm);	
 
 		});
 

@@ -15,13 +15,15 @@ import com.vaadin.ui.VerticalLayout;
 public class AFEmergencyComponent extends CustomComponent{
 	private static final long serialVersionUID = -650745296345774988L;
 	private HorizontalLayout buttons = new HorizontalLayout();
+	private NativeButton hover = new NativeButton("All UAVs<br>Hover in Place");
+  private NativeButton home = new NativeButton("All UAVs<br>Return to Home");
+  
 	public AFEmergencyComponent(){
 		VerticalLayout layout = new VerticalLayout();
 		layout.addStyleName("af_emergency_operations");
     
 		Label caption = new Label("Emergency Operations");
-    NativeButton hover = new NativeButton("All UAVs<br>Hover in Place");
-    NativeButton home = new NativeButton("All UAVs<br>Return to Home");
+    
     hover.setCaptionAsHtml(true);
     hover.addStyleName("button_warning");
     home.setCaptionAsHtml(true);
@@ -33,8 +35,12 @@ public class AFEmergencyComponent extends CustomComponent{
     setCompositionRoot(layout);
 	}
 	
-	public void addOnClickListener(LayoutClickListener listener){
-    buttons.addLayoutClickListener(listener);
+	public NativeButton getHome(){
+		return home;
+	}
+	
+	public NativeButton getHover(){
+		return hover;
 	}
 	
 }
