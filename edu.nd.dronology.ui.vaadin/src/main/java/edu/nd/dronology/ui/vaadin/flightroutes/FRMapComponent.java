@@ -8,12 +8,14 @@ import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
+import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -59,8 +61,8 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("fr_leaflet_map");
 
 		Configuration configuration = Configuration.getInstance();
-		leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-		leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
+		//leafletMap.setCenter(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+		//leafletMap.setZoomLevel(configuration.getMapDefaultZoom());
 
 		Window popup = createWayPointWindow();
 		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup);
@@ -77,13 +79,17 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.addOverlay(satelliteTiles, satelliteLayerName);
-		leafletMap.zoomToContent();
+		//leafletMap.zoomToContent();
 		content.addComponent(mapAndPopup);
 
 		route.disableRouteEditing();
 
 		setCompositionRoot(content);
 		content.addComponents(tableDisplay.getGrid());
+		
+		this.setRouteCenter();
+		
+		
 	}
 
 	private Window createWayPointWindow() {
@@ -281,11 +287,11 @@ public class FRMapComponent extends CustomComponent {
 	public void displayTable() {
 		content.addComponent(tableDisplay.getGrid());
 	}
-
+	
 	public void setCenter(double centerLat, double centerLon) {
-		leafletMap.setCenter(41.68, -86.25);
+		leafletMap.setCenter(centerLat, centerLon);
 	}
-
+	
 	public void setZoomLevel(double zoomLevel) {
 		leafletMap.setZoomLevel(zoomLevel);
 	}
@@ -325,5 +331,46 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
 
+	}
+	public void setRouteCenter(){
+		double meanLat = 0;
+		double meanLon = 0;
+		int numberPoints;
+		double farthestLat = 0;
+		double farthestLon = 0;
+		double zoom;
+		
+		List<WayPoint> currentWayPoints = route.getMapPoints();
+		numberPoints = route.getMapPoints().size();
+		//Notification.show(String.valueOf(numberPoints));
+		
+		for(WayPoint p: currentWayPoints){
+				meanLat += Double.valueOf(p.getLatitude());
+				meanLon += Double.valueOf(p.getLongitude());
+		}
+		
+		meanLat /= (numberPoints * 1.0);
+		meanLon /= (numberPoints * 1.0);
+		
+		for(WayPoint p: currentWayPoints){
+			if((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)){
+				farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
+			}
+			if((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)){
+				farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
+			}
+		}  
+		
+		Notification.show(String.valueOf(farthestLat) + " " + String.valueOf(farthestLon));
+		
+		Point centerPoint = new Point(meanLat, meanLon);
+		if(farthestLat == 0 && farthestLon == 0){
+			zoom = 17;
+		}else{
+			zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
+		}
+			
+		leafletMap.setCenter(centerPoint, zoom+1);
+						
 	}
 }

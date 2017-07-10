@@ -42,6 +42,8 @@ public class FRMainLayout extends CustomComponent {
 
 		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend",
 				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite");
+		
+		
 		map.setCenter(41.68, -86.25);
 		map.setZoomLevel(13);
 
@@ -72,14 +74,13 @@ public class FRMainLayout extends CustomComponent {
 		map.display();
 		// adds click listener to route list
 		routes.addLayoutClickListener(e -> {
+			
 			Component child = e.getChildComponent();
 			child.addStyleName("info_box_focus");
 			index = routes.getComponentIndex(child);
 
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<Waypoint> coords = flightInfo.getWaypoints();
-
-			map.displayByName(flightInfo, "not used", 0, false);
 
 			// removes old pins and polylines when switching routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
@@ -123,8 +124,15 @@ public class FRMainLayout extends CustomComponent {
 					routes.getComponent(i).removeStyleName("info_box_focus");
 				}
 			}
+			
+			map.setRouteCenter();
+			
+			map.displayByName(flightInfo, "not used", 0, false);
+			
 		});
 
+		
+		
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
