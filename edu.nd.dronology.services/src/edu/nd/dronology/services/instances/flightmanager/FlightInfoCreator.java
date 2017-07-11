@@ -14,11 +14,13 @@ public class FlightInfoCreator {
 	public static FlightInfo createInfo(String uavId) {
 		FlightInfo info = new FlightInfo(uavId, uavId);
 
-		IFlightPlan curentFlight = PlanPoolManager.getInstance().getCurrentPlan(uavId);
-		if (curentFlight != null) {
-			FlightPlanInfo currPl = new FlightPlanInfo(curentFlight.getFlightID(), curentFlight.getFlightID());
-			currPl.setWaypoints(curentFlight.getWayPoints());
+		IFlightPlan currentFlight = PlanPoolManager.getInstance().getCurrentPlan(uavId);
+		if (currentFlight != null) {
+			FlightPlanInfo currPl = new FlightPlanInfo(currentFlight.getFlightID(), currentFlight.getFlightID());
+			currPl.setWaypoints(currentFlight.getWayPoints());
+			currPl.setDroneId(currentFlight.getDesignatedDroneId());
 			info.setCurrentFlight(currPl);
+
 
 		}
 
@@ -26,12 +28,14 @@ public class FlightInfoCreator {
 		for (IFlightPlan plan : pendingPlans) {
 			FlightPlanInfo pinfo = new FlightPlanInfo(plan.getFlightID(), plan.getFlightID());
 			pinfo.setWaypoints(plan.getWayPoints());
+			pinfo.setDroneId(plan.getDesignatedDroneId());
 			info.addPending(pinfo);
 		}
 		List<IFlightPlan> completedPlans = PlanPoolManager.getInstance().getCompletedPlans(uavId);
 		for (IFlightPlan plan : completedPlans) {
 			FlightPlanInfo pinfo = new FlightPlanInfo(plan.getFlightID(), plan.getFlightID());
 			pinfo.setWaypoints(plan.getWayPoints());
+			pinfo.setDroneId(plan.getDesignatedDroneId());
 			info.addCompleted(pinfo);
 		}
 
@@ -44,6 +48,7 @@ public class FlightInfoCreator {
 		for (IFlightPlan plan : current) {
 			FlightPlanInfo pinfo = new FlightPlanInfo(plan.getFlightID(), plan.getFlightID());
 			pinfo.setWaypoints(plan.getWayPoints());
+			pinfo.setDroneId(plan.getDesignatedDroneId());
 			planInfo.add(pinfo);
 		}
 		return planInfo;
