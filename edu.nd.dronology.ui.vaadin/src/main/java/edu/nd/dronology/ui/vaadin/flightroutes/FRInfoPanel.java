@@ -53,6 +53,8 @@ public class FRInfoPanel extends CustomComponent {
 	private Button drawButton;
 	private Collection<FlightRouteInfo> items;
 	private FlightRouteInfo drone;
+	FRNewRoute display;
+	TextField inputField;
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
@@ -105,7 +107,7 @@ public class FRInfoPanel extends CustomComponent {
 		VerticalLayout popupContent = new VerticalLayout();
 
 		//popup box to input new route info
-		FRNewRoute display = new FRNewRoute();
+		display = new FRNewRoute();
 		popupContent.addComponent(display);
 		PopupView popup = new PopupView(null, popupContent);
 		
@@ -116,34 +118,37 @@ public class FRInfoPanel extends CustomComponent {
 		window.setClosable(false);
 		
 		drawButton = display.getDrawButton();
-		TextField inputField = display.getInputField();
+		inputField = display.getInputField();
+		
 		drawButton.addClickListener(e -> {
 			
 			routeInputName = inputField.getValue();
-		
-			addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
-			
-			//sends route to dronology
-			drone = addRouteDronology(routeInputName);
-			
-			//because dronology takes some time
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+			if(!routeInputName.isEmpty()){
+				addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
+				
+				//sends route to dronology
+				drone = addRouteDronology(routeInputName);
+				
+				//because dronology takes some time
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				
+				refreshRoutes();
+				
+				panel.setCaption(numberRoutes + " Routes in database");
+				
+				index = getRouteNumber(drone);
+				routes.getComponent(index).addStyleName("info_box_focus");	
+				
+				
+					inputField.clear();
+					UI.getCurrent().removeWindow(window);
 			}
-			
-			refreshRoutes();
-			//Notification.show(String.valueOf(numberRoutes));
-			panel.setCaption(numberRoutes + " Routes in database");
-			
-			index = getRouteNumber(drone);
-			routes.getComponent(index).addStyleName("info_box_focus");	
-			
-			inputField.clear();
-			UI.getCurrent().removeWindow(window);			
 		});
-
+		
 		newRoute.addClickListener(e -> {
 			UI.getCurrent().addWindow(window);
 		});
@@ -333,5 +338,13 @@ public FlightRouteInfo getRouteByName(String name){
 	public String getName(){
 		return routeInputName;
 	}
-	
+	public FRNewRoute getDisplay(){
+		return display;
+	}
+	public TextField getInputField(){
+		return inputField;
+	}
+	public ArrayList getRouteList(){
+		return routeList;
+	}
 }

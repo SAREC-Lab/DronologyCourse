@@ -11,6 +11,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.nd.dronology.core.util.Waypoint;
@@ -32,7 +33,8 @@ public class FRMainLayout extends CustomComponent {
 	private FRMapComponent map;
 	private VerticalLayout routeLayout;
 	boolean isFirst = true;
-
+	int componentCount;
+	
 	@WaypointReplace
 	public FRMainLayout() {
 
@@ -46,40 +48,47 @@ public class FRMainLayout extends CustomComponent {
 		map.setCenter(41.68, -86.25);
 		map.setZoomLevel(13);
 
-		routeLayout = controls.getInfoPanel().getRoutes();
-
+		routeLayout = controls.getInfoPanel().getRoutes();	
+		componentCount = controls.getInfoPanel().getRouteList().size();
+		
 		//this defines the add new route button and adds a click listener
 		Button drawRoute = controls.getInfoPanel().getDrawButton();
 		drawRoute.addClickListener(e -> {
-			map.enableEdit();
-			//to get rid of points and lines from previous routes
-			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-			map.getUtils().removeAllLines(map.getUtils().getPolylines());
-			map.getUtils().getMapPoints().clear();
 			
-			//displays the drone information in the info bar
-			FlightRouteInfo drone = controls.getInfoPanel().getRoute();
-			int numCoords = drone.getWaypoints().size();
-			String droneName = controls.getInfoPanel().getName();
-			map.displayByName(drone, droneName, numCoords, true);
+			//tests whether a route was added or not
+			if(!(componentCount == controls.getInfoPanel().getRouteList().size())){
 			
-			Point pt = new Point(0, 0);
-			way = new WayPoint(pt, true);
-			
-			map.getTableDisplay().getGrid().setItems();
-			map.enableEdit();
-			
-			map.getMapInstance().addClickListener(eve->{
+				map.enableEdit();
+				//to get rid of points and lines from previous routes
+				map.getUtils().removeAllMarkers(map.getUtils().getPins());
+				map.getUtils().removeAllLines(map.getUtils().getPolylines());
+				map.getUtils().getMapPoints().clear();
 				
-				//the size of mapPoints is received as 1 for the first two waypoints added
-				if(map.getUtils().getMapPoints().size() == 1 && isFirst){
-					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
-					isFirst = false;
-				}
-				else{
-					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
-				}
-			});
+				//displays the drone information in the info bar
+				FlightRouteInfo drone = controls.getInfoPanel().getRoute();
+				int numCoords = drone.getWaypoints().size();
+				String droneName = controls.getInfoPanel().getName();
+				map.displayByName(drone, droneName, numCoords, true);
+				
+				Point pt = new Point(0, 0);
+				way = new WayPoint(pt, true);
+				
+				map.getTableDisplay().getGrid().setItems();
+				map.enableEdit();
+				
+				map.getMapInstance().addClickListener(eve->{
+					
+					//the size of mapPoints is received as 1 for the first two waypoints added
+					if(map.getUtils().getMapPoints().size() == 1 && isFirst){
+						map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
+						isFirst = false;
+					}
+					else{
+						map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
+					}
+				});
+			
+			}
 			
 		});
 
