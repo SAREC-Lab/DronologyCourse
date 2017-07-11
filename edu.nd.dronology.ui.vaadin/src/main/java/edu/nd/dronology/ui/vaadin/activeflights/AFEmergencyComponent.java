@@ -1,6 +1,5 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
-import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -20,7 +19,7 @@ public class AFEmergencyComponent extends CustomComponent{
   
 	public AFEmergencyComponent(){
 		VerticalLayout layout = new VerticalLayout();
-		layout.addStyleName("af_emergency_operations");
+		layout.addStyleName("af_operations_group");
     
 		Label caption = new Label("Emergency Operations");
     
