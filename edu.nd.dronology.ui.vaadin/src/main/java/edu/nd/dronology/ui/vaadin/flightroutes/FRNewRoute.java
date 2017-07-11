@@ -32,4 +32,7 @@ public class FRNewRoute extends CustomComponent{
 	public TextField getInputField(){
 		return inputField;
 	}
+	public Button getCancelButton(){
+		return cancelButton;
+	}
 }

@@ -1,5 +1,6 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
+import java.awt.MouseInfo;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
@@ -13,7 +14,9 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
@@ -106,11 +109,18 @@ public class FRInfoPanel extends CustomComponent {
 		popupContent.addComponent(display);
 		PopupView popup = new PopupView(null, popupContent);
 		
+		Window window = new Window();
+		window.setContent(display);
+		window.setPosition(200, 80);
+		window.setResizable(false);
+		window.setClosable(false);
+		
 		drawButton = display.getDrawButton();
 		TextField inputField = display.getInputField();
 		drawButton.addClickListener(e -> {
 			
 			routeInputName = inputField.getValue();
+		
 			addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
 			
 			//sends route to dronology
@@ -128,12 +138,18 @@ public class FRInfoPanel extends CustomComponent {
 			panel.setCaption(numberRoutes + " Routes in database");
 			
 			index = getRouteNumber(drone);
-			routes.getComponent(index).addStyleName("info_box_focus");			
-						
+			routes.getComponent(index).addStyleName("info_box_focus");	
+			
+			inputField.clear();
+			UI.getCurrent().removeWindow(window);			
 		});
 
 		newRoute.addClickListener(e -> {
-			popup.setPopupVisible(true);
+			UI.getCurrent().addWindow(window);
+		});
+		
+		display.getCancelButton().addClickListener(e-> {
+			UI.getCurrent().removeWindow(window);
 		});
 
 		routes.addLayoutClickListener(e -> {
