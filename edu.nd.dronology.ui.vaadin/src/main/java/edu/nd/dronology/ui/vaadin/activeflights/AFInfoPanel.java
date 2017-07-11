@@ -114,7 +114,28 @@ public class AFInfoPanel extends CustomComponent{
 			
 		});
 
-
+		content.addLayoutClickListener( e-> {
+			Component testChild = e.getChildComponent();
+			if (testChild.getClass() == AFInfoBox.class){
+				AFInfoBox child = (AFInfoBox) e.getChildComponent();
+				if(!child.getCheckClick()){
+					child.addStyleName("info_box_focus");
+					child.setIsChecked(true);
+					for (int i = 1; i < numUAVs + 1; i++){
+						AFInfoBox box = (AFInfoBox) content.getComponent(i);
+						if (!box.getName().equals(child.getName())) {
+							box.removeStyleName("info_box_focus");
+							box.setIsChecked(false);
+							box.setCheckClick(false);
+						}
+					}
+				}
+				else{
+					child.removeStyleName("info_box_focus");
+				}
+			}
+		});
+		
 		sideBar.addComponents(panel, mapView, emergency);
 		setCompositionRoot(sideBar);
 		
@@ -237,6 +258,10 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setHoverInPlace(true);
 		}
+	}
+	
+	public VerticalLayout getBoxes(){
+		return content;
 	}
 	
 	public void refreshDrones(){

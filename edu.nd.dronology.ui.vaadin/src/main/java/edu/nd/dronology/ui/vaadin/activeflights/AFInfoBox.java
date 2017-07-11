@@ -50,6 +50,7 @@ public class AFInfoBox extends CustomComponent {
 	private double alt;
 	private double speed;
 	private boolean hoverInPlace;
+	private boolean checkClicked = false;
 
 	private CheckBox check = new CheckBox();
 	private Label statusInfo1 = new Label();
@@ -259,6 +260,16 @@ public class AFInfoBox extends CustomComponent {
 		mainContent.setSizeUndefined();
 		mainContent.setSpacing(false);
 
+		topContent.addLayoutClickListener( e-> {
+			Component child = e.getChildComponent();
+			if (child != null && child.getClass() == CheckBox.class){
+				checkClicked = true;
+			}
+			else{
+				checkClicked = false;
+			}
+		});
+		
 		middleContent.setVisible(visible);
 		bottomContent.setVisible(visible);
 		topContent.addLayoutClickListener(e -> {
@@ -412,6 +423,14 @@ public class AFInfoBox extends CustomComponent {
 
 	public Button getRouteButton() {
 		return this.assignNewRoute;
+	}
+	
+	public boolean getCheckClick(){
+		return checkClicked;
+	}
+	
+	public void setCheckClick(boolean checkClicked){
+		this.checkClicked = checkClicked;
 	}
 
 	@WaypointReplace
