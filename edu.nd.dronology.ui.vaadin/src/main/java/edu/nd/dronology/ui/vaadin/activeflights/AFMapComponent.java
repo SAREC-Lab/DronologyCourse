@@ -426,6 +426,12 @@ public class AFMapComponent extends CustomComponent {
 
 	public void followDrones(List<String> names) {
 		Configuration configuration = Configuration.getInstance();
+		if (names.size() < 1) {
+			Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+			double zoom = configuration.getMapDefaultZoom();
+			leafletMap.setCenter(point, zoom);
+			return;
+		}
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			drones = service.getDrones();
@@ -468,11 +474,6 @@ public class AFMapComponent extends CustomComponent {
 		} catch (RemoteException | DronologyServiceException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-		if (names.size() < 1) {
-			Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-			double zoom = configuration.getMapDefaultZoom();
-			leafletMap.setCenter(point, zoom);
 		}
 	}
 
