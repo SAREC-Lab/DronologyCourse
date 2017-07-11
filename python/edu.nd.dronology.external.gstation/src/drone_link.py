@@ -3,7 +3,7 @@ import os
 import signal
 import dronekit
 import time
-import shutil
+import util
 from common import *
 
 
@@ -11,7 +11,6 @@ class Drone(object):
     def __init__(self):
         self.id = None
         self.vehicle = None
-        self.strategy = None
 
     def connect(self):
         raise NotImplementedError
@@ -19,8 +18,8 @@ class Drone(object):
     def disconnect(self):
         raise NotImplementedError
 
-    def on_command(self, cmd, **kwargs):
-        self.strategy.respond(cmd, self.vehicle, **kwargs)
+    def simple_goto(self, lat, lon, alt, **kwargs):
+        raise NotImplementedError
 
     def get_location(self):
         return {'x': 0, 'y': 0, 'z': 0}
@@ -67,8 +66,17 @@ class Drone(object):
     def get_id(self):
         return self.id
 
-    def set_strategy(self, strategy):
-        self.strategy = strategy
+    def is_home(self, threshold=5):
+        tmp = self.get_home_location()
+        home_lla = util.Lla(tmp['x'], tmp['y'], tmp['z'])
+        tmp = self.get_location()
+        cur_lla = util.Lla(tmp['x'], tmp['y'], tmp['z'])
+
+        return home_lla.distance(cur_lla) <= threshold
+
+    def send_to_home(self):
+        home = self.get_home_location()
+        self.simple_goto(home['x'], home['y'], home['z'])
 
     def report(self):
         return {
@@ -94,10 +102,14 @@ class SITLDrone(Drone):
         super(SITLDrone, self).__init__()
 
     def connect(self):
-        pass
+        raise NotImplementedError
 
     def disconnect(self):
         self.vehicle.close()
+
+    def simple_goto(self, lat, lon, alt, airspeed=None, groundspeed=None):
+        location = dronekit.LocationGlobal(lat, lon, alt=alt)
+        self.vehicle.simple_goto(location, airspeed=airspeed, groundspeed=groundspeed)
 
 
 class VirtualSITL(SITLDrone):

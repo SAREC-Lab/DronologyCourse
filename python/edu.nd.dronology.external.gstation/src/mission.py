@@ -1,70 +1,42 @@
 import util
-import Queue
 import threading
 import log_util
+import time
 from common import *
-from comms import drone_link as dl
 
 
 _LOG = log_util.get_logger('default_file')
-_default_drone_specs = ((DRONE_TYPE_SITL_VRTL, {'instance': 0, D_ATTR_HOME_LOC: (41.519408, -86.239996, 0, 0)}),)
 
 
 class Mission(object):
-    _STATUS_WAITING = 0
-    _STATUS_RUNNING = 1
-    _STATUS_STOPPED = 2
+    _WAITING = 1
+    _IN_MISSION = 2
+    _EXIT_SUCCESS = 0
+    _EXIT_FAIL = -1
 
-    def __init__(self, queue_to_control, drone_specs=_default_drone_specs, ardupath=ARDUPATH, **kwargs):
-        self.drone_specs = drone_specs
-        self.ardupath = ardupath
-        self.queue_to_control = queue_to_control
-        self.queue_from_control = Queue.Queue()
-        self.mission_worker = None
-        self.drones = {}
-        self._status = self._STATUS_WAITING
-        self._status_lock = threading.Lock()
+    def __init__(self, *args, **kwargs):
+        self.in_queue = None
+        self.worker = None
+        self._status = self._WAITING
 
-    def start(self, *args, **kwargs):
-        self.drones = {}
-        for i, (d_type, d_kwargs) in enumerate(self.drone_specs):
-            drone = dl.make_drone_link(d_type, ardupath=self.ardupath, **d_kwargs)
-            drone.connect()
+    @staticmethod
+    def notify_start_mission():
+        _LOG.info('Mission: mission successfully started.')
 
-            # TODO: figure out why SYSID_THISMAV is not unique.
-            d_id = '{}{}'.format(d_type, i + 1)
-            drone.set_id(d_id)
-            self.drones[d_id] = drone
+    def set_in_queue(self, in_queue):
+        self.in_queue = in_queue
 
-        self.mission_worker = threading.Thread(target=self.do_mission, args=args, kwargs=kwargs)
-        self.mission_worker.start()
-        self._status = self._STATUS_RUNNING
+    def do_mission(self, drones):
+        self._status = self._IN_MISSION
+        self.worker = threading.Thread(target=self._do_mission, args=drones)
+        self.worker.start()
+        self.notify_start_mission()
 
-    def stop(self):
-        if self._status != self._STATUS_WAITING:
-            self._status = self._STATUS_STOPPED
-            self.mission_worker.join()
-            self.drones = {}
-            self.queue_from_control.join()
+    def stop(self, exit_status=_EXIT_SUCCESS):
+        self._status = exit_status
+        self.worker.join()
 
-        util.clean_up_run()
-
-    def get_drones(self):
-        return self.drones
-
-    def add_drone(self, d_type=DRONE_TYPE_SITL_VRTL, d_kwargs=None):
-        if d_kwargs is None:
-            d_kwargs = {}
-
-        drone = dl.make_drone_link(d_type, **d_kwargs)
-        d_id = '{}{}'.format(d_type, len(self.drones.keys()) + 1)
-        drone.set_id(d_id)
-        self.drones[d_id] = drone
-
-    def on_command(self, cmd):
-        self.queue_from_control.put(cmd)
-
-    def do_mission(self, **kwargs):
+    def _do_mission(self, drones):
         raise NotImplementedError
 
 
@@ -75,24 +47,29 @@ _default_sar_vertices = ((41.519367, -86.240419, 0),
 
 
 class SAR(Mission):
-    def __init__(self, *args, **kwargs):
-        self.commands = []
-        super(SAR, self).__init__(*args, **kwargs)
+    def __init__(self, vertices=_default_sar_vertices, last_known_location=None, responsiveness=RESPOND_CRITICAL):
+        self.vertices = vertices
+        self.lkl = last_known_location
+        self.rspns = responsiveness
+        super(SAR, self).__init__()
 
-    def do_mission(self, vertices=_default_sar_vertices, last_known_location=None, responsiveness=RESPOND_CRITICAL):
+    @staticmethod
+    def notify_start_mission():
+        _LOG.info('Search and Rescue mission successfully started.')
+
+    def _do_mission(self, drones):
         # set up the mission
-        vertices_ = [util.Lla(*v).to_pvector().as_array()[:-1] for v in vertices]
+        vertices_ = [util.Lla(*v).to_pvector().as_array()[:-1] for v in self.vertices]
         search_path = util.get_search_path(vertices_)
-        extents = search_path.get_extents()
 
         # start the loop
-        while self._status != self._STATUS_STOPPED:
+        while self._status == self._IN_MISSION:
             # 1. check parameters for changes in state (from a command)
-            while not self.queue_from_control.empty():
-                cmd = self.queue_from_control.get_nowait()
+            while not self.in_queue.empty():
+                cmd = self.in_queue.get_nowait()
                 # TODO: do something perhaps
 
             # 2. do the mission / move the drones
 
-        self.queue_to_control.put(ExitCommand(MISSION, CONTROL_STATION))
+
 

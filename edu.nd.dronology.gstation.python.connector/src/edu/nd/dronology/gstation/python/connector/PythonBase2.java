@@ -48,8 +48,8 @@ public class PythonBase2 implements IDroneCommandHandler {
 
 			LOGGER.info("Connecting to Python base " + hostStr + "@" + port);
 			pythonSocket = new Socket();
-			pythonSocket.connect(new InetSocketAddress(hostAddr, port), 5000);
-			pythonSocket.setSoTimeout(20000);
+			pythonSocket.connect(new InetSocketAddress(hostAddr, port), 50000);
+			pythonSocket.setSoTimeout(200000);
 
 			LOGGER.hwInfo("Connected to " + pythonSocket.getInetAddress().toString() + "@" + pythonSocket.getPort());
 			readDispatcher = new ReadDispatcher(pythonSocket);

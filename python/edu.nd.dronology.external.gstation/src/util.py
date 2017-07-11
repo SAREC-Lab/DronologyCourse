@@ -293,24 +293,24 @@ def mean_position(positions):
 
 def clean_up_run():
     if os.path.exists('.sitl_temp'):
-        _LOG.info('deleting temporary sitl directory')
+        _LOG.info('Util: deleting temporary sitl directory')
         shutil.rmtree('.sitl_temp')
 
     try:
         pids = map(int, subprocess.check_output(['pgrep', 'arducopter']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
-        _LOG.warn('ArduCopter processes failed to shut down gracefully.')
+        _LOG.warn('Util: ArduCopter processes failed to shut down gracefully.')
     except subprocess.CalledProcessError:
-        _LOG.debug('no sitl links found')
+        _LOG.debug('Util: no ArduCopter processes found')
     #
     try:
         pids = map(int, subprocess.check_output(['pgrep', '-f', '/usr/local/bin/mavproxy.py']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
-        _LOG.warn('MavProxy processes failed to shut down gracefully.')
+        _LOG.warn('Util: MavProxy processes failed to shut down gracefully.')
     except subprocess.CalledProcessError:
-        _LOG.debug('no python processes found')
+        _LOG.debug('Util: no MavProxy processes found')
 
 
 if __name__ == '__main__':
