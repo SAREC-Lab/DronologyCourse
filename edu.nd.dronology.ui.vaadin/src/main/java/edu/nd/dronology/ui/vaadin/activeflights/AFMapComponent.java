@@ -67,6 +67,8 @@ public class AFMapComponent extends CustomComponent {
 
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	private FileResource droneIcon = new FileResource(new File(basepath + "/VAADIN/img/drone_icon.png"));
+	private FileResource droneIconFocused = new FileResource(new File(basepath + "/VAADIN/img/drone_icon_focused.png"));
+	private FileResource droneIconSelected = new FileResource(new File(basepath + "/VAADIN/img/drone_icon_selected.png"));
 	private FileResource dotIcon = new FileResource(new File(basepath + "/VAADIN/img/dot.png"));
 
 	public AFMapComponent(String tileDataURL, String name) {
@@ -94,8 +96,9 @@ public class AFMapComponent extends CustomComponent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		addDroneMarkers();
-		addActiveFlightRoutes("", null);
+		List<String> temp = new ArrayList<>();
+		addDroneMarkers("", temp);
+		addActiveFlightRoutes("", temp);
 		this.setAverageCenter();
 		double screenHeight = UI.getCurrent().getPage().getBrowserWindowHeight();
 		int layoutHeight = (int) Math.rint(screenHeight * 0.9);
@@ -103,7 +106,6 @@ public class AFMapComponent extends CustomComponent {
 		layout.addComponent(leafletMap);
 		content.addComponent(layout);
 		setCompositionRoot(content);
-		// content.addComponents(leafletMap);
 	}
 
 	public void setCenter(double centerLat, double centerLon) {
@@ -138,10 +140,6 @@ public class AFMapComponent extends CustomComponent {
 				List<Waypoint> coordinates = e.getWaypoints();
 				List<WayPoint> wayPoints = new ArrayList<>();
 				List<LMarker> wayPointMarker = new ArrayList<>();
-				// LlaCoordinate tempCoord = e.getStartLocation();
-				// Point tempPoint = new Point(tempCoord.getLatitude(), tempCoord.getLongitude());
-				// WayPoint tempWayPoint = new WayPoint(tempPoint,false);
-				// wayPoints.add(tempWayPoint);
 				int i = 0;
 				for (Waypoint coord : coordinates) {
 					Point point = new Point(coord.getCoordinate().getLatitude(), coord.getCoordinate().getLongitude());
@@ -160,6 +158,21 @@ public class AFMapComponent extends CustomComponent {
 					i++;
 				}
 				List<LPolyline> polyLines = utilities.drawLines(wayPoints, true, 0);
+				//System.out.println(e.getDroneId());
+				/*List<LPolyline> polyLines = new ArrayList<>();
+				if (e.getDroneId().equals(focused))
+					polyLines = utilities.drawLines(wayPoints, true, 2);
+				else {
+					boolean drawn = false;
+					for (String name : checked){
+						if (e.getDroneId().equals(name)){
+							polyLines = utilities.drawLines(wayPoints, true, 1);
+							drawn = true;
+						}
+					}
+					if (!drawn)
+						polyLines = utilities.drawLines(wayPoints, true, 0);
+				}*/
 				flightRoutes.add(polyLines);
 				if (wayPointMarkers.size() != currentFlights.size())
 					wayPointMarkers.add(wayPointMarker);
@@ -227,7 +240,7 @@ public class AFMapComponent extends CustomComponent {
 		}
 	}
 
-	public void addDroneMarkers() {
+	public void addDroneMarkers(String focused, List<String> checked) {
 		try {
 			drones = service.getDrones();
 		} catch (RemoteException e) {
@@ -246,7 +259,19 @@ public class AFMapComponent extends CustomComponent {
 		for (Entry<String, DroneStatus> e : drones.entrySet()) {
 			LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
 			marker.setId(e.getValue().getID());
-			marker.setIcon(droneIcon);
+			if (marker.getId().equals(focused))
+				marker.setIcon(droneIconFocused);
+			else {
+				boolean chosen = false;
+				for (String name : checked){
+					if (marker.getId().equals(name)){
+						marker.setIcon(droneIconSelected);
+						chosen = true;
+					}
+				}
+				if (!chosen)
+					marker.setIcon(droneIcon);
+			}
 			marker.setIconSize(new Point(77, 33));
 			marker.addMouseOverListener(new DroneMouseListener());
 			markers.add(marker);
@@ -256,7 +281,7 @@ public class AFMapComponent extends CustomComponent {
 		}
 	}
 
-	public void updateDroneMarkers() {
+	public void updateDroneMarkers(String focused, List<String> checked) {
 		try {
 			drones = service.getDrones();
 			ArrayList<LMarker> remove = new ArrayList<>();
@@ -269,6 +294,19 @@ public class AFMapComponent extends CustomComponent {
 							temp.setLat(e.getValue().getLatitude());
 							temp.setLon(e.getValue().getLongitude());
 							marker.setPoint(temp);
+							if (marker.getId().equals(focused))
+								marker.setIcon(droneIconFocused);
+							else {
+								boolean chosen = false;
+								for (String name : checked){
+									if (marker.getId().equals(name)){
+										marker.setIcon(droneIconSelected);
+										chosen = true;
+									}
+								}
+								if (!chosen)
+									marker.setIcon(droneIcon);
+							}
 							exists = true;
 						}
 					}
@@ -283,7 +321,19 @@ public class AFMapComponent extends CustomComponent {
 							if (!old) {
 								LMarker newMarker = new LMarker(e1.getValue().getLatitude(), e1.getValue().getLongitude());
 								newMarker.setId(e1.getValue().getID());
-								newMarker.setIcon(droneIcon);
+								if (marker.getId().equals(focused))
+									marker.setIcon(droneIconFocused);
+								else {
+									boolean chosen = false;
+									for (String name : checked){
+										if (marker.getId().equals(name)){
+											marker.setIcon(droneIconSelected);
+											chosen = true;
+										}
+									}
+									if (!chosen)
+										marker.setIcon(droneIcon);
+								}
 								newMarker.setIconSize(new Point(77, 33));
 								newMarker.addMouseOverListener(new DroneMouseListener());
 								markers.add(newMarker);
@@ -304,7 +354,19 @@ public class AFMapComponent extends CustomComponent {
 					if (!exists) {
 						LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
 						marker.setId(e.getValue().getID());
-						marker.setIcon(droneIcon);
+						if (marker.getId().equals(focused))
+							marker.setIcon(droneIconFocused);
+						else {
+							boolean chosen = false;
+							for (String name : checked){
+								if (marker.getId().equals(name)){
+									marker.setIcon(droneIconSelected);
+									chosen = true;
+								}
+							}
+							if (!chosen)
+								marker.setIcon(droneIcon);
+						}
 						marker.setIconSize(new Point(77, 33));
 						marker.addMouseOverListener(new DroneMouseListener());
 						markers.add(marker);

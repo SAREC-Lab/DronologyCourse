@@ -48,9 +48,9 @@ public class MyUI extends UI {
 			    public void run() {
 			      access(() -> {
 			      	navigationBar.getAFLayout().getControls().getPanel().refreshDrones();
-			      	navigationBar.getAFLayout().getAFMap().updateDroneMarkers();
 			      	String focused = navigationBar.getAFLayout().getControls().getPanel().getFocusedName();
 			      	List<String> checkedNames = navigationBar.getAFLayout().getControls().getPanel().getChecked();
+			      	navigationBar.getAFLayout().getAFMap().updateDroneMarkers(focused, checkedNames);
 			      	navigationBar.getAFLayout().getAFMap().updateActiveFlightRoutes(focused, checkedNames);
 			      	navigationBar.getAFLayout().continueFollowing();
 			      });
