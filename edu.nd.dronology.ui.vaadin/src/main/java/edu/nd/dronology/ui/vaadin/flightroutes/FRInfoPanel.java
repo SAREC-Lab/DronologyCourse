@@ -9,6 +9,7 @@ import java.util.Collection;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
@@ -123,6 +124,8 @@ public class FRInfoPanel extends CustomComponent {
 			}
 			
 			refreshRoutes();
+			//Notification.show(String.valueOf(numberRoutes));
+			panel.setCaption(numberRoutes + " Routes in database");
 			
 			index = getRouteNumber(drone);
 			routes.getComponent(index).addStyleName("info_box_focus");			
@@ -252,12 +255,13 @@ public class FRInfoPanel extends CustomComponent {
 				String id = e.getId();
 				String name = e.getName();
 				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+				numberRoutes--;
 			}
 			
 		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 
 	}
 	public int getRouteNumber(FlightRouteInfo info){
