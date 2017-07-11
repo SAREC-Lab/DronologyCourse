@@ -34,15 +34,15 @@ class DronologyLink:
         self._status_lock = threading.Lock()
 
     def start(self):
+        self._status = self._STATUS_ALIVE
         self.worker = threading.Thread(target=self._work)
         self.worker.start()
-        self._status = self._STATUS_ALIVE
 
     def stop(self):
         if self._status == self._STATUS_ALIVE:
             socket.socket(socket.AF_INET,
                           socket.SOCK_STREAM).connect((self.host, self.port))
-            time.sleep(1)
+            time.sleep(0.2)
 
         if self._status in [self._STATUS_CONNECTED, self._STATUS_STOPPED]:
             self._status = self._STATUS_STOPPED
@@ -104,9 +104,9 @@ class DronologyLink:
         self.sock.bind((self.host, self.port))
         self.sock.listen(0)
 
-        client, _ = self.sock.accept()
-        _LOG.info('dronology connection established...')
-        self.conn = client
+        conn, addr = self.sock.accept()
+        _LOG.info('dronology connection established: {}'.format(addr))
+        self.conn = conn
         self.conn.settimeout(0.1)
         self.out_queue = Queue.Queue()
         self._status = self._STATUS_CONNECTED

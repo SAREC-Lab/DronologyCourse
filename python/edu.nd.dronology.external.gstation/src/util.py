@@ -283,30 +283,12 @@ class Pvector(Position):
         return self.p_EB_E.ravel()
 
 
-class RepeatedTimer(object):
-    def __init__(self, interval, function, *args, **kwargs):
-        self._timer = None
-        self.interval = interval
-        self.function = function
-        self.args = args
-        self.kwargs = kwargs
-        self.is_running = False
-        self.start()
+def mean_position(positions):
+    nvecs = arr([pos.to_nvector().as_array() for pos in positions]).T
+    p_EM_E = nv.mean_horizontal_position(nvecs)
+    x, y, z = p_EM_E.ravel()
 
-    def _run(self):
-        self.is_running = False
-        self.start()
-        self.function(*self.args, **self.kwargs)
-
-    def start(self):
-        if not self.is_running:
-            self._timer = Timer(self.interval, self._run)
-            self._timer.start()
-            self.is_running = True
-
-    def stop(self):
-        self._timer.cancel()
-        self.is_running = False
+    return Pvector(x, y, z)
 
 
 def clean_up_run():

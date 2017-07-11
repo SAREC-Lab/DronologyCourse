@@ -7,7 +7,6 @@ import json
 import argparse
 import importlib
 import util
-import atexit
 import Queue
 import log_util
 from common import *
@@ -21,6 +20,7 @@ class ControlStation:
     _STATUS_ALIVE = 0
     _STATUS_DEAD = 1
     _STATUS_WAITING = 2
+    _STATUS_EXITED = 3
 
     def __init__(self, mission_type=mission.SAR, port=1234, ardupath=ARDUPATH, report_freq=1.0, **kwargs):
         self.report_freq = report_freq
@@ -33,12 +33,15 @@ class ControlStation:
     def is_alive(self):
         return self._status != self._STATUS_DEAD
 
+    def is_exited(self):
+        return self._status == self._STATUS_EXITED
+
     def start(self):
+        self._status = self._STATUS_ALIVE
         self.dronology_link.start()
         _LOG.info('control waiting for dronology connection.')
         self.mission.start()
         _LOG.info('mission loaded, starting workers.')
-        self._status = self._STATUS_ALIVE
         self._worker.start()
 
     def _work(self):
@@ -78,6 +81,7 @@ class ControlStation:
         _LOG.info('dronology link stopped.')
         self.mission.stop()
         _LOG.info('mission link stopped.')
+        self._status = self._STATUS_EXITED
 
 
 def shutdown(control_station):
@@ -111,16 +115,18 @@ def main():
 
     _LOG.info('STARTING NEW MISSION.')
     ctrl = ControlStation(mission_type=args.mission, ardupath=args.ardu_path, port=args.port)
-    atexit.register(shutdown, control_station=ctrl)
+
     try:
         ctrl.start()
         while ctrl.is_alive():
             time.sleep(5)
     except KeyboardInterrupt:
         _LOG.warn('keyboard interrupt, shutting down.')
-    _LOG.info('control station is shutting down all modules.')
-    ctrl.stop()
-    _LOG.info('MISSION ENDED.')
+
+    if not ctrl.is_exited():
+        _LOG.info('control station is shutting down all modules.')
+        ctrl.stop()
+        _LOG.info('MISSION ENDED.')
 
 
 if __name__ == "__main__":

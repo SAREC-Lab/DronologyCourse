@@ -21,7 +21,6 @@ class Mission(object):
         self.queue_to_control = queue_to_control
         self.queue_from_control = Queue.Queue()
         self.mission_worker = None
-        self.cmd_worker = threading.Thread(target=self._on_command)
         self.drones = {}
         self._status = self._STATUS_WAITING
         self._status_lock = threading.Lock()
@@ -37,7 +36,6 @@ class Mission(object):
             drone.set_id(d_id)
             self.drones[d_id] = drone
 
-        self.cmd_worker.start()
         self.mission_worker = threading.Thread(target=self.do_mission, args=args, kwargs=kwargs)
         self.mission_worker.start()
         self._status = self._STATUS_RUNNING
@@ -45,21 +43,11 @@ class Mission(object):
     def stop(self):
         if self._status != self._STATUS_WAITING:
             self._status = self._STATUS_STOPPED
-            self.cmd_worker.join()
             self.mission_worker.join()
             self.drones = {}
             self.queue_from_control.join()
 
         util.clean_up_run()
-
-    def on_command(self, cmd):
-        self.queue_from_control.put(cmd)
-
-    def _on_command(self):
-        raise NotImplementedError
-
-    def do_mission(self, **kwargs):
-        raise NotImplementedError
 
     def get_drones(self):
         return self.drones
@@ -73,11 +61,17 @@ class Mission(object):
         drone.set_id(d_id)
         self.drones[d_id] = drone
 
+    def on_command(self, cmd):
+        self.queue_from_control.put(cmd)
 
-_default_sar_vertices = ((41.519367, -86.240419),
-                         (41.519277, -86.240405),
-                         (41.519395, -86.239418),
-                         (41.519313, -86.239417))
+    def do_mission(self, **kwargs):
+        raise NotImplementedError
+
+
+_default_sar_vertices = ((41.519367, -86.240419, 0),
+                         (41.519277, -86.240405, 0),
+                         (41.519395, -86.239418, 0),
+                         (41.519313, -86.239417, 0))
 
 
 class SAR(Mission):
@@ -87,29 +81,18 @@ class SAR(Mission):
 
     def do_mission(self, vertices=_default_sar_vertices, last_known_location=None, responsiveness=RESPOND_CRITICAL):
         # set up the mission
-        search_path = util.get_search_path(vertices)
+        vertices_ = [util.Lla(*v).to_pvector().as_array()[:-1] for v in vertices]
+        search_path = util.get_search_path(vertices_)
+        extents = search_path.get_extents()
 
         # start the loop
         while self._status != self._STATUS_STOPPED:
             # 1. check parameters for changes in state (from a command)
-            while self.commands:
-                cmd = self.commands.pop(0)
+            while not self.queue_from_control.empty():
+                cmd = self.queue_from_control.get_nowait()
                 # TODO: do something perhaps
 
             # 2. do the mission / move the drones
 
         self.queue_to_control.put(ExitCommand(MISSION, CONTROL_STATION))
-
-    def _on_command(self):
-        while self._status != self._STATUS_STOPPED:
-            try:
-                cmd = self.queue_from_control.get_nowait()
-                self.queue_from_control.task_done()
-                # check status
-                if cmd['type'] in [CMD_TYPE_ERROR]:
-                    # if we care about it add it to commands
-                    self.commands.append(cmd['data'])
-                # NOTE: commands should be popped from index 0
-            except Queue.Empty:
-                pass
 
