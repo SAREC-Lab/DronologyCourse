@@ -10,6 +10,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.nd.dronology.core.util.Waypoint;
@@ -76,7 +77,12 @@ public class FRMainLayout extends CustomComponent {
 			
 			//gets box of route info and changes its style to show that it is selected
 			Component child = e.getChildComponent();
-			child.addStyleName("info_box_focus");
+			
+			if(routeLayout.getComponentIndex(child) != -1){
+				child.addStyleName("info_box_focus");
+			}
+			
+			//child.addStyleName("info_box_focus");
 			index = routeLayout.getComponentIndex(child);
 
 			//gets the flight info for that route

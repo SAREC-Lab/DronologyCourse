@@ -189,8 +189,10 @@ public class FRInfoPanel extends CustomComponent {
 		} catch (RemoteException | DronologyServiceException e) {
 			e.printStackTrace();
 		}
+		if(index != -1){
+			flight = (FlightRouteInfo) routeList.get(index);
+		}
 		
-		flight = (FlightRouteInfo) routeList.get(index);
 		return flight;
 	}
 
@@ -229,7 +231,6 @@ public class FRInfoPanel extends CustomComponent {
 			routeInformation = newRoute;	
 			
 		} catch (RemoteException | DronologyServiceException | PersistenceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
