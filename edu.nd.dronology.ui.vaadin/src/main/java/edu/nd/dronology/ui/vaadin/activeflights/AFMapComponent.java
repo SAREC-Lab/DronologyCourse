@@ -160,7 +160,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					i++;
 				}
-				List<LPolyline> polyLines = utilities.drawLines(wayPoints, true);
+				List<LPolyline> polyLines = utilities.drawLines(wayPoints, true, 0);
 				flightRoutes.add(polyLines);
 				if (wayPointMarkers.size() != currentFlights.size())
 					wayPointMarkers.add(wayPointMarker);

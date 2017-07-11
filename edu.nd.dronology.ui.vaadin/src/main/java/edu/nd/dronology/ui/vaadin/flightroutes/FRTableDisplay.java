@@ -80,7 +80,7 @@ public class FRTableDisplay {
 			    	}
 
 				   	route.removeAllLines(route.getPolylines());
-				   	route.setPolylines(route.drawLines(route.getMapPoints(), false));
+				   	route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
 				   	for(int i = 0; i < route.getPolylines().size(); i++){
 						route.getMap().addComponent(route.getPolylines().get(i));
 					}
