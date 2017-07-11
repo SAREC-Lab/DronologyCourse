@@ -157,9 +157,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					i++;
 				}
-				List<LPolyline> polyLines = utilities.drawLines(wayPoints, true, 0);
-				//System.out.println(e.getDroneId());
-				/*List<LPolyline> polyLines = new ArrayList<>();
+				List<LPolyline> polyLines = new ArrayList<>();
 				if (e.getDroneId().equals(focused))
 					polyLines = utilities.drawLines(wayPoints, true, 2);
 				else {
@@ -172,7 +170,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					if (!drawn)
 						polyLines = utilities.drawLines(wayPoints, true, 0);
-				}*/
+				}
 				flightRoutes.add(polyLines);
 				if (wayPointMarkers.size() != currentFlights.size())
 					wayPointMarkers.add(wayPointMarker);
