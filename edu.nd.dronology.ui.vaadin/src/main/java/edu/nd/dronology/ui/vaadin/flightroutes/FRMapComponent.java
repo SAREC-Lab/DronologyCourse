@@ -66,6 +66,7 @@ public class FRMapComponent extends CustomComponent {
 		Window popup = createWayPointWindow();
 		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup);
 
+		mapAndPopup.addStyleName("fr_mapandpopup_layout");
 		mapAndPopup.addComponent(leafletMap);
 		tableDisplay.setRoute(route);
 		tableDisplay.getGrid().addStyleName("fr_table_component");
@@ -128,7 +129,7 @@ public class FRMapComponent extends CustomComponent {
 		route.disableRouteEditing();
 
 		layout = new AbsoluteLayout();
-		layout.setHeight("510px");
+		layout.setHeight("447px");
 		layout.setWidth("1075px");
 
 		

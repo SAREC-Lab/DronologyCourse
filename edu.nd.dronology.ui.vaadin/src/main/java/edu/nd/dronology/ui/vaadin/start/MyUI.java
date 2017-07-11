@@ -1,5 +1,6 @@
 package edu.nd.dronology.ui.vaadin.start;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,7 +49,9 @@ public class MyUI extends UI {
 			      access(() -> {
 			      	navigationBar.getAFLayout().getControls().getPanel().refreshDrones();
 			      	navigationBar.getAFLayout().getAFMap().updateDroneMarkers();
-			      	navigationBar.getAFLayout().getAFMap().updateActiveFlightRoutes();
+			      	String focused = navigationBar.getAFLayout().getControls().getPanel().getFocusedName();
+			      	List<String> checkedNames = navigationBar.getAFLayout().getControls().getPanel().getChecked();
+			      	navigationBar.getAFLayout().getAFMap().updateActiveFlightRoutes(focused, checkedNames);
 			      	navigationBar.getAFLayout().continueFollowing();
 			      });
 			    }

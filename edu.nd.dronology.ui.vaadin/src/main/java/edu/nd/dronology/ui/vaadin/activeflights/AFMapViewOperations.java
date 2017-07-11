@@ -23,7 +23,7 @@ public class AFMapViewOperations extends CustomComponent{
   
 	public AFMapViewOperations(){
 		VerticalLayout layout = new VerticalLayout();
-		layout.addStyleName("af_emergency_operations");
+		layout.addStyleName("af_operations_group");
     
 		Label caption = new Label("Map View Operations");
     follow.setCaptionAsHtml(true);

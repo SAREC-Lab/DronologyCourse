@@ -95,7 +95,7 @@ public class AFMapComponent extends CustomComponent {
 			e.printStackTrace();
 		}
 		addDroneMarkers();
-		addActiveFlightRoutes();
+		addActiveFlightRoutes("", null);
 		this.setAverageCenter();
 		double screenHeight = UI.getCurrent().getPage().getBrowserWindowHeight();
 		int layoutHeight = (int) Math.rint(screenHeight * 0.9);
@@ -131,14 +131,13 @@ public class AFMapComponent extends CustomComponent {
 	}
 
 	@WaypointReplace
-	public void addActiveFlightRoutes() {
+	public void addActiveFlightRoutes(String focused, List<String> checked) {
 		try {
 			currentFlights = flightRouteService.getCurrentFlights();
 			for (FlightPlanInfo e : currentFlights) {
 				List<Waypoint> coordinates = e.getWaypoints();
 				List<WayPoint> wayPoints = new ArrayList<>();
 				List<LMarker> wayPointMarker = new ArrayList<>();
-
 				// LlaCoordinate tempCoord = e.getStartLocation();
 				// Point tempPoint = new Point(tempCoord.getLatitude(), tempCoord.getLongitude());
 				// WayPoint tempWayPoint = new WayPoint(tempPoint,false);
@@ -160,7 +159,7 @@ public class AFMapComponent extends CustomComponent {
 					}
 					i++;
 				}
-				List<LPolyline> polyLines = utilities.drawLines(wayPoints, true);
+				List<LPolyline> polyLines = utilities.drawLines(wayPoints, true, 0);
 				flightRoutes.add(polyLines);
 				if (wayPointMarkers.size() != currentFlights.size())
 					wayPointMarkers.add(wayPointMarker);
@@ -189,7 +188,7 @@ public class AFMapComponent extends CustomComponent {
 		return next.isReached();
 	}
 
-	public void updateActiveFlightRoutes() {
+	public void updateActiveFlightRoutes(String focused, List<String> checked) {
 		try {
 			currentFlights = flightRouteService.getCurrentFlights();
 			if (currentFlights.size() != flightRoutes.size() || true) {
@@ -209,7 +208,7 @@ public class AFMapComponent extends CustomComponent {
 			/*
 			 * if (wayPointMarkers.size() != flightRoutes.size()){ for (ArrayList<LMarker> e:wayPointMarkers){ utilities.removeAllMarkers(e); } wayPointMarkers.clear(); } flightRoutes.clear();
 			 */
-			this.addActiveFlightRoutes();
+			this.addActiveFlightRoutes(focused, checked);
 			// }
 
 		} catch (RemoteException e) {
@@ -426,6 +425,12 @@ public class AFMapComponent extends CustomComponent {
 
 	public void followDrones(List<String> names) {
 		Configuration configuration = Configuration.getInstance();
+		if (names.size() < 1) {
+			Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
+			double zoom = configuration.getMapDefaultZoom();
+			leafletMap.setCenter(point, zoom);
+			return;
+		}
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			drones = service.getDrones();
@@ -468,11 +473,6 @@ public class AFMapComponent extends CustomComponent {
 		} catch (RemoteException | DronologyServiceException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-		if (names.size() < 1) {
-			Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-			double zoom = configuration.getMapDefaultZoom();
-			leafletMap.setCenter(point, zoom);
 		}
 	}
 

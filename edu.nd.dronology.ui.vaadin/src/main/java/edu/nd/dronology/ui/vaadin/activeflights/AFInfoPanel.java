@@ -38,6 +38,7 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
+	private String focused;
 	private AFMapViewOperations mapView = new AFMapViewOperations();
 	private Map<String, DroneStatus> drones;
 	private IDroneSetupRemoteService service;
@@ -121,6 +122,7 @@ public class AFInfoPanel extends CustomComponent{
 				if(!child.getCheckClick()){
 					child.addStyleName("info_box_focus");
 					child.setIsChecked(true);
+					focused = child.getName();
 					for (int i = 1; i < numUAVs + 1; i++){
 						AFInfoBox box = (AFInfoBox) content.getComponent(i);
 						if (!box.getName().equals(child.getName())) {
@@ -193,6 +195,10 @@ public class AFInfoPanel extends CustomComponent{
 	
 	public AFMapViewOperations getMapView(){
 		return mapView;
+	}
+	
+	public String getFocusedName(){
+		return focused;
 	}
 	
 	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){

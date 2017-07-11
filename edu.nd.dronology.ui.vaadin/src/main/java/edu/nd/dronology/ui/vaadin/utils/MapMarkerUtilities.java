@@ -62,7 +62,7 @@ public class MapMarkerUtilities {
 		    	
 		    	map.removeComponent(leafletMarker);
 				removeAllLines(polylines);
-				polylines = drawLines(mapPoints, true);
+				polylines = drawLines(mapPoints, true, 1);
 				grid.setItems(mapPoints);
 				
 				for (int i = 0; i < mapPoints.size(); i++) {
@@ -98,7 +98,7 @@ public class MapMarkerUtilities {
 	    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
 	    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
 	    	removeAllLines(polylines);
-	    	polylines = drawLines(mapPoints, false);
+	    	polylines = drawLines(mapPoints, false, 1);
 	    	grid.setItems(mapPoints);
 	    	for(int i = 0; i < polylines.size(); i++){
 				map.addComponent(polylines.get(i));
@@ -166,7 +166,7 @@ public class MapMarkerUtilities {
 		}
 		
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints, true);
+		polylines = drawLines(mapPoints, true, 1);
 		grid.setItems(mapPoints);
 		
 		return p;
@@ -181,7 +181,7 @@ public class MapMarkerUtilities {
 		}
 		mapPoints.add(p);
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints, false);
+		polylines = drawLines(mapPoints, false, 1);
 		grid.setItems(mapPoints);
 		
 		for (int i = 0; i < mapPoints.size(); i++) {
@@ -225,7 +225,7 @@ public class MapMarkerUtilities {
 			}
 		}
 	}
-	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap) {
+	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
@@ -233,7 +233,12 @@ public class MapMarkerUtilities {
 			LPolyline polyline = new LPolyline(current.toPoint(), mapPoints.get(i + 1).toPoint());
 			polyline.setId(UUID.randomUUID().toString());
 			polyline.setWeight(current.isReached() ? 1 : 2);
-			polyline.setColor("#000");
+			if (mode == 0) //normal
+				polyline.setColor("#444");
+			if (mode == 1) //selected
+				polyline.setColor("#000");
+			if (mode == 2) //focused
+				polyline.setColor("#d87703");
 			if (current.isReached()) {
 				polyline.setDashArray("5 10");
 				polyline.setColor("#249b09");
