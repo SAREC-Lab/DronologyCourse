@@ -134,6 +134,7 @@ public class AFInfoPanel extends CustomComponent{
 				}
 				else{
 					child.removeStyleName("info_box_focus");
+					focused = "";
 				}
 			}
 		});
