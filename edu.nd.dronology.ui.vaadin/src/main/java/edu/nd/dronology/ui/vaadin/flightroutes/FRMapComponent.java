@@ -52,6 +52,7 @@ public class FRMapComponent extends CustomComponent {
 	FRMetaInfo bar = new FRMetaInfo();
 	FReditBar editBar = new FReditBar();
 	AbsoluteLayout layout = new AbsoluteLayout();
+	FRMetaInfo selectedBar;
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
@@ -130,13 +131,14 @@ public class FRMapComponent extends CustomComponent {
 		layout.setHeight("510px");
 		layout.setWidth("1075px");
 
-		FRMetaInfo selectedBar;
-
+		
 		if (whichName) {
+			int numWaypoints = route.getMapPoints().size();
 			selectedBar = new FRMetaInfo(routeName, numCoords);
 		} else {
 			selectedBar = new FRMetaInfo(info);
 		}
+		 
 
 		editBar = new FReditBar();
 		editBar.setStyleName("edit_bar");
@@ -165,6 +167,7 @@ public class FRMapComponent extends CustomComponent {
 
 			leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 			tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
+			
 		});
 
 		Button cancel = editBar.getCancelButton();
@@ -273,7 +276,22 @@ public class FRMapComponent extends CustomComponent {
 		tableDisplay.setGrid(route.getMapPoints());
 		
 	}
+	
+	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName){
+		
+		displayByName(info, routeName, numCoords, whichName);
+		
+		route.enableRouteEditing();
+		leafletMap.setEnabled(true);
+		editBar.addStyleName("bring_front");
+		editBar.setWidth("880px");
+		layout.addComponent(editBar, "top: 5px; left:95px");
 
+		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
+		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
+		
+	}
+	
 	public void displayNoTable() {
 		content.removeComponent(tableDisplay.getGrid());
 	}
@@ -365,5 +383,11 @@ public class FRMapComponent extends CustomComponent {
 			
 		leafletMap.setCenter(centerPoint, zoom+1);
 						
+	}
+	public FRMetaInfo getMetaBar(){
+		return selectedBar;
+	}
+	public Button getEditButton(){
+		return selectedBar.getEditButton();
 	}
 }

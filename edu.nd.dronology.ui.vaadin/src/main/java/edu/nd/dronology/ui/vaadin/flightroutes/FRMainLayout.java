@@ -31,6 +31,7 @@ public class FRMainLayout extends CustomComponent {
 	private WayPoint way;
 	private FRMapComponent map;
 	private VerticalLayout routeLayout;
+	boolean isFirst = true;
 
 	@WaypointReplace
 	public FRMainLayout() {
@@ -67,7 +68,19 @@ public class FRMainLayout extends CustomComponent {
 			
 			map.getTableDisplay().getGrid().setItems();
 			map.enableEdit();
-
+			
+			map.getMapInstance().addClickListener(eve->{
+				
+				//the size of mapPoints is received as 1 for the first two waypoints added
+				if(map.getUtils().getMapPoints().size() == 1 && isFirst){
+					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
+					isFirst = false;
+				}
+				else{
+					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
+				}
+			});
+			
 		});
 
 		map.display();
@@ -130,6 +143,13 @@ public class FRMainLayout extends CustomComponent {
 			}	
 			map.setRouteCenter();
 			map.displayByName(flightInfo, null, 0, false);
+			
+			//click listener to update waypoint number 
+			map.getMapInstance().addClickListener(eve->{
+				
+				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
+						
+			});
 		});
 		
 		content.addComponents(controls, map);

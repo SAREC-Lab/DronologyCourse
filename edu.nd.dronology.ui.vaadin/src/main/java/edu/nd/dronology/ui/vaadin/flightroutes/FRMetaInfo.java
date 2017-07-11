@@ -83,10 +83,8 @@ public class FRMetaInfo extends CustomComponent {
 		setCompositionRoot(content);
 		
 	}
-	public FRMetaInfo(FlightRouteInfo info){	
-		
-		this(info.getName(), info.getWaypoints().size());
-		
+	public FRMetaInfo(FlightRouteInfo info){		
+		this(info.getName(), info.getWaypoints().size());	
 	}
 	
 	public FRMetaInfo(){
@@ -119,4 +117,5 @@ public class FRMetaInfo extends CustomComponent {
 	public Button getEditButton(){
 		return editButton;
 	}
+	
 }
