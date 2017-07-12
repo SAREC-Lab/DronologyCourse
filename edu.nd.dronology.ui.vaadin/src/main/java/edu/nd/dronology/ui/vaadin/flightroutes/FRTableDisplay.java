@@ -47,60 +47,60 @@ public class FRTableDisplay {
 			}
 		});
 		
-		
-		
 		grid.setColumnOrder("order", "latitude", "longitude", "altitude", "transitSpeed");
 		grid.addColumn(event -> "Delete",
 			new ButtonRenderer<WayPoint> (clickEvent -> {
-				Window deletePanel = new Window(" ");
-				VerticalLayout deletePanelContent = new VerticalLayout();
-				HorizontalLayout buttons = new HorizontalLayout();
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				deletePanel.setContent(deletePanelContent);
+				if (route.isEditable()) {
+					Window deletePanel = new Window(" ");
+					VerticalLayout deletePanelContent = new VerticalLayout();
+					HorizontalLayout buttons = new HorizontalLayout();
+					Button yes = new Button("Yes");
+					Button no = new Button("No");
+					deletePanel.setContent(deletePanelContent);
 					
-				deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
-				deletePanel.setWidth("425px");
+					deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
+					deletePanel.setWidth("425px");
 					
-				buttons.addComponent(yes);
-				buttons.addComponent(no);
+					buttons.addComponent(yes);
+					buttons.addComponent(no);
 					
-				deletePanel.setModal(true);
-				deletePanel.setClosable(false);
-				deletePanel.setResizable(false);
+					deletePanel.setModal(true);
+					deletePanel.setClosable(false);
+					deletePanel.setResizable(false);
 					
-				yes.addClickListener(event -> {
-					WayPoint w = clickEvent.getItem();
-			    	for (int i = 0; i < route.getMapPoints().size(); i++) {
-			    		if (route.getMapPoints().get(i).getId().equals(w.getId())) {
-			    			route.getMapPoints().remove(route.getMapPoints().get(i));
-			    			route.getMap().removeComponent(route.getPins().get(i));
-			    			route.getPins().remove(route.getPins().get(i));
-			    		}
-			    	}
+					yes.addClickListener(event -> {
+						WayPoint w = clickEvent.getItem();
+						for (int i = 0; i < route.getMapPoints().size(); i++) {
+							if (route.getMapPoints().get(i).getId().equals(w.getId())) {
+								route.getMapPoints().remove(route.getMapPoints().get(i));
+								route.getMap().removeComponent(route.getPins().get(i));
+								route.getPins().remove(route.getPins().get(i));
+							}
+						}
 
-				   	route.removeAllLines(route.getPolylines());
-				   	route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
-				   	for(int i = 0; i < route.getPolylines().size(); i++){
-						route.getMap().addComponent(route.getPolylines().get(i));
-					}
+						route.removeAllLines(route.getPolylines());
+						route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
+						for(int i = 0; i < route.getPolylines().size(); i++){
+							route.getMap().addComponent(route.getPolylines().get(i));
+						}
 
-					for (int i = 0; i < this.route.getMapPoints().size(); i++) {
-						this.route.getMapPoints().get(i).setOrder(i + 1);
-					}
+						for (int i = 0; i < this.route.getMapPoints().size(); i++) {
+							this.route.getMapPoints().get(i).setOrder(i + 1);
+						}
 					
-				   	grid.setItems(this.route.getMapPoints());
-				   	grid.setItems(route.getMapPoints());
-				   	UI.getCurrent().removeWindow(deletePanel);				   	
-				});
+						grid.setItems(this.route.getMapPoints());
+						grid.setItems(route.getMapPoints());
+						UI.getCurrent().removeWindow(deletePanel);				   	
+					});
+						
+					no.addClickListener(event -> {
+						UI.getCurrent().removeWindow(deletePanel);
+					});
+						
+					deletePanelContent.addComponent(buttons);
 					
-				no.addClickListener(event -> {
-					UI.getCurrent().removeWindow(deletePanel);
-				});
-					
-				deletePanelContent.addComponent(buttons);
-				
-				UI.getCurrent().addWindow(deletePanel);
+					UI.getCurrent().addWindow(deletePanel);
+				}
 			})
 		);
 	}
