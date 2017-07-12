@@ -484,11 +484,8 @@ public class AFMapComponent extends CustomComponent {
 	}
 
 	public void followDrones(List<String> names) {
-		Configuration configuration = Configuration.getInstance();
 		if (names.size() < 1) {
-			Point point = new Point(configuration.getMapCenterLat(), configuration.getMapCenterLon());
-			double zoom = configuration.getMapDefaultZoom();
-			leafletMap.setCenter(point, zoom);
+			this.follow = false;
 			return;
 		}
 		try {
