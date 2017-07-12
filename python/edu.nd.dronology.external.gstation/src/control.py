@@ -1,10 +1,7 @@
 import Queue
-import argparse
-import importlib
 import socket
 import threading
 import time
-
 import drone_link as dl
 import log_util
 import mission
@@ -21,8 +18,8 @@ class ControlStation:
     _EXIT_FAIL = -1
     _EXIT_SUCCESS = 0
 
-    def __init__(self, host='127.0.0.1', port=1234, report_freq=1.0,
-                 drone_specs=DEFAULT_DRONE_SPECS, mission_type=mission.SAR, ardupath=ARDUPATH, **kwargs):
+    def __init__(self, host='127.0.0.1', port=1234, report_freq=1.0, ardupath=ARDUPATH,
+                 drone_specs=DEFAULT_DRONE_SPECS, mission_type=mission.SAR, **kwargs):
         self.host = host
         self.port = port
         self.sock = None
@@ -62,12 +59,12 @@ class ControlStation:
     def work(self):
         while True:
             if self.is_waiting():
-                self._wait_for_connection()
-                _LOG.info('ControlStation: established connection.')
-                self.drones = self._make_drones()
-                self.mission.do_mission(self.drones)
-                self.set_status(ControlStation._IN_PROGRESS)
-                self._start_workers()
+                if self._wait_for_connection():
+                    _LOG.info('ControlStation: established connection.')
+                    self.drones = self._make_drones()
+                    self.mission.do_mission(self.drones)
+                    self.set_status(ControlStation._IN_PROGRESS)
+                    self._start_workers()
             elif self.is_disconnected():
                 _LOG.info('ControlStation: connection broken, attempting to reset.')
                 _LOG.info('ControlStation: joining send and receive workers.')
@@ -104,6 +101,7 @@ class ControlStation:
         util.clean_up_run()
 
     def _wait_for_connection(self, accept_timeout=10, conn_timeout=0.25):
+        success = 1
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(accept_timeout)
         self.sock.bind((self.host, self.port))
@@ -116,7 +114,10 @@ class ControlStation:
             self.buffer = ''
         except socket.timeout:
             # _LOG.debug('connection timed out, starting over.')
-            pass
+            self.sock.close()
+            success = 0
+
+        return success
 
     def _start_workers(self):
         self.recv_worker = threading.Thread(target=self._recv)
@@ -130,8 +131,8 @@ class ControlStation:
 
     def _handle_disconnection(self, e):
         with self._status_lock:
-            if self._status == ControlStation._IN_PROGRESS:
-                _LOG.info('connection interrupted: {}'.format(e))
+            if self.is_in_progress():
+                _LOG.info('ControlStation: connection interrupted: {}'.format(e))
                 if e.errno in (socket.errno.ECONNRESET, socket.errno.EPIPE):
                     # TODO: handle reconnection
                     self._status = self._DISCONNECTED
@@ -190,38 +191,3 @@ class ControlStation:
             # while not drone.is_home():
             #     time.sleep(3)
 
-
-def parse_mission_type(arg):
-    """
-    example usage:
-        python control.py -m "mission.SAR -n 4"
-    """
-    toks = arg.split('.')
-    mod_name, mission_type = toks[:2]
-    mod = importlib.import_module(mod_name)
-
-    mission_ = getattr(mod, mission_type)
-
-    return mission_
-
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-ap', dest='ardu_path', required=True, type=str, help='path to ardupilot folder')
-    ap.add_argument('-p', '--port', default=1234, type=int, help='port to connect to dronology')
-    ap.add_argument('-m', '--mission', default=mission.SAR, type=parse_mission_type, help=parse_mission_type.__doc__)
-    ap.add_argument('-rf', '--report_freq', default=1.0, type=float, help='how frequently drone updates should be sent')
-    args = ap.parse_args()
-
-    _LOG.info('STARTING NEW MISSION.')
-
-    ctrl = ControlStation(mission_type=args.mission, ardupath=args.ardu_path, port=args.port)
-    try:
-        ctrl.work()
-    except KeyboardInterrupt:
-        _LOG.warn('keyboard interrupt, shutting down.')
-        ctrl.shutdown()
-
-
-if __name__ == "__main__":
-    main()
