@@ -206,7 +206,16 @@ public class AFMapComponent extends CustomComponent {
 				for (List<LPolyline> e : flightRoutes) {
 					utilities.removeAllLines(e);
 				}
-				if (wayPointMarkers.size() != currentFlights.size()) {
+				boolean exists = true;
+				for (List<LMarker> e : wayPointMarkers){
+					for (FlightPlanInfo q : currentFlights){
+						if (e.get(0).getPoint().getLat() != q.getWaypoints().get(0).getCoordinate().getLatitude() || 
+								e.get(0).getPoint().getLon() != q.getWaypoints().get(0).getCoordinate().getLongitude()){
+							exists = false;
+						}
+					}
+				}
+				if (!exists || wayPointMarkers.size() != currentFlights.size()) {
 					for (List<LMarker> e : wayPointMarkers) {
 						utilities.removeAllMarkers(e);
 					}
