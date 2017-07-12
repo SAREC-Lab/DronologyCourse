@@ -11,7 +11,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -33,6 +32,7 @@ public class FRMetaInfo extends CustomComponent {
 	Button editButton;
 	
 	public FRMetaInfo(String name, int numCoords){
+		//used if route is selected
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
@@ -83,14 +83,12 @@ public class FRMetaInfo extends CustomComponent {
 		setCompositionRoot(content);
 		
 	}
-	public FRMetaInfo(FlightRouteInfo info){	
-		
-		this(info.getName(), info.getCoordinates().size());
-		
+	public FRMetaInfo(FlightRouteInfo info){		
+		this(info.getName(), info.getWaypoints().size());	
 	}
 	
 	public FRMetaInfo(){
-		
+		//used if no route selected
 		HorizontalLayout information = new HorizontalLayout();
 		routeName = "No Route Selected";
 		Label nameLabel = new Label(routeName);
@@ -102,7 +100,6 @@ public class FRMetaInfo extends CustomComponent {
 		information.addComponent(nameLabel);
 		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
 		setCompositionRoot(information);
-		
 	}
 	
 	public void setName(String name){
@@ -120,4 +117,5 @@ public class FRMetaInfo extends CustomComponent {
 	public Button getEditButton(){
 		return editButton;
 	}
+	
 }

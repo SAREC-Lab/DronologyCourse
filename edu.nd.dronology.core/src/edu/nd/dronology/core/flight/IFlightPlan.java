@@ -38,4 +38,6 @@ public interface IFlightPlan {
 
 	boolean isCompleted();
 
+	double getTakeoffAltitude();
+
 }

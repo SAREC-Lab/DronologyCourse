@@ -18,7 +18,6 @@ import com.google.gson.GsonBuilder;
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
-import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -89,7 +88,7 @@ public class DispatchQueueManager {
 			}
 		}
 		if (USE_MONITORING) {
-			UAVMonitoringManager.getInstance().notify(id, GSON.toJson(status));
+		//	UAVMonitoringManager.getInstance().notify(id, GSON.toJson(status));
 		}
 
 	}

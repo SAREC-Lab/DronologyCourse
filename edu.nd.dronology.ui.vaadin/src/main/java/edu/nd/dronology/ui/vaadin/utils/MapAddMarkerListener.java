@@ -1,8 +1,8 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
 import java.awt.MouseInfo;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
@@ -95,6 +95,8 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    	else {
 	    		Notification.show(caption);
 	    	}
+	    	
+	    	//Notification.show(route.getMapPoints().get(0).getAltitude());
 		});
 		
 		cancelButton.addClickListener(event -> {
@@ -104,7 +106,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			UI.getCurrent().removeWindow(popup);
 
 			route.enableRouteEditing();
-			ArrayList<LPolyline> polylines = route.getPolylines();
+			List<LPolyline> polylines = route.getPolylines();
 			for(int i = 0; i < polylines.size(); i++){
 				route.getMap().addComponent(polylines.get(i));
 			}
@@ -122,7 +124,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getMapPoints().remove(route.getMapPoints().get(i));
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
-				route.setPolylines(route.drawLines(route.getMapPoints(), false));
+				route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
 				
 			}
 		}
