@@ -140,5 +140,8 @@ public class FRTableDisplay {
 	}
 	public void setGrid(List<WayPoint> points){
 		grid.setItems(points);
+		for (int i = 0; i < points.size(); i++) {
+			points.get(i).setOrder(i + 1);
+		}
 	}
 }

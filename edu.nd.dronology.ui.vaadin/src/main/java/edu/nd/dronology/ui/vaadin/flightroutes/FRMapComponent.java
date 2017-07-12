@@ -228,8 +228,10 @@ public class FRMapComponent extends CustomComponent {
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
 
-			List<WayPoint> newWaypoints = route.getMapPoints();
-
+			
+			List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
+			
+			
 			FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 			ByteArrayInputStream inStream;
 			IFlightRoute froute;
@@ -292,6 +294,8 @@ public class FRMapComponent extends CustomComponent {
 					toSend.setApproachingspeed(approach);
 					froute.addWaypoint(toSend);
 					
+					
+					
 				}
 
 				ByteArrayOutputStream outs = new ByteArrayOutputStream();
@@ -315,7 +319,7 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
 		
-		//tableDisplay.setGrid(route.getMapPoints());
+		tableDisplay.setGrid(route.getMapPoints());
 		
 	}
 	

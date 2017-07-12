@@ -164,8 +164,13 @@ public class FRMainLayout extends CustomComponent {
 						
 			});
 			
-			map.getUtils().setMapPoints(waypoints);
-			map.getTableDisplay().setGrid(map.getUtils().getMapPoints());
+			
+			//map.getUtils().setMapPoints(waypoints);
+			//map.getTableDisplay().setGrid(map.getUtils().getMapPoints());
+			
+			//List<WayPoint> local = map.getUtils().getMapPoints();
+			//map.getUtils().setSetPoints(waypoints);
+			map.getTableDisplay().setGrid(waypoints);
 		});
 		
 		content.addComponents(controls, map);
