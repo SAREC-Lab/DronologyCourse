@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
+import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
@@ -190,7 +191,25 @@ public class FRMapComponent extends CustomComponent {
 			}
 			
 			route.getGrid().setItems(route.getMapPoints());
-
+			
+			route.removeAllMarkers(route.getPins());
+			route.removeAllLines(route.getPolylines());
+			
+			for (int i = 0; i < storedPoints.size(); i++) {
+				WayPoint point = storedPoints.get(i);
+				route.addPinForWayPoint(point);
+				
+			}
+			
+			List<LPolyline> localPolylines = route.drawLines(storedPoints, false, 0);
+		
+			route.setPolylines(localPolylines);
+						
+			for (int i = 0; i < localPolylines.size(); i++) {
+				route.getMap().addComponent(localPolylines.get(i));
+			}
+			
+			
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
