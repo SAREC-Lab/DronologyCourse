@@ -360,5 +360,7 @@ public class MapMarkerUtilities {
 	public void setAllItems(ArrayList<WayPoint> dronologyPoints){
 		grid.setItems(dronologyPoints);
 	}
-
+	public void setMapPoints(List<WayPoint> waypoints){
+		mapPoints = waypoints;
+	}
 }

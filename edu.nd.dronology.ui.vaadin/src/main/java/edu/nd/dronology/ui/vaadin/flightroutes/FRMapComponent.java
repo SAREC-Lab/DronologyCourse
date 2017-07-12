@@ -315,9 +315,7 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
 		
-		//Notification.show(route.getMapPoints().get(0).getAltitude());
-		
-		tableDisplay.setGrid(route.getMapPoints());
+		//tableDisplay.setGrid(route.getMapPoints());
 		
 	}
 	
