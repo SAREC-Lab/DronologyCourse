@@ -106,7 +106,7 @@ public class MapMarkerUtilities {
 		}
 	}
 	
-	private class PolylineClickListener implements LeafletClickListener{
+	private class PolylineClickListener implements LeafletClickListener {
 
 		@Override
 		public void onClick(LeafletClickEvent event) {
@@ -290,12 +290,7 @@ public class MapMarkerUtilities {
 		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).
 					addListener(LeafletClickEvent.class, new MarkerClickListener(), LeafletClickListener.METHOD));
-//			registeredListeners.add(pins.get(i).addDragEndListener(event -> {}));
-//			Notification.show("added drag end listener " + String.valueOf(i));
-		}
-		for (int i = 0; i < pins.size(); i++) {
-			registeredListeners.add(pins.get(i).
-					addListener(DragEndEvent.class, new MarkerDragEndListener(), DragEndListener.METHOD));
+			registeredListeners.add(pins.get(i).addDragEndListener(new MarkerDragEndListener()));
 		}
 		for (int i = 0; i < polylines.size(); i++) {
 			registeredListeners.add(polylines.get(i).
