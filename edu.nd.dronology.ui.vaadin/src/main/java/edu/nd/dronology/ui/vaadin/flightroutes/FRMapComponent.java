@@ -16,6 +16,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -209,7 +210,6 @@ public class FRMapComponent extends CustomComponent {
 				route.getMap().addComponent(localPolylines.get(i));
 			}
 			
-			
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
@@ -264,6 +264,7 @@ public class FRMapComponent extends CustomComponent {
 					double alt = 0;
 					double lon = 0;
 					double lat = 0;
+					double approach = 0;
 				
 					try {
 						lon = Double.parseDouble(way.getLongitude());
@@ -280,8 +281,16 @@ public class FRMapComponent extends CustomComponent {
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					}
+					try{
+						approach = Double.parseDouble(way.getTransitSpeed());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
 					
-					froute.addWaypoint(new Waypoint(new LlaCoordinate(lat, lon, alt)));
+					
+					Waypoint toSend = new Waypoint(new LlaCoordinate(lat, lon, alt));
+					toSend.setApproachingspeed(approach);
+					froute.addWaypoint(toSend);
 					
 				}
 
@@ -306,7 +315,7 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
 		
-		tableDisplay.setGrid(route.getMapPoints());
+		//tableDisplay.setGrid(route.getMapPoints());
 		
 	}
 	

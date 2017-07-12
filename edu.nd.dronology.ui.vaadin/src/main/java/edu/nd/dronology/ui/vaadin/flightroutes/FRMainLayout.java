@@ -110,7 +110,7 @@ public class FRMainLayout extends CustomComponent {
 			//gets the flight info for that route
 			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 			List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
-			
+		
 			// removes old pins, polylines, and style when switching routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
 			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
@@ -123,14 +123,18 @@ public class FRMainLayout extends CustomComponent {
 			
 			//iterates through the flight info and adds to internal waypoints list
 			for (Waypoint coor : flightWaypoints) {
-
+				
+				String altitude = String.valueOf(coor.getCoordinate().getAltitude());
+				String approachingSpeed = String.valueOf(coor.getApproachingspeed());
+				
 				pt.setLat(coor.getCoordinate().getLatitude());
 				pt.setLon(coor.getCoordinate().getLongitude());
 				
 				WayPoint way = new WayPoint(pt, false);
-				way.setAltitude("wow");
+				way.setAltitude(altitude);
+				way.setTransitSpeed(approachingSpeed);
 				map.getUtils().addNewPinRemoveOld(pt, first);
-
+				
 				waypoints.add(way);
 				first = false;
 			}
@@ -159,6 +163,9 @@ public class FRMainLayout extends CustomComponent {
 				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
 						
 			});
+			
+			map.getUtils().setMapPoints(waypoints);
+			map.getTableDisplay().setGrid(map.getUtils().getMapPoints());
 		});
 		
 		content.addComponents(controls, map);
