@@ -15,7 +15,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -53,6 +52,7 @@ public class FRMapComponent extends CustomComponent {
 	FReditBar editBar = new FReditBar();
 	AbsoluteLayout layout = new AbsoluteLayout();
 	FRMetaInfo selectedBar;
+	private List<WayPoint> storedPoints = new ArrayList<>();
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
@@ -160,6 +160,10 @@ public class FRMapComponent extends CustomComponent {
 
 		// enable editing
 		edit.addClickListener(event -> {
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				storedPoints.add(route.getMapPoints().get(i));
+			}
+			
 			route.enableRouteEditing();
 			leafletMap.setEnabled(true);
 			editBar.addStyleName("bring_front");
@@ -174,8 +178,17 @@ public class FRMapComponent extends CustomComponent {
 		Button cancel = editBar.getCancelButton();
 		cancel.addClickListener(event -> {
 			route.disableRouteEditing();
-			int numberMapPoints = route.getMapPoints().size();
-			route.clearMapPointsIndex(info.getWaypoints().size());
+			
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				route.getMapPoints().remove(i);
+			}
+			
+			route.getMapPoints().clear();
+			
+			for (int i = 0; i < storedPoints.size(); i++) {
+				route.getMapPoints().add(storedPoints.get(i));
+			}
+			
 			route.getGrid().setItems(route.getMapPoints());
 
 			layout.removeComponent(editBar);
@@ -335,8 +348,8 @@ public class FRMapComponent extends CustomComponent {
 
 	public void enableEdit() {
 
-		route.enableRouteEditing();
-		leafletMap.setEnabled(true);
+//		route.enableRouteEditing();
+//		leafletMap.setEnabled(true);
 		editBar.addStyleName("bring_front");
 		editBar.setWidth("880px");
 		layout.addComponent(editBar, "top: 5px; left:95px");
@@ -344,6 +357,7 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
 
+		route.enableRouteEditing();
 	}
 	public void setRouteCenter(){
 		//calculates the mean point and sets the route

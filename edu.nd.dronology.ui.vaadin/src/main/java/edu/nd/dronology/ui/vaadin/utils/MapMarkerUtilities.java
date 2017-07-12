@@ -86,7 +86,7 @@ public class MapMarkerUtilities {
 		}		
 	}
 	private class MarkerDragEndListener implements DragEndListener {
-
+		
 		@Override
 		public void dragEnd(DragEndEvent event) {
 			LMarker leafletMarker = (LMarker)event.getSource();
@@ -290,6 +290,10 @@ public class MapMarkerUtilities {
 		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).
 					addListener(LeafletClickEvent.class, new MarkerClickListener(), LeafletClickListener.METHOD));
+//			registeredListeners.add(pins.get(i).addDragEndListener(event -> {}));
+//			Notification.show("added drag end listener " + String.valueOf(i));
+		}
+		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).
 					addListener(DragEndEvent.class, new MarkerDragEndListener(), DragEndListener.METHOD));
 		}
