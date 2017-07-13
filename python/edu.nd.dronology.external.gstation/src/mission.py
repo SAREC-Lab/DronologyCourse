@@ -49,7 +49,7 @@ class Mission(object):
         self._status = exit_status
         self.worker.join()
 
-    def _do_mission(self, drones):
+    def _do_mission(self, drones, drone_lock):
         raise NotImplementedError
 
 
@@ -70,10 +70,11 @@ class SAR(Mission):
     def notify_start_mission():
         _LOG.info('Search and Rescue mission successfully started.')
 
-    def _do_mission(self, drones):
+    def _do_mission(self, drones, drone_lock):
         # set up the mission
-        vertices_ = [util.Lla(*v).to_pvector().as_array()[:-1] for v in self.vertices]
-        search_path = util.get_search_path(vertices_)
+        locations = [util.Lla(*v) for v in self.vertices]
+        xyz_vertices = [loc.to_pvector().as_array()[:-1] for loc in locations]
+        search_path = util.get_search_path(xyz_vertices)
 
         cont = True
         # start the loop

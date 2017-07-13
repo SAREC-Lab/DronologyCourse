@@ -2,15 +2,30 @@ import subprocess
 import os
 import signal
 import dronekit
+import dronekit_sitl
 import time
 import util
+import log_util
 from common import *
+
+
+_LOG = log_util.get_logger('default_file')
 
 
 class Drone(object):
     def __init__(self):
         self.id = None
         self.vehicle = None
+        self.attrs = []
+
+    def is_attribute(self, attr_id):
+        return attr_id in self.attrs
+
+    def get_attribute(self, attr_id):
+        if self.is_attribute(attr_id):
+            return self.attrs[attr_id]
+        else:
+            _LOG.info('Invalid attribute: {}'.format(attr_id))
 
     def connect(self):
         raise NotImplementedError
@@ -21,8 +36,14 @@ class Drone(object):
     def simple_goto(self, lat, lon, alt, **kwargs):
         raise NotImplementedError
 
-    def get_location(self):
-        return {'x': 0, 'y': 0, 'z': 0}
+    def _get_attribute(self):
+        raise NotImplementedError
+
+    def get_location(self, as_array=False):
+        if as_array:
+            return [0, 0, 0]
+        else:
+            return {'x': 0, 'y': 0, 'z': 0}
 
     def get_attitude(self):
         return {'x': 0, 'y': 0, 'z': 0}
@@ -118,28 +139,37 @@ class VirtualSITL(SITLDrone):
                  instance=0,
                  ardupath=ARDUPATH,
                  speed=1, rate=10, home=(41.732955, -86.180886, 0, 0), baud=115200):
-        port = SITL_PORT + instance * 10
         self.ip = ip
-        self.port = port
-        self.connect_port = '127.0.0.1:' + str(14550 + 10 * instance)
-        self.baud = baud
+        self.instance = instance
+        self.ardupath = ardupath
+        self.speed = speed
+        self.rate = rate
         self.home = home
-        self.sitl_args = ['../resources/startSITL.sh',
-                          ip,
-                          str(self.port),
-                          str(instance),
-                          ardupath,
-                          str(speed),
-                          str(rate),
-                          ','.join(map(str, home))]
-
+        self.baud = baud
+        self.sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
         super(VirtualSITL, self).__init__()
 
-    def connect(self):
-        subprocess.call(self.sitl_args)
-        time.sleep(1)
-        self.vehicle = dronekit.connect(self.connect_port, wait_ready=True, baud=self.baud)
+    def connect(self, verbose=False):
+        # self.sitl.download('copter', '3.3')
+        sitl_args = [
+            '-S',
+            '-I{}'.format(self.instance),
+            '--model', '+',
+            '--home', ','.join(map(str, self.home)),
+            '--speedup', str(self.speed),
+            '--rate', str(self.rate),
+            '--defaults', os.path.join(self.ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
+        ]
+        self.sitl.launch(sitl_args, await_ready=True, verbose=True)
+        conn_string = self.sitl.connection_string()
+        _LOG.info('SITL launched on: {}'.format(conn_string))
+        self.vehicle = dronekit.connect(conn_string, wait_ready=True, baud=self.baud)
+        _LOG.info('Vehicle connected'.format(conn_string))
         self.set_id('VRTL_{}'.format(int(self.vehicle.parameters['SYSID_THISMAV'])))
+
+    def disconnect(self):
+        self.vehicle.close()
+        self.sitl.stop()
 
 
 class PhysicalSITL(SITLDrone):
@@ -160,3 +190,7 @@ def make_drone_link(drone_type, **kwargs):
         return PhysicalSITL(**kwargs)
     else:
         pass  # warn
+
+
+if __name__ == '__main__':
+    VirtualSITL().connect(verbose=True)

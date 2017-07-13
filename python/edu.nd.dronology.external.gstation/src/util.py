@@ -21,6 +21,12 @@ NV_A = SEMI_MAJOR
 NV_F = 1 - (SEMI_MINOR / SEMI_MAJOR)
 
 
+class CommunicationManager:
+    @staticmethod
+    def format_message(parts):
+        pass
+
+
 def get_search_path(vertices):
     if len(vertices) < 3:
         raise ValueError('invalid search area, must have 3 vertices.')
