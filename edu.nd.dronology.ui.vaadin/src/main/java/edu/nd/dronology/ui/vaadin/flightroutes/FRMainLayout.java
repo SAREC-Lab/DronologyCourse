@@ -3,6 +3,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.shared.Point;
 
@@ -13,6 +14,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -38,6 +40,7 @@ public class FRMainLayout extends CustomComponent {
 	private boolean isFirst = true;
 	private int componentCount;
 	private String name = "";
+	private List<String> routesClicked = new ArrayList<>();
 	
 	@WaypointReplace
 	public FRMainLayout() {
@@ -106,6 +109,7 @@ public class FRMainLayout extends CustomComponent {
 				buttons.addComponents(yes, no);
 				
 				VerticalLayout windowContent = new VerticalLayout();
+				name = routesClicked.get(routesClicked.size() - 1);
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
 				
@@ -165,6 +169,9 @@ public class FRMainLayout extends CustomComponent {
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 		List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
 	
+		Notification.show(flightInfo.getName());
+		routesClicked.add(flightInfo.getName());
+		
 		// removes old pins, polylines, and style when switching routes
 		map.getUtils().removeAllMarkers(map.getUtils().getPins());
 		map.getTableDisplay().getGrid().setStyleName("fr_table_component");

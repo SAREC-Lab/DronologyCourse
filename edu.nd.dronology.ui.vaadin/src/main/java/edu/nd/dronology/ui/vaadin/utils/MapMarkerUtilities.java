@@ -21,6 +21,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -290,7 +291,9 @@ public class MapMarkerUtilities {
 		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).
 					addListener(LeafletClickEvent.class, new MarkerClickListener(), LeafletClickListener.METHOD));
+			MarkerDragEndListener listener = new MarkerDragEndListener();
 			registeredListeners.add(pins.get(i).addDragEndListener(new MarkerDragEndListener()));
+			registeredListeners.remove(pins.get(i).getListeners(getClass()));
 		}
 		for (int i = 0; i < polylines.size(); i++) {
 			registeredListeners.add(polylines.get(i).
