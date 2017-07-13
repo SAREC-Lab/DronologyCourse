@@ -89,7 +89,6 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponents(tableDisplay.getGrid());
 		
 		this.setRouteCenter();
-		
 	}
 
 	private Window createWayPointWindow() {
