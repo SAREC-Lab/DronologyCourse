@@ -39,11 +39,11 @@ class Mission(object):
     def set_in_queue(self, in_queue):
         self.in_queue = in_queue
 
-    def do_mission(self, drones):
+    def do_mission(self, drones, drone_lock):
         self.set_status(self._IN_PROGRESS)
-        self.worker = threading.Thread(target=self._do_mission, args=drones)
-        self.worker.start()
         self.notify_start_mission()
+        self.worker = threading.Thread(target=self._do_mission, args=[drones, drone_lock])
+        self.worker.start()
 
     def stop(self, exit_status=_EXIT_SUCCESS):
         self._status = exit_status
@@ -85,6 +85,7 @@ class SAR(Mission):
                     cmd = self.in_queue.get_nowait()
                     self.in_queue.task_done()
                     # TODO: do something perhaps
+
             elif status == Mission._PAUSED:
                 pass
                 # 2. do the mission / move the drones
