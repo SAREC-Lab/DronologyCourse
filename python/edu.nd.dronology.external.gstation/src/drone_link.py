@@ -4,6 +4,7 @@ import signal
 import dronekit
 import dronekit_sitl
 import time
+import threading
 import util
 import log_util
 from common import *
@@ -151,6 +152,9 @@ class VirtualSITL(SITLDrone):
 
     def connect(self, verbose=False):
         # self.sitl.download('copter', '3.3')
+        threading.Thread(target=self._connect()).start()
+
+    def _connect(self):
         sitl_args = [
             '-S',
             '-I{}'.format(self.instance),
@@ -161,11 +165,13 @@ class VirtualSITL(SITLDrone):
             '--defaults', os.path.join(self.ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
         ]
         self.sitl.launch(sitl_args, await_ready=True, verbose=True)
-        conn_string = self.sitl.connection_string()
+        tcp, ip, port = self.sitl.connection_string().split(':')
+        port = str(int(port) + self.instance * 10)
+        conn_string = ':'.join([tcp, ip, port])
         _LOG.info('SITL launched on: {}'.format(conn_string))
         self.vehicle = dronekit.connect(conn_string, wait_ready=True, baud=self.baud)
         _LOG.info('Vehicle connected'.format(conn_string))
-        self.set_id('VRTL_{}'.format(int(self.vehicle.parameters['SYSID_THISMAV'])))
+        # self.set_id('VRTL_{}'.format(int(self.vehicle.parameters['SYSID_THISMAV'])))
 
     def disconnect(self):
         self.vehicle.close()
