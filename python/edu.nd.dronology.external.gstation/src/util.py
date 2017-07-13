@@ -83,58 +83,58 @@ class Position(object):
 
         return a
 
-    def update(self, v_EB_N, t=0.1):
-        """
-        Given a position and NED, we *might* be able to use equations 12, 14, 15 to determine an exact solution
-        for an updated position at some point in the future.
-            Gade, Kenneth. "A non-singular horizontal position representation."
-            The journal of navigation 63.3 (2010): 395-417.
+    # def update(self, v_EB_N, t=0.1):
+    #     """
+    #     Given a position and NED, we *might* be able to use equations 12, 14, 15 to determine an exact solution
+    #     for an updated position at some point in the future.
+    #         Gade, Kenneth. "A non-singular horizontal position representation."
+    #         The journal of navigation 63.3 (2010): 395-417.
+    #
+    #     This would be great for simulation. Not sure if we can do it though.
+    #
+    #     :param v_EB_N: north east down (3x1 ndarray)
+    #     :param t: time step for update
+    #     :return:
+    #     """
+    #     n_EB_E_and_h = self.to_nvector().as_array(flat=False)
+    #     n_EB_E = n_EB_E_and_h[:-1, :]
+    #     h_B = n_EB_E_and_h[-1, 0]
+    #
+    #     R_EN = nv.n_E2R_EN(n_EB_E)
+    #     # we want to go from N to E, so need to transpose
+    #     R_NE = np.transpose(R_EN)
+    #     v_EB_E = np.dot(R_NE, v_EB_N)
+    #
+    #     temp = column_vector([0, 0, 1])
+    #     # temp = [0, 0, 1]
+    #     # Equation 9
+    #     v_EB_E_east = np.cross(v_EB_E.ravel(), temp.ravel())
+    #     # Equation 10
+    #     v_EB_E_north = np.cross(v_EB_E_east, temp.ravel())
+    #
+    #     lla = self.to_lla()
+    #     lat = lla.get_latitude()
+    #
+    #     v_EB_E_north_scaled = v_EB_E_north / Earth.meridional_radius_curvature(lat)
+    #     v_EB_E_east_scaled = v_EB_E_east / Earth.transverse_radius_curvature(lat)
+    #     # Equation 12: the angular velocity in E
+    #     omega_EL_E = np.cross(n_EB_E.ravel(), (v_EB_E_north_scaled + v_EB_E_east_scaled))
+    #
+    #     # Equation 14: derivative wrt time
+    #     n_EB_E_prime = np.cross(omega_EL_E, n_EB_E.ravel())
+    #     h_B_prime = np.dot(n_EB_E.ravel(), v_EB_E)
+    #
+    #     update_n_EB_E = n_EB_E_prime * t
+    #     update_h_B = h_B_prime * t
+    #
+    #     new_x, new_y, new_z = n_EB_E.ravel() + update_n_EB_E
+    #     new_depth = h_B + update_h_B[0]
+    #
+    #     new_self = Nvector(new_x, new_y, new_z, new_depth)
+    #
+    #     return self.coerce(new_self)
 
-        This would be great for simulation. Not sure if we can do it though.
-
-        :param v_EB_N: north east down (3x1 ndarray)
-        :param t: time step for update
-        :return:
-        """
-        n_EB_E_and_h = self.to_nvector().as_array(flat=False)
-        n_EB_E = n_EB_E_and_h[:-1, :]
-        h_B = n_EB_E_and_h[-1, 0]
-
-        R_EN = nv.n_E2R_EN(n_EB_E)
-        # we want to go from N to E, so need to transpose
-        R_NE = np.transpose(R_EN)
-        v_EB_E = np.dot(R_NE, v_EB_N)
-
-        # TODO: the next two equations are broken... cross products are hard.
-        temp = column_vector([0, 0, 1])
-        # temp = [0, 0, 1]
-        # Equation 9
-        v_EB_E_east = np.cross(v_EB_E.ravel(), temp.ravel())
-        # Equation 10
-        v_EB_E_north = np.cross(v_EB_E_east, temp.ravel())
-
-        lla = self.to_lla()
-        lat = lla.get_latitude()
-
-        v_EB_E_north_scaled = v_EB_E_north / Earth.meridional_radius_curvature(lat)
-        v_EB_E_east_scaled = v_EB_E_east / Earth.transverse_radius_curvature(lat)
-        # Equation 12: the angular velocity in E
-        omega_EL_E = np.cross(n_EB_E.ravel(), (v_EB_E_north_scaled + v_EB_E_east_scaled))
-
-        # Equation 14: derivative wrt time
-        n_EB_E_prime = np.cross(omega_EL_E, n_EB_E.ravel())
-        h_B_prime = np.dot(n_EB_E.ravel(), v_EB_E)
-
-        update_n_EB_E = n_EB_E_prime * t
-        update_h_B = h_B_prime * t
-
-        new_x, new_y, new_z = n_EB_E.ravel() + update_n_EB_E
-        new_depth = h_B + update_h_B[0]
-
-        new_self = Nvector(new_x, new_y, new_z, new_depth)
-
-        return self.coerce(new_self)
-
+    # noinspection PyTypeChecker
     def distance(self, other):
         p1 = self.to_pvector().as_array()
         p2 = other.to_pvector().as_array()
@@ -293,24 +293,24 @@ def mean_position(positions):
 
 def clean_up_run():
     if os.path.exists('.sitl_temp'):
-        _LOG.info('Util: deleting temporary sitl directory')
+        _LOG.info('Deleting temporary sitl directory')
         shutil.rmtree('.sitl_temp')
 
     try:
         pids = map(int, subprocess.check_output(['pgrep', 'arducopter']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
-        _LOG.warn('Util: ArduCopter processes failed to shut down gracefully.')
+        _LOG.warn('ArduCopter processes failed to shut down gracefully.')
     except subprocess.CalledProcessError:
-        _LOG.debug('Util: no ArduCopter processes found')
+        _LOG.debug('No ArduCopter processes found')
     #
     try:
         pids = map(int, subprocess.check_output(['pgrep', '-f', '/usr/local/bin/mavproxy.py']).split())
         for pid in pids:
             os.kill(pid, signal.SIGINT)
-        _LOG.warn('Util: MavProxy processes failed to shut down gracefully.')
+        _LOG.warn('MavProxy processes failed to shut down gracefully.')
     except subprocess.CalledProcessError:
-        _LOG.debug('Util: no MavProxy processes found')
+        _LOG.debug('No MavProxy processes found')
 
 
 if __name__ == '__main__':

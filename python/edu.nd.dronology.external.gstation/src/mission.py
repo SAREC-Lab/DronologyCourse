@@ -10,7 +10,8 @@ _LOG = log_util.get_logger('default_file')
 
 class Mission(object):
     _WAITING = 1
-    _IN_MISSION = 2
+    _IN_PROGRESS = 2
+    _PAUSED = 3
     _EXIT_SUCCESS = 0
     _EXIT_FAIL = -1
 
@@ -18,16 +19,28 @@ class Mission(object):
         self.in_queue = None
         self.worker = None
         self._status = self._WAITING
+        self._status_lock = threading.Lock()
+
+    def get_status(self):
+        with self._status_lock:
+            return self._status
+
+    def set_status(self, status):
+        with self._status_lock:
+            self._status = status
+
+    def is_in_progress(self):
+        return Mission._IN_PROGRESS == self.get_status()
 
     @staticmethod
     def notify_start_mission():
-        _LOG.info('Mission: mission successfully started.')
+        _LOG.info('Mission successfully started.')
 
     def set_in_queue(self, in_queue):
         self.in_queue = in_queue
 
     def do_mission(self, drones):
-        self._status = self._IN_MISSION
+        self.set_status(self._IN_PROGRESS)
         self.worker = threading.Thread(target=self._do_mission, args=drones)
         self.worker.start()
         self.notify_start_mission()
@@ -62,14 +75,23 @@ class SAR(Mission):
         vertices_ = [util.Lla(*v).to_pvector().as_array()[:-1] for v in self.vertices]
         search_path = util.get_search_path(vertices_)
 
+        cont = True
         # start the loop
-        while self._status == self._IN_MISSION:
-            # 1. check parameters for changes in state (from a command)
-            while not self.in_queue.empty():
-                cmd = self.in_queue.get_nowait()
-                # TODO: do something perhaps
+        while cont:
+            status = self.get_status()
+            if status == Mission._IN_PROGRESS:
+                # 1. check parameters for changes in state (from a command)
+                while not self.in_queue.empty():
+                    cmd = self.in_queue.get_nowait()
+                    self.in_queue.task_done()
+                    # TODO: do something perhaps
+            elif status == Mission._PAUSED:
+                pass
+                # 2. do the mission / move the drones
+            else:
+                cont = False
 
-            # 2. do the mission / move the drones
+            time.sleep(0.1)
 
-
+        _LOG.info('Mission Complete')
 

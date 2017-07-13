@@ -2,6 +2,7 @@ import argparse
 import importlib
 import log_util
 import mission
+import atexit
 from control import ControlStation
 
 
@@ -36,9 +37,8 @@ def main():
     try:
         ctrl.work()
     except KeyboardInterrupt:
-        _LOG.warn('keyboard interrupt, shutting down.')
-        ctrl.shutdown()
-
+        ctrl.shutdown(-1)
+    # atexit.register(lambda: ctrl.shutdown(-1))
     _LOG.info('MISSION ENDED.')
 
 

@@ -58,70 +58,73 @@ class ControlStation:
 
     def work(self):
         while True:
-            if self.is_waiting():
-                if self._wait_for_connection():
-                    _LOG.info('ControlStation: established connection.')
+            status = self.get_status()
+            if status == ControlStation._WAITING:
+                self._wait_for_connection()
+                _LOG.info('Established connection.')
+                self.set_status(ControlStation._IN_PROGRESS)
+                if not self.mission.is_in_progress():
                     self.drones = self._make_drones()
                     self.mission.do_mission(self.drones)
-                    self.set_status(ControlStation._IN_PROGRESS)
-                    self._start_workers()
-            elif self.is_disconnected():
-                _LOG.info('ControlStation: connection broken, attempting to reset.')
-                _LOG.info('ControlStation: joining send and receive workers.')
+                _LOG.info('Starting send and receive workers')
+                self._start_workers()
+            elif status == ControlStation._DISCONNECTED:
+                _LOG.info('Connection broken, attempting to reset.')
                 self._join_workers()
                 self.sock.close()
                 self.conn.close()
-                _LOG.info('ControlStation: sending drones to home locations.')
+                _LOG.info('Sending drones to home locations.')
                 self._send_drones_home()
-                _LOG.info('ControlStation: waiting for connection.')
-                self._wait_for_connection()
-                _LOG.info('ControlStation: restarting send and receive workers.')
-                self.set_status(ControlStation._IN_PROGRESS)
-                self._start_workers()
-                _LOG.info('ControlStation: mission has been successfully reset.')
-            elif self.is_in_progress():
+                time.sleep(3)
+                _LOG.info('Waiting for connection.')
+                self.set_status(ControlStation._WAITING)
+            elif status == ControlStation._IN_PROGRESS:
+                # _LOG.info('mission in progress')
                 # self.mission.do_mission(self.drones)
                 pass
-            else:
+            elif status in (ControlStation._EXIT_FAIL, ControlStation._EXIT_SUCCESS):
                 # do shutdown
-                _LOG.info('ControlStation exiting with status {}.'.format(self.get_status()))
-                self._join_workers()
-                self.shutdown()
+                self.shutdown(status)
                 return
 
-    def shutdown(self):
-        _LOG.info('ControlStation: closing connection.')
-        self.conn.close()
-        _LOG.info('ControlStation: closing socket.')
-        self.sock.close()
-        # blocking call, hopefully we made sure all the messages were received by the mission
-        _LOG.info('ControlStation: joining message queue.')
-        self.in_queue.join()
-        _LOG.info('ControlStation: shutting down SITL and MAVLINK connections.')
-        util.clean_up_run()
+            time.sleep(0.1)
 
-    def _wait_for_connection(self, accept_timeout=10, conn_timeout=0.25):
-        success = 1
+    def shutdown(self, status):
+        _LOG.info('Exiting with status {}.'.format(status))
+        if not self.is_waiting():
+            self.set_status(status)
+            _LOG.info('Closing connection.')
+            self.conn.close()
+            _LOG.info('Closing socket.')
+            self.sock.close()
+            # blocking call, hopefully we made sure all the messages were received by the mission
+            _LOG.info('Joining message queue.')
+            self.in_queue.join()
+            self._join_workers()
+            _LOG.info('shutting down SITL and MAVLINK connections.')
+            self.mission.stop(status)
+            util.clean_up_run()
+
+    def _wait_for_connection(self, accept_timeout=5, conn_timeout=0.25):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(accept_timeout)
         self.sock.bind((self.host, self.port))
         self.sock.listen(0)
-        try:
-            conn, addr = self.sock.accept()
-            self.conn = conn
-            self.conn.settimeout(conn_timeout)
-            self.sock.settimeout(None)
-            self.buffer = ''
-        except socket.timeout:
-            # _LOG.debug('connection timed out, starting over.')
-            self.sock.close()
-            success = 0
 
-        return success
+        while True:
+            try:
+                conn, addr = self.sock.accept()
+                self.conn = conn
+                self.conn.settimeout(conn_timeout)
+                self.sock.settimeout(None)
+                self.buffer = ''
+                return
+            except socket.timeout:
+                _LOG.debug('no connection attempted in {} seconds, starting over.'.format(accept_timeout))
 
     def _start_workers(self):
         self.recv_worker = threading.Thread(target=self._recv)
-        self.send_worker = threading.Thread(target=self._send)
+        self.send_worker = threading.Thread(target=self._send, args=[self.report_freq])
         self.recv_worker.start()
         self.send_worker.start()
 
@@ -131,13 +134,13 @@ class ControlStation:
 
     def _handle_disconnection(self, e):
         with self._status_lock:
-            if self.is_in_progress():
-                _LOG.info('ControlStation: connection interrupted: {}'.format(e))
-                if e.errno in (socket.errno.ECONNRESET, socket.errno.EPIPE):
-                    # TODO: handle reconnection
-                    self._status = self._DISCONNECTED
-                else:
-                    self._status = self._EXIT_FAIL
+            if self._status == ControlStation._IN_PROGRESS:
+                _LOG.info('Connection interrupted: {}'.format(e))
+                self._status = ControlStation._DISCONNECTED
+                # if e.errno in (socket.errno.ECONNRESET, socket.errno.EPIPE):
+                #     pass
+                # else:
+                #     self._status = ControlStation._EXIT_FAIL
 
     def _recv(self):
         while self.is_in_progress():
@@ -145,6 +148,7 @@ class ControlStation:
                 msg = self.conn.recv(4096)
                 if os.linesep in msg:
                     msg_end, msg = msg.split(os.linesep)
+                    _LOG.info('Message received: {}'.format(self.buffer + msg_end))
                     self.in_queue.put(DronologyCommand.from_string(self.buffer + msg_end))
                     self.buffer = ''
                 self.buffer += msg
@@ -154,7 +158,9 @@ class ControlStation:
             except socket.error as e:
                 self._handle_disconnection(e)
 
-    def _send(self, send_rate=0.25):
+        _LOG.info('Receive worker exiting.')
+
+    def _send(self, send_rate):
         while self.is_in_progress():
             try:
                 self.conn.send(self._get_drone_update())
@@ -162,6 +168,8 @@ class ControlStation:
                 time.sleep(send_rate)
             except socket.error as e:
                 self._handle_disconnection(e)
+
+        _LOG.info('Send worker exiting.')
 
     def _make_drones(self):
         drones = {}
