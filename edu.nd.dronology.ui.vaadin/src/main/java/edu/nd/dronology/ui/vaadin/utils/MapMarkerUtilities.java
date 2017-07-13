@@ -13,6 +13,8 @@ import org.vaadin.addon.leaflet.LMarker.DragEndListener;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
+import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
+import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.shared.Registration;
@@ -35,10 +37,12 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
  */
 
 public class MapMarkerUtilities {
-	private class MarkerClickListener implements LeafletClickListener {
+	private class MarkerMouseOverListener implements LeafletMouseOverListener {
 
 		@Override
-		public void onClick(LeafletClickEvent event) {	
+		public void onMouseOver(LeafletMouseOverEvent event) {
+			Notification.show("adding a mouse over listener");
+			
 			LMarker leafletMarker = (LMarker)event.getSource();
 			WayPoint w = null;
 			
@@ -84,8 +88,9 @@ public class MapMarkerUtilities {
 					+ String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 240) + "px");
 
 			map.addComponent(popup);
-		}		
+		}
 	}
+	
 	private class MarkerDragEndListener implements DragEndListener {
 		
 		@Override
@@ -122,6 +127,7 @@ public class MapMarkerUtilities {
 			
 		}
 	}
+	
 	private LMap map;
 	private FRTableDisplay tableDisplay;
 	private Grid<WayPoint> grid;
@@ -172,6 +178,7 @@ public class MapMarkerUtilities {
 		
 		return p;
 	}
+	
 	public WayPoint addNewPinRemoveOld(Point point, boolean first) {
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
@@ -198,7 +205,7 @@ public class MapMarkerUtilities {
 		pins.add(leafletMarker);
 		
 		if (isEditable) {
-			leafletMarker.addClickListener(new MarkerClickListener());
+			leafletMarker.addMouseOverListener(new MarkerMouseOverListener());
     
 			/**
 			 * Drag End Listener is a listener that updates the path if a waypoint is moved.
@@ -226,6 +233,7 @@ public class MapMarkerUtilities {
 			}
 		}
 	}
+	
 	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 
@@ -263,21 +271,6 @@ public class MapMarkerUtilities {
 		}
 		return polylines;
 	}
-/*	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints) {
-		ArrayList<LPolyline> polylines = new ArrayList<>();
-		
-		for (int i = 0; i < mapPoints.size() - 1; i++) {
-			LPolyline polyline = new LPolyline(mapPoints.get(i).toPoint(), mapPoints.get(i+1).toPoint());
-			polyline.setId(UUID.randomUUID().toString());
-			
-			polylines.add(polyline);
-			map.addComponent(polyline);
-			if (isEditable) {
-				polyline.addClickListener(new PolylineClickListener());
-			}
-		}
-		return polylines;
-	}*/
 	
 	public void removeAllLines(List<LPolyline> polylines) {
 		for (int i = polylines.size() - 1; i >= 0; i--) {
@@ -289,11 +282,8 @@ public class MapMarkerUtilities {
 	public void enableRouteEditing () {
 		isEditable = true;
 		for (int i = 0; i < pins.size(); i++) {
-			registeredListeners.add(pins.get(i).
-					addListener(LeafletClickEvent.class, new MarkerClickListener(), LeafletClickListener.METHOD));
-			MarkerDragEndListener listener = new MarkerDragEndListener();
 			registeredListeners.add(pins.get(i).addDragEndListener(new MarkerDragEndListener()));
-			registeredListeners.remove(pins.get(i).getListeners(getClass()));
+			pins.get(i).addMouseOverListener(new MarkerMouseOverListener());
 		}
 		for (int i = 0; i < polylines.size(); i++) {
 			registeredListeners.add(polylines.get(i).
@@ -311,7 +301,6 @@ public class MapMarkerUtilities {
 		}
 		registeredListeners.clear();
 		tableDisplay.makeUneditable(this);
-		//map.setResponsive(false);
 	}
 	
 	public boolean isEditable () {
@@ -374,6 +363,7 @@ public class MapMarkerUtilities {
 	}
 	public void setMapPointsTransit(List<WayPoint> wayPoints){
 		for(int i = 0; i < mapPoints.size(); i++){
-			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		}
+			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
+		}
 	}
 }

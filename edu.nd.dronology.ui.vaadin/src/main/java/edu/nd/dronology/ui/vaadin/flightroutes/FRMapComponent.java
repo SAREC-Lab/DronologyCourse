@@ -132,7 +132,6 @@ public class FRMapComponent extends CustomComponent {
 		layout = new AbsoluteLayout();
 		layout.setHeight("447px");
 		layout.setWidth("1075px");
-
 		
 		if (whichName) {
 			int numWaypoints = route.getMapPoints().size();
@@ -141,7 +140,6 @@ public class FRMapComponent extends CustomComponent {
 			selectedBar = new FRMetaInfo(info);
 		}
 		 
-
 		editBar = new FReditBar();
 		editBar.setStyleName("edit_bar");
 		CheckBox tableBox = selectedBar.getCheckBox();
@@ -302,10 +300,7 @@ public class FRMapComponent extends CustomComponent {
 				e1.printStackTrace();
 			}
 			
-			int difference = route.getMapPoints().size() - storedPoints.size();
-			
-			int storedSize = storedPoints.size();
-			for(int i = storedSize; i < difference + storedSize; i++){
+			for(int i = storedPoints.size(); i < route.getMapPoints().size(); i++){
 				String alt = route.getMapPoints().get(i).getAltitude();
 				String lon = route.getMapPoints().get(i).getLongitude();
 				String lat = route.getMapPoints().get(i).getLatitude();
@@ -355,20 +350,14 @@ public class FRMapComponent extends CustomComponent {
 			route.disableRouteEditing();
 			leafletMap.setEnabled(false);
 		});
-		/*
-		this.getMapInstance().addClickListener(e-{
-			route.
-		});
-		*/
+
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
 		
-		tableDisplay.setGrid(route.getMapPoints());
-		
-		
+		tableDisplay.setGrid(route.getMapPoints());	
 	}
 	
 	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName){
@@ -425,9 +414,6 @@ public class FRMapComponent extends CustomComponent {
 	}
 
 	public void enableEdit() {
-
-//		route.enableRouteEditing();
-//		leafletMap.setEnabled(true);
 		editBar.addStyleName("bring_front");
 		editBar.setWidth("880px");
 		layout.addComponent(editBar, "top: 5px; left:95px");
