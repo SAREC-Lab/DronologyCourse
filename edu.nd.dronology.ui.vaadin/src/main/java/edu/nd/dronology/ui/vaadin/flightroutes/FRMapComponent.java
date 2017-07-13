@@ -46,14 +46,14 @@ public class FRMapComponent extends CustomComponent {
 
 	private LMap leafletMap;
 
-	MapMarkerUtilities route;
-	FRTableDisplay tableDisplay = new FRTableDisplay();
-	VerticalLayout content = new VerticalLayout();
-	AbsoluteLayout mapAndPopup = new AbsoluteLayout();
-	FRMetaInfo bar = new FRMetaInfo();
-	FReditBar editBar = new FReditBar();
-	AbsoluteLayout layout = new AbsoluteLayout();
-	FRMetaInfo selectedBar;
+	private MapMarkerUtilities route;
+	private FRTableDisplay tableDisplay = new FRTableDisplay();
+	private VerticalLayout content = new VerticalLayout();
+	private AbsoluteLayout mapAndPopup = new AbsoluteLayout();
+	private FRMetaInfo bar = new FRMetaInfo();
+	private FReditBar editBar = new FReditBar();
+	private AbsoluteLayout layout = new AbsoluteLayout();
+	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
@@ -174,7 +174,6 @@ public class FRMapComponent extends CustomComponent {
 
 			leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 			tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
-			
 		});
 
 		Button cancel = editBar.getCancelButton();
@@ -219,7 +218,6 @@ public class FRMapComponent extends CustomComponent {
 
 		Button save = editBar.getSaveButton();
 		save.addClickListener(event -> {
-
 			route.disableRouteEditing();
 
 			layout.removeComponent(editBar);
@@ -228,9 +226,7 @@ public class FRMapComponent extends CustomComponent {
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
 
-			
 			List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
-			
 			
 			FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 			ByteArrayInputStream inStream;
@@ -242,7 +238,6 @@ public class FRMapComponent extends CustomComponent {
 
 			//sends the information to dronology to be saved
 			try {
-
 				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 						.getService(IFlightRouteplanningRemoteService.class);
 
@@ -293,9 +288,6 @@ public class FRMapComponent extends CustomComponent {
 					Waypoint toSend = new Waypoint(new LlaCoordinate(lat, lon, alt));
 					toSend.setApproachingspeed(approach);
 					froute.addWaypoint(toSend);
-					
-					
-					
 				}
 
 				ByteArrayOutputStream outs = new ByteArrayOutputStream();
@@ -304,13 +296,11 @@ public class FRMapComponent extends CustomComponent {
 
 				service.transmitToServer(froute.getId(), bytes);
 
-
 			} catch (DronologyServiceException | RemoteException e1) {
 				e1.printStackTrace();
 			} catch (PersistenceException e1) {
 				e1.printStackTrace();
 			}
-
 		});
 		
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
@@ -324,7 +314,6 @@ public class FRMapComponent extends CustomComponent {
 	}
 	
 	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName){
-		
 		displayByName(info, routeName, numCoords, whichName);
 		
 		route.enableRouteEditing();
@@ -335,7 +324,6 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
-		
 	}
 	
 	public void displayNoTable() {

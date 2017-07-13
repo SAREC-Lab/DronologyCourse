@@ -28,13 +28,13 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
-	ArrayList<WayPoint> mapPoints = new ArrayList<>();
-	MapMarkerUtilities route;
+	private ArrayList<WayPoint> mapPoints = new ArrayList<>();
+	private MapMarkerUtilities route;
 	
-	TextField latitude = new TextField();
-	TextField longitude = new TextField();
-	TextField altitude = new TextField();
-	TextField transitSpeed = new TextField();
+	private TextField latitude = new TextField();
+	private TextField longitude = new TextField();
+	private TextField altitude = new TextField();
+	private TextField transitSpeed = new TextField();
 	
 	public FRTableDisplay() {
 		grid.getColumns().stream().forEach(c -> c.setSortable(false));
@@ -80,7 +80,7 @@ public class FRTableDisplay {
 
 						route.removeAllLines(route.getPolylines());
 						route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
-						for(int i = 0; i < route.getPolylines().size(); i++){
+						for (int i = 0; i < route.getPolylines().size(); i++){
 							route.getMap().addComponent(route.getPolylines().get(i));
 						}
 
