@@ -302,6 +302,59 @@ public class FRMapComponent extends CustomComponent {
 			} catch (PersistenceException e1) {
 				e1.printStackTrace();
 			}
+			
+int difference = route.getMapPoints().size() - storedPoints.size();
+			
+			int storedSize = storedPoints.size();
+			for(int i = storedSize; i < difference + storedSize; i++){
+				String alt = route.getMapPoints().get(i).getAltitude();
+				String lon = route.getMapPoints().get(i).getLongitude();
+				String lat = route.getMapPoints().get(i).getLatitude();
+				String trans = route.getMapPoints().get(i).getTransitSpeed();
+				
+				Point pt = new Point();
+				
+				pt.setLat(Double.valueOf(lat));
+				pt.setLon(Double.valueOf(lon));
+				
+				WayPoint way = new WayPoint(pt, false);
+				way.setAltitude(alt);
+				way.setTransitSpeed(trans);
+				
+				storedPoints.add(way);
+				
+			}
+			
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				route.getMapPoints().remove(i);
+			}
+			
+			route.getMapPoints().clear();
+			
+			for (int i = 0; i < storedPoints.size(); i++) {
+				route.getMapPoints().add(storedPoints.get(i));
+			}
+			
+			route.getGrid().setItems(route.getMapPoints());
+			
+			route.removeAllMarkers(route.getPins());
+			route.removeAllLines(route.getPolylines());
+			
+			for (int i = 0; i < storedPoints.size(); i++) {
+				WayPoint point = storedPoints.get(i);
+				route.addPinForWayPoint(point);
+			}
+			
+			List<LPolyline> localPolylines = route.drawLines(storedPoints, false, 0);
+		
+			route.setPolylines(localPolylines);
+						
+			for (int i = 0; i < localPolylines.size(); i++) {
+				route.getMap().addComponent(localPolylines.get(i));
+			}
+			
+			route.disableRouteEditing();
+			leafletMap.setEnabled(false);
 		});
 		
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
