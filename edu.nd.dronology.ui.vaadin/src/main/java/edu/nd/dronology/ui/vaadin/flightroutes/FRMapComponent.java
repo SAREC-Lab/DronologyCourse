@@ -162,6 +162,7 @@ public class FRMapComponent extends CustomComponent {
 
 		// enable editing
 		edit.addClickListener(event -> {
+			storedPoints.clear();
 			for (int i = 0; i < route.getMapPoints().size(); i++) {
 				storedPoints.add(route.getMapPoints().get(i));
 			}
@@ -185,6 +186,7 @@ public class FRMapComponent extends CustomComponent {
 			}
 			
 			route.getMapPoints().clear();
+			Notification.show(String.valueOf(route.getMapPoints().size()));
 			
 			for (int i = 0; i < storedPoints.size(); i++) {
 				route.getMapPoints().add(storedPoints.get(i));
@@ -198,7 +200,6 @@ public class FRMapComponent extends CustomComponent {
 			for (int i = 0; i < storedPoints.size(); i++) {
 				WayPoint point = storedPoints.get(i);
 				route.addPinForWayPoint(point);
-				
 			}
 			
 			List<LPolyline> localPolylines = route.drawLines(storedPoints, false, 0);
