@@ -165,8 +165,14 @@ public class FRMainLayout extends CustomComponent {
 
 		//gets the flight info for that route
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
-		List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
-		name = flightInfo.getName();
+		
+		List<Waypoint> flightWaypoints = new ArrayList();
+		if(routeLayout.getComponentIndex(child) != -1){
+			flightWaypoints = flightInfo.getWaypoints();
+			name = flightInfo.getName();
+		}else{
+			flightWaypoints = new ArrayList();
+		}
 		
 		// removes old pins, polylines, and style when switching routes
 		map.getUtils().removeAllMarkers(map.getUtils().getPins());
@@ -212,18 +218,21 @@ public class FRMainLayout extends CustomComponent {
 			}
 		}	
 		map.setRouteCenter();
-		map.displayByName(flightInfo, null, 0, false);
+		
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.displayByName(flightInfo, null, 0, false);
+		}
 		
 		//click listener to update waypoint number 
 		map.getMapInstance().addClickListener(eve->{
-			
-			map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
-					
+			if(toString().valueOf(map.isEnabled()).equalsIgnoreCase("true")){
+				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
+			}	
 		});
-		
-		map.getTableDisplay().setGrid(waypoints);
-		map.getUtils().setMapPointsAltitude(waypoints);
-		map.getUtils().setMapPointsTransit(waypoints);
-	
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.getTableDisplay().setGrid(waypoints);
+			map.getUtils().setMapPointsAltitude(waypoints);
+			map.getUtils().setMapPointsTransit(waypoints);
+		}
 	}
 }

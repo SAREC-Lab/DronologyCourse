@@ -280,6 +280,7 @@ public class MapMarkerUtilities {
 	}
 
 	public void enableRouteEditing () {
+		map.setEnabled(true);
 		isEditable = true;
 		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).addDragEndListener(new MarkerDragEndListener()));
@@ -301,6 +302,7 @@ public class MapMarkerUtilities {
 		}
 		registeredListeners.clear();
 		tableDisplay.makeUneditable(this);
+		map.setEnabled(false);
 	}
 	
 	public boolean isEditable () {
