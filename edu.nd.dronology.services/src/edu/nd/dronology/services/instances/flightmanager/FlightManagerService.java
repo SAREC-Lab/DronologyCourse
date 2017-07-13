@@ -1,12 +1,14 @@
 package edu.nd.dronology.services.instances.flightmanager;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.base.AbstractServerService;
 import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 
 public class FlightManagerService extends AbstractServerService<IFlightManagerServiceInstance> {
 
@@ -59,6 +61,8 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 
 	}
 
-
+	public Collection<FlightPlanInfo> getCurrentFlights() {
+		return serviceInstance.getCurrentFlights();
+	}
 
 }

@@ -24,8 +24,10 @@ public class WorkspaceInitializer {
 			root = DronologyConstants.DEFAULT_ROOT_FOLDER;
 		}
 
+		//Replace file path in Windows
 		root = root.replace("file:\\", "");
-		root = root.replace("file:/", "");
+		//Replace file path on Linux/MAC
+		root = root.replace("file:/", "/");
 
 		LOGGER.info("Server workspace root location is: '" + root + "'");
 

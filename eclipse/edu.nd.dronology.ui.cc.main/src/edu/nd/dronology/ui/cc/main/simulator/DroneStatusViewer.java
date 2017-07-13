@@ -91,11 +91,11 @@ public class DroneStatusViewer extends Composite {
 
 	protected void fillContextMenu(DroneStatus remoteItem, IMenuManager manager) {
 		MenuCreationHelper.createMenuEntry(manager, "Activate FlightRoute", ImageProvider.IMG_DRONE_ACTIVATE_24,
-				() -> selectFlightRoute((DroneStatus) remoteItem));
+				() -> selectFlightRoute(remoteItem));
 		MenuCreationHelper.createMenuEntry(manager, "Hover", ImageProvider.IMG_DRONE_ACTIVATE_24,
-				() -> hover((DroneStatus) remoteItem));
+				() -> hover(remoteItem));
 		MenuCreationHelper.createMenuEntry(manager, "Return to Home", ImageProvider.IMG_DRONE_ACTIVATE_24,
-				() -> returnHome((DroneStatus) remoteItem));
+				() -> returnHome(remoteItem));
 
 	}
 

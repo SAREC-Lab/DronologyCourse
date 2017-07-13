@@ -22,13 +22,10 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 
 public class NavigationBar extends CustomComponent {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -511507929126974047L;
-  private VerticalLayout content = new VerticalLayout();
-  private AFMainLayout activeflights = new AFMainLayout();
-  private FRMainLayout flightroutes = new FRMainLayout();
+	private VerticalLayout content = new VerticalLayout();
+	private AFMainLayout activeflights = new AFMainLayout();
+	private FRMainLayout flightroutes = new FRMainLayout();
 	public NavigationBar(){
 		
 		class NavigationBarCommand implements MenuBar.Command {
@@ -67,7 +64,7 @@ public class NavigationBar extends CustomComponent {
 		MenuBar menuBar = new MenuBar();
 		menuBar.setWidth("100%");
 
-    content.addComponents(menuBar);
+		content.addComponents(menuBar);
 
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource afIcon = new FileResource(new File(basepath + "/VAADIN/img/radar_icon.png"));
@@ -77,11 +74,10 @@ public class NavigationBar extends CustomComponent {
 		menubarCommand.setDefaultItem(activeFlightsItem);
 		menuBar.addItem("Flight Routes", frIcon, menubarCommand);
     
-    setCompositionRoot(content);
+		setCompositionRoot(content);
 	}
 	
 	public AFMainLayout getAFLayout(){
 		return activeflights;
 	}
-	
 }

@@ -1,14 +1,11 @@
 package edu.nd.dronology.core.flight.internal;
 
-import java.text.Normalizer.Form;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.IFlightPlan;
-import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.core.util.FormatUtil;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
@@ -39,6 +36,8 @@ public class FlightPlan implements IFlightPlan {
 	private long startTime = -1;
 	private long endTime = -1;
 	private String uavid;
+	private double takeoffAltitude = 5;
+
 
 	private enum Status {
 		PLANNED, FLYING, COMPLETED, ON_HOLD;
@@ -97,8 +96,7 @@ public class FlightPlan implements IFlightPlan {
 	}
 
 	/**
-	 * Returns the drone assigned to the flight plan. Will return null if no
-	 * drone is yet assigned.
+	 * Returns the drone assigned to the flight plan. Will return null if no drone is yet assigned.
 	 * 
 	 * @return iDrone
 	 */
@@ -214,6 +212,12 @@ public class FlightPlan implements IFlightPlan {
 	public boolean isCompleted() {
 		return status == Status.COMPLETED || waypointsReached();
 	}
+	
+	@Override
+	public double getTakeoffAltitude() {
+		return takeoffAltitude;
+	}
+
 
 	private boolean waypointsReached() {
 		for (Waypoint wp : wayPoints) {

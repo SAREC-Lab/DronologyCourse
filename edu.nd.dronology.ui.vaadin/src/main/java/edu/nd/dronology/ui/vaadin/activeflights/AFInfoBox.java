@@ -1,7 +1,6 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.io.File;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +22,13 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
-import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
+import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
  * 
@@ -51,6 +50,7 @@ public class AFInfoBox extends CustomComponent {
 	private double alt;
 	private double speed;
 	private boolean hoverInPlace;
+	private boolean checkClicked = false;
 
 	private CheckBox check = new CheckBox();
 	private Label statusInfo1 = new Label();
@@ -163,33 +163,40 @@ public class AFInfoBox extends CustomComponent {
 		Label caption = new Label("Hover in Place");
 		bottomSwitch.addComponents(caption, hoverSwitch);
 
-		
 		returnToHome.setHeight("30px");
 		assignNewRoute.setHeight("30px");
-		
-		returnToHome.addClickListener( e -> {
+
+		returnToHome.addClickListener(e -> {
 			Window confirm = new Window("Confirm");
 			VerticalLayout subContent = new VerticalLayout();
 			HorizontalLayout subButtons = new HorizontalLayout();
 			Label label = new Label("Are you sure you want to send " + this.name + " to its home?");
 			Button yes = new Button("Yes");
 			Button no = new Button("No");
-			
+
 			yes.addClickListener(subEvent -> {
 				UI.getCurrent().removeWindow(confirm);
+				IFlightManagerRemoteService service;
+				try {
+					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+					service.returnToHome(this.name);
+				} catch (Exception exc) {
+					exc.printStackTrace();
+				}
+				
 			});
-			
+
 			no.addClickListener(subEvent -> {
 				UI.getCurrent().removeWindow(confirm);
 			});
-			
+
 			subButtons.addComponents(yes, no);
 			subContent.addComponents(label, subButtons);
 			confirm.setContent(subContent);
 			confirm.setModal(true);
 			confirm.center();
-			UI.getCurrent().addWindow(confirm);
-			
+			UI.getCurrent().addWindow(confirm);	
+
 		});
 
 		assignNewRoute.addClickListener(e -> {
@@ -210,6 +217,7 @@ public class AFInfoBox extends CustomComponent {
 				else
 					apply.setEnabled(false);
 			});
+
 			apply.addClickListener(event -> {
 				Window confirm = new Window("Confirm");
 				VerticalLayout subContent = new VerticalLayout();
@@ -252,6 +260,16 @@ public class AFInfoBox extends CustomComponent {
 		mainContent.setSizeUndefined();
 		mainContent.setSpacing(false);
 
+		topContent.addLayoutClickListener( e-> {
+			Component child = e.getChildComponent();
+			if (child != null && child.getClass() == CheckBox.class){
+				checkClicked = true;
+			}
+			else{
+				checkClicked = false;
+			}
+		});
+		
 		middleContent.setVisible(visible);
 		bottomContent.setVisible(visible);
 		topContent.addLayoutClickListener(e -> {
@@ -398,24 +416,32 @@ public class AFInfoBox extends CustomComponent {
 	public boolean getBoxVisible() {
 		return this.visible;
 	}
-	
-	public Button getHomeButton(){
+
+	public Button getHomeButton() {
 		return this.returnToHome;
 	}
-	
-	public Button getRouteButton(){
+
+	public Button getRouteButton() {
 		return this.assignNewRoute;
 	}
+	
+	public boolean getCheckClick(){
+		return checkClicked;
+	}
+	
+	public void setCheckClick(boolean checkClicked){
+		this.checkClicked = checkClicked;
+	}
 
+	@WaypointReplace
 	private void activate(FlightRouteInfo remoteItem) {
 		IFlightManagerRemoteService service;
 		try {
 			service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-			List<LlaCoordinate> coordds = new ArrayList<>(remoteItem.getCoordinates());
-			LlaCoordinate initPoint = coordds.remove(0);
-			service.planFlight(this.name, remoteItem.getName(), initPoint, coordds);
-		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
+			List<Waypoint> coordds = new ArrayList<>(remoteItem.getWaypoints());
+			// LlaCoordinate initPoint = coordds.remove(0);
+			service.planFlight(this.name, remoteItem.getName(), coordds);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

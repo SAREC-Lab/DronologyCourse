@@ -1,11 +1,9 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
-import com.vaadin.ui.CustomComponent;
-
 import java.util.List;
 
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.CustomComponent;
 
 /**
  * This is the main layout for the Active Flights UI

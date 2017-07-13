@@ -10,124 +10,157 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
  * This is the main layout for the Flight Routes UI
  * 
  * @author Jinghui Cheng
  */
+
 public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	private int index;
 	private FRControlsComponent controls = new FRControlsComponent();
-	WayPoint way;
-	ArrayList<WayPoint> waypoints;
-	ArrayList routeList;
-	FRMapComponent map;
+	private WayPoint way;
+	private FRMapComponent map;
+	private VerticalLayout routeLayout;
+	boolean isFirst = true;
+	int componentCount;
 	
+	@WaypointReplace
 	public FRMainLayout() {
 
 		addStyleName("main_layout");
-
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 
-		FRMapComponent map = new FRMapComponent(
-				"VAADIN/sbtiles/{z}/{x}/{y}.png",
-				"South Bend",
-				"VAADIN/sateltiles/{z}/{x}/{y}.png",
-				"Satellite");
+		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend",
+				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite");
+		
 		map.setCenter(41.68, -86.25);
 		map.setZoomLevel(13);
 
-		VerticalLayout routes;
-
-		routes = controls.getInfoPanel().getRoutes();
+		routeLayout = controls.getInfoPanel().getRoutes();	
+		componentCount = controls.getInfoPanel().getRouteList().size();
 		
-		Button tempDraw = controls.getInfoPanel().getDrawButton();
-		tempDraw.addClickListener(e -> {
-			map.enableEdit();
-			//map.display();
-			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-			map.getUtils().removeAllLines(map.getUtils().getPolylines());
-			map.getUtils().getMapPoints().clear();
-			FlightRouteInfo drone = controls.getInfoPanel().getRoute();
+		//this defines the add new route button and adds a click listener
+		Button drawRoute = controls.getInfoPanel().getDrawButton();
+		drawRoute.addClickListener(e -> {
 			
-			int numCoords = drone.getCoordinates().size();
-			String droneName = controls.getInfoPanel().getName();
-			map.displayByName(drone, droneName, numCoords, true);
+			//tests whether a route was added or not
+			if(!(componentCount == controls.getInfoPanel().getRouteList().size())){
 			
-			Point pt = new Point(0,0);
-			WayPoint way = new WayPoint(pt, true);
-			map.getTableDisplay().getGrid().setItems();
-			map.enableEdit();
+				map.enableEdit();
+				//to get rid of points and lines from previous routes
+				map.getUtils().removeAllMarkers(map.getUtils().getPins());
+				map.getUtils().removeAllLines(map.getUtils().getPolylines());
+				map.getUtils().getMapPoints().clear();
+				
+				//displays the drone information in the info bar
+				FlightRouteInfo drone = controls.getInfoPanel().getRoute();
+				int numCoords = drone.getWaypoints().size();
+				String droneName = controls.getInfoPanel().getName();
+				map.displayByName(drone, droneName, numCoords, true);
+				
+				Point pt = new Point(0, 0);
+				way = new WayPoint(pt, true);
+				
+				map.getTableDisplay().getGrid().setItems();
+				map.enableEdit();
+				
+				map.getMapInstance().addClickListener(eve->{
+					
+					//the size of mapPoints is received as 1 for the first two waypoints added
+					if(map.getUtils().getMapPoints().size() == 1 && isFirst){
+						map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
+						isFirst = false;
+					}
+					else{
+						map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
+					}
+				});
+			
+			}
 			
 		});
 
 		map.display();
+		
 		// adds click listener to route list
-		routes.addLayoutClickListener(e -> {
+		routeLayout.addLayoutClickListener(e -> {
+			
+			//gets box of route info and changes its style to show that it is selected
 			Component child = e.getChildComponent();
-			child.addStyleName("info_box_focus");
-			index = routes.getComponentIndex(child);
 			
-			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
-			List<LlaCoordinate> coords = flightInfo.getCoordinates();
+			if(routeLayout.getComponentIndex(child) != -1){
+				child.addStyleName("info_box_focus");
+			}
 			
-			map.displayByName(flightInfo, "not used", 0, false);
+			//child.addStyleName("info_box_focus");
+			index = routeLayout.getComponentIndex(child);
 
+			//gets the flight info for that route
+			FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
+			List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
 			
-			//removes old pins and polylines when switching routes
+			// removes old pins, polylines, and style when switching routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-			
-			//to make sure the table is no longer bolded when switching routes without saving
 			map.getTableDisplay().getGrid().setStyleName("fr_table_component");
-			
-			long tempLong;
-			long tempLat;
+
 			int numComponents;
 			boolean first = true;
 
-			ArrayList<WayPoint> waypoints = new ArrayList<>();
+			List<WayPoint> waypoints = new ArrayList<>();
 			Point pt = new Point();
+			
+			//iterates through the flight info and adds to internal waypoints list
+			for (Waypoint coor : flightWaypoints) {
 
-			// trying to convert to waypoint
-			for (LlaCoordinate coor : coords) {
-
-
-				pt.setLat(coor.getLatitude());
-				pt.setLon(coor.getLongitude());
-
+				pt.setLat(coor.getCoordinate().getLatitude());
+				pt.setLon(coor.getCoordinate().getLongitude());
+				
 				WayPoint way = new WayPoint(pt, false);
-
+				way.setAltitude("wow");
 				map.getUtils().addNewPinRemoveOld(pt, first);
 
 				waypoints.add(way);
 				first = false;
 			}
 
-			ArrayList<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false);
-			
+			//adds the lines to the map
+			List<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false, 1);
 			map.getUtils().setPolylines(mapLines);
-			for(int i = 0; i < mapLines.size(); i++){
+			for (int i = 0; i < mapLines.size(); i++) {
 				map.getUtils().getMap().addComponent(mapLines.get(i));
 			}
 
-			numComponents = routes.getComponentCount();
+			numComponents = routeLayout.getComponentCount();
+			
 			// when one route is clicked, the others go back to default background color
 			for (int i = 0; i < numComponents; i++) {
 				if (i != index) {
-					routes.getComponent(i).removeStyleName("info_box_focus");
+					routeLayout.getComponent(i).removeStyleName("info_box_focus");
 				}
-			}
+			}	
+			map.setRouteCenter();
+			map.displayByName(flightInfo, null, 0, false);
+			
+			//click listener to update waypoint number 
+			map.getMapInstance().addClickListener(eve->{
+				
+				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
+						
+			});
 		});
-
+		
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
@@ -135,10 +168,12 @@ public class FRMainLayout extends CustomComponent {
 	public FRControlsComponent getControls() {
 		return controls;
 	}
+
 	public int getIndex() {
 		return index;
 	}
-	public FRMapComponent getMap(){
+
+	public FRMapComponent getMap() {
 		return map;
 	}
 }

@@ -3,6 +3,7 @@ package edu.nd.dronology.ui.vaadin.utils;
 import java.awt.MouseInfo;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.vaadin.addon.leaflet.LMap;
@@ -61,7 +62,7 @@ public class MapMarkerUtilities {
 		    	
 		    	map.removeComponent(leafletMarker);
 				removeAllLines(polylines);
-				polylines = drawLines(mapPoints, true);
+				polylines = drawLines(mapPoints, true, 1);
 				grid.setItems(mapPoints);
 				
 				for (int i = 0; i < mapPoints.size(); i++) {
@@ -97,7 +98,7 @@ public class MapMarkerUtilities {
 	    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
 	    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
 	    	removeAllLines(polylines);
-	    	polylines = drawLines(mapPoints, false);
+	    	polylines = drawLines(mapPoints, false, 1);
 	    	grid.setItems(mapPoints);
 	    	for(int i = 0; i < polylines.size(); i++){
 				map.addComponent(polylines.get(i));
@@ -124,10 +125,10 @@ public class MapMarkerUtilities {
 	private FRTableDisplay tableDisplay;
 	private Grid<WayPoint> grid;
 	private Window popup;
-	private ArrayList<WayPoint> mapPoints = new ArrayList<>();
-	private ArrayList<LPolyline> polylines = new ArrayList<>();
-	private ArrayList<LMarker> pins = new ArrayList<>();
-	private ArrayList<Registration> registeredListeners = new ArrayList<>();
+	private List<WayPoint> mapPoints = new ArrayList<>();
+	private List<LPolyline> polylines = new ArrayList<>();
+	private List<LMarker> pins = new ArrayList<>();
+	private List<Registration> registeredListeners = new ArrayList<>();
 	private boolean lineClicked = false;
 	private int lineIndex = -1;
 	private boolean isEditable = false;
@@ -165,7 +166,7 @@ public class MapMarkerUtilities {
 		}
 		
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints, true);
+		polylines = drawLines(mapPoints, true, 1);
 		grid.setItems(mapPoints);
 		
 		return p;
@@ -180,7 +181,7 @@ public class MapMarkerUtilities {
 		}
 		mapPoints.add(p);
 		removeAllLines(polylines);
-		polylines = drawLines(mapPoints, false);
+		polylines = drawLines(mapPoints, false, 1);
 		grid.setItems(mapPoints);
 		
 		for (int i = 0; i < mapPoints.size(); i++) {
@@ -224,7 +225,7 @@ public class MapMarkerUtilities {
 			}
 		}
 	}
-	public ArrayList<LPolyline> drawLines(ArrayList<WayPoint> mapPoints, boolean drawOnMap) {
+	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode) {
 		ArrayList<LPolyline> polylines = new ArrayList<>();
 
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
@@ -232,7 +233,12 @@ public class MapMarkerUtilities {
 			LPolyline polyline = new LPolyline(current.toPoint(), mapPoints.get(i + 1).toPoint());
 			polyline.setId(UUID.randomUUID().toString());
 			polyline.setWeight(current.isReached() ? 1 : 2);
-			polyline.setColor("#000");
+			if (mode == 0) //normal
+				polyline.setColor("#444");
+			if (mode == 1) //selected
+				polyline.setColor("#000");
+			if (mode == 2) //focused
+				polyline.setColor("#d87703");
 			if (current.isReached()) {
 				polyline.setDashArray("5 10");
 				polyline.setColor("#249b09");
@@ -272,7 +278,7 @@ public class MapMarkerUtilities {
 		return polylines;
 	}*/
 	
-	public void removeAllLines(ArrayList<LPolyline> polylines) {
+	public void removeAllLines(List<LPolyline> polylines) {
 		for (int i = polylines.size() - 1; i >= 0; i--) {
 			map.removeComponent(polylines.get(i));
 		}
@@ -310,13 +316,13 @@ public class MapMarkerUtilities {
 		return isEditable;
 	}
 	
-	public void removeAllMarkers(ArrayList<LMarker> markers) {
+	public void removeAllMarkers(List<LMarker> markers) {
 		for (int i = markers.size() - 1; i >= 0; i--) {
 			map.removeComponent(markers.get(i));
 		}
 	}
 
-	public ArrayList<WayPoint> getMapPoints() {
+	public List<WayPoint> getMapPoints() {
 		return mapPoints;
 	}
 	
@@ -324,15 +330,15 @@ public class MapMarkerUtilities {
 		return grid;
 	}
 	
-	public ArrayList<LPolyline> getPolylines() {
+	public List<LPolyline> getPolylines() {
 		return polylines;
 	}
 	
-	public void setPolylines(ArrayList<LPolyline> polylines) {
+	public void setPolylines(List<LPolyline> polylines) {
 		this.polylines = polylines;
 	}
 	
-	public ArrayList<LMarker> getPins() {
+	public List<LMarker> getPins() {
 		return pins;
 	}
 	

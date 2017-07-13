@@ -34,11 +34,10 @@ $valo-menu-background-color: #eee;
 	@include valo;
 	
 	//Custom variables
-	$screen-width: 1440px;
 	$controls-width: 360px;
 	$screen-height: 90vh;
 	$fr-map-height: 55vh;
-	$fr-table-height: 35vh;
+	$fr-top-bar-height: 68px;
 	
 	$color-dark-5: #000040;
 	$color-dark-4: #224080;
@@ -100,7 +99,7 @@ $valo-menu-background-color: #eee;
 	}
 	
 	.main_layout {
-		max-width: $screen-width;
+		max-width: 100%;
 		left: 0;
 		right: 0;
 		margin: auto;
@@ -163,6 +162,9 @@ $valo-menu-background-color: #eee;
 		background-color: #91b3ea;
 	}
 
+	.fr_mapandpopup_layout {
+		height: $fr-map-height !important;
+	}
 	.fr_leaflet_map {
 		height: $fr-map-height !important;
 	}
@@ -173,12 +175,16 @@ $valo-menu-background-color: #eee;
 		border-color: #000000;
 		z-index: 0 !important;
 	}
+	.fr_top_bar {
+		height: $fr-top-bar-height !important;
+		border: 0;
+	}
 	.fr_table_component {
-		height: calc(#{$fr-table-height} - 6px) !important;
+		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px) !important;
 		width: 100% !important;
 	}
 	.fr_table_component_edit_mode {
-		height: calc(#{$fr-table-height} - 6px) !important;
+		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px) !important;
 		width: 100% !important;
 		border-width: 5px;
 		border-style: solid; 
@@ -220,12 +226,12 @@ $valo-menu-background-color: #eee;
 	}
 
 	.af_info_panel {
-		height: calc(#{$screen-height} - 106px);
+		height: calc(#{$screen-height} - 212px);
 		.v-margin-top {
 			padding-top:0px;
 		}
 	}
-	.af_emergency_operations {
+	.af_operations_group {
 		height: 100px;
 		border: 1px solid $color-dark-1;
 		padding: 3px 8px !important;
@@ -360,9 +366,7 @@ $valo-menu-background-color: #eee;
 		padding: 3px 6px;
 	}
 	.route_meta_info{
-		border-width: 2px;
-		border-style: solid; 
-		background-color: #f2f2f2;
+		border: solid 1px $color-light-4;
 	}
 	.bring_front{
 		z-index: 999 !important;

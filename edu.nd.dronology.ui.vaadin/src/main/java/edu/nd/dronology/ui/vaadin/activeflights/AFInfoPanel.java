@@ -10,13 +10,17 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
@@ -34,6 +38,7 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
+	private String focused;
 	private AFMapViewOperations mapView = new AFMapViewOperations();
 	private Map<String, DroneStatus> drones;
 	private IDroneSetupRemoteService service;
@@ -52,14 +57,88 @@ public class AFInfoPanel extends CustomComponent{
 		
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
 		
-		
-		emergency.addOnClickListener( e -> {
-			Component child = e.getChildComponent();
-			if (child.getCaption().equals("All UAVs Hover in Place")){
-				this.setAllToHover();
+		emergency.getHome().addClickListener( e-> {
+			List<String> checked = this.getChecked();
+			String message = "";
+			if (checked.size() > 0){
+				if (checked.size() == 1)
+					message = "Are you sure you want to send " + checked.get(0) + " to its home?";
+				else{
+					String drones = "";
+					for (int i = 0; i < checked.size() - 1; i++){
+						drones += checked.get(i) + ", ";
+					}
+					message = "Are you sure you want to send " + drones + "and " + checked.get(checked.size()-1) + " to their homes?";
+				}
 			}
+			else {
+				message = "Are you sure to send all UAVs to their homes?";
+			}
+			Window confirm = new Window("Confirm");
+			VerticalLayout subContent = new VerticalLayout();
+			HorizontalLayout subButtons = new HorizontalLayout();
+			Label label = new Label(message);
+			Button yes = new Button("Yes");
+			Button no = new Button("No");
+			
+			yes.addClickListener(subEvent -> {
+				UI.getCurrent().removeWindow(confirm);
+				IFlightManagerRemoteService service;
+				try {
+					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+					if (checked.size() > 0){
+						for (int i = 0; i < checked.size(); i++)
+							service.returnToHome(checked.get(i));
+					}
+					else {
+						for (int i = 1; i < numUAVs + 1; i++){
+							AFInfoBox box = (AFInfoBox) content.getComponent(i);
+							service.returnToHome(box.getName());
+						}
+					}
+				} catch (Exception exc) {
+					exc.printStackTrace();
+				}
+				
+			});
+
+			no.addClickListener(subEvent -> {
+				UI.getCurrent().removeWindow(confirm);
+			});
+			
+			subButtons.addComponents(yes, no);
+			subContent.addComponents(label, subButtons);
+			confirm.setContent(subContent);
+			confirm.setModal(true);
+			confirm.center();
+			UI.getCurrent().addWindow(confirm);
+			
 		});
 
+		content.addLayoutClickListener( e-> {
+			Component testChild = e.getChildComponent();
+			if (testChild.getClass() == AFInfoBox.class){
+				AFInfoBox child = (AFInfoBox) e.getChildComponent();
+				if(!child.getCheckClick()){
+					child.addStyleName("info_box_focus");
+					child.setIsChecked(true);
+					focused = child.getName();
+					for (int i = 1; i < numUAVs + 1; i++){
+						AFInfoBox box = (AFInfoBox) content.getComponent(i);
+						if (!box.getName().equals(child.getName())) {
+							box.removeStyleName("info_box_focus");
+							box.setIsChecked(false);
+							box.setCheckClick(false);
+						}
+					}
+				}
+				else{
+					child.removeStyleName("info_box_focus");
+					focused = "";
+				}
+			}
+		});
+		
 		sideBar.addComponents(panel, mapView, emergency);
 		setCompositionRoot(sideBar);
 		
@@ -117,6 +196,10 @@ public class AFInfoPanel extends CustomComponent{
 	
 	public AFMapViewOperations getMapView(){
 		return mapView;
+	}
+	
+	public String getFocusedName(){
+		return focused;
 	}
 	
 	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
@@ -182,6 +265,10 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setHoverInPlace(true);
 		}
+	}
+	
+	public VerticalLayout getBoxes(){
+		return content;
 	}
 	
 	public void refreshDrones(){

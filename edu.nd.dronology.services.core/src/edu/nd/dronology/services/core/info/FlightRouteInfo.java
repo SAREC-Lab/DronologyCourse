@@ -34,7 +34,8 @@ public class FlightRouteInfo extends RemoteInfoObject {
 
 	public List<Waypoint> getWaypoints() {
 		return Collections.unmodifiableList(waypoints);
-    
+	}
+
 	public void setDateModified(long dateModified) {
 		this.dateModified = dateModified;
 	}
@@ -43,8 +44,6 @@ public class FlightRouteInfo extends RemoteInfoObject {
 		this.dateCreated = dateCreated;
 	}
 
-
-
 	public void addWaypoint(Waypoint waypoint) {
 		waypoints.add(waypoint);
 	}
@@ -52,7 +51,6 @@ public class FlightRouteInfo extends RemoteInfoObject {
 	public void removeWaypoint(Waypoint waypoint) {
 		waypoints.remove(waypoint);
 	}
-
 
 	public double getLenght() {
 		return lenght;
@@ -70,6 +68,5 @@ public class FlightRouteInfo extends RemoteInfoObject {
 		this.distance = distance;
 
 	}
-
 
 }
