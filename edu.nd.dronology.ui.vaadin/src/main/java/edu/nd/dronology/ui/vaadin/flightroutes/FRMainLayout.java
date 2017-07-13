@@ -3,6 +3,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.shared.Point;
 
@@ -13,6 +14,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -164,7 +166,8 @@ public class FRMainLayout extends CustomComponent {
 		//gets the flight info for that route
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 		List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
-	
+		name = flightInfo.getName();
+		
 		// removes old pins, polylines, and style when switching routes
 		map.getUtils().removeAllMarkers(map.getUtils().getPins());
 		map.getTableDisplay().getGrid().setStyleName("fr_table_component");
