@@ -211,7 +211,7 @@ public class AFInfoBox extends CustomComponent {
 			cancel.addClickListener(event -> {
 				UI.getCurrent().removeWindow(window);
 			});
-			window.addClickListener(event -> {
+			window.addClickListener(event -> { //will need to change to if flights are in left panel
 				if (frLayout.getControls().getInfoPanel().getIsRouteSelected())
 					apply.setEnabled(true);
 				else
@@ -389,6 +389,15 @@ public class AFInfoBox extends CustomComponent {
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
 		if (this.hoverInPlace) {
+			Window window = new Window("Assign New Route");
+			
+			AFAssignRouteComponent content = new AFAssignRouteComponent();
+			
+			window.setContent(content);
+			window.setModal(true);
+			window.setWidth(1496, Unit.PIXELS);
+			UI.getCurrent().addWindow(window);
+			
 			this.status = "Hovering";
 			statusInfo2.setValue("Status: ");
 		} else {
