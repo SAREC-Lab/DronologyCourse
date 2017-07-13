@@ -302,7 +302,7 @@ public class FRMapComponent extends CustomComponent {
 				e1.printStackTrace();
 			}
 			
-int difference = route.getMapPoints().size() - storedPoints.size();
+			int difference = route.getMapPoints().size() - storedPoints.size();
 			
 			int storedSize = storedPoints.size();
 			for(int i = storedSize; i < difference + storedSize; i++){
@@ -355,7 +355,11 @@ int difference = route.getMapPoints().size() - storedPoints.size();
 			route.disableRouteEditing();
 			leafletMap.setEnabled(false);
 		});
-		
+		/*
+		this.getMapInstance().addClickListener(e-{
+			route.
+		});
+		*/
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
@@ -363,6 +367,7 @@ int difference = route.getMapPoints().size() - storedPoints.size();
 		content.addComponents(layout, tableDisplay.getGrid());
 		
 		tableDisplay.setGrid(route.getMapPoints());
+		
 		
 	}
 	
