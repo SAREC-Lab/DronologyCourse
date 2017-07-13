@@ -41,8 +41,6 @@ public class MapMarkerUtilities {
 
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
-			Notification.show("adding a mouse over listener");
-			
 			LMarker leafletMarker = (LMarker)event.getSource();
 			WayPoint w = null;
 			
