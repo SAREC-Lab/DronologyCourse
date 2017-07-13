@@ -40,7 +40,6 @@ public class FRMainLayout extends CustomComponent {
 	private boolean isFirst = true;
 	private int componentCount;
 	private String name = "";
-	private List<String> routesClicked = new ArrayList<>();
 	
 	@WaypointReplace
 	public FRMainLayout() {
@@ -109,7 +108,6 @@ public class FRMainLayout extends CustomComponent {
 				buttons.addComponents(yes, no);
 				
 				VerticalLayout windowContent = new VerticalLayout();
-				name = routesClicked.get(routesClicked.size() - 1);
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
 				
@@ -168,9 +166,7 @@ public class FRMainLayout extends CustomComponent {
 		//gets the flight info for that route
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 		List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
-	
-		Notification.show(flightInfo.getName());
-		routesClicked.add(flightInfo.getName());
+		name = flightInfo.getName();
 		
 		// removes old pins, polylines, and style when switching routes
 		map.getUtils().removeAllMarkers(map.getUtils().getPins());
