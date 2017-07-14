@@ -1,9 +1,10 @@
 package edu.nd.dronology.services.launch;
 
+import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
-import edu.nd.dronology.gstation.python.connector.PythonBase2;
+import edu.nd.dronology.gstation.python.connector.MAVLinkUAVConnector;
+import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.services.instances.dronesimulator.DroneSimulatorService;
@@ -31,11 +32,13 @@ public class DronologyServiceRunner {
 			RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 
 			runtimeMode.setPhysicalEnvironment();
-			runtimeMode.setCommandHandler(new PythonBase2());
 
-		} catch (DronologyServiceException e) {
-			LOGGER.error(e);
-		} catch (FlightZoneException e) {
+			MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("H001", "ilia.cse.nd.edu", 1234);
+			runtimeMode.registerCommandHandler(groundStation);
+
+			groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
+
+		} catch (DronologyServiceException | DroneException | FlightZoneException e) {
 			LOGGER.error(e);
 		}
 
