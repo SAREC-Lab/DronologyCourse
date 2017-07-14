@@ -146,7 +146,7 @@ public class AFInfoBox extends CustomComponent {
 		 * middle layer components
 		 */
 		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat) * 1000000.0) / 1000000.0));
-		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon) * 1000000.0) / 100000.0));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon) * 1000000.0) / 1000000.0));
 		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + " meters");
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
@@ -391,7 +391,8 @@ public class AFInfoBox extends CustomComponent {
 		if (this.hoverInPlace) {
 			Window window = new Window("Assign New Route");
 			
-			AFAssignRouteComponent content = new AFAssignRouteComponent();
+			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
+					this.lon, this.alt, this.speed);
 			
 			window.setContent(content);
 			window.setModal(true);
