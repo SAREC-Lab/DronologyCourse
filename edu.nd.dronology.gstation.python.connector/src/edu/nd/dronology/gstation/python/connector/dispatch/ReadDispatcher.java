@@ -1,4 +1,4 @@
-package edu.nd.dronology.gstation.python.connector;
+package edu.nd.dronology.gstation.python.connector.dispatch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,9 +11,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.MalformedJsonException;
 
 import edu.nd.dronology.core.util.FormatUtil;
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
+import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -27,8 +30,10 @@ public class ReadDispatcher implements Runnable {
 			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
 			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
 	private BufferedReader reader;
+	private DispatchQueueManager dispatchQueueManager;
 
-	public ReadDispatcher(Socket pythonSocket) {
+	public ReadDispatcher(Socket pythonSocket, DispatchQueueManager dispatchQueueManager) {
+		this.dispatchQueueManager = dispatchQueueManager;
 		try {
 			inputStream = pythonSocket.getInputStream();
 			cont.set(true);
@@ -48,11 +53,14 @@ public class ReadDispatcher implements Runnable {
 					// TODO: create the timestamp before deserializing the
 					// object....
 					try {
-						UAVMessage message = GSON.fromJson(line, UAVMessage.class);
-						message.timestamp();
-						processMessage(message);
+						AbstractUAVMessage msg = UAVMessageFactory.create(line);
+						processMessage(msg);
+						if (msg == null) {
+							LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
+						}
+
 					} catch (Exception ex) {
-						LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
+						LOGGER.hwFatal("Error when parsing incomming message '" + line + "' " + ex.getMessage());
 					}
 
 				} else {
@@ -78,12 +86,14 @@ public class ReadDispatcher implements Runnable {
 		}
 	}
 
-	private void processMessage(UAVMessage message) {
-		LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS) + " - "
-				+ message.toString());
+	private void processMessage(AbstractUAVMessage<?> message) {
+		if (message instanceof UAVStateMessage) {
+			LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
+					+ " - " + message.toString());
+			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
-		for (UAVState state : message.getStats()) {
-			DispatchQueueManager.getInstance().postDroneStatusUpdate(state.getId(), state);
+		} else if (message instanceof UAVMonitoringMessage) {
+			dispatchQueueManager.postMonitoringMessage((UAVMonitoringMessage) message);
 		}
 	}
 

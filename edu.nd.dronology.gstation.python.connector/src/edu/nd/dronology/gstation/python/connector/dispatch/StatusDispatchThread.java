@@ -1,21 +1,20 @@
-package edu.nd.dronology.gstation.python.connector;
+package edu.nd.dronology.gstation.python.connector.dispatch;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
+import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class StatusDispatchThread implements Callable {
+public class StatusDispatchThread extends AbstractStatusDispatchThread<UAVStateMessage> implements Callable {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(StatusDispatchThread.class);
-	private BlockingQueue<UAVState> queue;
-	private AtomicBoolean cont = new AtomicBoolean(true);
+
 	private IDroneStatusUpdateListener listener;
 
-	public StatusDispatchThread(final BlockingQueue<UAVState> queue, IDroneStatusUpdateListener listener) {
-		this.queue = queue;
+	public StatusDispatchThread(final BlockingQueue<UAVStateMessage> queue, IDroneStatusUpdateListener listener) {
+		super(queue);
 		this.listener = listener;
 	}
 
@@ -28,7 +27,7 @@ public class StatusDispatchThread implements Callable {
 		while (cont.get()) {
 
 			try {
-				UAVState state = queue.take();
+				UAVStateMessage state = queue.take();
 				listener.updateCoordinates(state.getLocation());
 				listener.updateVelocity(state.getGroundspeed());
 			} catch (Exception e) {
@@ -38,14 +37,6 @@ public class StatusDispatchThread implements Callable {
 		}
 		LOGGER.info("Dispatcher shutdown!");
 		return null;
-	}
-
-	int getQueueSize() {
-		return queue.size();
-	}
-
-	public void tearDown() {
-		cont.set(false);
 	}
 
 }

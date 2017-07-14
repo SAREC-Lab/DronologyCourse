@@ -1,4 +1,4 @@
-package edu.nd.dronology.gstation.python.connector;
+package edu.nd.dronology.gstation.python.connector.dispatch;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,7 +11,8 @@ import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 /**
- * Writer Thread takes items from the outbound queue and writes it to the socket.
+ * Writer Thread takes items from the outbound queue and writes it to the
+ * socket.
  * 
  * @author Michael
  *
@@ -42,7 +43,7 @@ public class WriteDispatcher implements Runnable {
 
 				LOGGER.hwInfo("Sending Command to UAV -" + toSend.toString());
 				outputStream.write(toSend.toJsonString().getBytes());
-				outputStream.write(System.lineSeparator().getBytes());
+				outputStream.write('\n');
 				outputStream.flush();
 			} catch (IOException | InterruptedException e) {
 				LOGGER.error(e);
