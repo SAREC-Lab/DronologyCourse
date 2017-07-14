@@ -70,8 +70,12 @@ public class AFMapComponent extends CustomComponent {
 	private FileResource droneIconFocused = new FileResource(new File(basepath + "/VAADIN/img/drone_icon_focused.png"));
 	private FileResource droneIconSelected = new FileResource(new File(basepath + "/VAADIN/img/drone_icon_selected.png"));
 	private FileResource dotIcon = new FileResource(new File(basepath + "/VAADIN/img/dot.png"));
+	
+	private AFInfoPanel panel;
 
-	public AFMapComponent(String tileDataURL, String name) {
+	public AFMapComponent(String tileDataURL, String name, AFInfoPanel panel) {
+		this.panel = panel;
+		
 		this.setWidth("100%");
 		addStyleName("map_component");
 
@@ -565,11 +569,40 @@ public class AFMapComponent extends CustomComponent {
 							e.getValue().getAltitude(), e.getValue().getVelocity(), false);
 					box.setBoxVisible(false);
 					box.addStyleName("af_info_box");
+					VerticalLayout boxes = panel.getBoxes();
+					int numUAVs = panel.getNumUAVS();
+					for(int i = 1; i < numUAVs + 1; i++){
+						AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
+						if (panelBox.getName().equals(box.getName())){
+							box.setIsChecked(panelBox.getIsChecked());
+							box.setHealthColor(panelBox.getHealthColor());
+							box.setHoverInPlace(panelBox.getHoverInPlace());
+						}
+					}
 					box.getRouteButton().addClickListener(click -> {
 						popup.setPopupVisible(false);
 					});
 					box.getHomeButton().addClickListener(click -> {
 						popup.setPopupVisible(false);
+					});
+					box.getCheckBox().addValueChangeListener( click -> {
+						
+						if (box.getCheckBox().getValue()){
+							for(int i = 1; i < numUAVs + 1; i++){
+								AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
+								if (panelBox.getName().equals(box.getName())){
+									panelBox.setIsChecked(true);
+								}
+							}
+						}
+						else {
+							for(int i = 1; i < numUAVs + 1; i++){
+								AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
+								if (panelBox.getName().equals(box.getName())){
+									panelBox.setIsChecked(false);
+								}
+							}
+						}
 					});
 					content.addComponent(box);
 				}

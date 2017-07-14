@@ -117,10 +117,10 @@ public class AFInfoBox extends CustomComponent {
 		Image droneImage = new Image();
 		droneImage.setSource(resource);
 
-		statusInfo1.setValue(name);
+		statusInfo1.setValue(this.name);
 		statusInfo1.addStyleName("info_box_name");
 		statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
-		statusInfo2.setValue("Status: " + status);
+		statusInfo2.setValue("Status: " + this.status);
 		this.batteryLife = Math.round(this.batteryLife * 100);
 		this.batteryLife = this.batteryLife / 100;
 		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " %");
@@ -297,6 +297,10 @@ public class AFInfoBox extends CustomComponent {
 		this.isChecked = check.getValue();
 		return this.isChecked;
 	}
+	
+	public CheckBox getCheckBox(){
+		return this.check;
+	}
 
 	public void setName(String name) {
 		this.name = name;
@@ -309,11 +313,11 @@ public class AFInfoBox extends CustomComponent {
 
 	public void setStatus(String status) {
 		this.status = status;
-		statusInfo2.setValue("Status: " + status);
-		if (this.status.equals("Hovering"))
+		statusInfo2.setValue("Status: " + this.status);
+		/*if (this.status.equals("Hovering"))
 			this.hoverSwitch.setValue(true);
 		else
-			this.hoverSwitch.setValue(false);
+			this.hoverSwitch.setValue(false);*/
 	}
 
 	public String getStatus() {
