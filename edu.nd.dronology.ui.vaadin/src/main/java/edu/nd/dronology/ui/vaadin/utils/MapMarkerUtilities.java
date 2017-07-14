@@ -115,7 +115,7 @@ public class MapMarkerUtilities {
 			for (int j = 0; j < polylines.size(); j++) {
 				if (polylines.get(j).getId().equals(polyline.getId())) {
 					int index = j+1;
-					MapAddMarkerListener.getInstance(MapMarkerUtilities.this, popup).processOnClick(event.getPoint(), index);
+					mapAddMarkerListener.processOnClick(event.getPoint(), index);
 					break;
 				}
 			}
@@ -125,18 +125,18 @@ public class MapMarkerUtilities {
 	private LMap map;
 	private FRTableDisplay tableDisplay;
 	private Grid<WayPoint> grid;
-	private Window popup;
 	private List<WayPoint> mapPoints = new ArrayList<>();
 	private List<Registration> registeredListeners = new ArrayList<>();
 	private boolean isEditable = false;
 	private AbsoluteLayout layout;
+	private MapAddMarkerListener mapAddMarkerListener;
 	
 	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window popup) {
 		this.map = map;
 		this.tableDisplay = tableDisplay;
 		this.grid = tableDisplay.getGrid();
-		this.popup = popup;
 		this.layout = layout;
+		this.mapAddMarkerListener = new MapAddMarkerListener(this, popup);
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
@@ -274,7 +274,7 @@ public class MapMarkerUtilities {
 					addListener(LeafletClickEvent.class, new PolylineClickListener(), LeafletClickListener.METHOD));
 		}
 		
-		registeredListeners.add(map.addClickListener(MapAddMarkerListener.getInstance(this, popup)));
+		registeredListeners.add(map.addClickListener(mapAddMarkerListener));
 		tableDisplay.makeEditable(this);
 	}
 	

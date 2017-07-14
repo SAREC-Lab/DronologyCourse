@@ -22,21 +22,10 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	private String altitude = "";
 	private String transitSpeed = "";
 	private WayPoint currentWayPoint;
-	private boolean atEnd = false;
-	private boolean buttonSelected = false;
 	private MapMarkerUtilities route;
 	private Window popup;
 	
-	private static MapAddMarkerListener instance = null;
-	
-	public static MapAddMarkerListener getInstance(MapMarkerUtilities route, Window popup) {
-		if (instance == null) {
-			instance = new MapAddMarkerListener(route, popup);
-		}
-		return instance;
-	}
-	
-	private MapAddMarkerListener(MapMarkerUtilities route, Window popup) {
+	public MapAddMarkerListener(MapMarkerUtilities route, Window popup) {
 		this.route = route;
 		this.popup = popup;
 	}
@@ -47,16 +36,8 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	}
 	
 	public void processOnClick(Point p, int index) {
-		if (atEnd && !buttonSelected) {
-	    	removeCurrentWayPoint();
-		}
-		
-		atEnd = false;
-			
 		currentWayPoint = route.addNewPin(p, index);
 		popup.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
-			
-		buttonSelected = false;
 
 		UI.getCurrent().addWindow(popup);
 		route.disableRouteEditing();
@@ -65,13 +46,9 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		TextField altitudeField = (TextField) getComponentByCaption(popup, "Altitude: ");
 		TextField transitSpeedField = (TextField) getComponentByCaption(popup, "Transit Speed: ");
 		
-		altitudeField.setRequiredIndicatorVisible(true);
-		transitSpeedField.setRequiredIndicatorVisible(true);
-		
 		saveButton.addClickListener(event -> {
 			altitude = altitudeField.getValue();
 			transitSpeed = transitSpeedField.getValue();
-			buttonSelected = true;
 			String caption = "";
 			if (altitude.isEmpty())
 				caption = "Altitude is the empty string.";
@@ -100,22 +77,13 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		});
 		
 		cancelButton.addClickListener(event -> {
-			buttonSelected = true;
-	    	removeCurrentWayPoint();
+	    removeCurrentWayPoint();
 
 			UI.getCurrent().removeWindow(popup);
 
 			route.enableRouteEditing();
-			List<LPolyline> polylines = route.getPolylines();
-			for(int i = 0; i < polylines.size(); i++){
-				route.getMap().addComponent(polylines.get(i));
-			}
+			route.drawLines(route.getMapPoints(), true, 0);
 		});
-		atEnd = true;
-	}
-	
-	public boolean isButtonSelected () {
-		return buttonSelected;
 	}
 
 	public void removeCurrentWayPoint() {
