@@ -32,7 +32,7 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
-	private int index;
+	private int index = -1;
 	private FRControlsComponent controls = new FRControlsComponent();
 	private WayPoint way;
 	private FRMapComponent map;

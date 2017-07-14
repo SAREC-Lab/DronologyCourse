@@ -398,6 +398,10 @@ public class AFInfoBox extends CustomComponent {
 			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
 					this.lon, this.alt, this.speed);
 			
+			content.getCancel().addClickListener(event -> {
+				UI.getCurrent().removeWindow(window);
+			});
+			
 			window.setContent(content);
 			window.setModal(true);
 			window.setWidth(1496, Unit.PIXELS);

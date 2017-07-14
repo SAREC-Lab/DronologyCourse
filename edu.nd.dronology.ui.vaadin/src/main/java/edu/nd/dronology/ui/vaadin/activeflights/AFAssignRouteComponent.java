@@ -9,14 +9,17 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 
@@ -48,6 +51,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private int numRoutes = 0;
 	private Switch hoverSwitch = new Switch();
 	private Button returnToHome = new Button("Return to Home");
+	int index = -1;
 	
 	public AFAssignRouteComponent(String name, String status, double batteryLife, String healthColor, double lat,
 			double lon, double alt, double speed){
@@ -122,12 +126,49 @@ public class AFAssignRouteComponent extends CustomComponent{
 		sidePanel.addStyleName("control_panel");
 		sidePanel.setContent(panelContent);
 		sidePanel.setCaption(numRoutes + " Routes Assigned");
-		addRoute("Testing", "1234", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
-		apply.setEnabled(false);
+		//addRoute("Testing", "1234", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
+		apply.setEnabled(true);
 		
 		sideButtons.addComponents(left, right);
 		sideButtons.setComponentAlignment(left, Alignment.MIDDLE_CENTER);
 		sideButtons.setComponentAlignment(right, Alignment.MIDDLE_CENTER);
+		
+		left.addClickListener( e-> {
+			if (frLayout.getIndex() != -1){
+				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
+				addRoute(selectedFlight.getName(), selectedFlight.getId(), "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+			}
+			else
+				Notification.show("Please select route to assign.");
+		});
+		
+		right.addClickListener( e -> {
+			if(index != -1){
+				removeRoute(this.index);
+				this.index = -1;
+			}
+			else
+				Notification.show("Please select assigned route to remove.");
+		});
+		
+		panelContent.addLayoutClickListener( e -> {
+			Component child = e.getChildComponent();
+			if(panelContent.getComponentIndex(child) != -1){
+				child.addStyleName("info_box_focus");
+			}
+			index = panelContent.getComponentIndex(child);
+			//will use when connecting to Dronology
+			FlightRouteInfo flightInfo = frLayout.getControls().getInfoPanel().getFlight(index);
+			
+			int numComponents = panelContent.getComponentCount();
+			
+			// when one route is clicked, the others go back to default background color
+			for (int i = 0; i < numComponents; i++) {
+				if (i != index) {
+					panelContent.getComponent(i).removeStyleName("info_box_focus");
+				}
+			}	
+		});
 		
 		sideContent.addComponents(sidePanel, sideButtons, frLayout);
 		bottomButtons.addComponents(cancel, apply);
@@ -144,6 +185,20 @@ public class AFAssignRouteComponent extends CustomComponent{
 		panelContent.addComponent(route);
 		numRoutes += 1;
 		sidePanel.setCaption(numRoutes + "Routes Assigned");
+	}
+	
+	public void removeRoute(int index){
+		panelContent.removeComponent(panelContent.getComponent(index));
+		numRoutes -= 1;
+		sidePanel.setCaption(numRoutes + "Routes Assigned");
+	}
+	
+	public Button getCancel(){
+		return cancel;
+	}
+	
+	public Button getApply(){
+		return apply;
 	}
 	
 }
