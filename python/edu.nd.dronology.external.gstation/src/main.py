@@ -41,6 +41,7 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
 
 
 def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUNDS):
+    _LOG.info('STARTING NEW MISSION.')
     try:
         # start a thread to monitor dronology connection
         connection = core.Connection(host=host, port=port)
@@ -48,8 +49,10 @@ def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUN
 
         # TODO: make this configurable
         mission_single_uav_sar(connection, vehicle_type, vehicle_id, bounds, ardupath=ardupath)
+        connection.stop()
     except KeyboardInterrupt:
         exit(-1)
+    _LOG.info('MISSION ENDED.')
 
 
 if __name__ == '__main__':
