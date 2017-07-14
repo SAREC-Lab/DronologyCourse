@@ -1,5 +1,7 @@
 package edu.nd.dronology.core.util;
 
+import edu.nd.dronology.core.simulator.nvecsimulator.NvecInterpolator;
+
 /**
  * A terrestrial position defined by a normal vector (N-vector) and an altitude.
  * 
@@ -14,7 +16,7 @@ package edu.nd.dronology.core.util;
  * @author Michael Murphy
  *
  */ 
-public class NVector {
+public class NVector extends AbstractPosition {
 
 	public static final double SEMI_MAJOR = 6378137.0;
 	public static final double SEMI_MINOR = 6356752.31;// 4245;
@@ -123,6 +125,8 @@ public class NVector {
 	/**
 	 * Finds the distance in meters from this NVector to another.
 	 * 
+	 * This is the distance that a laser would travel.
+	 * 
 	 * @param other
 	 *            the other position to find the position to.
 	 * @return The distance from this position to the other in meters
@@ -167,9 +171,33 @@ public class NVector {
 	 *         altitude.
 	 */
 	public LlaCoordinate toLlaCoordinate() {
-		double lat = Math.asin(this.getZ());
+		double lat = Math.atan2(this.getZ(), Math.sqrt(this.getX() * this.getX() + this.getY() * this.getY()));
 		double lon = Math.atan2(this.getY(), this.getX());
 		return new LlaCoordinate(Math.toDegrees(lat), Math.toDegrees(lon), this.getAltitude());
+	}
+	
+	public static double laserDistance(NVector a, NVector b) {
+		PVector pa = a.toPVector();
+		PVector pb = b.toPVector();
+		double dx = pa.getX() - pb.getX();
+		double dy = pa.getY() - pb.getY();
+		double dz = pa.getZ() - pb.getZ();
+		return Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+	
+	public static double travelDistance(NVector a, NVector b, double stepDistance) {
+		double dist = 0.0;
+		NVector current = a;
+		while (current.distance(b) > stepDistance) {
+			current = NvecInterpolator.move(current, b, 1.0);
+			dist += stepDistance;
+		}
+		dist += current.distance(b);
+		return dist;
+	}
+	
+	public static double travelDistance(NVector a, NVector b) {
+		return travelDistance(a, b, 1.0);
 	}
 
 }
