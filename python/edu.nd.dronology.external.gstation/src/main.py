@@ -1,247 +1,64 @@
+import core
 import argparse
-import importlib
-import Queue
-import socket
-import threading
-import time
-import drone_link as dl
-import log_util
-import mission
 import util
+from core import connect_vehicle, make_mavlink_command, deploy_vehicle
+from pymavlink.mavutil import mavlink
 from common import *
 
-_LOG = log_util.get_logger('default_file')
+_LOG = util.get_logger()
 
 
-class ControlStation:
-    _WAITING = 1
-    _IN_PROGRESS = 2
-    _DISCONNECTED = 3
-    _EXIT_FAIL = -1
-    _EXIT_SUCCESS = 0
+def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None, ip=None,
+                           instance=0, ardupath=ARDUPATH,
+                           speed=1, rate=10, home=(41.732955, -86.180886, 0, 0), baud=115200):
+    vehicle, shutdown_cb = connect_vehicle(v_type, vehicle_id=v_id, ip=ip, instance=instance, ardupath=ardupath,
+                                           speed=speed, rate=rate, home=home, baud=baud)
 
-    def __init__(self, host='127.0.0.1', port=1234, report_freq=1.0, ardupath=ARDUPATH,
-                 drone_specs=DEFAULT_DRONE_SPECS, mission_type=mission.SAR, **kwargs):
-        self.host = host
-        self.port = port
-        self.sock = None
-        self.conn = None
-        self.recv_worker = None
-        self.send_worker = None
-        self.buffer = None
-        self.ardupath = ardupath
-        self.drone_specs = drone_specs
-        self.drones = {}
-        self.drone_lock = threading.Lock()
-        self.in_queue = Queue.Queue()
-        # self.out_queue = Queue.Queue()
-        self.mission = mission_type(**kwargs)
-        self.mission.set_in_queue(self.in_queue)
-        self.report_freq = report_freq
-        self._status = self._WAITING
-        self._status_lock = threading.Lock()
+    vehicle.commands.clear()
+    vehicle.commands.upload()
 
-    def get_status(self):
-        with self._status_lock:
-            return self._status
+    vehicle.commands.add(core.make_mavlink_command(mavlink.MAV_CMD_DO_SET_HOME))
+    vehicle.commands.add(core.make_mavlink_command(mavlink.MAV_CMD_MISSION_START))
+    # TODO: if last known location is not none, we should start there
 
-    def set_status(self, status):
-        with self._status_lock:
-            self._status = status
+    for lat, lon, alt in bounds:
+        # TODO: do some sort of search instead of just iterating the boundaries
+        cmd = make_mavlink_command(mavlink.MAV_CMD_NAV_WAYPOINT,
+                                   frame=mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                                   latitude=lat, longitude=lon, altitude=alt)
+        vehicle.commands.add(cmd)
 
-    def is_waiting(self):
-        return ControlStation._WAITING == self.get_status()
+    @vehicle.on_attribute('mode')
+    def mode_listener(_, name, value):
+        # should stop doing whatever we are doing if mode changes
+        pass
 
-    def is_disconnected(self):
-        return ControlStation._DISCONNECTED == self.get_status()
+    vehicle.commands.upload()
 
-    def is_in_progress(self):
-        return ControlStation._IN_PROGRESS == self.get_status()
-
-    def work(self):
-        while True:
-            status = self.get_status()
-            if status == ControlStation._WAITING:
-                self._wait_for_connection()
-                _LOG.info('Established connection.')
-                self.set_status(ControlStation._IN_PROGRESS)
-                if not self.mission.is_in_progress():
-                    self.drones = self._make_drones()
-                    self.mission.do_mission(self.drones, self.drone_lock)
-                _LOG.info('Starting send and receive workers')
-                self._start_workers()
-            elif status == ControlStation._DISCONNECTED:
-                _LOG.info('Connection broken, attempting to reset.')
-                self._join_workers()
-                self.sock.close()
-                self.conn.close()
-                _LOG.info('Sending drones to home locations.')
-                self._send_drones_home()
-                time.sleep(3)
-                _LOG.info('Waiting for connection.')
-                self.set_status(ControlStation._WAITING)
-            elif status == ControlStation._IN_PROGRESS:
-                # _LOG.info('mission in progress')
-                # self.mission.do_mission(self.drones)
-                pass
-            elif status in (ControlStation._EXIT_FAIL, ControlStation._EXIT_SUCCESS):
-                # do shutdown
-                self.shutdown(status)
-                return
-
-            time.sleep(0.1)
-
-    def shutdown(self, status):
-        _LOG.info('Exiting with status {}.'.format(status))
-        if not self.is_waiting():
-            self.set_status(status)
-            _LOG.info('Closing connection.')
-            self.conn.close()
-            _LOG.info('Closing socket.')
-            self.sock.close()
-            # blocking call, hopefully we made sure all the messages were received by the mission
-            _LOG.info('Joining message queue.')
-            self.in_queue.join()
-            self._join_workers()
-            _LOG.info('shutting down SITL and MAVLINK connections.')
-            self.mission.stop(status)
-
-            for drone in self.drones.values():
-                drone.disconnect()
-
-            util.clean_up_run()
-
-    def _wait_for_connection(self, accept_timeout=5, conn_timeout=0.25):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(accept_timeout)
-        self.sock.bind((self.host, self.port))
-        self.sock.listen(0)
-
-        conn = None
-        while not conn:
-            try:
-                conn, addr = self.sock.accept()
-                self.conn = conn
-                self.conn.settimeout(conn_timeout)
-                self.sock.settimeout(None)
-                self.buffer = ''
-            except socket.timeout:
-                _LOG.debug('no connection attempted in {} seconds, starting over.'.format(accept_timeout))
-
-    def _start_workers(self):
-        self.recv_worker = threading.Thread(target=self._recv)
-        self.send_worker = threading.Thread(target=self._send, args=[self.report_freq])
-        self.recv_worker.start()
-        self.send_worker.start()
-
-    def _join_workers(self):
-        self.recv_worker.join()
-        self.send_worker.join()
-
-    def _handle_disconnection(self, e):
-        with self._status_lock:
-            if self._status == ControlStation._IN_PROGRESS:
-                _LOG.info('Connection interrupted: {}'.format(e))
-                self._status = ControlStation._DISCONNECTED
-                # if e.errno in (socket.errno.ECONNRESET, socket.errno.EPIPE):
-                #     pass
-                # else:
-                #     self._status = ControlStation._EXIT_FAIL
-
-    def _recv(self):
-        while self.is_in_progress():
-            try:
-                msg = self.conn.recv(4096)
-                if os.linesep in msg:
-                    msg_end, msg = msg.split(os.linesep)
-                    _LOG.info('Message received: {}'.format(self.buffer + msg_end))
-                    self.in_queue.put(DronologyCommand.from_string(self.buffer + msg_end))
-                    self.buffer = ''
-                self.buffer += msg
-            except socket.timeout:
-                # _LOG.debug('socket timeout when receiving message from dronology.')
-                pass
-            except socket.error as e:
-                self._handle_disconnection(e)
-
-        _LOG.info('Receive worker exiting.')
-
-    def _send(self, send_rate):
-        while self.is_in_progress():
-            try:
-                self.conn.send(self._get_drone_update())
-                self.conn.send(os.linesep)
-                time.sleep(send_rate)
-            except socket.error as e:
-                self._handle_disconnection(e)
-
-        _LOG.info('Send worker exiting.')
-
-    def _make_drones(self):
-        drones = {}
-        for i, (d_type, d_kwargs) in enumerate(self.drone_specs):
-            drone = dl.make_drone_link(d_type, ardupath=self.ardupath, **d_kwargs)
-            drone.connect()
-
-            # TODO: figure out why SYSID_THISMAV is not unique.
-            d_id = '{}{}'.format(d_type, i + 1)
-            drone.set_id(d_id)
-            drones[d_id] = drone
-
-        return drones
-
-    def _get_drone_update(self):
-        drone_list = {}
-        with self.drone_lock:
-            for drone_id, drone in self.drones.items():
-                drone_list[str(drone_id)] = drone.report()
-
-        return json.dumps({'type': 'drone_list', 'data': drone_list})
-
-    def _send_drones_home(self):
-        for drone_id, drone in self.drones.items():
-            pass
-            # drone.send_to_home()
-            # while not drone.is_home():
-            #     time.sleep(3)
+    _LOG.info('Commands uploaded successfully to vehicle {}.'.format(v_id))
+    v_worker = deploy_vehicle(connection, vehicle, v_id, mode='AUTO')
+    v_worker.join()
 
 
-def parse_mission_type(arg):
-    """
-    example usage:
-        python control.py -m "mission.SAR -n 4"
-    """
-    toks = arg.split('.')
-    mod_name, mission_type = toks[:2]
-    mod = importlib.import_module(mod_name)
-
-    mission_ = getattr(mod, mission_type)
-
-    return mission_
-
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-ap', dest='ardu_path', required=True, type=str, help='path to ardupilot folder')
-    ap.add_argument('-p', '--port', default=1234, type=int, help='port to connect to dronology')
-    ap.add_argument('-m', '--mission', default=mission.SAR, type=parse_mission_type, help=parse_mission_type.__doc__)
-    ap.add_argument('-rf', '--report_freq', default=1.0, type=float, help='how frequently drone updates should be sent')
-    args = ap.parse_args()
-
-    _LOG.info('STARTING NEW MISSION.')
-
-    ctrl = ControlStation(mission_type=args.mission, ardupath=args.ardu_path, port=args.port)
+def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUNDS):
     try:
-        ctrl.work()
+        # start a thread to monitor dronology connection
+        connection = core.Connection(host=host, port=port)
+        connection.start()
+
+        # TODO: make this configurable
+        mission_single_uav_sar(connection, vehicle_type, vehicle_id, bounds, ardupath=ardupath)
     except KeyboardInterrupt:
-        status = ctrl.get_status()
-        if status == 1:
-            ctrl.shutdown(status)
-        else:
-            ctrl.shutdown(-1)
-    # atexit.register(lambda: ctrl.shutdown(-1))
-    _LOG.info('MISSION ENDED.')
+        exit(-1)
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-ap', '--ardupath', type=str, required=True)
+    parser.add_argument('-host', '--host', type=str, default='127.0.0.1')
+    parser.add_argument('-p', '--port', type=int, default=1234)
+    parser.add_argument('-vtype', '--vehicle_type', type=str, default=DRONE_TYPE_SITL_VRTL)
+    parser.add_argument('-vid', '--vehicle_id', type=float, default=1.0)
+    args = parser.parse_args()
+
+    main(args.host, args.port, args.vehicle_type, args.vehicle_id, args.ardupath)

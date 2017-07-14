@@ -1,4 +1,5 @@
-import dronekit
+import logging
+import logging.config
 import sys
 import os
 import shutil
@@ -7,10 +8,20 @@ import signal
 import numpy as np
 import nvector as nv
 import matplotlib.path as mpl_path
+import yaml
 from threading import Timer
-import log_util
 
-_LOG = log_util.get_logger('default_file')
+
+def get_logger(name='default_file', p2cfg='../cfg/logging.conf'):
+    with open(p2cfg, 'r') as f:
+        cfg = yaml.load(f)
+
+    logging.config.dictConfig(cfg)
+
+    return logging.getLogger(name)
+
+
+_LOG = get_logger('default_file')
 
 arr = np.array
 
@@ -19,12 +30,6 @@ SEMI_MINOR = np.float64(6356752.31)
 
 NV_A = SEMI_MAJOR
 NV_F = 1 - (SEMI_MINOR / SEMI_MAJOR)
-
-
-class CommunicationManager:
-    @staticmethod
-    def format_message(parts):
-        pass
 
 
 def get_search_path(vertices):
@@ -295,6 +300,37 @@ def mean_position(positions):
     x, y, z = p_EM_E.ravel()
 
     return Pvector(x, y, z)
+
+
+class RepeatedTimer(object):
+    def __init__(self, interval, function, *args, **kwargs):
+        self._timer = None
+        self.interval = interval
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
+        self.is_running = False
+        self.start()
+
+    def _run(self):
+        self.is_running = False
+        self.start()
+        self.function(*self.args, **self.kwargs)
+
+    def start(self):
+        if not self.is_running:
+            self._timer = Timer(self.interval, self._run)
+            self._timer.start()
+            self.is_running = True
+
+    def set_interval(self, interval):
+        self._timer.cancel()
+        self.interval = interval
+        self.start()
+
+    def stop(self):
+        self._timer.cancel()
+        self.is_running = False
 
 
 def clean_up_run():

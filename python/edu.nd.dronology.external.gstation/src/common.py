@@ -5,7 +5,6 @@ MISSION = 'mission'
 DRONOLOGY_LINK = 'dronology'
 CONTROL_STATION = 'control'
 
-
 D_ATTR_LOC = 'location'
 D_ATTR_ATTITUDE = 'attitude'
 D_ATTR_VEL = 'velocity'
@@ -29,45 +28,39 @@ DRONE_ATTRS = [D_ATTR_LOC, D_ATTR_ATTITUDE, D_ATTR_VEL, D_ATTR_GMBL_ROT, D_ATTR_
 ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
 DRONE_TYPE_SITL_PHYS = 'PHYS'
 DRONE_TYPE_SITL_VRTL = 'VRTL'
-DRONE_TYPE_HTTP = 'http'
-DRONE_TYPE_SIM = 'simulated'
 
-DEFAULT_DRONE_SPECS = ((DRONE_TYPE_SITL_VRTL, {'instance': 0, D_ATTR_HOME_LOC: (41.519408, -86.239996, 0, 0)}),
-                       (DRONE_TYPE_SITL_VRTL, {'instance': 1, D_ATTR_HOME_LOC: (41.519408, -86.239496, 0, 0)}),)
+DRONE_1 = (DRONE_TYPE_SITL_VRTL, {'instance': 0, D_ATTR_HOME_LOC: (41.519408, -86.239996, 0, 0)})
+DRONE_2 = (DRONE_TYPE_SITL_VRTL, {'instance': 1, D_ATTR_HOME_LOC: (41.519408, -86.239496, 0, 0)})
 
-RESPOND_ALL = 'all'
-RESPOND_CRITICAL = 'critical'
+DEFAULT_DRONE_SPECS = (DRONE_1,)
+DEFAULT_SAR_BOUNDS = ((41.519367, -86.240419, 0),
+                      (41.519277, -86.240405, 0),
+                      (41.519395, -86.239418, 0),
+                      (41.519313, -86.239417, 0))
 
-SITL_PORT = 5760
 
 
-CMD_TYPE_ERROR = 'error'
-CMD_RESET = 'reset'
+class DronologyMessage:
+    def __init__(self):
+        pass
 
-ERROR_CONN_RESET = {'type': CMD_TYPE_ERROR, 'data': {'id': None, 'command': CMD_RESET, 'data': None}}
 
 
 class Command(object):
+    def __init__(self, vehicle_id, time_stamp, command_type):
+        self._vid = vehicle_id
+        self._timestamp = time_stamp
+        self._c_type = command_type
 
-    def __init__(self, origin, destination, payload):
-        self.orig = origin
-        self.dest = destination
-        self.payload = payload
-
-    def get_origin(self):
-        return self.orig
-
-    def get_destination(self):
-        return self.dest
-
-    def get_payload(self):
-        return self.payload
+    @classmethod
+    def from_string(cls, msg):
+        pass
 
 
-class DronologyCommand(Command):
-
-    def __init__(self, data):
-        super(DronologyCommand, self).__init__(DRONOLOGY_LINK, MISSION, data)
+class SetMonitorFrequency(Command):
+    def __init__(self, data, *args):
+        self.data = data
+        super(SetMonitorFrequency, self).__init__(*args)
 
     @classmethod
     def from_string(cls, msg):
@@ -75,7 +68,4 @@ class DronologyCommand(Command):
         cls(d_msg['data'])
 
 
-class ExitCommand(Command):
 
-    def __init__(self, origin, destination):
-        super(ExitCommand, self).__init__(origin, destination, None)
