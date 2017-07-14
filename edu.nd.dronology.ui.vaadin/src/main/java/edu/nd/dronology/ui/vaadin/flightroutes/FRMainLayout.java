@@ -203,11 +203,7 @@ public class FRMainLayout extends CustomComponent {
 		}
 
 		//adds the lines to the map
-		List<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false, 1);
-		map.getUtils().setPolylines(mapLines);
-		for (int i = 0; i < mapLines.size(); i++) {
-			map.getUtils().getMap().addComponent(mapLines.get(i));
-		}
+		map.getUtils().drawLines(waypoints, true, 1);
 
 		numComponents = routeLayout.getComponentCount();
 		

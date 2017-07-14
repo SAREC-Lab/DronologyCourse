@@ -199,13 +199,7 @@ public class FRMapComponent extends CustomComponent {
 				route.addPinForWayPoint(point);
 			}
 			
-			List<LPolyline> localPolylines = route.drawLines(storedPoints, false, 0);
-		
-			route.setPolylines(localPolylines);
-						
-			for (int i = 0; i < localPolylines.size(); i++) {
-				route.getMap().addComponent(localPolylines.get(i));
-			}
+			route.drawLines(storedPoints, true, 0);
 			
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
@@ -339,13 +333,7 @@ public class FRMapComponent extends CustomComponent {
 				route.addPinForWayPoint(point);
 			}
 			
-			List<LPolyline> localPolylines = route.drawLines(storedPoints, false, 0);
-		
-			route.setPolylines(localPolylines);
-						
-			for (int i = 0; i < localPolylines.size(); i++) {
-				route.getMap().addComponent(localPolylines.get(i));
-			}
+			route.drawLines(storedPoints, true, 0);
 			
 			route.disableRouteEditing();
 			leafletMap.setEnabled(false);

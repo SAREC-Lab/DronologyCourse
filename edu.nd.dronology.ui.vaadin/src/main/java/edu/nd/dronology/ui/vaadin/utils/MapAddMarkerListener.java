@@ -7,6 +7,7 @@ import java.util.List;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
+import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -42,19 +43,18 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	
 	@Override
 	public void onClick(LeafletClickEvent e) {
+		processOnClick(e.getPoint(), -1);
+	}
+	
+	public void processOnClick(Point p, int index) {
 		if (atEnd && !buttonSelected) {
 	    	removeCurrentWayPoint();
 		}
 		
 		atEnd = false;
-		
-		if (route.getLineClicked()) {
-			//Notification.show("Line was clicked");
-		}
 			
-		currentWayPoint = route.addNewPin(e.getPoint(), route.getLineClicked());
+		currentWayPoint = route.addNewPin(p, index);
 		popup.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
-		route.setLineClicked(false);
 			
 		buttonSelected = false;
 
@@ -124,14 +124,12 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getMapPoints().remove(route.getMapPoints().get(i));
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
-				route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
-				
+				route.drawLines(route.getMapPoints(), false, 1);
 			}
 		}
 		for (int i = 0; i < route.getPins().size(); i++) {
 			if (route.getPins().get(i).getId().equals(currentWayPoint.getId())) {
 				route.getMap().removeComponent(route.getPins().get(i));
-				route.getPins().remove(route.getPins().get(i));
 			}
 		}
 		for(int i = 0; i < route.getPolylines().size(); i++){
