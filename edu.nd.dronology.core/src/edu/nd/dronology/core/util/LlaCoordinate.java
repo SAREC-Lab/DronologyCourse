@@ -108,6 +108,7 @@ public class LlaCoordinate  extends AbstractPosition  implements Serializable {
 	/**
 	 * @return a terrestrial position defined by an N-vector plus altitude
 	 */
+	@Override
 	public NVector toNVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article called: "A Non-singular Horizontal Position Representation" by Kenneth Gade. You can find it at https://goo.gl/iCqdCn (see
@@ -127,6 +128,7 @@ public class LlaCoordinate  extends AbstractPosition  implements Serializable {
 	/**
 	 * @return a terrestrial position defined by an x, y, and z coordinate in an Earth centered Earth fixed reference frame.
 	 */
+	@Override
 	public PVector toPVector() {
 		return this.toNVector().toPVector();
 	}

@@ -49,6 +49,7 @@ public class NVector extends AbstractPosition {
 		this.altitude = altitude;
 	}
 
+	@Override
 	public NVector toNVector() {
 		return this;
 	}
@@ -145,6 +146,7 @@ public class NVector extends AbstractPosition {
 	 * @return a terrestrial position defined by an x, y, and z coordinate in an
 	 *         Earth centered Earth fixed reference frame.
 	 */
+	@Override
 	public PVector toPVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article
@@ -170,6 +172,7 @@ public class NVector extends AbstractPosition {
 	 * @return a terrestrial position defined by a latitude, longitude, and
 	 *         altitude.
 	 */
+	@Override
 	public LlaCoordinate toLlaCoordinate() {
 		double lat = Math.atan2(this.getZ(), Math.sqrt(this.getX() * this.getX() + this.getY() * this.getY()));
 		double lon = Math.atan2(this.getY(), this.getX());
