@@ -40,7 +40,6 @@ public class FRMainLayout extends CustomComponent {
 	private boolean isFirst = true;
 	private int componentCount;
 	private String name = "";
-	private List<String> routesClicked = new ArrayList<>();
 	
 	@WaypointReplace
 	public FRMainLayout() {
@@ -109,7 +108,6 @@ public class FRMainLayout extends CustomComponent {
 				buttons.addComponents(yes, no);
 				
 				VerticalLayout windowContent = new VerticalLayout();
-				name = routesClicked.get(routesClicked.size() - 1);
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
 				
@@ -167,10 +165,14 @@ public class FRMainLayout extends CustomComponent {
 
 		//gets the flight info for that route
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
-		List<Waypoint> flightWaypoints = flightInfo.getWaypoints();
-	
-		Notification.show(flightInfo.getName());
-		routesClicked.add(flightInfo.getName());
+		
+		List<Waypoint> flightWaypoints = new ArrayList();
+		if(routeLayout.getComponentIndex(child) != -1){
+			flightWaypoints = flightInfo.getWaypoints();
+			name = flightInfo.getName();
+		}else{
+			flightWaypoints = new ArrayList();
+		}
 		
 		// removes old pins, polylines, and style when switching routes
 		map.getUtils().removeAllMarkers(map.getUtils().getPins());
@@ -201,11 +203,7 @@ public class FRMainLayout extends CustomComponent {
 		}
 
 		//adds the lines to the map
-		List<LPolyline> mapLines = map.getUtils().drawLines(waypoints, false, 1);
-		map.getUtils().setPolylines(mapLines);
-		for (int i = 0; i < mapLines.size(); i++) {
-			map.getUtils().getMap().addComponent(mapLines.get(i));
-		}
+		map.getUtils().drawLines(waypoints, true, 1);
 
 		numComponents = routeLayout.getComponentCount();
 		
@@ -216,21 +214,21 @@ public class FRMainLayout extends CustomComponent {
 			}
 		}	
 		map.setRouteCenter();
-		map.displayByName(flightInfo, null, 0, false);
+		
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.displayByName(flightInfo, null, 0, false);
+		}
 		
 		//click listener to update waypoint number 
 		map.getMapInstance().addClickListener(eve->{
-			
-			map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
-					
+			if(toString().valueOf(map.isEnabled()).equalsIgnoreCase("true")){
+				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
+			}	
 		});
-		
-		
-		//map.getUtils().setMapPoints(waypoints);
-		//map.getTableDisplay().setGrid(map.getUtils().getMapPoints());
-		
-		//List<WayPoint> local = map.getUtils().getMapPoints();
-		//map.getUtils().setSetPoints(waypoints);
-		map.getTableDisplay().setGrid(waypoints);
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.getTableDisplay().setGrid(waypoints);
+			map.getUtils().setMapPointsAltitude(waypoints);
+			map.getUtils().setMapPointsTransit(waypoints);
+		}
 	}
 }

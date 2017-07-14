@@ -132,7 +132,6 @@ public class FRMapComponent extends CustomComponent {
 		layout = new AbsoluteLayout();
 		layout.setHeight("447px");
 		layout.setWidth("1075px");
-
 		
 		if (whichName) {
 			int numWaypoints = route.getMapPoints().size();
@@ -141,7 +140,6 @@ public class FRMapComponent extends CustomComponent {
 			selectedBar = new FRMetaInfo(info);
 		}
 		 
-
 		editBar = new FReditBar();
 		editBar.setStyleName("edit_bar");
 		CheckBox tableBox = selectedBar.getCheckBox();
@@ -201,13 +199,7 @@ public class FRMapComponent extends CustomComponent {
 				route.addPinForWayPoint(point);
 			}
 			
-			List<LPolyline> localPolylines = route.drawLines(storedPoints, false, 0);
-		
-			route.setPolylines(localPolylines);
-						
-			for (int i = 0; i < localPolylines.size(); i++) {
-				route.getMap().addComponent(localPolylines.get(i));
-			}
+			route.drawLines(storedPoints, true, 0);
 			
 			layout.removeComponent(editBar);
 			leafletMap.setStyleName("fr_leaflet_map");
@@ -301,16 +293,59 @@ public class FRMapComponent extends CustomComponent {
 			} catch (PersistenceException e1) {
 				e1.printStackTrace();
 			}
+			
+			for(int i = storedPoints.size(); i < route.getMapPoints().size(); i++){
+				String alt = route.getMapPoints().get(i).getAltitude();
+				String lon = route.getMapPoints().get(i).getLongitude();
+				String lat = route.getMapPoints().get(i).getLatitude();
+				String trans = route.getMapPoints().get(i).getTransitSpeed();
+				
+				Point pt = new Point();
+				
+				pt.setLat(Double.valueOf(lat));
+				pt.setLon(Double.valueOf(lon));
+				
+				WayPoint way = new WayPoint(pt, false);
+				way.setAltitude(alt);
+				way.setTransitSpeed(trans);
+				
+				storedPoints.add(way);
+				
+			}
+			
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				route.getMapPoints().remove(i);
+			}
+			
+			route.getMapPoints().clear();
+			
+			for (int i = 0; i < storedPoints.size(); i++) {
+				route.getMapPoints().add(storedPoints.get(i));
+			}
+			
+			route.getGrid().setItems(route.getMapPoints());
+			
+			route.removeAllMarkers(route.getPins());
+			route.removeAllLines(route.getPolylines());
+			
+			for (int i = 0; i < storedPoints.size(); i++) {
+				WayPoint point = storedPoints.get(i);
+				route.addPinForWayPoint(point);
+			}
+			
+			route.drawLines(storedPoints, true, 0);
+			
+			route.disableRouteEditing();
+			leafletMap.setEnabled(false);
 		});
-		
+
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
 		content.addComponent(selectedBar);
 		content.addComponents(layout, tableDisplay.getGrid());
 		
-		tableDisplay.setGrid(route.getMapPoints());
-		
+		tableDisplay.setGrid(route.getMapPoints());	
 	}
 	
 	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName){
@@ -367,9 +402,6 @@ public class FRMapComponent extends CustomComponent {
 	}
 
 	public void enableEdit() {
-
-//		route.enableRouteEditing();
-//		leafletMap.setEnabled(true);
 		editBar.addStyleName("bring_front");
 		editBar.setWidth("880px");
 		layout.addComponent(editBar, "top: 5px; left:95px");
