@@ -78,6 +78,7 @@ public class AFMapComponent extends CustomComponent {
 		
 		this.setWidth("100%");
 		addStyleName("map_component");
+		addStyleName("af_map_component");
 
 		leafletMap = new LMap();
 		utilities = new MapMarkerUtilities(leafletMap);

@@ -59,6 +59,7 @@ public class FRMapComponent extends CustomComponent {
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
 		addStyleName("map_component");
+		addStyleName("fr_map_component");
 
 		leafletMap = new LMap();
 		leafletMap.addStyleName("fr_leaflet_map");
@@ -68,7 +69,7 @@ public class FRMapComponent extends CustomComponent {
 		Window popup = createWayPointWindow();
 		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup);
 
-		mapAndPopup.addStyleName("fr_mapandpopup_layout");
+		mapAndPopup.addStyleName("fr_mapabsolute_layout");
 		mapAndPopup.addComponent(leafletMap);
 		tableDisplay.setRoute(route);
 		tableDisplay.getGrid().addStyleName("fr_table_component");
@@ -117,8 +118,6 @@ public class FRMapComponent extends CustomComponent {
 
 	public void display() {
 		//displays when no route is selected
-		mapAndPopup.setHeight("510px");
-		mapAndPopup.setWidth("1075px");
 		content.addComponent(bar);
 		content.addComponents(mapAndPopup, tableDisplay.getGrid());
 	}
@@ -130,8 +129,7 @@ public class FRMapComponent extends CustomComponent {
 		route.disableRouteEditing();
 
 		layout = new AbsoluteLayout();
-		layout.setHeight("447px");
-		layout.setWidth("1075px");
+		layout.addStyleName("fr_mapabsolute_layout");
 		
 		if (whichName) {
 			int numWaypoints = route.getMapPoints().size();
@@ -141,7 +139,6 @@ public class FRMapComponent extends CustomComponent {
 		}
 		 
 		editBar = new FReditBar();
-		editBar.setStyleName("edit_bar");
 		CheckBox tableBox = selectedBar.getCheckBox();
 		Button edit = selectedBar.getEditButton();
 		
@@ -167,8 +164,7 @@ public class FRMapComponent extends CustomComponent {
 			route.enableRouteEditing();
 			leafletMap.setEnabled(true);
 			editBar.addStyleName("bring_front");
-			editBar.setWidth("880px");
-			layout.addComponent(editBar, "top: 5px; left:95px");
+			layout.addComponent(editBar);
 
 			leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 			tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
@@ -202,8 +198,8 @@ public class FRMapComponent extends CustomComponent {
 			route.drawLines(storedPoints, true, 0);
 			
 			layout.removeComponent(editBar);
-			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
+			leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
 		});
@@ -213,8 +209,8 @@ public class FRMapComponent extends CustomComponent {
 			route.disableRouteEditing();
 
 			layout.removeComponent(editBar);
-			leafletMap.setStyleName("fr_leaflet_map");
 			leafletMap.addStyleName("bring_back");
+			leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
 			tableDisplay.getGrid().setStyleName("fr_table_component");
 			leafletMap.setEnabled(false);
 

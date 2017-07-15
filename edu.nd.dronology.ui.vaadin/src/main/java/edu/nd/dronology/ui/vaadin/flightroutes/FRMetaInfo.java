@@ -38,9 +38,6 @@ public class FRMetaInfo extends CustomComponent {
 		VerticalLayout controls = new VerticalLayout();
 		Label nameLabel;
 		
-		content.setWidth("1075px");
-		content.setHeight("68px");
-		
 		routeName = name;
 		numWaypoints = numCoords;
 		
@@ -53,10 +50,6 @@ public class FRMetaInfo extends CustomComponent {
 		
 		editButton = new Button("Edit");
 		Button deleteButton = new Button("Delete");
-		editButton.setWidth("55");
-		editButton.setHeight("28px");
-		deleteButton.setWidth("58");
-		deleteButton.setHeight("28px");
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/editButtonFull.PNG"));
@@ -69,16 +62,17 @@ public class FRMetaInfo extends CustomComponent {
 		deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 			
 		tableView = new CheckBox("Table View");
-		tableView.setHeight("23px");
-		content.setStyleName("route_meta_info");
+		content.setStyleName("fr_route_meta_info");
+		content.addStyleName("has_route");
 		
 		tableView.setValue(true);
 		
 		buttons.addComponents(editButton, deleteButton);
 		controls.addComponents(buttons, tableView);
 		content.addComponents(nameLabel, controls);
-		content.setComponentAlignment(controls, Alignment.MIDDLE_RIGHT);
-		content.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
+
+		controls.addStyleName("route_meta_controls");
+		nameLabel.addStyleName("route_meta_name");
 		
 		setCompositionRoot(content);
 		
@@ -93,9 +87,8 @@ public class FRMetaInfo extends CustomComponent {
 		routeName = "No Route Selected";
 		Label nameLabel = new Label(routeName);
 		
-		information.setStyleName("route_meta_info");
-		information.setWidth("1075px");
-		information.setHeight("68px");
+		information.setStyleName("fr_route_meta_info");
+		information.addStyleName("no_route");
 		
 		information.addComponent(nameLabel);
 		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);

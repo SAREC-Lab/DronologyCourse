@@ -37,7 +37,7 @@ $valo-menu-background-color: #eee;
 	$controls-width: 360px;
 	$screen-height: 90vh;
 	$fr-map-height: 55vh;
-	$fr-top-bar-height: 68px;
+	$fr-top-bar-height: 60px;
 	
 	$color-dark-5: #000040;
 	$color-dark-4: #224080;
@@ -104,9 +104,6 @@ $valo-menu-background-color: #eee;
 		right: 0;
 		margin: auto;
 	}
-	.v-leaflet {
-		height: $screen-height;
-	}
 	.controls_component {
 		width: $controls-width !important;
 		height: $screen-height;
@@ -114,6 +111,19 @@ $valo-menu-background-color: #eee;
 	.map_component {
 		width: calc(100% - #{$controls-width}) !important;
 		padding-left: 6px;
+	}
+	.af_map_component {
+		.v-leaflet {
+			height: $screen-height;
+		}
+	}
+	.fr_map_component {
+		.v-leaflet {
+			height: $fr-map-height !important;
+		}
+		.v-absolutelayout-margin {
+			overflow: visible !important;
+		}
 	}
 
 	.control_panel {
@@ -162,8 +172,14 @@ $valo-menu-background-color: #eee;
 		background-color: #91b3ea;
 	}
 
-	.fr_mapandpopup_layout {
+	.v-absolutelayout-wrapper {
+		top: 0px !important;
+		left: 0px !important;
+		width: 100%;
+	}
+	.fr_mapabsolute_layout {
 		height: $fr-map-height !important;
+		width: 100%;
 	}
 	.fr_leaflet_map {
 		height: $fr-map-height !important;
@@ -175,9 +191,47 @@ $valo-menu-background-color: #eee;
 		border-color: #000000;
 		z-index: 0 !important;
 	}
-	.fr_top_bar {
+	.fr_route_meta_info{
+		padding: 5px 15px;
+		background-color: $color-light-4;
+		width: 100%;
 		height: $fr-top-bar-height !important;
-		border: 0;
+		
+		.v-slot-route_meta_controls {
+			width: 20%;
+			text-align: right;
+			
+			>.v-layout {
+				text-align: right;
+				padding-right: 15px;
+			}
+			
+			.v-button {
+				width: 65px;
+				height: 28px;
+			}
+			.v-checkbox {
+				font-size: 12px;
+			}
+		}
+		.v-slot-route_meta_name {
+			padding: 15px 0;
+			width: 80%;
+		}
+	}
+	.v-absolutelayout-wrapper-fr_edit_bar {
+		left: calc(100%/2 - 440px) !important;
+	}
+	.fr_edit_bar{
+		background-color: black;
+		color: white;
+		padding-right: 90px;
+		width: 880px !important;
+		.v-button {
+			height: 20px;
+			margin: 5px 0;
+			font-size: 12px;
+		}
 	}
 	.fr_table_component {
 		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px) !important;
@@ -365,20 +419,12 @@ $valo-menu-background-color: #eee;
 		height: 20px;
 		padding: 3px 6px;
 	}
-	.route_meta_info{
-		border: solid 1px $color-light-4;
-	}
+
 	.bring_front{
 		z-index: 999 !important;
 	}
 	.bring_back{
 		z-index: 0;
-	}
-	.edit_bar{
-		background-color: black;
-		color: white;
-		padding-right: 90px;
-		
 	}
 	.large_text{
 		padding-left: 20px;

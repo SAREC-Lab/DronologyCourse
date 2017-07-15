@@ -16,7 +16,7 @@ public class FReditBar extends CustomComponent{
 	Label smallText = new Label("Left click to add a new waypoint. Right click to finish drawing and add a finish point. Drag waypoints to move.");
 	
 	public FReditBar() {
-		setStyleName("fr_top_bar");
+		setStyleName("fr_edit_bar");
 		textLabel.setStyleName("large_text");
 		smallText.setStyleName("small_text");
 		
