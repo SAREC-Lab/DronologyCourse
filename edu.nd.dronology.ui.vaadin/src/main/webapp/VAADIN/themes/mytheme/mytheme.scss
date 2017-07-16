@@ -41,6 +41,7 @@ $valo-menu-background-color: #eee;
 	
 	$color-dark-5: #000040;
 	$color-dark-4: #224080;
+	$color-dark-2: #666666;
 	$color-dark-1: #999999;
 	$color-light-5: #ffffff;
 	$color-light-4: #f5f5f5;
@@ -56,6 +57,11 @@ $valo-menu-background-color: #eee;
 	$color-danger-main-border: #d43f3a;
 	$color-danger-hover: #c9302c;
 	$color-danger-hover-border: #ac2925;
+	
+	$color-okay-main: #5cb85c;
+	$color-okay-main-border: #4cae4c;
+	$color-okay-hover: #449d44;
+	$color-okay-hover-border: #398439;
 		
 	//Custom styles
 	.v-button:focus,
@@ -125,6 +131,12 @@ $valo-menu-background-color: #eee;
 			overflow: visible !important;
 		}
 	}
+	.fr_map_component_no_table {
+		.v-leaflet {
+			height: calc(#{$screen-height} - #{$fr-top-bar-height} - 6px) !important;
+		}
+	}
+
 
 	.control_panel {
 		border-radius: 0;
@@ -188,7 +200,7 @@ $valo-menu-background-color: #eee;
 		height: $fr-map-height !important;
 		border-style: solid;
 		border-width: 5px; 
-		border-color: #000000;
+		border-color: $color-dark-4;
 		z-index: 0 !important;
 	}
 	.fr_route_meta_info{
@@ -223,26 +235,64 @@ $valo-menu-background-color: #eee;
 		left: calc(100%/2 - 440px) !important;
 	}
 	.fr_edit_bar{
-		background-color: black;
+		background-color: $color-dark-4;
 		color: white;
 		padding-right: 90px;
 		width: 880px !important;
 		.v-button {
-			height: 20px;
+			height: 22px !important;
 			margin: 5px 0;
 			font-size: 12px;
+		}
+		.large_text{
+			padding: 4px 4px 4px 20px;
+		}
+		.small_text{
+			font-size: 60%;
+			padding: 10px 80px 6px 8px;
 		}
 	}
 	.fr_table_component {
 		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px) !important;
 		width: 100% !important;
+		.v-grid-column-resize-handle {
+			width: 0;
+		}
+		.v-grid-header {
+			.v-grid-cell {
+				background-color: $color-dark-2;
+				color: $color-light-5;
+				font-size: 14px;
+				font-weight: bold;
+			}
+		}
+		.v-grid-body {
+			.v-grid-cell {
+				font-size: 14px;
+				line-height: 32px;
+				height: 34px;
+			}
+			.v-nativebutton{
+				font-size: 12px;
+			}
+		}
+		.v-grid-cell-focused:before {
+			border: 0;
+		}
 	}
 	.fr_table_component_edit_mode {
-		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px) !important;
-		width: 100% !important;
 		border-width: 5px;
 		border-style: solid; 
-		border-color: #000000;
+		border-color: $color-dark-4;
+		.v-grid-tablewrapper {
+			height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px - 10px) !important;
+			width: 100% !important;
+		}
+		.v-grid-editor {
+			input.v-textfield {
+				font-size: 14px;
+			}
+		}
 	}
 	.fr_info_panel {
 		height: $screen-height;
@@ -426,16 +476,7 @@ $valo-menu-background-color: #eee;
 	.bring_back{
 		z-index: 0;
 	}
-	.large_text{
-		padding-left: 20px;
-	}
-	.small_text{
-		font-size: 60%;
-		padding-top: 7px;
-		padding-right: 80px;
-	}
 	.cancel_button{
 		padding-left: 50px;
-	
 	}
 }

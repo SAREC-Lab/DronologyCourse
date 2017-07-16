@@ -37,6 +37,7 @@ public class FRTableDisplay {
 	private TextField transitSpeed = new TextField();
 	
 	public FRTableDisplay() {
+		grid.addStyleName("fr_table_component");
 		grid.getColumns().stream().forEach(c -> c.setSortable(false));
 		grid.getColumns().stream().forEach(c -> {
 			if (c.getCaption().equals("Id") || c.getCaption().equals("Reached")) {
@@ -100,6 +101,8 @@ public class FRTableDisplay {
 				}
 			})
 		);
+		grid.setColumnResizeMode(null);
+		grid.setSelectionMode(SelectionMode.NONE);
 	}
 	
 	public Grid<WayPoint> getGrid() {
@@ -116,15 +119,6 @@ public class FRTableDisplay {
 			mapMarkers.updatePinForWayPoint(event.getBean());
 			grid.getEditor().cancel();
 		});
-		
-		//grid.asSingleSelect();
-
-		grid.setSelectionMode(SelectionMode.SINGLE);
-		
-		SingleSelectionModel<WayPoint> singleSelect =
-			      (SingleSelectionModel<WayPoint>) grid.getSelectionModel();
-			// disallow empty selection
-			singleSelect.setDeselectAllowed(true);
 	}
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {
