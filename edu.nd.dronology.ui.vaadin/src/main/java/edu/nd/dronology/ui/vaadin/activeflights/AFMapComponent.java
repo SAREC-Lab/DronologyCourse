@@ -5,6 +5,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,12 +24,14 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.Waypoint;
@@ -62,6 +65,7 @@ public class AFMapComponent extends CustomComponent {
 	private List<List<LMarker>> wayPointMarkers = new ArrayList<>();
 	private boolean follow = false;
 	private AbsoluteLayout layout = new AbsoluteLayout();
+	private PopupView popup;
 
 	private MapMarkerUtilities utilities;
 
@@ -109,6 +113,8 @@ public class AFMapComponent extends CustomComponent {
 		int layoutHeight = (int) Math.rint(screenHeight * 0.9);
 		layout.setHeight(Integer.toString(layoutHeight) + "px");
 		layout.addComponent(leafletMap);
+		popup = createWayPointPopupView();
+		layout.addComponent(popup);
 		content.addComponent(layout);
 		setCompositionRoot(content);
 	}
@@ -624,41 +630,95 @@ public class AFMapComponent extends CustomComponent {
 
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {	
-			LMarker leafletMarker = (LMarker)event.getSource();
-
-			VerticalLayout content = new VerticalLayout();
-			PopupView popup = new PopupView(null, content);
 			
-			try {
-				currentFlights = flightRouteService.getCurrentFlights();
-				for (FlightPlanInfo e : currentFlights) {
-					List<Waypoint> coordinates = e.getWaypoints();
-					for (Waypoint coord : coordinates) {
-						if (coord.getCoordinate().getLatitude() == leafletMarker.getPoint().getLat() && coord.getCoordinate().getLongitude() == leafletMarker.getPoint().getLon()) {
-							content.addComponent(new Label("Latitude: " + coord.getCoordinate().getLatitude()));
-							content.addComponent(new Label("Longitude: " + coord.getCoordinate().getLongitude()));
-							content.addComponent(new Label("Altitude: "  + coord.getCoordinate().getAltitude()));
-							content.addComponent(new Label("Transit Speed: " + coord.getApproachingspeed()));
+			popup.setVisible(false);
+			popup.setPopupVisible(false);
+			LMarker leafletMarker = (LMarker)event.getSource();
+			
+			WayPoint w = null;
+			
+	    	for (int i = 0; i < utilities.getMapPoints().size(); i++) {
+	    		if (utilities.getMapPoints().get(i).getId().equals(leafletMarker.getId())) {
+	    			w = utilities.getMapPoints().get(i);
+	    		}
+	    	}
+
+			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
+			Iterator<Component> it = popupContent.iterator();
+			while(it.hasNext()) {
+				Component c = it.next();
+				try {
+					currentFlights = flightRouteService.getCurrentFlights();
+					for (FlightPlanInfo e : currentFlights) {
+						List<Waypoint> coordinates = e.getWaypoints();
+						for (Waypoint coord : coordinates) {
+							if (coord.getCoordinate().getLatitude() == leafletMarker.getPoint().getLat() && coord.getCoordinate().getLongitude() == leafletMarker.getPoint().getLon()) {
+								if (c.getId()!=null && c.getId().equals("latitude")) {
+									Label l = (Label)c;
+									l.setValue("Latitude: " + coord.getCoordinate().getLatitude());
+								}
+								if (c.getId()!=null && c.getId().equals("longitude")) {
+									Label l = (Label)c;
+									l.setValue("Longitude: " + coord.getCoordinate().getLongitude());
+								}
+								if (c.getId()!=null && c.getId().equals("altitude")) {
+									Label l = (Label)c;
+									l.setValue("Altitude: "  + coord.getCoordinate().getAltitude());
+								}
+								if (c.getId()!=null && c.getId().equals("transitSpeed")) {
+									Label l = (Label)c;
+									l.setValue("Transit Speed: " + coord.getApproachingspeed());
+								}
+							}
 						}
 					}
-				}
-			}catch (RemoteException e) {
-				try {
-					Notification.show("Reconnecting...");
-					service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-					flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
+				}catch (RemoteException e) {
+					try {
+						Notification.show("Reconnecting...");
+						service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
+						flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 							.getService(IFlightManagerRemoteService.class);
-				} catch (RemoteException | DronologyServiceException e1) {
+					} catch (RemoteException | DronologyServiceException e1) {
+						Notification.show("Reconnecting...");
+					}
 					Notification.show("Reconnecting...");
 				}
-				Notification.show("Reconnecting...");
 			}
-	
-			popup.setPopupVisible(true);
-			popup.addStyleName("bring_front");
-			
+
 			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150)
 			+ "px;left:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+			popup.setVisible(true);
+			popup.setPopupVisible(true);
 		}		
+	}
+	
+	public PopupView createWayPointPopupView() {
+		VerticalLayout popupContent = new VerticalLayout();
+		popupContent.removeAllComponents();
+		
+		Label latitudeLabel = new Label();
+		latitudeLabel.setId("latitude");
+		
+		Label longitudeLabel = new Label();
+		longitudeLabel.setId("longitude");
+		
+		Label altitudeLabel = new Label();
+		altitudeLabel.setId("altitude");
+		
+		Label transitSpeedLabel = new Label();
+		transitSpeedLabel.setId("transitSpeed");
+		
+		popupContent.addComponent(latitudeLabel);
+		popupContent.addComponent(longitudeLabel);
+		popupContent.addComponent(altitudeLabel);
+		popupContent.addComponent(transitSpeedLabel);
+		
+		PopupView popup = new PopupView(null, popupContent);
+		
+		popup.addStyleName("bring_front");
+		popup.setVisible(false);
+		popup.setPopupVisible(false);
+		
+		return popup;
 	}
 }
