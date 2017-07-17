@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
-import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
@@ -16,7 +15,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -31,7 +31,6 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
-import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
@@ -63,11 +62,11 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap = new LMap();
 		leafletMap.addStyleName("fr_leaflet_map");
-
-		Configuration configuration = Configuration.getInstance();
 	
-		Window popup = createWayPointWindow();
-		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup);
+		Window window = createWayPointWindow();
+		PopupView popup = createWayPointPopupView();
+		mapAndPopup.addComponent(popup);
+		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, window, popup);
 
 		mapAndPopup.addStyleName("fr_mapabsolute_layout");
 		mapAndPopup.addComponent(leafletMap);
@@ -105,16 +104,70 @@ public class FRMapComponent extends CustomComponent {
 		popupContent.addComponent(transitSpeedField);
 		popupContent.addComponent(buttons);
 
-		Window popup;
-		popup = new Window(null, popupContent);
+		Window window;
+		window = new Window(null, popupContent);
 
-		popup.setModal(true);
-		popup.setClosable(false);
-		popup.setResizable(false);
+		window.setModal(true);
+		window.setClosable(false);
+		window.setResizable(false);
 
-		return popup;
+		return window;
 	}
 
+	public PopupView createWayPointPopupView() {
+		VerticalLayout popupContent = new VerticalLayout();
+		popupContent.removeAllComponents();
+		
+		Label latitudeLabel = new Label();
+		latitudeLabel.setId("latitude");
+		
+		Label longitudeLabel = new Label();
+		longitudeLabel.setId("longitude");
+		
+		Label altitudeLabel = new Label();
+		altitudeLabel.setId("altitude");
+		
+		Label transitSpeedLabel = new Label();
+		transitSpeedLabel.setId("transitSpeed");
+		
+		popupContent.addComponent(latitudeLabel);
+		popupContent.addComponent(longitudeLabel);
+		popupContent.addComponent(altitudeLabel);
+		popupContent.addComponent(transitSpeedLabel);
+		
+		PopupView popup = new PopupView(null, popupContent);
+		
+		Button toDelete = new Button("Remove Waypoint");
+		
+		toDelete.addClickListener(event -> {
+			popup.setPopupVisible(false);
+			
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				if (route.getMapPoints().get(i).getId().equals(route.getSelectedWayPointId())) {
+					route.getMapPoints().remove(route.getMapPoints().get(i));
+				}
+			}
+			
+			route.getMap().removeComponent(route.getLeafletMarker());
+			route.removeAllLines(route.getPolylines());
+			route.drawLines(route.getMapPoints(), true, 1);
+			route.getGrid().setItems(route.getMapPoints());
+			
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				route.getMapPoints().get(i).setOrder(i+1);
+			}
+		});
+		
+		toDelete.setId("toDelete");
+		popupContent.addComponent(toDelete);
+		
+		popup.addStyleName("bring_front");
+		popup.setVisible(false);
+		popup.setPopupVisible(false);
+		
+		return popup;
+	}
+	
 	public void display() {
 		//displays when no route is selected
 		content.addComponent(bar);
@@ -131,7 +184,6 @@ public class FRMapComponent extends CustomComponent {
 		layout.addStyleName("fr_mapabsolute_layout");
 		
 		if (whichName) {
-			int numWaypoints = route.getMapPoints().size();
 			selectedBar = new FRMetaInfo(routeName, numCoords);
 		} else {
 			selectedBar = new FRMetaInfo(info);
@@ -178,7 +230,6 @@ public class FRMapComponent extends CustomComponent {
 			}
 			
 			route.getMapPoints().clear();
-			Notification.show(String.valueOf(route.getMapPoints().size()));
 			
 			for (int i = 0; i < storedPoints.size(); i++) {
 				route.getMapPoints().add(storedPoints.get(i));

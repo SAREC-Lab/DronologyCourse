@@ -13,17 +13,18 @@ import org.vaadin.addon.leaflet.LMarker.DragEndListener;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
+import org.vaadin.addon.leaflet.LeafletMouseOutEvent;
+import org.vaadin.addon.leaflet.LeafletMouseOutListener;
 import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
 import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.shared.Registration;
 import com.vaadin.ui.AbsoluteLayout;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -41,50 +42,60 @@ public class MapMarkerUtilities {
 
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
-			LMarker leafletMarker = (LMarker)event.getSource();
-			WayPoint w = null;
+			popup.setVisible(false);
+			popup.setPopupVisible(false);
+			leafletMarker = (LMarker)event.getSource();
 			
 	    	for (int i = 0; i < mapPoints.size(); i++) {
 	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
 	    			w = mapPoints.get(i);
 	    		}
 	    	}
-	    	
-			Button toDelete = new Button("Remove Waypoint");
-			VerticalLayout content = new VerticalLayout();
-			PopupView popup = new PopupView(null, content);
-			
-			toDelete.addClickListener(e -> {
-				popup.setPopupVisible(false);
-		    	for (int i = 0; i < mapPoints.size(); i++) {
-		    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
-		    			mapPoints.remove(mapPoints.get(i));
-		    		}
-		    	}
-		    	
-		    	map.removeComponent(leafletMarker);
-				removeAllLines(getPolylines());
-				drawLines(mapPoints, true, 1);
-				grid.setItems(mapPoints);
-				
-				for (int i = 0; i < mapPoints.size(); i++) {
-					mapPoints.get(i).setOrder(i + 1);
-				}
-			});
-			
-			content.addComponent(new Label("Latitude: " + w.getLatitude()));
-			content.addComponent(new Label("Longitude: " + w.getLongitude()));
-			content.addComponent(new Label("Altitude: "  + w.getAltitude()));
-			content.addComponent(new Label("Transit Speed: " + w.getTransitSpeed()));
-			content.addComponent(toDelete);
-			
-			popup.setPopupVisible(true);
-			popup.addStyleName("bring_front");
-			
-			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 100) + "px;left:" 
-					+ String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 240) + "px");
+	    	selectedWayPointId = w.getId();
 
-			map.addComponent(popup);
+			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
+			Iterator<Component> it = popupContent.iterator();
+			while(it.hasNext()) {
+				Component c = it.next();
+				if (c.getId()!=null && c.getId().equals("latitude")) {
+					Label l = (Label)c;
+					l.setValue("Latitude: " + w.getLatitude());
+				}
+				if (c.getId()!=null && c.getId().equals("longitude")) {
+					Label l = (Label)c;
+					l.setValue("Longitude: " + w.getLongitude());
+				}
+				if (c.getId()!=null && c.getId().equals("altitude")) {
+					Label l = (Label)c;
+					l.setValue("Altitude: "  + w.getAltitude());
+				}
+				if (c.getId()!=null && c.getId().equals("transitSpeed")) {
+					Label l = (Label)c;
+					l.setValue("Transit Speed: " + w.getTransitSpeed());
+				}
+			}
+
+			ComponentPosition position = layout.getPosition(popup);
+			x = (int) MouseInfo.getPointerInfo().getLocation().getX();
+			y = (int) MouseInfo.getPointerInfo().getLocation().getY();
+			position.setCSSString("top:" + String.valueOf(y - 100) + "px;left:" + String.valueOf(x - 240) + "px;");
+			layout.setPosition(popup, position);
+
+			popup.setVisible(true);
+			popup.setPopupVisible(true);
+		}
+	}
+	
+	private class MarkerMouseOutListener implements LeafletMouseOutListener {
+
+		@Override
+		public void onMouseOut(LeafletMouseOutEvent event) {
+			if ((int) MouseInfo.getPointerInfo().getLocation().getX() >= x + popup.getWidth() &&
+					(int) MouseInfo.getPointerInfo().getLocation().getY() >= y + popup.getHeight()) {
+			}
+			else {
+				popup.setPopupVisible(false);
+			}	
 		}
 	}
 	
@@ -130,13 +141,20 @@ public class MapMarkerUtilities {
 	private boolean isEditable = false;
 	private AbsoluteLayout layout;
 	private MapAddMarkerListener mapAddMarkerListener;
+	private PopupView popup;
+	private int x = 0;
+	private int y = 0;
+	private WayPoint w = null;
+	private String selectedWayPointId = "";
+	private LMarker leafletMarker;
 	
-	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window popup) {
+	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window window, PopupView popup) {
 		this.map = map;
 		this.tableDisplay = tableDisplay;
 		this.grid = tableDisplay.getGrid();
 		this.layout = layout;
-		this.mapAddMarkerListener = new MapAddMarkerListener(this, popup);
+		this.mapAddMarkerListener = new MapAddMarkerListener(this, window);
+		this.popup = popup;
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
@@ -266,6 +284,7 @@ public class MapMarkerUtilities {
 		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).addDragEndListener(new MarkerDragEndListener()));
 			pins.get(i).addMouseOverListener(new MarkerMouseOverListener());
+			pins.get(i).addMouseOutListener(new MarkerMouseOutListener());
 		}
 
   	List<LPolyline> polylines = getPolylines();
@@ -354,5 +373,11 @@ public class MapMarkerUtilities {
 		for(int i = 0; i < mapPoints.size(); i++){
 			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
 		}
+	}
+	public String getSelectedWayPointId() {
+		return selectedWayPointId;
+	}
+	public LMarker getLeafletMarker() {
+		return leafletMarker;
 	}
 }

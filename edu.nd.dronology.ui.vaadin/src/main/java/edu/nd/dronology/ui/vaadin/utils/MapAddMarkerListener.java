@@ -23,11 +23,11 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	private String transitSpeed = "";
 	private WayPoint currentWayPoint;
 	private MapMarkerUtilities route;
-	private Window popup;
+	private Window window;
 	
-	public MapAddMarkerListener(MapMarkerUtilities route, Window popup) {
+	public MapAddMarkerListener(MapMarkerUtilities route, Window window) {
 		this.route = route;
-		this.popup = popup;
+		this.window = window;
 	}
 	
 	@Override
@@ -37,14 +37,14 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	
 	public void processOnClick(Point p, int index) {
 		currentWayPoint = route.addNewPin(p, index);
-		popup.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
+		window.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
 
-		UI.getCurrent().addWindow(popup);
+		UI.getCurrent().addWindow(window);
 		route.disableRouteEditing();
-		Button saveButton = (Button) getComponentByCaption(popup, "Save");
-		Button cancelButton = (Button) getComponentByCaption(popup, "Cancel");
-		TextField altitudeField = (TextField) getComponentByCaption(popup, "Altitude: ");
-		TextField transitSpeedField = (TextField) getComponentByCaption(popup, "Transit Speed: ");
+		Button saveButton = (Button) getComponentByCaption(window, "Save");
+		Button cancelButton = (Button) getComponentByCaption(window, "Cancel");
+		TextField altitudeField = (TextField) getComponentByCaption(window, "Altitude: ");
+		TextField transitSpeedField = (TextField) getComponentByCaption(window, "Transit Speed: ");
 		
 		saveButton.addClickListener(event -> {
 			altitude = altitudeField.getValue();
@@ -59,7 +59,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 					caption = "Approaching speed is the empty string.";
 			}
 	    	if (!altitude.isEmpty() && !transitSpeed.isEmpty()) {
-	    		UI.getCurrent().removeWindow(popup);
+	    		UI.getCurrent().removeWindow(window);
 				route.enableRouteEditing();
 	    		for (int i = 0; i < route.getMapPoints().size(); i++) {
 	    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
@@ -72,14 +72,12 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    	else {
 	    		Notification.show(caption);
 	    	}
-	    	
-	    	//Notification.show(route.getMapPoints().get(0).getAltitude());
 		});
 		
 		cancelButton.addClickListener(event -> {
 	    removeCurrentWayPoint();
 
-			UI.getCurrent().removeWindow(popup);
+			UI.getCurrent().removeWindow(window);
 
 			route.enableRouteEditing();
 			route.drawLines(route.getMapPoints(), true, 0);

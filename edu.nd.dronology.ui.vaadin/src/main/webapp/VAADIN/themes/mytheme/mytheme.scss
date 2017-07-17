@@ -184,14 +184,19 @@ $valo-menu-background-color: #eee;
 		background-color: #91b3ea;
 	}
 
-	.v-absolutelayout-wrapper {
-		top: 0px !important;
-		left: 0px !important;
+	.v-absolutelayout-wrapper-fr_mapabsolute_layout {
+		top:0 !important;
+		left:0 !important;
 		width: 100%;
 	}
 	.fr_mapabsolute_layout {
 		height: $fr-map-height !important;
 		width: 100%;
+		>div>.v-absolutelayout-margin>.v-absolutelayout-wrapper:first-child {
+			top:0 !important;
+			left:0 !important;
+			width: 100%;
+		}
 	}
 	.fr_leaflet_map {
 		height: $fr-map-height !important;
