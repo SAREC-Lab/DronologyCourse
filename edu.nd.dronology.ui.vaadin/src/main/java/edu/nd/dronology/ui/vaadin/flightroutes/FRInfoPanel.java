@@ -4,6 +4,8 @@ import java.awt.MouseInfo;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -74,11 +76,17 @@ public class FRInfoPanel extends CustomComponent {
 
 			String id;
 			String name;
+			String dateModified;
+			String dateCreated;
+			String length;
 
 			// gets routes from dronology and requests their name/id
 			for (FlightRouteInfo e : items) {
 				id = e.getId();
 				name = e.getName();
+				dateModified = String.valueOf(e.getDateCreated());
+				dateCreated = String.valueOf(e.getDateModified());
+				length = String.valueOf(e.getLenght());
 				
 				byte[] information = service.requestFromServer(id);
 				inStream = new ByteArrayInputStream(information);
@@ -88,7 +96,8 @@ public class FRInfoPanel extends CustomComponent {
 					e1.printStackTrace();
 				}
 
-				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+				addRoute(name, id, dateCreated, dateModified, length);
+				refreshRoutes();
 			}
 
 		} catch (DronologyServiceException | RemoteException e1) {
@@ -124,7 +133,7 @@ public class FRInfoPanel extends CustomComponent {
 			
 			routeInputName = inputField.getValue();
 			if(!routeInputName.isEmpty()){
-				addRoute(routeInputName, "41323", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi"); 
+			
 				
 				//sends route to dronology
 				drone = addRouteDronology(routeInputName);
@@ -143,9 +152,10 @@ public class FRInfoPanel extends CustomComponent {
 				index = getRouteNumber(drone);
 				routes.getComponent(index).addStyleName("info_box_focus");	
 				
+				//addRoute(name, id, creationFormatted, modifiedFormatted, length);
 				
-					inputField.clear();
-					UI.getCurrent().removeWindow(window);
+				inputField.clear();
+				UI.getCurrent().removeWindow(window);
 			}
 		});
 		
@@ -175,6 +185,7 @@ public class FRInfoPanel extends CustomComponent {
 	}
 
 	public void addRoute(String name, String ID, String created, String modified, String length) {
+		
 		FRInfoBox route = new FRInfoBox(name, ID, created, modified, length);
 		routes.addComponent(route);
 		numberRoutes += 1;
@@ -273,10 +284,20 @@ public class FRInfoPanel extends CustomComponent {
 			Collection<FlightRouteInfo> items = service.getItems();
 			routeList = new ArrayList(items);
 			
+			panel.setCaption(routeList.size() + " Routes in database");
+			
 			for (FlightRouteInfo e : items) {
 				String id = e.getId();
 				String name = e.getName();
-				addRoute(name, id, "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+				long creationTime = e.getDateCreated();
+				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
+				String creationFormatted = sdf.format(new Date(creationTime));
+				
+				long modifiedTime = e.getDateModified();
+				String modifiedFormatted = sdf.format(new Date(modifiedTime));
+				
+				String length = String.valueOf(e.getLenght());
+				addRoute(name, id, creationFormatted, modifiedFormatted, length);
 				numberRoutes--;
 			}
 			
@@ -284,7 +305,6 @@ public class FRInfoPanel extends CustomComponent {
 			e.printStackTrace();
 		}
 		
-
 	}
 	public int getRouteNumber(FlightRouteInfo info){
 		//given the route information, returns the index of the route
