@@ -66,6 +66,7 @@ public class AFMapComponent extends CustomComponent {
 	private boolean follow = false;
 	private AbsoluteLayout layout = new AbsoluteLayout();
 	private PopupView popup;
+	private PopupView dronePopup;
 
 	private MapMarkerUtilities utilities;
 
@@ -114,7 +115,8 @@ public class AFMapComponent extends CustomComponent {
 		layout.setHeight(Integer.toString(layoutHeight) + "px");
 		layout.addComponent(leafletMap);
 		popup = createWayPointPopupView();
-		layout.addComponent(popup);
+		dronePopup = createDronePopupView();
+		layout.addComponents(popup, dronePopup);
 		content.addComponent(layout);
 		setCompositionRoot(content);
 	}
@@ -557,25 +559,25 @@ public class AFMapComponent extends CustomComponent {
 
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
-			// TODO Auto-generated method stub
-			LMarker leafletMarker = (LMarker) event.getSource();
-			VerticalLayout content = new VerticalLayout();
-			PopupView popup = new PopupView(null, content);
-
 			try {
 				drones = service.getDrones();
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			dronePopup.setVisible(false);
+			dronePopup.setPopupVisible(false);
+			LMarker leafletMarker = (LMarker)event.getSource();
 
+			VerticalLayout popupContent = (VerticalLayout)dronePopup.getContent().getPopupComponent();
+			popupContent.removeAllComponents();
 			for (Entry<String, DroneStatus> e : drones.entrySet()) {
 				if (e.getValue().getID().equals(leafletMarker.getId())) {
 					AFInfoBox box = new AFInfoBox(false, e.getValue().getID(), e.getValue().getStatus(),
 							e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(),
 							e.getValue().getAltitude(), e.getValue().getVelocity(), false);
 					box.setBoxVisible(false);
-					box.addStyleName("af_info_box");
 					VerticalLayout boxes = panel.getBoxes();
 					int numUAVs = panel.getNumUAVS();
 					for(int i = 1; i < numUAVs + 1; i++){
@@ -587,13 +589,13 @@ public class AFMapComponent extends CustomComponent {
 						}
 					}
 					box.getRouteButton().addClickListener(click -> {
-						popup.setPopupVisible(false);
+						dronePopup.setPopupVisible(false);
 					});
 					box.getHomeButton().addClickListener(click -> {
-						popup.setPopupVisible(false);
+						dronePopup.setPopupVisible(false);
 					});
 					box.getHoverSwitch().addValueChangeListener(click ->{
-						popup.setPopupVisible(false);
+						dronePopup.setPopupVisible(false);
 					});
 					box.getCheckBox().addValueChangeListener(click -> {
 						
@@ -614,15 +616,13 @@ public class AFMapComponent extends CustomComponent {
 							}
 						}
 					});
-					content.addComponent(box);
+					popupContent.addComponent(box);
 				}
 			}
-
-			popup.setPopupVisible(true);
-			popup.addStyleName("bring_front");
-
-			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150)
-					+ "px;left:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+			layout.addComponent(dronePopup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150)
+			+ "px;left:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+			dronePopup.setVisible(true);
+			dronePopup.setPopupVisible(true);
 		}
 	}
 
@@ -634,14 +634,6 @@ public class AFMapComponent extends CustomComponent {
 			popup.setVisible(false);
 			popup.setPopupVisible(false);
 			LMarker leafletMarker = (LMarker)event.getSource();
-			
-			WayPoint w = null;
-			
-	    	for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-	    		if (utilities.getMapPoints().get(i).getId().equals(leafletMarker.getId())) {
-	    			w = utilities.getMapPoints().get(i);
-	    		}
-	    	}
 
 			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
 			Iterator<Component> it = popupContent.iterator();
@@ -719,6 +711,19 @@ public class AFMapComponent extends CustomComponent {
 		popup.setVisible(false);
 		popup.setPopupVisible(false);
 		
+		return popup;
+	}
+	
+	public PopupView createDronePopupView() {
+		VerticalLayout popupContent = new VerticalLayout();
+		popupContent.removeAllComponents();
+		
+		popupContent.addComponent(new Label("Drone Information"));
+		PopupView popup = new PopupView(null, popupContent);
+		
+		popup.addStyleName("bring_front");
+		popup.setVisible(false);
+		popup.setPopupVisible(false);
 		return popup;
 	}
 }
