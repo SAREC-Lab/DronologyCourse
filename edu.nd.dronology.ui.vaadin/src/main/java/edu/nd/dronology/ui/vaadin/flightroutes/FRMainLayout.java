@@ -8,6 +8,7 @@ import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -96,6 +97,18 @@ public class FRMainLayout extends CustomComponent {
 			}
 		});
 
+		map.getDeleteRouteWindow().getYesButton().addClickListener(e->{
+			
+			VaadinSession session = getSession();
+			if(session != null){
+				UI.getCurrent().access(() -> {
+				
+					controls.getInfoPanel().refreshRoutes();
+					//need to refresh route counter too
+				});
+			}
+		});
+		
 		map.display();
 		name = controls.getInfoPanel().getName();
 		

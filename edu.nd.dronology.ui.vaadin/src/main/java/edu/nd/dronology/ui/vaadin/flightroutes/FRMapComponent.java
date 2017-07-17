@@ -18,6 +18,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -31,6 +32,7 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
+import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
@@ -54,6 +56,8 @@ public class FRMapComponent extends CustomComponent {
 	private AbsoluteLayout layout = new AbsoluteLayout();
 	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
+	FRDeleteRoute delete = new FRDeleteRoute(this);
+	ArrayList<String> names = new ArrayList();
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
@@ -62,6 +66,8 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap = new LMap();
 		leafletMap.addStyleName("fr_leaflet_map");
+		
+		Configuration configuration = Configuration.getInstance();
 	
 		Window window = createWayPointWindow();
 		PopupView popup = createWayPointPopupView();
@@ -173,7 +179,19 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponent(bar);
 		content.addComponents(mapAndPopup, tableDisplay.getGrid());
 	}
-
+	public void displayNoRoute(){
+		content.removeAllComponents();
+		content.addComponent(bar);
+		content.addComponents(mapAndPopup, tableDisplay.getGrid());
+		
+		
+		route.getMapPoints().clear();
+		route.getGrid().setItems(route.getMapPoints());
+		
+		route.removeAllMarkers(route.getPins());
+		route.removeAllLines(route.getPolylines());
+	}
+	
 	@WaypointReplace
 	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName) {
 		//displays with selected route info
@@ -256,13 +274,7 @@ public class FRMapComponent extends CustomComponent {
 
 		Button save = editBar.getSaveButton();
 		save.addClickListener(event -> {
-			route.disableRouteEditing();
-
-			layout.removeComponent(editBar);
-			leafletMap.addStyleName("bring_back");
-			leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
-			tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-			leafletMap.setEnabled(false);
+			exitEditMode();
 
 			List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
 			
@@ -385,6 +397,11 @@ public class FRMapComponent extends CustomComponent {
 			leafletMap.setEnabled(false);
 		});
 
+		selectedBar.getDeleteButton().addListener(e->{
+			delete.setRouteInfoTobeDeleted(info);
+			UI.getCurrent().addWindow(delete.getWindow());
+		});
+		
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
@@ -457,6 +474,15 @@ public class FRMapComponent extends CustomComponent {
 
 		route.enableRouteEditing();
 	}
+	public void exitEditMode() {
+		route.disableRouteEditing();
+
+		layout.removeComponent(editBar);
+		leafletMap.setStyleName("fr_leaflet_map");
+		leafletMap.addStyleName("bring_back");
+		tableDisplay.getGrid().setStyleName("fr_table_component");
+		leafletMap.setEnabled(false);
+	}
 	public void setRouteCenter(){
 		//calculates the mean point and sets the route
 		double meanLat = 0;
@@ -502,5 +528,8 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public Button getEditButton(){
 		return selectedBar.getEditButton();
+	}
+	public FRDeleteRoute getDeleteRouteWindow(){
+		return delete;
 	}
 }

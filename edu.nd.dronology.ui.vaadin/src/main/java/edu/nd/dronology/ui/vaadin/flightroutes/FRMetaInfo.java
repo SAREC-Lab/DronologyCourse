@@ -30,6 +30,7 @@ public class FRMetaInfo extends CustomComponent {
 	int numWaypoints;
 	CheckBox tableView;
 	Button editButton;
+	Button deleteButton;
 	
 	public FRMetaInfo(String name, int numCoords){
 		//used if route is selected
@@ -49,7 +50,7 @@ public class FRMetaInfo extends CustomComponent {
 		}
 		
 		editButton = new Button("Edit");
-		Button deleteButton = new Button("Delete");
+		deleteButton = new Button("Delete");
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/editButtonFull.PNG"));
@@ -109,6 +110,9 @@ public class FRMetaInfo extends CustomComponent {
 	}
 	public Button getEditButton(){
 		return editButton;
+	}
+	public Button getDeleteButton(){
+		return deleteButton;
 	}
 	
 }
