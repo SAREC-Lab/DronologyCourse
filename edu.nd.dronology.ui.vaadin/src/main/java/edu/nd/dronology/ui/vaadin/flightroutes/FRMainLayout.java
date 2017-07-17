@@ -231,12 +231,10 @@ public class FRMainLayout extends CustomComponent {
 		map.getUtils().drawLines(waypoints, true, 1);
 
 		numComponents = routeLayout.getComponentCount();
-		System.out.println("trueeeeee2222");
 		// when one route is clicked, the others go back to default background color
 		for (int i = 0; i < numComponents; i++) {
 			if (i != index) {
 				routeLayout.getComponent(i).removeStyleName("info_box_focus");
-				System.out.println("trueeeeee");
 			}
 		}	
 		map.setRouteCenter();
