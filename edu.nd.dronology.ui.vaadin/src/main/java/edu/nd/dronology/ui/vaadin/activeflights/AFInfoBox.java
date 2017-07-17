@@ -418,6 +418,10 @@ public class AFInfoBox extends CustomComponent {
 	public boolean getHoverInPlace() {
 		return this.hoverInPlace;
 	}
+	
+	public Switch getHoverSwitch(){
+		return this.hoverSwitch;
+	}
 
 	public void setBoxVisible(boolean visible) {
 		if (visible) {

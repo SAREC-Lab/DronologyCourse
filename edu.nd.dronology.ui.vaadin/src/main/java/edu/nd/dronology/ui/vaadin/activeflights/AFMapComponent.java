@@ -586,7 +586,10 @@ public class AFMapComponent extends CustomComponent {
 					box.getHomeButton().addClickListener(click -> {
 						popup.setPopupVisible(false);
 					});
-					box.getCheckBox().addValueChangeListener( click -> {
+					box.getHoverSwitch().addValueChangeListener(click ->{
+						popup.setPopupVisible(false);
+					});
+					box.getCheckBox().addValueChangeListener(click -> {
 						
 						if (box.getCheckBox().getValue()){
 							for(int i = 1; i < numUAVs + 1; i++){
