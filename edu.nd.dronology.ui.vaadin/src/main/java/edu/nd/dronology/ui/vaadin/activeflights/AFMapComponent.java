@@ -221,12 +221,15 @@ public class AFMapComponent extends CustomComponent {
 				}
 				boolean exists = true;
 				for (List<LMarker> e : wayPointMarkers){
+					boolean individualExist = false;
 					for (FlightPlanInfo q : currentFlights){
-						if (e.get(0).getPoint().getLat() != q.getWaypoints().get(0).getCoordinate().getLatitude() || 
-								e.get(0).getPoint().getLon() != q.getWaypoints().get(0).getCoordinate().getLongitude()){
-							exists = false;
+						if (e.get(0).getPoint().getLat() == q.getWaypoints().get(0).getCoordinate().getLatitude() && 
+								e.get(0).getPoint().getLon() == q.getWaypoints().get(0).getCoordinate().getLongitude()){
+							individualExist = true;
 						}
 					}
+					if (individualExist == false)
+						exists = false;
 				}
 				if (!exists || wayPointMarkers.size() != currentFlights.size()) {
 					for (List<LMarker> e : wayPointMarkers) {
@@ -510,6 +513,8 @@ public class AFMapComponent extends CustomComponent {
 			this.follow = false;
 			return;
 		}
+		if (this.follow == false)
+			return;
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			drones = service.getDrones();
