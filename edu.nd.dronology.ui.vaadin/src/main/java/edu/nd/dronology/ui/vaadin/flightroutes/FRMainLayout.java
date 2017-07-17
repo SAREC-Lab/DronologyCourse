@@ -52,6 +52,9 @@ public class FRMainLayout extends CustomComponent {
 		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend",
 				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite");
 		
+		this.map = map;
+		
+		
 		map.setCenter(41.68, -86.25);
 		map.setZoomLevel(13);
 
@@ -137,7 +140,7 @@ public class FRMainLayout extends CustomComponent {
 				
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
-					switchWindows(e, map);
+					switchWindows(e, map, null);
 				});
 				
 				no.addClickListener(event -> {
@@ -145,7 +148,7 @@ public class FRMainLayout extends CustomComponent {
 				});
 			}
 			else {
-				switchWindows(e, map);
+				switchWindows(e, map, null);
 			}
 		});
 		
@@ -165,9 +168,19 @@ public class FRMainLayout extends CustomComponent {
 		return map;
 	}
 	
-	private void switchWindows(LayoutClickEvent e, FRMapComponent map) {
+	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
 		//gets box of route info and changes its style to show that it is selected
-		Component child = e.getChildComponent();
+		Component child = component; //to initialize the variable
+		if (e != null){
+			child = e.getChildComponent();
+		}
+		else {
+			for (int i = 0; i < routeLayout.getComponentCount(); i++){
+				if (component.getid().equals(((FRInfoBox) routeLayout.getComponent(i)).getid())){
+					child = routeLayout.getComponent(i);
+				}
+			}
+		}
 		
 		if(routeLayout.getComponentIndex(child) != -1){
 			child.addStyleName("info_box_focus");
@@ -218,11 +231,12 @@ public class FRMainLayout extends CustomComponent {
 		map.getUtils().drawLines(waypoints, true, 1);
 
 		numComponents = routeLayout.getComponentCount();
-		
+		System.out.println("trueeeeee2222");
 		// when one route is clicked, the others go back to default background color
 		for (int i = 0; i < numComponents; i++) {
 			if (i != index) {
 				routeLayout.getComponent(i).removeStyleName("info_box_focus");
+				System.out.println("trueeeeee");
 			}
 		}	
 		map.setRouteCenter();

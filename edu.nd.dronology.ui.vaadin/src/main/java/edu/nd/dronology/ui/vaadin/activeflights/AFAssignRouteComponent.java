@@ -1,6 +1,8 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.io.File;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 import org.vaadin.teemu.switchui.Switch;
 
@@ -126,7 +128,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 		sidePanel.addStyleName("control_panel");
 		sidePanel.setContent(panelContent);
 		sidePanel.setCaption(numRoutes + " Routes Assigned");
-		//addRoute("Testing", "1234", "Mar 19, 2015, 4:32PM", "Jul 12, 2016, 7:32AM", "5.1mi");
 		apply.setEnabled(true);
 		
 		sideButtons.addComponents(left, right);
@@ -136,7 +137,15 @@ public class AFAssignRouteComponent extends CustomComponent{
 		left.addClickListener( e-> {
 			if (frLayout.getIndex() != -1){
 				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
-				addRoute(selectedFlight.getName(), selectedFlight.getId(), "Jun 5, 2017, 2:04AM", "Jun 7, 2017, 3:09AM", "10mi");
+				long creationTime = selectedFlight.getDateCreated();
+				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
+				String creationFormatted = sdf.format(new Date(creationTime));
+				
+				long modifiedTime = selectedFlight.getDateModified();
+				String modifiedFormatted = sdf.format(new Date(modifiedTime));
+				
+				String length = String.valueOf(selectedFlight.getLenght());
+				addRoute(selectedFlight.getName(), selectedFlight.getId(), creationFormatted, modifiedFormatted, length);
 			}
 			else
 				Notification.show("Please select route to assign.");
@@ -155,6 +164,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 			Component child = e.getChildComponent();
 			if(panelContent.getComponentIndex(child) != -1){
 				child.addStyleName("info_box_focus");
+				frLayout.switchWindows(null, frLayout.getMap(), (FRInfoBox) child);
 			}
 			index = panelContent.getComponentIndex(child);
 			//will use when connecting to Dronology
