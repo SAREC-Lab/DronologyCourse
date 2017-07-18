@@ -5,10 +5,11 @@ import java.rmi.server.RemoteObject;
 
 import edu.nd.dronology.monitoring.service.DroneSafetyService;
 import edu.nd.dronology.monitoring.service.IMonitoringValidationListener;
+import edu.nd.dronology.monitoring.validation.ValidationResult.Result;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class TrustManager  {
+public class TrustManager {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(TrustManager.class);
 	private static volatile TrustManager INSTANCE = null;
 
@@ -48,11 +49,11 @@ public class TrustManager  {
 		private static final long serialVersionUID = -3045122339587951628L;
 
 		@Override
-		public void constraintEvaluated(String uavid, String assumptionid, String message) throws RemoteException {
-			LOGGER.info("New Eval result:" + uavid + ": " + assumptionid + " --> " + message);
+		public void constraintEvaluated(String uavid, String assumptionid, String message, Result result)
+				throws RemoteException {
+			LOGGER.info("New Eval result:" + uavid + ": " + assumptionid + " --> " + result.name());
 
 		}
 	}
-
 
 }

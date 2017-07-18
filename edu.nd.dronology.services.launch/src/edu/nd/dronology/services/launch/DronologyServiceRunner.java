@@ -2,12 +2,14 @@ package edu.nd.dronology.services.launch;
 
 import java.rmi.RemoteException;
 
+import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
 import edu.nd.dronology.gstation.python.connector.MAVLinkUAVConnector;
 import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
+import edu.nd.dronology.monitoring.service.DroneSafetyService;
 import edu.nd.dronology.monitoring.service.DroneSafetyServiceRemoteFacade;
 import edu.nd.dronology.monitoring.service.IDroneSafetyRemoteService;
 import edu.nd.dronology.monitoring.validation.SafetyCaseValidationManager;
@@ -37,6 +39,7 @@ public class DronologyServiceRunner {
 			DroneSetupService.getInstance().startService();
 			DroneSpecificationService.getInstance().startService();
 			DroneSimulatorService.getInstance().startService();
+			DroneSafetyService.getInstance().startService();
 			RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 
 			runtimeMode.setPhysicalEnvironment();

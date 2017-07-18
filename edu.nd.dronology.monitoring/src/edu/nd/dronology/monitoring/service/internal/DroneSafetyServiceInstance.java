@@ -59,7 +59,7 @@ public class DroneSafetyServiceInstance extends AbstractServiceInstance implemen
 
 	@Override
 	protected void doStartService() throws Exception {
-		
+
 	}
 
 	@Override
@@ -109,7 +109,8 @@ public class DroneSafetyServiceInstance extends AbstractServiceInstance implemen
 
 		for (IMonitoringValidationListener l : listeners) {
 			try {
-				l.constraintEvaluated(uavid, validationResult.getAssumptionid(), sb.toString());
+				l.constraintEvaluated(uavid, validationResult.getAssumptionid(), sb.toString(),
+						validationResult.getResult());
 			} catch (RemoteException e) {
 				LOGGER.error(e);
 				listeners.remove(l);

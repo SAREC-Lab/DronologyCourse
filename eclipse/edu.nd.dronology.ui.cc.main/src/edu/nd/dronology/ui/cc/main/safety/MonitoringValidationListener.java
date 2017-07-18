@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import edu.nd.dronology.monitoring.service.IMonitoringValidationListener;
+import edu.nd.dronology.monitoring.validation.ValidationResult.Result;
 
 public class MonitoringValidationListener extends UnicastRemoteObject implements IMonitoringValidationListener {
 
@@ -24,7 +25,8 @@ public class MonitoringValidationListener extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public void constraintEvaluated(String uavid, String assumptionid, String message) throws RemoteException {
+	public void constraintEvaluated(String uavid, String assumptionid, String message, Result result)
+			throws RemoteException {
 		safetyViewer.newEvaluationMessage(message);
 
 	}
