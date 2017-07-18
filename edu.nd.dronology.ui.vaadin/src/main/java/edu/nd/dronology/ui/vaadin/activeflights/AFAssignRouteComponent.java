@@ -13,6 +13,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.DragAndDropWrapper;
+import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
@@ -23,6 +25,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
+import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoPanel;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 
 /**
@@ -163,8 +166,8 @@ public class AFAssignRouteComponent extends CustomComponent{
 		panelContent.addLayoutClickListener( e -> {
 			Component child = e.getChildComponent();
 			if(panelContent.getComponentIndex(child) != -1){
-				child.addStyleName("info_box_focus");
-				frLayout.switchWindows(null, frLayout.getMap(), (FRInfoBox) child);
+				((AFDragAndDropBox) child).getRoute().addStyleName("info_box_focus");
+				frLayout.switchWindows(null, frLayout.getMap(), ((AFDragAndDropBox) child).getRoute());
 			}
 			index = panelContent.getComponentIndex(child);
 			//will use when connecting to Dronology
@@ -175,10 +178,11 @@ public class AFAssignRouteComponent extends CustomComponent{
 			// when one route is clicked, the others go back to default background color
 			for (int i = 0; i < numComponents; i++) {
 				if (i != index) {
-					panelContent.getComponent(i).removeStyleName("info_box_focus");
+					((AFDragAndDropBox) panelContent.getComponent(i)).getRoute().removeStyleName("info_box_focus");
 				}
 			}	
 		});
+		
 		
 		sideContent.addComponents(sidePanel, sideButtons, frLayout);
 		bottomButtons.addComponents(cancel, apply);
@@ -191,8 +195,8 @@ public class AFAssignRouteComponent extends CustomComponent{
 	}
 	
 	public void addRoute(String name, String ID, String created, String modified, String length) {
-		FRInfoBox route = new FRInfoBox(name, ID, created, modified, length);
-		panelContent.addComponent(route);
+		AFDragAndDropBox wrapper = new AFDragAndDropBox(name, ID, created, modified, length);
+		panelContent.addComponent(wrapper);
 		numRoutes += 1;
 		sidePanel.setCaption(numRoutes + "Routes Assigned");
 	}
