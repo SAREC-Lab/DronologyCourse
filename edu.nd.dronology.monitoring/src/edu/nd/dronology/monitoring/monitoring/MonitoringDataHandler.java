@@ -12,13 +12,15 @@ import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 import org.mapdb.DBMaker;
 
+import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
+import edu.nd.dronology.monitoring.validation.MonitoringValidator;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 public class MonitoringDataHandler implements Runnable {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(MonitoringDataHandler.class);
-	private BlockingQueue<String> queue;
+	private BlockingQueue<UAVMonitoringMessage> queue;
 	private AtomicBoolean cont = new AtomicBoolean(true);
 	private String filePath = "D:\\dronemonitoring";
 	private String recordingName = "monitoringlog";
@@ -32,14 +34,14 @@ public class MonitoringDataHandler implements Runnable {
 	private static final String RECORDING_FILENAME_P = "record.prec.p";
 	private static final String RECORDING_FILENAME_T = "record.prec.t";
 
-	public MonitoringDataHandler(final BlockingQueue<String> queue) {
+	public MonitoringDataHandler(final BlockingQueue<UAVMonitoringMessage> queue) {
 		this.queue = queue;
 	}
 
 	@Override
 	public void run() {
 		try {
-			initFile();
+			// initFile();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -49,8 +51,17 @@ public class MonitoringDataHandler implements Runnable {
 		while (cont.get()) {
 
 			try {
-				String monitoringMesasge = queue.take();
-				extractParameters(monitoringMesasge);
+				UAVMonitoringMessage monitoringMesasge = queue.take();
+				//LOGGER.info("MONITORING MESSAGE RECEIVED");
+				MonitoringValidator validator = UAVMonitoringManager.getInstance()
+						.getValidator(monitoringMesasge.getUavid());
+				if (validator != null) {
+					validator.validate(monitoringMesasge);
+				}
+				else {
+					LOGGER.error("No validator found for "+ monitoringMesasge.getUavid());
+				}
+
 			} catch (Exception e) {
 				LOGGER.error(e);
 			}
@@ -81,7 +92,7 @@ public class MonitoringDataHandler implements Runnable {
 
 			BTreeMap<String, String> m = map.makeOrGet();
 			eventMap.put(new Integer(eventcounter++).toString(), logid);
-			m.put("DUMMY","ABC");
+			m.put("DUMMY", "ABC");
 			if (dataArray != null) {
 				// System.out.println(id + " BATTERY is: " +
 				// dataArray.get("level"));
