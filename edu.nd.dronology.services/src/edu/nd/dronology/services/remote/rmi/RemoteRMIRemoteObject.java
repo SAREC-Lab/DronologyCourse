@@ -6,6 +6,7 @@ import java.util.List;
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.remote.IRemoteManager;
 import edu.nd.dronology.services.core.remote.IRemoteServiceListener;
+import edu.nd.dronology.services.core.remote.IRemoteableService;
 import edu.nd.dronology.services.core.remote.RemoteInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.remote.RemoteManager;
@@ -114,6 +115,13 @@ public class RemoteRMIRemoteObject extends AbstractRMIRemoteObject implements IR
 			}
 		}
 		return instance;
+	}
+
+	@Override
+	public void contributeService(Class service, IRemoteableService serviceInstance)
+			throws RemoteException, DronologyServiceException {
+		RemoteManager.getInstance().contributeService(service,serviceInstance);
+		
 	}
 
 }

@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.libs"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.mv.logging"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/edu.nd.dronology.monitoring"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

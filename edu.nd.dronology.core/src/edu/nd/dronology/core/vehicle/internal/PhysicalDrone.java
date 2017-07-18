@@ -4,7 +4,6 @@ import edu.nd.dronology.core.CoordinateChange;
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.CoordinateConverter;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
@@ -31,26 +30,19 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	private String droneID;
 	private LlaCoordinate currentTarget;
 
+	// distance to WP in m
+	private static final double THRESHOLD_DISTACE = 5.0;
+
 	public PhysicalDrone(String drnName, IDroneCommandHandler baseStation) {
 		super(drnName);
 		this.baseStation = baseStation;
 		currentTarget = new LlaCoordinate(0, 0, 0);
-
-		// droneID = 0; // TODO: fix this to properly obtain a drone ID
-		// the drone ID is made available in the baseStation.getIncomingData()
-		// call, which currently only runs after the PhysicalDrone instance is
-		// created
-		// TODO: fix the timing of this to actually get incoming data all the
-		// time (maybe in another thread?)
 		try {
-			// droneID = baseStation.getNewDroneID();
 			droneID = drnName;
 			baseStation.setStatusCallbackListener(droneID, this);
 		} catch (Exception e) {
 			LOGGER.error(e);
 		}
-		// createDispatchThread
-
 	}
 
 	@Override
@@ -70,18 +62,9 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	@Override
 	public void flyTo(LlaCoordinate targetCoordinates) {
-		// if (targetCoordinates != currentTarget) { // TODO: add some time
-		// limit for refreshing the information in case it didn't properly get
-		// sent
-		// currentTarget = targetCoordinates;
-		// baseStation.sendCommand(droneID, "gotoLocation",
-		// baseStation.getDroneState(droneID).JSONfromCoord(targetCoordinates));
-		// }
-
-		if (targetCoordinates != currentTarget) { // TODO: add some time limit
-			// for refreshing the
-			// information in case it
-			// didn't properly get sent
+		if (targetCoordinates != currentTarget) {
+			// TODO: add some time limit for refreshing the information in case it didn't
+			// properly get sent
 			currentTarget = targetCoordinates;
 			try {
 				baseStation.sendCommand(new GoToCommand(droneID, targetCoordinates));
@@ -94,16 +77,6 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	@Override
 	public LlaCoordinate getCoordinates() {
-
-		// IDroneAttribute<Coordinate> location =
-		// baseStation.getAttribute(droneID,
-		// IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
-		// Coordinate coordinate = location.getValue();
-		// LOGGER.info("Coordinates retrieved: (" +
-		// Long.toString(coordinate.getLatitude()) + ","
-		// + Long.toString(coordinate.getLongitude()) + "," +
-		// Integer.toString(coordinate.getAltitude()) + ")");
-		// return coordinate;
 		return droneStatus.getCoordinates();
 	}
 
@@ -118,9 +91,6 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 
 	@Override
 	public void takeOff(double altitude) throws FlightZoneException {
-		// HashMap<String, Object> tempData = new HashMap<String, Object>();
-		// tempData.put("altitude", altitude);
-		// baseStation.sendCommand(droneID, "takeoff", tempData);
 		try {
 			baseStation.sendCommand(new TakeoffCommand(droneID, altitude));
 		} catch (DroneException e) {
@@ -128,22 +98,9 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 		}
 	}
 
-	// @Override
-	// public void setCoordinates(long lat, long lon, int alt) {
-	// // TODO Auto-generated method stub
-	// }
-
 	@Override
 	public double getBatteryStatus() {
-		// in volts
-
 		return droneStatus.getBatteryLevel();
-
-		// IDroneAttribute<Double> attribute = baseStation.getAttribute(droneID,
-		// IDroneAttribute.ATTRIBUTE_BATTERY_VOLTAGE);
-		// Double level = attribute.getValue();
-		// LOGGER.info("Battery LeveL :" +level);
-		// return level;
 	}
 
 	@Override
@@ -165,41 +122,45 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IDroneStatus
 	@Override
 	@CoordinateChange
 	public boolean isDestinationReached(int i) {
-		int horizThreshold = 50;
-		int vertThreshold = 2;
-		// Coordinates currentPos =
-		// baseStation.getDroneState(droneID).getLocation();
-		LlaCoordinate currentPos = getCoordinates();
-		// float dx = currentTarget.getLatitude() - currentPos.getLatitude();
-		// float dy = currentTarget.getLongitude() - currentPos.getLongitude();
-		// int dz = currentTarget.getAltitude() - currentPos.getAltitude();
 
-		float dx = CoordinateConverter.floatToCoordLong(currentTarget.getLatitude())
-				- CoordinateConverter.floatToCoordLong(currentPos.getLatitude());
-		float dy = CoordinateConverter.floatToCoordLong(currentTarget.getLongitude())
-				- CoordinateConverter.floatToCoordLong(currentPos.getLongitude());
-		int dz = new Double(currentTarget.getAltitude() - currentPos.getAltitude()).intValue();
+		return Math.abs(currentPosition.distance(currentTarget)) < THRESHOLD_DISTACE;
 
-		if (dx < 0) {
-			dx = -1 * dx;
-		}
-		if (dy < 0) {
-			dy = -1 * dy;
-		}
-		if (dz < 0) {
-			dz = -1 * dz;
-		}
-		// LOGGER.info(dx+":"+dy+":"+dz);
-		if (dx > horizThreshold) {
-			return false;
-		}
-		if (dy > horizThreshold) {
-			return false;
-		}
-		if (dz > vertThreshold) {
-			return false;
-		}
-		return true;
+		// int horizThreshold = 50;
+		// int vertThreshold = 2;
+		// // Coordinates currentPos =
+		// // baseStation.getDroneState(droneID).getLocation();
+		// LlaCoordinate currentPos = getCoordinates();
+		// // float dx = currentTarget.getLatitude() - currentPos.getLatitude();
+		// // float dy = currentTarget.getLongitude() - currentPos.getLongitude();
+		// // int dz = currentTarget.getAltitude() - currentPos.getAltitude();
+		//
+		// float dx = CoordinateConverter.floatToCoordLong(currentTarget.getLatitude())
+		// - CoordinateConverter.floatToCoordLong(currentPos.getLatitude());
+		// float dy = CoordinateConverter.floatToCoordLong(currentTarget.getLongitude())
+		// - CoordinateConverter.floatToCoordLong(currentPos.getLongitude());
+		// int dz = new Double(currentTarget.getAltitude() -
+		// currentPos.getAltitude()).intValue();
+		//
+		// if (dx < 0) {
+		// dx = -1 * dx;
+		// }
+		// if (dy < 0) {
+		// dy = -1 * dy;
+		// }
+		// if (dz < 0) {
+		// dz = -1 * dz;
+		// }
+		// // LOGGER.info(dx+":"+dy+":"+dz);
+		// if (dx > horizThreshold) {
+		// return false;
+		// }
+		// if (dy > horizThreshold) {
+		// return false;
+		// }
+		// if (dz > vertThreshold) {
+		// return false;
+		// }
+		// return true;
 	}
 
 	@Override

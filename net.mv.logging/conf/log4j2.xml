@@ -14,7 +14,7 @@
 	</properties>
 	<appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%-5p] %-20M @ (%F:%L) %m%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%-8p] %-30M @ (%F:%L) %m%n" />
 		</Console>
 
 
