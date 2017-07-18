@@ -2,7 +2,6 @@ import core
 import argparse
 import util
 import dronekit
-import time
 from common import *
 
 _LOG = util.get_logger()
@@ -26,7 +25,7 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
 
         if connection.is_connected():
             # send to Dronology
-            pass
+            connection.send(str(msg))
 
     # ARM & READY
     core.set_armed(vehicle, armed=True)
@@ -62,6 +61,8 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
                 # TODO: decide how to respond to this command
                 pass
 
+    worker.join()
+    
     core.land(vehicle)
     _LOG.info('Vehicle {} landed.'.format(v_id))
     core.set_armed(vehicle, armed=False)
