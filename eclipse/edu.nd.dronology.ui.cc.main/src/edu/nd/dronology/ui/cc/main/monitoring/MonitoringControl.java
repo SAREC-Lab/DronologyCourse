@@ -208,7 +208,6 @@ public class MonitoringControl extends Composite {
 		Object selected = ((StructuredSelection) selection).getFirstElement();
 		if (selected instanceof ServiceInfo) {
 			ServiceInfo inf = (ServiceInfo) selected;
-			System.out.println(inf.getServiceID());
 
 			droneSetupDetails.show(false);
 			flightManagerDetails.show(false);

@@ -119,13 +119,7 @@ public class ControlCreationHelper {
 	public static ManagedText createMultiLineTextWitLabel(Composite parent, String labelName, int hSpan, int attributes,
 			IManagedTextInputValidator<String> validator) {
 
-		ManagedText text = createTextWitLabel(parent, labelName, hSpan, attributes, validator);
-
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.heightHint = 80;
-		gd.horizontalSpan = hSpan;
-		text.getControl().setLayoutData(gd);
-		return text;
+		return createMultiLineTextWitLabel(parent, labelName, hSpan, attributes, validator, null, null);
 	}
 
 	public static Label createSeparator(Composite parent) {
@@ -174,6 +168,18 @@ public class ControlCreationHelper {
 
 	public static Button createButton(Composite parent, String text, String ttText, Image icon, Runnable runnable) {
 		return createButton(parent, SWT.PUSH, text, ttText, icon, runnable);
+	}
+
+	public static ManagedText createMultiLineTextWitLabel(Composite parent, String labelName, int hSpan, int attributes,
+			IManagedTextInputValidator<String> validator, Font lblFont, Font txtFont) {
+
+		ManagedText text = createTextWitLabel(parent, labelName, hSpan, attributes, validator, lblFont, txtFont);
+
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.heightHint = 80;
+		gd.horizontalSpan = hSpan;
+		text.getControl().setLayoutData(gd);
+		return text;
 	}
 
 }

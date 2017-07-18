@@ -13,7 +13,7 @@ package edu.nd.dronology.core.util;
  * @author Michael Murphy
  *
  */ 
-public class PVector {
+public class PVector  extends AbstractPosition {
 	private double x;
 	private double y;
 	private double z;
@@ -61,6 +61,7 @@ public class PVector {
 	/**
 	 * @return the n-vector plus altitude for this position
 	 */
+	@Override
 	public NVector toNVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article
@@ -98,6 +99,7 @@ public class PVector {
 	/**
 	 * @return the latitude, longitude, and altitude for this position
 	 */
+	@Override
 	public LlaCoordinate toLlaCoordinate() {
 		return toNVector().toLlaCoordinate();
 	}
@@ -137,5 +139,10 @@ public class PVector {
 		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z))
 			return false;
 		return true;
+	}
+
+	@Override
+	public PVector toPVector() {
+		return this;
 	}
 }

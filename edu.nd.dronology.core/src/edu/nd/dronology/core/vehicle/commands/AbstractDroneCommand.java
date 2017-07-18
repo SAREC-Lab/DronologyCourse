@@ -14,20 +14,19 @@ public class AbstractDroneCommand implements IDroneCommand {
 			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
 			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
 
-	private final Map<String, Object> data = new HashMap<>();
-	private final String type = "command";
-	protected final transient Map<String, Object> innerdata = new HashMap<>();
+	protected final Map<String, Object> data = new HashMap<>();
+	private final String uavid;
+	private final String command;
+	private long sendtimestamp;
 
-	protected AbstractDroneCommand(String droneId, String commandId) {
-		data.put("id", droneId);
-		data.put("command", commandId);
-		data.put("data", innerdata);
-
+	protected AbstractDroneCommand(String uavid, String command) {
+		this.uavid = uavid;
+		this.command = command;
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName()+" ["+GSON.toJson(this)+"]";
+		return this.getClass().getSimpleName() + " [" + GSON.toJson(this) + "]";
 	}
 
 	@Override

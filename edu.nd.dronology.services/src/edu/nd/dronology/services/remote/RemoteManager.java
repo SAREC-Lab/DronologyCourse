@@ -3,13 +3,15 @@ package edu.nd.dronology.services.remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.nd.dronology.services.core.api.ServiceInfo;
 import edu.nd.dronology.services.core.base.AbstractServerService;
-import edu.nd.dronology.services.core.remote.IDroneSpecificationRemoteService;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IDroneSimulatorRemoteService;
+import edu.nd.dronology.services.core.remote.IDroneSpecificationRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.remote.IRemoteManager;
@@ -17,9 +19,9 @@ import edu.nd.dronology.services.core.remote.IRemoteServiceListener;
 import edu.nd.dronology.services.core.remote.IRemoteableService;
 import edu.nd.dronology.services.core.remote.RemoteInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
-import edu.nd.dronology.services.facades.DroneSpecificationServiceRemoteFacade;
 import edu.nd.dronology.services.facades.DroneSetupServiceRemoteFacade;
 import edu.nd.dronology.services.facades.DroneSimulatorServiceRemoteFacade;
+import edu.nd.dronology.services.facades.DroneSpecificationServiceRemoteFacade;
 import edu.nd.dronology.services.facades.FlightManagerServiceRemoteFacade;
 import edu.nd.dronology.services.facades.FlightRouteplanningServiceRemoteFacade;
 import net.mv.logging.ILogger;
@@ -36,6 +38,8 @@ public class RemoteManager implements IRemoteManager {
 
 	private static RemoteManager instance;
 
+	private Map<Class, IRemoteableService> externalServices = new HashMap<>();
+
 	/**
 	 * @return The singleton instance of the RemoteManager.
 	 */
@@ -49,32 +53,33 @@ public class RemoteManager implements IRemoteManager {
 	@Override
 	public Object getService(Class<?> service) throws RemoteException, DronologyServiceException {
 		if (!IRemoteableService.class.isAssignableFrom(service)) {
-			throw new DronologyServiceException("Invalid service requested - Valid services extend "
-					+ IRemoteableService.class.getCanonicalName());
+			throw new DronologyServiceException(
+					"Invalid service requested - Valid services extend " + IRemoteableService.class.getCanonicalName());
 		}
 
-		
 		if (service.equals(IFlightRouteplanningRemoteService.class)) {
 			return FlightRouteplanningServiceRemoteFacade.getInstance();
 		}
-		
-		
+
 		if (service.equals(IFlightManagerRemoteService.class)) {
 			return FlightManagerServiceRemoteFacade.getInstance();
 		}
-		
+
 		if (service.equals(IDroneSetupRemoteService.class)) {
 			return DroneSetupServiceRemoteFacade.getInstance();
 		}
-		
+
 		if (service.equals(IDroneSpecificationRemoteService.class)) {
 			return DroneSpecificationServiceRemoteFacade.getInstance();
 		}
-		
+
 		if (service.equals(IDroneSimulatorRemoteService.class)) {
 			return DroneSimulatorServiceRemoteFacade.getInstance();
 		}
-		
+
+		if (externalServices.containsKey(service)) {
+			return externalServices.get(service);
+		}
 
 		throw new DronologyServiceException("Service" + service.getCanonicalName() + " not found!");
 
@@ -98,7 +103,7 @@ public class RemoteManager implements IRemoteManager {
 		List<ServiceInfo> allServices = new ArrayList<>();
 
 		allServices.addAll(getCoreServices());
-//		allServices.addAll(getExtensionServices());
+		// allServices.addAll(getExtensionServices());
 
 		return Collections.unmodifiableList(allServices);
 
@@ -108,29 +113,29 @@ public class RemoteManager implements IRemoteManager {
 	public List<ServiceInfo> getCoreServices() throws RemoteException, DronologyServiceException {
 		return AbstractServerService.getCoreServices();
 	}
+
 	@Override
 	public List<ServiceInfo> getAllServices() throws RemoteException, DronologyServiceException {
 		return AbstractServerService.getServiceInfos();
 	}
+
 	@Override
 	public List<ServiceInfo> getFileServices() throws RemoteException, DronologyServiceException {
 		return AbstractServerService.getFileServiceInfos();
 	}
 
-
-//
-//	@Override
-//	public void contributeService(ServiceInfo info) throws RemoteException, DistributionException {
-//		ServiceOrchestrator.registerService(info);
-//	}
-//
-//	@Override
-//	public void removeService(ServiceInfo info) throws RemoteException, DistributionException {
-//		ServiceOrchestrator.unregisterService(info);
-//
-//	}
-
-
+	//
+	@Override
+	public void contributeService(Class service,  IRemoteableService serviceInstance) throws RemoteException, DronologyServiceException {
+		externalServices.put(service, serviceInstance);
+	}
+	//
+	// @Override
+	// public void removeService(ServiceInfo info) throws RemoteException,
+	// DistributionException {
+	// ServiceOrchestrator.unregisterService(info);
+	//
+	// }
 
 	@Override
 	public void register(RemoteInfo rInfo) throws RemoteException {
@@ -143,18 +148,16 @@ public class RemoteManager implements IRemoteManager {
 		RemoteService.getInstance().unregister(rInfo);
 	}
 
-	
-
 	@Override
 	public void initialize() throws RemoteException, DronologyServiceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void tearDown() throws RemoteException, DronologyServiceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

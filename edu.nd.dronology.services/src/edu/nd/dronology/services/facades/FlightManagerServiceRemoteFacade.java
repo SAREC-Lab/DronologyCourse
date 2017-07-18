@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.mission.IMissionPlan;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
@@ -74,6 +74,12 @@ public class FlightManagerServiceRemoteFacade extends AbstractRemoteFacade imple
 	@Override
 	public Collection<FlightPlanInfo> getCurrentFlights() throws RemoteException {
 		return FlightManagerService.getInstance().getCurrentFlights();
+	}
+
+	@Override
+	public void planMission(IMissionPlan missionPlan) throws RemoteException, Exception {
+		FlightManagerService.getInstance().planMission(missionPlan);
+
 	}
 
 }

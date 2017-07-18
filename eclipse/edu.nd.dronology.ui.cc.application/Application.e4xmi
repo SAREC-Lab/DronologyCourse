@@ -31,6 +31,11 @@
           <children xsi:type="basic:Part" xmi:id="_u410IDZ2Eee3OMsv3wZldQ" elementId="edu.nd.dronology.ui.cc.application.part.simulatorscenariopart" containerData="75" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SimulatorScenarioPart" label="Simulator Scenario Part"/>
         </children>
       </children>
+      <children xsi:type="advanced:Perspective" xmi:id="_iPXIIGncEeeg8MRX-KspUA" elementId="edu.nd.dronology.ui.cc.perspective.safety">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_luao8GncEeeg8MRX-KspUA" elementId="edu.nd.dronology.ui.cc.application.partsashcontainer.4" horizontal="true">
+          <children xsi:type="basic:Part" xmi:id="_oN_CsGncEeeg8MRX-KspUA" elementId="edu.nd.dronology.ui.cc.application.part.safetypart" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.parts.SafetyPart"/>
+        </children>
+      </children>
     </children>
   </children>
   <handlers xmi:id="_0AI3wCz3EeebcacJt5l5fA" elementId="edu.nd.dronology.ui.cc.application.handler.1" contributionURI="bundleclass://edu.nd.dronology.ui.cc.main/edu.nd.dronology.ui.cc.main.handler.ShowSettingsHandler" command="_jaaboCz3EeebcacJt5l5fA"/>

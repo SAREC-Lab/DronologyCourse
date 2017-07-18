@@ -158,8 +158,7 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 	@Override
 	public FlightRouteInfo getItem(String name) throws DronologyServiceException {
 		for (FlightRouteInfo item : itemmap.values()) {
-			System.out.println(item.getName());
-			if (item.getName().equals(name)) {
+			if (item.getId().equals(name)) {
 				return item;
 			}
 		}
