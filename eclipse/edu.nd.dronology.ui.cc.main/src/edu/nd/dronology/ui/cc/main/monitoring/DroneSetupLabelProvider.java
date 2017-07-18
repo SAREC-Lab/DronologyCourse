@@ -48,8 +48,6 @@ public class DroneSetupLabelProvider implements ILabelProvider {
 			} else if ("TAKING_OFF".equals(stat)) {
 				return ImageProvider.IMG_DRONE_TAKINGOFF;
 			}
-
-			System.out.println(stat);
 		}
 
 		return null;

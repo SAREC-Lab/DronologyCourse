@@ -58,7 +58,7 @@ public class LauncherControl extends Composite {
 	private Pushable pushSpecification;
 	private Pushable pushMonitor;
 	private Pushable pushSimulatorScenario;
-	
+	private Pushable pushSafetyMonitor;
 
 
 	private List<Pushable> pushables = new ArrayList<>();
@@ -156,7 +156,8 @@ public class LauncherControl extends Composite {
 				ImageProvider.IMG_LAUNCHER_SETTINGS_LARGE, ImageProvider.IMG_LAUNCHER_SETTINGS, indent, GRAY_COLOR);
 	
 		indent = -5;
-		createTile(pushableContainer, indent);
+		pushSafetyMonitor = new Pushable(pushableContainer, "Safety Monitoring", ImageProvider.IMG_LAUNCHER_SAFETYMONITORING, //$NON-NLS-1$
+				ImageProvider.IMG_LAUNCHER_SAFETYMONITORING_LARGE, ImageProvider.IMG_LAUNCHER_SAFETYMONITORING, indent, ORANGE_COLOR);
 		pushSimulatorScenario = new Pushable(pushableContainer, "Simulator Scenarios", ImageProvider.IMG_LAUNCHER_SIMSCENARIO, //$NON-NLS-1$
 				ImageProvider.IMG_LAUNCHER_SIMSCENARIO_LARGE, ImageProvider.IMG_LAUNCHER_SIMSCENARIO, indent, ORANGE_COLOR);
 
@@ -173,7 +174,7 @@ public class LauncherControl extends Composite {
 		pushables.add(pushSpecification);
 		pushables.add(pushMonitor);
 		pushables.add(pushSimulatorScenario);
-		
+		pushables.add(pushSafetyMonitor);
 		setInfoText();
 		addListener();
 
@@ -184,6 +185,7 @@ public class LauncherControl extends Composite {
 		pushSpecification.setState(true);
 		pushMonitor.setState(true);
 		pushSimulatorScenario.setState(true);
+		pushSafetyMonitor.setState(true);
 	}
 
 	private void setInfoText() {
@@ -242,12 +244,16 @@ public class LauncherControl extends Composite {
 		
 		pushSimulatorScenario.addListener(SWT.MouseUp, (Event e) -> {
 			if (listenerEnabled)
-				switchToPerspective(PerspectiveConstants.SIMULATOR__SCENARIO_PERSPECTIVE);
+				switchToPerspective(PerspectiveConstants.SIMULATOR_SCENARIO_PERSPECTIVE);
 		});
 		
 		pushSettings.addListener(SWT.MouseUp, (Event e) -> {
 			if (listenerEnabled)
 				showSettings();
+		});
+		pushSafetyMonitor.addListener(SWT.MouseUp, (Event e) -> {
+			if (listenerEnabled)
+				switchToPerspective(PerspectiveConstants.SAFETY_PERSPECTIVE);
 		});
 	
 		

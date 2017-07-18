@@ -31,6 +31,10 @@ public interface Launcher {
 
 	public static final Image IMG_LAUNCHER_SIMSCENARIO = new ManagedImage(FOLDER+"launcher_scenario_96.png").getImage();
 	public static final Image IMG_LAUNCHER_SIMSCENARIO_LARGE = new ManagedImage(FOLDER+"launcher_scenario_128.png").getImage();
+	
+
+	public static final Image IMG_LAUNCHER_SAFETYMONITORING = new ManagedImage(FOLDER+"launcher_safety_96.png").getImage();
+	public static final Image IMG_LAUNCHER_SAFETYMONITORING_LARGE = new ManagedImage(FOLDER+"launcher_safety_128.png").getImage();
 
 	public static final Image IMG_LAUNCHER_INFO = new ManagedImage(FOLDER+"launcher_info.png").getImage();
 
