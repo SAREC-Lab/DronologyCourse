@@ -89,5 +89,18 @@ public abstract class AbstractPosition {
 		double[][] data = { north.toArray(), east.toArray(), down.toArray() };
 		return new Array2DRowRealMatrix(data);
 	}
+	
+	public Vector3D findNED(AbstractPosition other) {
+		Vector3D self = makeVector3D(this);
+		Vector3D otherVec = makeVector3D(other);
+		Vector3D displacement = otherVec.subtract(self);
+		RealMatrix tmp = new Array2DRowRealMatrix(displacement.toArray());
+		return new Vector3D(this.toRotMatrix().multiply(tmp).getColumn(0));
+	}
+	
+	private static Vector3D makeVector3D(AbstractPosition pos) {
+		PVector p = pos.toPVector();
+		return new Vector3D(p.getX(), p.getY(), p.getZ());
+	}
 
 }

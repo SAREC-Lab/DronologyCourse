@@ -12,6 +12,15 @@ import edu.nd.dronology.core.util.LlaCoordinate;
 public class TestAbstractPosition {
 
 	private static final double EPSILON = 0.0000000001;
+	
+	@Test
+	public void testFindNED() {
+		double x = 12.24;
+		double y = 0.3;
+		LlaCoordinate s = new LlaCoordinate(y, x, 0);
+		LlaCoordinate t = new LlaCoordinate(y, x + 0.001, 0);
+		System.out.println(s.findNED(t));
+	}
 
 	@Test
 	public void testRotMat() {
