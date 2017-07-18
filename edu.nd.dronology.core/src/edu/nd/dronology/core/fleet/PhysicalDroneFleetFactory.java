@@ -45,18 +45,24 @@ public class PhysicalDroneFleetFactory extends AbstractDroneFleetFactory {
 	@Discuss(discuss = "todo: fligh to altitude 10... workaround just for testing purposes... needs to be fixed..")
 	public ManagedDrone initializeDrone(String droneID, String droneType, double latitude, double longitude,
 			double altitude) throws DroneException {
-		if (RuntimeDroneTypes.getInstance().getCommandHandler() == null) {
-			throw new DroneException("Physical Drone Command Handler not prperly initialized!");
-		}
 
-		IDrone drone = new PhysicalDrone(createDroneID(droneID), RuntimeDroneTypes.getInstance().getCommandHandler());
+		String[] ids = droneID.split(":");
+		if (ids.length != 2) {
+			throw new DroneException("Invalid drone id '" + droneID + "' --> - droneid:groundstationid");
+		}
+		String drnId = ids[0];
+		String groundstationid = ids[1];
+
+		IDrone drone = new PhysicalDrone(createDroneID(drnId),
+				RuntimeDroneTypes.getInstance().getCommandHandler(groundstationid));
 		ManagedDrone managedDrone = new ManagedDrone(drone);
 
 		LlaCoordinate currentPosition = new LlaCoordinate(latitude, longitude, 10);
 		LOGGER.info("Drone initialized at: " + currentPosition.toString());
 
 		drone.setBaseCoordinates(currentPosition);
-		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
+		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(),
+				currentPosition.getAltitude());
 		managedDrone.start();
 		DroneFleetManager.getInstance().addDrone(managedDrone);
 		return managedDrone;
