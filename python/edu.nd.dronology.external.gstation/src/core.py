@@ -15,6 +15,13 @@ _CMD_DICT = {}
 
 
 def put_command(target, command):
+    """
+    Store a command from Dronology to a vehicle.
+
+    :param target:
+    :param command:
+    :return:
+    """
     with _CMD_LOCK:
         if target not in _CMD_DICT:
             _CMD_DICT[target] = Queue.Queue()
@@ -22,6 +29,12 @@ def put_command(target, command):
 
 
 def get_commands(target):
+    """
+    Get all the commands for a vehicle.
+
+    :param target:
+    :return:
+    """
     commands = []
     with _CMD_LOCK:
         if target in _CMD_DICT:
@@ -55,6 +68,9 @@ class Connection:
         with self._status_lock:
             self._status = status
 
+    def is_connected(self):
+        return self.get_status() == Connection._CONNECTED
+
     def start(self):
         threading.Thread(target=self._work).start()
 
@@ -85,7 +101,7 @@ class Connection:
                 self._socket.bind((self._host, self._port))
                 self._socket.listen(0)
                 conn = None
-                while conn is None:
+                while conn is None and self.get_status() != Connection._DEAD:
                     try:
                         conn, addr = self._socket.accept()
                         self._conn = conn
@@ -123,20 +139,55 @@ class Connection:
 def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
                          frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                          param1=0, param2=0, param3=0, param4=0,
-                         latitude=0, longitude=0, altitude=0):
+                         lat_or_param5=0, lon_or_param6=0, alt_or_param7=0):
+    """
+    Make a new mavlink command.
+
+    :param command:
+    :param trg_sys:
+    :param trg_component:
+    :param seq:
+    :param frame:
+    :param param1:
+    :param param2:
+    :param param3:
+    :param param4:
+    :param lat_or_param5:
+    :param lon_or_param6:
+    :param alt_or_param7:
+    :return:
+    """
     cmd_args = [trg_sys, trg_component,
                 seq,
                 frame,
                 command,
                 0, 0,
                 param1, param2, param3, param4,
-                latitude, longitude, altitude]
+                lat_or_param5, lon_or_param6, alt_or_param7]
 
     return dronekit.Command(*cmd_args)
 
 
+# def arm_vehicle(vehicle):
+#
+
+
 def connect_vehicle(vehicle_type, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, speed=1, rate=10,
                     home=(41.732955, -86.180886, 0, 0), baud=115200):
+    """
+    Connect to a SITL vehicle or a real vehicle.
+
+    :param vehicle_type:
+    :param vehicle_id:
+    :param ip:
+    :param instance:
+    :param ardupath:
+    :param speed:
+    :param rate:
+    :param home:
+    :param baud:
+    :return:
+    """
     def _sitl_shutdown_cb(m_vehicle, m_sitl):
         m_vehicle.close()
         m_sitl.stop()
@@ -162,9 +213,9 @@ def connect_vehicle(vehicle_type, vehicle_id=None, ip=None, instance=0, ardupath
         tcp, ip, port = sitl.connection_string().split(':')
         port = str(int(port) + instance * 10)
         conn_string = ':'.join([tcp, ip, port])
-        _LOG.info('SITL launched on: {}'.format(conn_string))
+        _LOG.info('SITL instance {} launched on: {}'.format(instance ,conn_string))
         vehicle = dronekit.connect(conn_string, wait_ready=True, baud=baud)
-        _LOG.info('Vehicle connected'.format(conn_string))
+        _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
         shutdown_cb = lambda: _sitl_shutdown_cb(vehicle, sitl)
     else:
         _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
@@ -177,33 +228,79 @@ def connect_vehicle(vehicle_type, vehicle_id=None, ip=None, instance=0, ardupath
     return vehicle, shutdown_cb
 
 
-def _deploy_vehicle_auto(connection, vehicle, v_id):
-    # these are going to be timers
-    num_commands = vehicle.count()
+def set_armed(vehicle, armed=True):
+    if vehicle.armed != armed:
+        if armed:
+            while not vehicle.is_armable:
+                time.sleep(1)
 
-    vehicle.mode = dronekit.VehicleMode('AUTO')
-    is_connected = False
-    send_state_message_timer = None
-    send_monitor_message_timer = None
+        vehicle.armed = armed
 
-    while vehicle.next != num_commands:
-        if not is_connected:
-            is_connected = connection.send('placeholder')
-        else:
-            for cmd in get_commands(v_id):
-                # TODO: check what the command is and maybe do something
-                # send_location_beacon = util.RepeatedTimer(some interval, some func)
-                pass
+        while vehicle.armed != armed:
+            time.sleep(1)
 
 
-def deploy_vehicle(connection, vehicle, vehicle_id, mode='AUTO'):
-    if mode == 'AUTO':
-        worker = threading.Thread(target=_deploy_vehicle_auto, args=[connection, vehicle, vehicle_id])
+def takeoff(vehicle, alt):
+    cur_alt = 0
+    vehicle.simple_takeoff(alt=alt)
+
+    while abs(alt - cur_alt) > 3:
+        cur_alt = vehicle.location.global_frame.alt
+        time.sleep(1)
+
+
+def land(vehicle):
+    vehicle.mode = dronekit.VehicleMode("LAND")
+
+    while vehicle.location.global_frame.alt:
+        time.sleep(1)
+
+
+def goto_lla(vehicle, lat, lon, alt, groundspeed=None):
+    vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), groundspeed=groundspeed)
+
+
+def is_lla_reached(vehicle, lat, lon, alt, threshold=5):
+    return vehicle_to_lla(vehicle).distance(util.Lla(lat, lon, alt)) <= threshold
+
+
+def _goto_sequential(vehicle, waypoints):
+    is_complete = False
+    waypoints = list(waypoints)
+    cur_wp = waypoints.pop(0)
+    goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
+
+    while not is_complete:
+        if is_lla_reached(vehicle, *cur_wp.get_lla(), threshold=5):
+            _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
+            if waypoints:
+                cur_wp = waypoints.pop(0)
+                goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
+            else:
+                is_complete = True
+
+
+def goto_sequential(vehicle, waypoints, block=False):
+    """
+    Execute a series of "goto commands":
+        (lat, lon, alt, groundspeed)
+    :param vehicle:
+    :param waypoints:
+    :return:
+    """
+    if block:
+        _goto_sequential(vehicle, waypoints)
     else:
-        _LOG.warn('Mode {} is not currently supported'.format(mode))
-        worker = threading.Thread(target=lambda: 0)
-    worker.start()
-    return worker
+        worker = threading.Thread(target=_goto_sequential, args=[vehicle, waypoints])
+        worker.start()
+        return worker
+
+
+def vehicle_to_lla(vehicle):
+    lla = vehicle.location.global_frame
+    return util.Lla(lla.lat, lla.lon, lla.alt)
+
+
 
 
 

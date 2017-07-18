@@ -1,43 +1,72 @@
 import core
 import argparse
 import util
-from core import connect_vehicle, make_mavlink_command, deploy_vehicle
-from pymavlink.mavutil import mavlink
+import dronekit
+import time
 from common import *
 
 _LOG = util.get_logger()
 
 
-def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None, ip=None,
-                           instance=0, ardupath=ARDUPATH,
-                           speed=1, rate=10, home=(41.732955, -86.180886, 0, 0), baud=115200):
-    vehicle, shutdown_cb = connect_vehicle(v_type, vehicle_id=v_id, ip=ip, instance=instance, ardupath=ardupath,
-                                           speed=speed, rate=rate, home=home, baud=baud)
+def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None, ip=None, instance=0,
+                           ardupath=ARDUPATH, speed=1, rate=10, home=(41.519508, -86.239996, 0, 0), baud=115200):
+    vehicle, shutdown_cb = core.connect_vehicle(v_type, vehicle_id=v_id, ip=ip, instance=instance,
+                                                ardupath=ardupath, speed=speed, rate=rate, home=home, baud=baud)
 
-    vehicle.commands.clear()
-    vehicle.commands.upload()
-
-    vehicle.commands.add(core.make_mavlink_command(mavlink.MAV_CMD_DO_SET_HOME))
-    vehicle.commands.add(core.make_mavlink_command(mavlink.MAV_CMD_MISSION_START))
-    # TODO: if last known location is not none, we should start there
-
-    for lat, lon, alt in bounds:
-        # TODO: do some sort of search instead of just iterating the boundaries
-        cmd = make_mavlink_command(mavlink.MAV_CMD_NAV_WAYPOINT,
-                                   frame=mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                                   latitude=lat, longitude=lon, altitude=alt)
-        vehicle.commands.add(cmd)
-
+    # SET UP CALLBACKS
     @vehicle.on_attribute('mode')
     def mode_listener(_, name, value):
         # should stop doing whatever we are doing if mode changes
         pass
 
-    vehicle.commands.upload()
+    # SET UP TIMERS
+    def gen_state_message(m_vehicle):
+        msg = DronologyStateMessage.from_vehicle(m_vehicle, v_id)
+        _LOG.debug(str(msg))
 
-    _LOG.info('Commands uploaded successfully to vehicle {}.'.format(v_id))
-    v_worker = deploy_vehicle(connection, vehicle, v_id, mode='AUTO')
-    v_worker.join()
+        if connection.is_connected():
+            # send to Dronology
+            pass
+
+    # ARM & READY
+    core.set_armed(vehicle, armed=True)
+    _LOG.info('Vehicle {} armed.'.format(v_id))
+    vehicle.mode = dronekit.VehicleMode('GUIDED')
+
+    # TODO: make the route better (if we actually care)
+    waypoints = [Waypoint(lat, lon, alt, groundpseed=10) for lat, lon, alt in bounds]
+    home = vehicle.home_location
+    waypoints.append(Waypoint(home.lat, home.lon, bounds[-1][-1], groundpseed=10))
+
+    # START MESSAGE TIMERS
+    dronology_handshake_complete = False
+    send_state_message_timer = util.RepeatedTimer(1.0, gen_state_message, vehicle)
+    send_monitor_message_timer = None
+
+    # TAKEOFF
+    core.takeoff(vehicle, alt=30)
+    _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
+    # FLY
+    worker = core.goto_sequential(vehicle, waypoints, block=False)
+
+    # HANDLE INCOMING MESSAGES
+    while worker.isAlive():
+        if not dronology_handshake_complete:
+            # TRY HANDSHAKE
+            pass
+
+        cmds = core.get_commands(v_id)
+        if cmds:
+            dronology_handshake_complete = True
+            for cmd in cmds:
+                # TODO: decide how to respond to this command
+                pass
+
+    core.land(vehicle)
+    _LOG.info('Vehicle {} landed.'.format(v_id))
+    core.set_armed(vehicle, armed=False)
+    _LOG.info('Vehicle {} disarmed.'.format(v_id))
+    shutdown_cb()
 
 
 def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUNDS):
