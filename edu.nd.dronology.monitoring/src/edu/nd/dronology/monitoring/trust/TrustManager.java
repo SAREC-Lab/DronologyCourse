@@ -8,7 +8,7 @@ import edu.nd.dronology.monitoring.service.IMonitoringValidationListener;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class TrustManager implements IMonitoringValidationListener {
+public class TrustManager  {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(TrustManager.class);
 	private static volatile TrustManager INSTANCE = null;
 
@@ -54,10 +54,5 @@ public class TrustManager implements IMonitoringValidationListener {
 		}
 	}
 
-	@Override
-	public void constraintEvaluated(String uavid, String assumptionid, String message) throws RemoteException {
-		// TODO Auto-generated method stub
-
-	}
 
 }
