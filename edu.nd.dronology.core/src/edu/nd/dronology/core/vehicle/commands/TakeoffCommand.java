@@ -4,8 +4,7 @@ public class TakeoffCommand extends AbstractDroneCommand implements IDroneComman
 
 	public TakeoffCommand(String droneId, double altitude) {
 		super(droneId, CommandIds.TAKEOFF_COMMAND);
-		innerdata.put("altitude", altitude);
+		data.put(ATTRIBUTE_ALTITUDE, altitude);
 	}
-
 
 }
