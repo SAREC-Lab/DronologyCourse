@@ -17,6 +17,7 @@ import edu.nd.dronology.monitoring.monitoring.ValidationResultManager;
 import edu.nd.dronology.monitoring.safety.internal.UAVSaeftyCase;
 import edu.nd.dronology.monitoring.service.DroneSafetyService;
 import edu.nd.dronology.monitoring.service.IMonitoringValidationListener;
+import edu.nd.dronology.monitoring.trust.TrustManager;
 import edu.nd.dronology.monitoring.validation.SafetyCaseValidator;
 import edu.nd.dronology.monitoring.validation.ValidationEntry;
 import edu.nd.dronology.monitoring.validation.ValidationResult;
@@ -58,7 +59,7 @@ public class DroneSafetyServiceInstance extends AbstractServiceInstance implemen
 
 	@Override
 	protected void doStartService() throws Exception {
-
+		
 	}
 
 	@Override
