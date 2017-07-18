@@ -2,6 +2,7 @@ package edu.nd.dronology.core.utilities;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.junit.Test;
@@ -16,10 +17,13 @@ public class TestAbstractPosition {
 	@Test
 	public void testFindNED() {
 		double x = 12.24;
-		double y = 0.3;
+		double y = 18.3;
 		LlaCoordinate s = new LlaCoordinate(y, x, 0);
-		LlaCoordinate t = new LlaCoordinate(y, x + 0.001, 0);
-		System.out.println(s.findNED(t));
+		LlaCoordinate t = new LlaCoordinate(y, x + 0.004, 0);
+		Vector3D ned = s.findNED(t);
+		System.out.println(ned);
+		System.out.println(s.findLla(ned));
+		System.out.println(t);
 	}
 
 	@Test

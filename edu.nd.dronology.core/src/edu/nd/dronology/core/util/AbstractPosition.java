@@ -98,6 +98,14 @@ public abstract class AbstractPosition {
 		return new Vector3D(this.toRotMatrix().multiply(tmp).getColumn(0));
 	}
 	
+	public LlaCoordinate findLla(Vector3D ned) {
+		Vector3D self = makeVector3D(this);
+		RealMatrix tmp = new Array2DRowRealMatrix(ned.toArray());
+		Vector3D d = new Vector3D(this.toRotMatrix().transpose().multiply(tmp).getColumn(0));
+		Vector3D p = self.add(d);
+		return new PVector(p.getX(), p.getY(), p.getZ()).toLlaCoordinate();
+	}
+	
 	private static Vector3D makeVector3D(AbstractPosition pos) {
 		PVector p = pos.toPVector();
 		return new Vector3D(p.getX(), p.getY(), p.getZ());
