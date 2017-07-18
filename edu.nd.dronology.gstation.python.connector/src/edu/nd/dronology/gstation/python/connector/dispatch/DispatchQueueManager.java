@@ -1,7 +1,5 @@
 package edu.nd.dronology.gstation.python.connector.dispatch;
 
-import java.text.DateFormat;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,14 +10,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
+import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
+import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
@@ -46,10 +42,6 @@ public class DispatchQueueManager {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DispatchQueueManager.class);
 
-	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
-			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
-			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
-
 	private static final int NUM_THREADS = 20;
 	private static final ExecutorService SERVICE_EXECUTOR = Executors.newFixedThreadPool(NUM_THREADS,
 			new NamedThreadFactory("Dispatch-Threads"));
@@ -64,6 +56,8 @@ public class DispatchQueueManager {
 	private List<IMonitoringMessageHandler> handlers = new ArrayList<>();
 
 	private final String groundstationid;
+
+	private IUAVSafetyValidator validator;
 
 	public DispatchQueueManager(String groundstationid) {
 		this.groundstationid = groundstationid;
@@ -160,6 +154,17 @@ public class DispatchQueueManager {
 		synchronized (handlers) {
 			handlers.add(handler);
 		}
+	}
+
+	public void postDoneHandshakeMessage(String uavid, UAVHandshakeMessage message) {
+		if (validator != null) {
+			validator.validate(uavid, message.getSafetyCase());
+		}
+	}
+
+	public void registerSafetyValidator(IUAVSafetyValidator validator) {
+		this.validator = validator;
+
 	}
 
 }

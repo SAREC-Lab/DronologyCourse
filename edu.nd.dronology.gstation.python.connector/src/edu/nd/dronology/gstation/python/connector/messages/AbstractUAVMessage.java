@@ -23,10 +23,6 @@ public class AbstractUAVMessage<T> implements Serializable {
 	protected final Map<String, T> data = new HashMap<>();
 	protected String uavid;
 
-	public Object readResolve() {
-		this.receiveTimestamp = PreciseTimestamp.create();
-		return this;
-	}
 
 	public void timestamp() {
 		this.receiveTimestamp = PreciseTimestamp.create();
@@ -35,6 +31,10 @@ public class AbstractUAVMessage<T> implements Serializable {
 
 	public PreciseTimestamp getTimestamp() {
 		return receiveTimestamp;
+	}
+
+	public long getSendtimestamp() {
+		return sendtimestamp;
 	}
 
 	@Override
@@ -52,6 +52,11 @@ public class AbstractUAVMessage<T> implements Serializable {
 
 	public void addPropery(String key, T value) {
 		data.put(key, value);
+
+	}
+
+	public T getProperty(String key) {
+		return data.get(key);
 
 	}
 

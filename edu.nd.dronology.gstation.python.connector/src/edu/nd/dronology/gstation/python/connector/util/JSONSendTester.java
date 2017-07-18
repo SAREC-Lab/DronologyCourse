@@ -43,17 +43,17 @@ public class JSONSendTester {
 
 			UAVStateMessage sm = new UAVStateMessage("Drone1", "Drone1");
 
-			sm.setType(UAVStateMessage.MESSAGE_TYPE);
-			sm.setUavid("DRONE1");
-			sm.setArmable(true);
-			sm.setArmed(true);
-			sm.setAttitude(new LlaCoordinate(1, 2, 3));
-			sm.setGroundspeed(25.3);
-			sm.setLocation(new LlaCoordinate(3, 4, 5));
-			sm.setMode(edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage.DroneMode.CIRCLE);
-			sm.setStatus(DroneStatus.ACTIVE);
-			sm.setVelocity(new LlaCoordinate(5, 6, 7));
-			sm.setBatterystatus(new BatteryStatus());
+			// sm.setType(UAVStateMessage.MESSAGE_TYPE);
+			// sm.setUavid("DRONE1");
+			// sm.setArmable(true);
+			// sm.setArmed(true);
+			// sm.setAttitude(new LlaCoordinate(1, 2, 3));
+			// sm.setGroundspeed(25.3);
+			// sm.setLocation(new LlaCoordinate(3, 4, 5));
+			// sm.setMode(edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage.DroneMode.CIRCLE);
+			// sm.setStatus(DroneStatus.ACTIVE);
+			// sm.setVelocity(new LlaCoordinate(5, 6, 7));
+			// sm.setBatterystatus(new BatteryStatus());
 
 			toSend = GSON.toJson(sm);
 

@@ -1,6 +1,7 @@
 package edu.nd.dronology.gstation.python.connector.messages;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
 
@@ -9,19 +10,18 @@ public class UAVStateMessage extends AbstractUAVMessage<Object> implements Seria
 	private static final long serialVersionUID = -5703232763831907307L;
 	public static final String MESSAGE_TYPE = "state";
 
-	private LlaCoordinate location;
-	private LlaCoordinate attitude;
-	private LlaCoordinate velocity;
+	public static final transient String LOCATION = "location";
+	public static final transient String ATTITUDE = "attitude";
+	public static final transient String VELOCITY = "velocity";
 
-	private DroneStatus status;
-	private DroneMode mode;
+	public static final transient String MODE = "mode";
+	public static final transient String STATUS = "status";
 
-	private boolean armed;
-	private boolean armable;
+	public static final transient String ARMED = "armed";
+	public static final transient String ARMABLE = "armable";
 
-	private double groundspeed;
-
-	private BatteryStatus batterystatus;
+	public static final transient String GROUNDSPEED = "groundspeed";
+	public static final transient String BATTERYSTATUS = "batterystatus";
 
 	public enum DroneMode {
 		GUIDED, INIT, LAND, RTL, POSHOLD, OF_LOITER, STABILIZE, AUTO, THROW, DRIFT, FLIP, AUTOTUNE, ALT_HOLD, BRAKE, LOITER, AVOID_ADSB, POSITION, CIRCLE, SPORT, ACRO;
@@ -36,93 +36,58 @@ public class UAVStateMessage extends AbstractUAVMessage<Object> implements Seria
 	}
 
 	public LlaCoordinate getLocation() {
-		return location;
-	}
-
-	public void setLocation(LlaCoordinate location) {
-		this.location = location;
+		return (LlaCoordinate) data.get(LOCATION);
 	}
 
 	public LlaCoordinate getAttitude() {
-		return attitude;
-	}
-
-	public void setAttitude(LlaCoordinate attitude) {
-		this.attitude = attitude;
+		return (LlaCoordinate) data.get(ATTITUDE);
 	}
 
 	public LlaCoordinate getVelocity() {
-		return velocity;
-	}
-
-	public void setVelocity(LlaCoordinate velocity) {
-		this.velocity = velocity;
+		return (LlaCoordinate) data.get(VELOCITY);
 	}
 
 	public boolean isArmable() {
-		return armable;
-	}
-
-	public void setArmable(boolean armable) {
-		this.armable = armable;
+		return (Boolean) data.get(ARMABLE);
 	}
 
 	public double getGroundspeed() {
-		return groundspeed;
-	}
-
-	public void setGroundspeed(double groundspeed) {
-		this.groundspeed = groundspeed;
+		return (Double) data.get(GROUNDSPEED);
 	}
 
 	public DroneStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(DroneStatus status) {
-		this.status = status;
+		return (DroneStatus) data.get(STATUS);
 	}
 
 	public boolean isArmed() {
-		return armed;
-	}
-
-	public void setArmed(boolean armed) {
-		this.armed = armed;
+		return (Boolean) data.get(ARMED);
 	}
 
 	public DroneMode getMode() {
-		return mode;
-	}
-
-	public void setMode(DroneMode mode) {
-		this.mode = mode;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-
+		return (DroneMode) data.get(MODE);
 	}
 
 	public BatteryStatus getBatterystatus() {
-		return batterystatus;
-	}
-
-	public void setBatterystatus(BatteryStatus batterystatus) {
-		this.batterystatus = batterystatus;
+		return (BatteryStatus) data.get(BATTERYSTATUS);
 	}
 
 	@Override
 	public String toString() {
-		return "armed=" + armed + "| mode " + mode + " | Coordinate[" + Double.toString(getLocation().getLatitude())
-				+ "," + Double.toString(getLocation().getLongitude()) + ","
-				+ Double.toString(getLocation().getAltitude()) + "]";
+		return "armed=" + isArmed() + "| mode " + getMode() + " | Coordinate["
+				+ Double.toString(getLocation().getLatitude()) + "," + Double.toString(getLocation().getLongitude())
+				+ "," + Double.toString(getLocation().getAltitude()) + "]";
 	}
 
 	public static class BatteryStatus {
 		private double current;
 		private double voltage;
 		private double level;
+
+		public BatteryStatus(double current, double voltage, double level) {
+			this.current = current;
+			this.voltage = voltage;
+			this.level = level;
+		}
 
 		public double getBatteryLevel() {
 			return level;

@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.IDroneStatusUpdateListener;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
@@ -114,6 +113,11 @@ public class MAVLinkUAVConnector implements IDroneCommandHandler {
 	public void registerMonitoringMessageHandler(IMonitoringMessageHandler monitoringhandler) {
 		dispatchQueueManager.registerMonitoringMessageHandler(monitoringhandler);
 
+	}
+
+	public void registerSafetyValidator(IUAVSafetyValidator validator) {
+	 dispatchQueueManager.registerSafetyValidator(validator);
+		
 	}
 
 }

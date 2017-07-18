@@ -14,6 +14,7 @@ import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.core.util.FormatUtil;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
@@ -26,9 +27,6 @@ public class ReadDispatcher implements Runnable {
 	private AtomicBoolean cont = new AtomicBoolean(false);
 	private static final ILogger LOGGER = LoggerProvider.getLogger(ReadDispatcher.class);
 
-	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
-			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
-			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
 	private BufferedReader reader;
 	private DispatchQueueManager dispatchQueueManager;
 
@@ -60,6 +58,7 @@ public class ReadDispatcher implements Runnable {
 						}
 
 					} catch (Exception ex) {
+						ex.printStackTrace();
 						LOGGER.hwFatal("Error when parsing incomming message '" + line + "' " + ex.getMessage());
 					}
 
@@ -83,6 +82,21 @@ public class ReadDispatcher implements Runnable {
 
 		} catch (Throwable t) {
 			LOGGER.error(t);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					LOGGER.error(e);
+				}
+			}
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					LOGGER.error(e);
+				}
+			}
 		}
 	}
 
@@ -91,6 +105,11 @@ public class ReadDispatcher implements Runnable {
 			LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
 					+ " - " + message.toString());
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
+
+		} else if (message instanceof UAVHandshakeMessage) {
+			LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
+					+ " - " + message.toString());
+			dispatchQueueManager.postDoneHandshakeMessage(message.getUavid(), (UAVHandshakeMessage) message);
 
 		} else if (message instanceof UAVMonitoringMessage) {
 			dispatchQueueManager.postMonitoringMessage((UAVMonitoringMessage) message);

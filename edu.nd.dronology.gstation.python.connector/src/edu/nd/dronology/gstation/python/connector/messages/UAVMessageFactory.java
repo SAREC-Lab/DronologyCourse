@@ -1,6 +1,7 @@
 package edu.nd.dronology.gstation.python.connector.messages;
 
 import java.text.DateFormat;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -13,11 +14,16 @@ import edu.nd.dronology.gstation.python.connector.GroundStationException;
 
 public class UAVMessageFactory {
 
-	private static final String MESSAGE_TYPE = "messagetype";
+	private static final String MESSAGE_TYPE = "type";
 
 	public static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
 			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
 			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
+
+	static final Gson TYPE_GSON = new GsonBuilder().serializeNulls().setDateFormat(DateFormat.LONG)
+			.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).setVersion(1.0)
+			.serializeSpecialFloatingPointValues().registerTypeAdapter(Map.class, new StateMessageTypeAdapter())
+			.create();
 
 	public static AbstractUAVMessage<?> create(String messagestring) throws Exception {
 
@@ -30,13 +36,13 @@ public class UAVMessageFactory {
 		AbstractUAVMessage<?> message = null;
 		switch (messagetype) {
 		case UAVStateMessage.MESSAGE_TYPE: {
-			message = GSON.fromJson(messagestring, UAVStateMessage.class);
+			message = TYPE_GSON.fromJson(messagestring, UAVStateMessage.class);
 			message.timestamp();
 			return message;
 		}
 
 		case UAVHandshakeMessage.MESSAGE_TYPE: {
-			message = GSON.fromJson(messagestring, UAVMonitoringMessage.class);
+			message = GSON.fromJson(messagestring, UAVHandshakeMessage.class);
 			message.timestamp();
 			return message;
 		}
