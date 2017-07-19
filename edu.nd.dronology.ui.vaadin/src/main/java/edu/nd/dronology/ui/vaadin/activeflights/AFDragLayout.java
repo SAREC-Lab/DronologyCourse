@@ -35,6 +35,12 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
+/**
+ * 
+ * @author Patrick Falvey
+ *
+ */
+
 public class AFDragLayout extends VerticalLayout {
 
 	/**
@@ -245,7 +251,6 @@ public class AFDragLayout extends VerticalLayout {
 				TargetDetails dropTargetData = dropEvent.getTargetDetails();
 				DropTarget target = dropTargetData.getTarget();
 
-				// find the location where to move the dragged component
 				boolean sourceWasAfterTarget = true;
 				int index = 0;
 				@SuppressWarnings("deprecation")
@@ -260,18 +265,15 @@ public class AFDragLayout extends VerticalLayout {
 					}
 				}
 				if (next == null || next != target) {
-					// component not found - if dragging from another layout
 					return;
 				}
 
-				// drop on top of target?
 				if (dropTargetData.getData("horizontalLocation").equals(HorizontalDropLocation.CENTER.toString())) {
 					if (sourceWasAfterTarget) {
 						index--;
 					}
 				}
 
-				// drop before the target?
 				else if (dropTargetData.getData("horizontalLocation").equals(HorizontalDropLocation.LEFT.toString())) {
 					index--;
 					if (index < 0) {
@@ -279,7 +281,6 @@ public class AFDragLayout extends VerticalLayout {
 					}
 				}
 
-				// move component within the layout
 				layout.removeComponent(sourceComponent);
 				layout.addComponent(sourceComponent, index);
 			}
