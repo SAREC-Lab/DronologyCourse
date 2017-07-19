@@ -58,14 +58,23 @@ public class StateMessageTypeAdapter implements JsonDeserializer<Map> {
 	private BatteryStatus deserializeBatteryStatus(JsonObject mapObject, String itemname) {
 		JsonElement locationElem = mapObject.get(itemname);
 		JsonObject locObject = locationElem.getAsJsonObject();
-		
 
 		JsonPrimitive current = locObject.getAsJsonPrimitive("current");
 		JsonPrimitive voltage = locObject.getAsJsonPrimitive("voltage");
-		JsonPrimitive level = locObject.getAsJsonPrimitive("level");
-		
-		
-		return new BatteryStatus(current.getAsDouble(),voltage.getAsDouble(),level.getAsDouble());
+
+		double bcurrent = -1;
+		if (!locObject.has("current")) {
+			JsonPrimitive level = locObject.getAsJsonPrimitive("current");
+			bcurrent = level.getAsDouble();
+		}
+
+		double blevel = -1;
+		if (!locObject.has("level")) {
+			JsonPrimitive level = locObject.getAsJsonPrimitive("level");
+			blevel = level.getAsDouble();
+		}
+
+		return new BatteryStatus(bcurrent, voltage.getAsDouble(), blevel);
 	}
 
 	private LlaCoordinate deserializeLLACoordinate(JsonObject mapObject, String itemname) {

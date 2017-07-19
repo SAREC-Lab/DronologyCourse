@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import edu.nd.dronology.core.IDroneStatusUpdateListener;
+import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
@@ -97,7 +97,7 @@ public class DispatchQueueManager {
 
 	}
 
-	public void createDispatchThread(String id, IDroneStatusUpdateListener listener) {
+	public void createDispatchThread(String id, IUAVPropertyUpdateNotifier listener) {
 		BlockingQueue<UAVStateMessage> queue;
 		synchronized (queueMap) {
 			if (queueMap.containsKey(id)) {

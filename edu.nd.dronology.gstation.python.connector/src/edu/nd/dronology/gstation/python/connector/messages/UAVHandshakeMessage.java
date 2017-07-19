@@ -26,11 +26,9 @@ public class UAVHandshakeMessage extends AbstractUAVMessage<Object> implements S
 		if (data.get(HOME) instanceof LlaCoordinate) {
 			return (LlaCoordinate) data.get(HOME);
 		}
-
 		Map<String, Double> homeMap = (Map<String, Double>) data.get(HOME);
 		data.put(HOME, new LlaCoordinate(homeMap.get("x"), homeMap.get("y"), homeMap.get("z")));
 		return (LlaCoordinate) data.get(HOME);
-
 	}
 
 	public String getSafetyCase() {

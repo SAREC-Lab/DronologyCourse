@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import edu.nd.dronology.core.IDroneStatusUpdateListener;
+import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
@@ -30,7 +30,7 @@ public class MAVLinkUAVConnector implements IDroneCommandHandler {
 
 	// socket for communication with python ground station
 	private Socket pythonSocket;
-	private final Map<String, IDroneStatusUpdateListener> registeredListeners = new ConcurrentHashMap<>();
+	private final Map<String, IUAVPropertyUpdateNotifier> registeredListeners = new ConcurrentHashMap<>();
 	private ReadDispatcher readDispatcher;
 	private WriteDispatcher writeDispatcher;
 	private final String groundstationid;
@@ -81,12 +81,12 @@ public class MAVLinkUAVConnector implements IDroneCommandHandler {
 
 	@Override
 	public void sendCommand(IDroneCommand cmd) throws DroneException {
-		LOGGER.hwInfo("Sending Command to UAV " + cmd.toString());
+		LOGGER.hwInfo(groundstationid + " Sending Command to UAV " + cmd.toString());
 		dispatchQueueManager.send(cmd);
 	}
 
 	@Override
-	public void setStatusCallbackListener(String id, IDroneStatusUpdateListener listener) throws DroneException {
+	public void setStatusCallbackNotifier(String id, IUAVPropertyUpdateNotifier listener) throws DroneException {
 		if (registeredListeners.containsKey(id)) {
 			throw new DroneException("An listener with '" + id + "' is already registered");
 		}
@@ -116,8 +116,8 @@ public class MAVLinkUAVConnector implements IDroneCommandHandler {
 	}
 
 	public void registerSafetyValidator(IUAVSafetyValidator validator) {
-	 dispatchQueueManager.registerSafetyValidator(validator);
-		
+		dispatchQueueManager.registerSafetyValidator(validator);
+
 	}
 
 }

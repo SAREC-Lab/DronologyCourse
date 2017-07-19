@@ -46,6 +46,7 @@ public class FakePythonGroundstation {
 			handshake.setHome(new LlaCoordinate(1, 2, 3));
 			handshake.setType(UAVHandshakeMessage.MESSAGE_TYPE);
 			File file = new File("sac"+File.separator+"sacjson.txt");
+			System.out.println(file.getAbsolutePath());
 			String sac = FileUtils.readFileToString(file);
 			handshake.setSafetyCase(sac);
 

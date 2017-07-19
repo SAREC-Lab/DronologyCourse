@@ -3,7 +3,7 @@ package edu.nd.dronology.gstation.python.connector.dispatch;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 
-import edu.nd.dronology.core.IDroneStatusUpdateListener;
+import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -11,9 +11,9 @@ import net.mv.logging.LoggerProvider;
 public class StatusDispatchThread extends AbstractStatusDispatchThread<UAVStateMessage> implements Callable {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(StatusDispatchThread.class);
 
-	private IDroneStatusUpdateListener listener;
+	private IUAVPropertyUpdateNotifier listener;
 
-	public StatusDispatchThread(final BlockingQueue<UAVStateMessage> queue, IDroneStatusUpdateListener listener) {
+	public StatusDispatchThread(final BlockingQueue<UAVStateMessage> queue, IUAVPropertyUpdateNotifier listener) {
 		super(queue);
 		this.listener = listener;
 	}
