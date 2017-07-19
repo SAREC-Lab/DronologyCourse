@@ -79,7 +79,7 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 
 	@Override
 	public void pauseFlight(String uavid) throws Exception {
-		// TODO Auto-generated method stub
+		flightManager.pauseFlight(uavid);
 
 	}
 

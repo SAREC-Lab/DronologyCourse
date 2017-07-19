@@ -25,6 +25,6 @@ public interface IFlightManagerServiceInstance extends IServiceInstance {
 
 	Collection<FlightPlanInfo> getCurrentFlights();
 
-	public void  planMission(IMissionPlan missionPlan) throws Exception;
+	public void planMission(IMissionPlan missionPlan) throws Exception;
 
 }
