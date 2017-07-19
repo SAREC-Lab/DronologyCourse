@@ -15,7 +15,7 @@ public class FReditBar extends CustomComponent{
 	Label textLabel = new Label("Editing Route");
 	Label smallText = new Label("Left click to add a new waypoint. Right click to finish drawing and add a finish point. Drag waypoints to move.");
 	
-	public FReditBar() {
+	public FReditBar(FRMapComponent map) {
 		setStyleName("fr_edit_bar");
 		textLabel.setStyleName("large_text");
 		smallText.setStyleName("small_text");
@@ -24,6 +24,14 @@ public class FReditBar extends CustomComponent{
 		saveButton.setHeight("25px");
 		totalLayout.addComponents(textLabel, smallText, cancelButton, saveButton);
 		setCompositionRoot(totalLayout);
+		
+		cancelButton.addClickListener(e->{
+			map.cancelClick();
+		});
+		
+		saveButton.addClickListener(e->{
+			map.saveClick();
+		});
 	}
 	public Button getCancelButton(){
 		return cancelButton;

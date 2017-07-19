@@ -32,7 +32,7 @@ public class FRMetaInfo extends CustomComponent {
 	Button editButton;
 	Button deleteButton;
 	
-	public FRMetaInfo(String name, int numCoords){
+	public FRMetaInfo(String name, int numCoords, FRMapComponent map){
 		//used if route is selected
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
@@ -75,12 +75,19 @@ public class FRMetaInfo extends CustomComponent {
 		controls.addStyleName("route_meta_controls");
 		nameLabel.addStyleName("route_meta_name");
 		
+		editButton.addClickListener(e->{
+			map.editButton();
+		});
+		deleteButton.addClickListener(e->{
+			map.deleteClick();
+		});
+		
 		setCompositionRoot(content);
 		
 	}
-	public FRMetaInfo(FlightRouteInfo info){		
-		this(info.getName(), info.getWaypoints().size());	
-	}
+	public FRMetaInfo(FlightRouteInfo info, FRMapComponent map){		
+		this(info.getName(), info.getWaypoints().size(), map);	
+	}	
 	
 	public FRMetaInfo(){
 		//used if no route selected

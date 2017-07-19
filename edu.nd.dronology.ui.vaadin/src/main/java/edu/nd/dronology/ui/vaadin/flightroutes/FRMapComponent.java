@@ -52,12 +52,14 @@ public class FRMapComponent extends CustomComponent {
 	private VerticalLayout content = new VerticalLayout();
 	private AbsoluteLayout mapAndPopup = new AbsoluteLayout();
 	private FRMetaInfo bar = new FRMetaInfo();
-	private FReditBar editBar = new FReditBar();
+	private FReditBar editBar = new FReditBar(this);
 	private AbsoluteLayout layout = new AbsoluteLayout();
 	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
-	FRDeleteRoute delete = new FRDeleteRoute(this);
-	ArrayList<String> names = new ArrayList();
+	private FRDeleteRoute delete = new FRDeleteRoute(this);
+	private ArrayList<String> names = new ArrayList();
+	private PopupView popup;
+	private FlightRouteInfo selectedRoute;
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
 		this.setWidth("100%");
@@ -141,10 +143,9 @@ public class FRMapComponent extends CustomComponent {
 		popupContent.addComponent(altitudeLabel);
 		popupContent.addComponent(transitSpeedLabel);
 		
-		PopupView popup = new PopupView(null, popupContent);
+		popup = new PopupView(null, popupContent);
 		
 		Button toDelete = new Button("Remove Waypoint");
-		
 		toDelete.addClickListener(event -> {
 			popup.setPopupVisible(false);
 			
@@ -163,7 +164,6 @@ public class FRMapComponent extends CustomComponent {
 				route.getMapPoints().get(i).setOrder(i+1);
 			}
 		});
-		
 		toDelete.setId("toDelete");
 		popupContent.addComponent(toDelete);
 		
@@ -195,21 +195,20 @@ public class FRMapComponent extends CustomComponent {
 	@WaypointReplace
 	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName) {
 		//displays with selected route info
-		
+		selectedRoute = info;
 		route.disableRouteEditing();
 
 		layout = new AbsoluteLayout();
 		layout.addStyleName("fr_mapabsolute_layout");
 		
 		if (whichName) {
-			selectedBar = new FRMetaInfo(routeName, numCoords);
+			selectedBar = new FRMetaInfo(routeName, numCoords, this);
 		} else {
-			selectedBar = new FRMetaInfo(info);
+			selectedBar = new FRMetaInfo(info, this);
 		}
 		 
-		editBar = new FReditBar();
+		editBar = new FReditBar(this);
 		CheckBox tableBox = selectedBar.getCheckBox();
-		Button edit = selectedBar.getEditButton();
 		
 		//to hide the table 
 		tableBox.addValueChangeListener(event -> {
@@ -223,185 +222,6 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap.setStyleName("bring_back");
 
-		// enable editing
-		edit.addClickListener(event -> {
-			storedPoints.clear();
-			for (int i = 0; i < route.getMapPoints().size(); i++) {
-				storedPoints.add(route.getMapPoints().get(i));
-			}
-			
-			route.enableRouteEditing();
-			leafletMap.setEnabled(true);
-			editBar.addStyleName("bring_front");
-			layout.addComponent(editBar);
-
-			leafletMap.addStyleName("fr_leaflet_map_edit_mode");
-			tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
-		});
-
-		Button cancel = editBar.getCancelButton();
-		cancel.addClickListener(event -> {
-			route.disableRouteEditing();
-			
-			for (int i = 0; i < route.getMapPoints().size(); i++) {
-				route.getMapPoints().remove(i);
-			}
-			
-			route.getMapPoints().clear();
-			
-			for (int i = 0; i < storedPoints.size(); i++) {
-				route.getMapPoints().add(storedPoints.get(i));
-			}
-			
-			route.getGrid().setItems(route.getMapPoints());
-			
-			route.removeAllMarkers(route.getPins());
-			route.removeAllLines(route.getPolylines());
-			
-			for (int i = 0; i < storedPoints.size(); i++) {
-				WayPoint point = storedPoints.get(i);
-				route.addPinForWayPoint(point);
-			}
-			
-			route.drawLines(storedPoints, true, 0);
-			
-			layout.removeComponent(editBar);
-			leafletMap.addStyleName("bring_back");
-			leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
-			tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-			leafletMap.setEnabled(false);
-		});
-
-		Button save = editBar.getSaveButton();
-		save.addClickListener(event -> {
-			exitEditMode();
-
-			List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
-			
-			FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
-			ByteArrayInputStream inStream;
-			IFlightRoute froute;
-
-			IFlightRouteplanningRemoteService service;
-			BaseServiceProvider provider = MyUI.getProvider();
-			ArrayList routeList;
-
-			//sends the information to dronology to be saved
-			try {
-				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-						.getService(IFlightRouteplanningRemoteService.class);
-
-				String id;
-				String name;
-
-				// gets routes from dronology and requests their name/id
-				id = info.getId();
-				name = info.getName();
-
-				byte[] information = service.requestFromServer(id);
-				inStream = new ByteArrayInputStream(information);
-				froute = routePersistor.loadItem(inStream);
-
-				ArrayList<Waypoint> oldCoords = new ArrayList(froute.getWaypoints());
-				for (Waypoint cord : oldCoords) {
-					froute.removeWaypoint(cord);
-				}
-				
-				for (WayPoint way : newWaypoints) {
-					double alt = 0;
-					double lon = 0;
-					double lat = 0;
-					double approach = 0;
-				
-					try {
-						lon = Double.parseDouble(way.getLongitude());
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-					try {
-						lat = Double.parseDouble(way.getLatitude());
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-					try {
-						alt = Double.parseDouble(way.getAltitude());
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-					try{
-						approach = Double.parseDouble(way.getTransitSpeed());
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-					
-					
-					Waypoint toSend = new Waypoint(new LlaCoordinate(lat, lon, alt));
-					toSend.setApproachingspeed(approach);
-					froute.addWaypoint(toSend);
-				}
-
-				ByteArrayOutputStream outs = new ByteArrayOutputStream();
-				routePersistor.saveItem(froute, outs);
-				byte[] bytes = outs.toByteArray();
-
-				service.transmitToServer(froute.getId(), bytes);
-
-			} catch (DronologyServiceException | RemoteException e1) {
-				e1.printStackTrace();
-			} catch (PersistenceException e1) {
-				e1.printStackTrace();
-			}
-			
-			for(int i = storedPoints.size(); i < route.getMapPoints().size(); i++){
-				String alt = route.getMapPoints().get(i).getAltitude();
-				String lon = route.getMapPoints().get(i).getLongitude();
-				String lat = route.getMapPoints().get(i).getLatitude();
-				String trans = route.getMapPoints().get(i).getTransitSpeed();
-				
-				Point pt = new Point();
-				
-				pt.setLat(Double.valueOf(lat));
-				pt.setLon(Double.valueOf(lon));
-				
-				WayPoint way = new WayPoint(pt, false);
-				way.setAltitude(alt);
-				way.setTransitSpeed(trans);
-				
-				storedPoints.add(way);
-				
-			}
-			
-			for (int i = 0; i < route.getMapPoints().size(); i++) {
-				route.getMapPoints().remove(i);
-			}
-			
-			route.getMapPoints().clear();
-			
-			for (int i = 0; i < storedPoints.size(); i++) {
-				route.getMapPoints().add(storedPoints.get(i));
-			}
-			
-			route.getGrid().setItems(route.getMapPoints());
-			
-			route.removeAllMarkers(route.getPins());
-			route.removeAllLines(route.getPolylines());
-			
-			for (int i = 0; i < storedPoints.size(); i++) {
-				WayPoint point = storedPoints.get(i);
-				route.addPinForWayPoint(point);
-			}
-			
-			route.drawLines(storedPoints, true, 0);
-			
-			route.disableRouteEditing();
-			leafletMap.setEnabled(false);
-		});
-
-		selectedBar.getDeleteButton().addListener(e->{
-			delete.setRouteInfoTobeDeleted(info);
-			UI.getCurrent().addWindow(delete.getWindow());
-		});
-		
 		layout.addComponent(mapAndPopup, "top:5px; left:5px");
 
 		content.removeAllComponents();
@@ -531,5 +351,177 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public FRDeleteRoute getDeleteRouteWindow(){
 		return delete;
+	}
+	public void editButton(){
+		storedPoints.clear();
+		for (int i = 0; i < route.getMapPoints().size(); i++) {
+			storedPoints.add(route.getMapPoints().get(i));
+		}
+		
+		route.enableRouteEditing();
+		leafletMap.setEnabled(true);
+		editBar.addStyleName("bring_front");
+		layout.addComponent(editBar);
+
+		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
+		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
+	}
+	public void cancelClick(){
+		route.disableRouteEditing();
+		
+		for (int i = 0; i < route.getMapPoints().size(); i++) {
+			route.getMapPoints().remove(i);
+		}
+		
+		route.getMapPoints().clear();
+		
+		for (int i = 0; i < storedPoints.size(); i++) {
+			route.getMapPoints().add(storedPoints.get(i));
+		}
+		
+		route.getGrid().setItems(route.getMapPoints());
+		
+		route.removeAllMarkers(route.getPins());
+		route.removeAllLines(route.getPolylines());
+		
+		for (int i = 0; i < storedPoints.size(); i++) {
+			WayPoint point = storedPoints.get(i);
+			route.addPinForWayPoint(point);
+		}
+		
+		route.drawLines(storedPoints, true, 0);
+		
+		layout.removeComponent(editBar);
+		leafletMap.addStyleName("bring_back");
+		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
+		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
+		leafletMap.setEnabled(false);
+	}
+	public void deleteClick(){
+		delete.setRouteInfoTobeDeleted(selectedRoute);
+		UI.getCurrent().addWindow(delete.getWindow());
+	}
+	public void saveClick(){
+		exitEditMode();
+
+		List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
+		
+		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+		ByteArrayInputStream inStream;
+		IFlightRoute froute;
+
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+		ArrayList routeList;
+
+		//sends the information to dronology to be saved
+		try {
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+
+			String id;
+			String name;
+
+			// gets routes from dronology and requests their name/id
+			id = selectedRoute.getId();
+			name = selectedRoute.getName();
+
+			byte[] information = service.requestFromServer(id);
+			inStream = new ByteArrayInputStream(information);
+			froute = routePersistor.loadItem(inStream);
+
+			ArrayList<Waypoint> oldCoords = new ArrayList(froute.getWaypoints());
+			for (Waypoint cord : oldCoords) {
+				froute.removeWaypoint(cord);
+			}
+			
+			for (WayPoint way : newWaypoints) {
+				double alt = 0;
+				double lon = 0;
+				double lat = 0;
+				double approach = 0;
+			
+				try {
+					lon = Double.parseDouble(way.getLongitude());
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+				try {
+					lat = Double.parseDouble(way.getLatitude());
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+				try {
+					alt = Double.parseDouble(way.getAltitude());
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+				try{
+					approach = Double.parseDouble(way.getTransitSpeed());
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+				
+				
+				Waypoint toSend = new Waypoint(new LlaCoordinate(lat, lon, alt));
+				toSend.setApproachingspeed(approach);
+				froute.addWaypoint(toSend);
+			}
+
+			ByteArrayOutputStream outs = new ByteArrayOutputStream();
+			routePersistor.saveItem(froute, outs);
+			byte[] bytes = outs.toByteArray();
+
+			service.transmitToServer(froute.getId(), bytes);
+
+		} catch (DronologyServiceException | RemoteException e1) {
+			e1.printStackTrace();
+		} catch (PersistenceException e1) {
+			e1.printStackTrace();
+		}
+		
+		for(int i = storedPoints.size(); i < route.getMapPoints().size(); i++){
+			String alt = route.getMapPoints().get(i).getAltitude();
+			String lon = route.getMapPoints().get(i).getLongitude();
+			String lat = route.getMapPoints().get(i).getLatitude();
+			String trans = route.getMapPoints().get(i).getTransitSpeed();
+			
+			Point pt = new Point();
+			
+			pt.setLat(Double.valueOf(lat));
+			pt.setLon(Double.valueOf(lon));
+			
+			WayPoint way = new WayPoint(pt, false);
+			way.setAltitude(alt);
+			way.setTransitSpeed(trans);
+			
+			storedPoints.add(way);
+			
+		}
+		
+		for (int i = 0; i < route.getMapPoints().size(); i++) {
+			route.getMapPoints().remove(i);
+		}
+		
+		route.getMapPoints().clear();
+		
+		for (int i = 0; i < storedPoints.size(); i++) {
+			route.getMapPoints().add(storedPoints.get(i));
+		}
+		
+		route.getGrid().setItems(route.getMapPoints());
+		
+		route.removeAllMarkers(route.getPins());
+		route.removeAllLines(route.getPolylines());
+		
+		for (int i = 0; i < storedPoints.size(); i++) {
+			WayPoint point = storedPoints.get(i);
+			route.addPinForWayPoint(point);
+		}
+		
+		route.drawLines(storedPoints, true, 0);
+		
+		route.disableRouteEditing();
+		leafletMap.setEnabled(false);
 	}
 }
