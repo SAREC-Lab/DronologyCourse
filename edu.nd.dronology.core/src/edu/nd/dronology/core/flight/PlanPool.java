@@ -7,7 +7,6 @@ import java.util.List;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.util.DummyLockObject;
-import edu.nd.dronology.core.util.FormatUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 

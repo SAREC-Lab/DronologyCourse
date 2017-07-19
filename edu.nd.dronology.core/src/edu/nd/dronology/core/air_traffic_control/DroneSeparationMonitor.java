@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.dronology.core.CoordinateChange;
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -21,7 +22,6 @@ public class DroneSeparationMonitor {
 	private static volatile DroneSeparationMonitor INSTANCE = null;
 
 	private List<ManagedDrone> drones = new ArrayList<>();
-	private Double safetyZone; // Set arbitrarily for now.
 
 	/**
 	 * Construct the safety manager. SafetyZone size is hard coded at 10000 degree
@@ -29,7 +29,6 @@ public class DroneSeparationMonitor {
 	 */
 	public DroneSeparationMonitor() {
 		drones = new ArrayList<>();
-		safetyZone = 10d;
 	}
 
 	public static DroneSeparationMonitor getInstance() {
@@ -94,9 +93,9 @@ public class DroneSeparationMonitor {
 			if (!managedDrone.equals(drone2)
 					&& (drone2.getFlightModeState().isFlying() || drone2.getFlightModeState().isInAir())) {
 				dronDistance = getDistance(managedDrone, drone2);
-				if (dronDistance < safetyZone * 1.5) {
+				if (dronDistance < DronologyConstants.SAFETY_ZONE * 1.5) {
 					LOGGER.error("Safety Distance Violation - Drone not allowed to TakeOff! distance: " + dronDistance
-							+ " safety zone: " + safetyZone + " => " + dronDistance);
+							+ " safety zone: " + DronologyConstants.SAFETY_ZONE + " => " + dronDistance);
 					return false;
 				}
 			}
@@ -118,7 +117,7 @@ public class DroneSeparationMonitor {
 						&& drone2.getFlightModeState().isFlying()) {// !drone.isUnderSafetyDirectives()
 					// &&
 					// !drone2.isUnderSafetyDirectives()){
-					if (getDistance(drone, drone2) < safetyZone) {
+					if (getDistance(drone, drone2) < DronologyConstants.SAFETY_ZONE) {
 						// Do not remove even though not used right now.
 						// double angle1 = PointDelta.computeAngle(drone.getCoordinates(),
 						// drone.getTargetCoordinates());

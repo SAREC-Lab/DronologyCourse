@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.IFlightPlan;
 import edu.nd.dronology.core.util.FormatUtil;
@@ -37,7 +38,7 @@ public class FlightPlan implements IFlightPlan {
 	private long startTime = -1;
 	private long endTime = -1;
 	private String uavid;
-	private double takeoffAltitude = 5;
+
 
 	private enum Status {
 		PLANNED, FLYING, COMPLETED, ON_HOLD;
@@ -222,7 +223,7 @@ public class FlightPlan implements IFlightPlan {
 
 	@Override
 	public double getTakeoffAltitude() {
-		return takeoffAltitude;
+		return DronologyConstants.TAKE_OFF_ALTITUDE;
 	}
 
 	private boolean waypointsReached() {
