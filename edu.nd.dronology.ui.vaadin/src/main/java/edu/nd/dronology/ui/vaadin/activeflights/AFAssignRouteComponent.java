@@ -1,11 +1,16 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.io.File;
+import java.rmi.RemoteException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
 import org.vaadin.teemu.switchui.Switch;
 
+import com.vaadin.event.dd.DragAndDropEvent;
+import com.vaadin.event.dd.DropHandler;
+import com.vaadin.event.dd.acceptcriteria.AcceptAll;
+import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
@@ -15,6 +20,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
+import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
+import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
@@ -23,10 +30,18 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
+import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.ui.vaadin.activeflights.AFDragLayout.WrappedComponent;
+import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoPanel;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
+import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
  * 
@@ -46,7 +61,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private HorizontalLayout sideContent = new HorizontalLayout();
 	private HorizontalLayout bottomButtons = new HorizontalLayout();
 	private VerticalLayout sideButtons = new VerticalLayout();
-	private VerticalLayout panelContent = new VerticalLayout();
+	private AFDragLayout panelContent;
 	private FRMainLayout frLayout = new FRMainLayout();
 	private Panel sidePanel = new Panel();
 	private Button cancel = new Button("Cancel");
@@ -58,8 +73,14 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private Button returnToHome = new Button("Return to Home");
 	int index = -1;
 	
+	private BaseServiceProvider provider = MyUI.getProvider();
+	private IFlightManagerRemoteService flightRouteService;
+	
+	@SuppressWarnings("null")
 	public AFAssignRouteComponent(String name, String status, double batteryLife, String healthColor, double lat,
 			double lon, double alt, double speed){
+		
+		panelContent = new AFDragLayout(name);
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource resource = new FileResource(new File(basepath + "/VAADIN/img/drone_icon.png"));
@@ -127,9 +148,21 @@ public class AFAssignRouteComponent extends CustomComponent{
 		
 		topContent.addComponent(buttons);
 		
+		FlightInfo flightRouteInfo = null;
+		try {
+			flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
+					.getService(IFlightManagerRemoteService.class);
+			flightRouteInfo = flightRouteService.getFlightInfo(name);
+		} catch (RemoteException | DronologyServiceException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		numRoutes = flightRouteInfo.getPendingFlights().size();
+		
 		sidePanel.addStyleName("fr_info_panel");
 		sidePanel.addStyleName("control_panel");
-		sidePanel.setContent(panelContent);
 		sidePanel.setCaption(numRoutes + " Routes Assigned");
 		apply.setEnabled(true);
 		
@@ -163,13 +196,14 @@ public class AFAssignRouteComponent extends CustomComponent{
 				Notification.show("Please select assigned route to remove.");
 		});
 		
-		panelContent.addLayoutClickListener( e -> {
-			Component child = e.getChildComponent();
-			if(panelContent.getComponentIndex(child) != -1){
-				((AFDragAndDropBox) child).getRoute().addStyleName("info_box_focus");
-				frLayout.switchWindows(null, frLayout.getMap(), ((AFDragAndDropBox) child).getRoute());
+		panelContent.getSortableLayout().getVerticalLayout().addLayoutClickListener( e -> {
+			WrappedComponent child = (WrappedComponent) e.getChildComponent();
+			Component childContent = child.getContent();
+			if(panelContent.getComponentIndex(childContent) != -1){
+				((FRInfoBox) childContent).addStyleName("info_box_focus");
+				frLayout.switchWindows(null, frLayout.getMap(), ((FRInfoBox) childContent));
 			}
-			index = panelContent.getComponentIndex(child);
+			index = panelContent.getComponentIndex(childContent);
 			//will use when connecting to Dronology
 			FlightRouteInfo flightInfo = frLayout.getControls().getInfoPanel().getFlight(index);
 			
@@ -178,12 +212,12 @@ public class AFAssignRouteComponent extends CustomComponent{
 			// when one route is clicked, the others go back to default background color
 			for (int i = 0; i < numComponents; i++) {
 				if (i != index) {
-					((AFDragAndDropBox) panelContent.getComponent(i)).getRoute().removeStyleName("info_box_focus");
+					panelContent.getComponent(i).removeStyleName("info_box_focus");
 				}
 			}	
 		});
 		
-		
+		sidePanel.setContent(panelContent);
 		sideContent.addComponents(sidePanel, sideButtons, frLayout);
 		bottomButtons.addComponents(cancel, apply);
 		bottomButtons.setComponentAlignment(cancel, Alignment.MIDDLE_RIGHT);
@@ -195,16 +229,16 @@ public class AFAssignRouteComponent extends CustomComponent{
 	}
 	
 	public void addRoute(String name, String ID, String created, String modified, String length) {
-		AFDragAndDropBox wrapper = new AFDragAndDropBox(name, ID, created, modified, length);
-		panelContent.addComponent(wrapper);
+		FRInfoBox box = new FRInfoBox(name, ID, created, modified, length);
+		panelContent.addNewComponent(box);
 		numRoutes += 1;
-		sidePanel.setCaption(numRoutes + "Routes Assigned");
+		sidePanel.setCaption(numRoutes + " Routes Assigned");
 	}
 	
 	public void removeRoute(int index){
 		panelContent.removeComponent(panelContent.getComponent(index));
 		numRoutes -= 1;
-		sidePanel.setCaption(numRoutes + "Routes Assigned");
+		sidePanel.setCaption(numRoutes + " Routes Assigned");
 	}
 	
 	public Button getCancel(){
