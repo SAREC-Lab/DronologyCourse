@@ -93,9 +93,25 @@ public class DroneStatusViewer extends Composite {
 				() -> hover(remoteItem));
 		MenuCreationHelper.createMenuEntry(manager, "Return to Home", ImageProvider.IMG_DRONE_ACTIVATE_24,
 				() -> returnHome(remoteItem));
+
+		MenuCreationHelper.createMenuEntry(manager, "Hover in Place ", ImageProvider.IMG_DRONE_ACTIVATE_24,
+				() -> hoverInPlace(remoteItem));
 		MenuCreationHelper.createMenuEntry(manager, "Create Mission", ImageProvider.IMG_DRONE_ACTIVATE_24,
 				() -> createMission());
 
+	}
+
+	private void hoverInPlace(DroneStatus remoteItem) {
+		// TODO Auto-generated method stub
+		try {
+			IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider()
+					.getRemoteManager().getService(IFlightManagerRemoteService.class);
+
+			service.pauseFlight(remoteItem.getID());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void createMission() {
@@ -103,17 +119,17 @@ public class DroneStatusViewer extends Composite {
 		int result = dlg.open();
 		if (result == Window.OK) {
 			IMissionPlan plan = dlg.getMissionPlan();
-			
+
 			try {
-				IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider()
-						.getRemoteManager().getService(IFlightManagerRemoteService.class);
+				IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider
+						.getBaseServiceProvider().getRemoteManager().getService(IFlightManagerRemoteService.class);
 
 				service.planMission(plan);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
 
 	}
