@@ -42,7 +42,7 @@ public class FRMainLayout extends CustomComponent {
 	private boolean isFirst = true;
 	private int componentCount;
 	private String name = "";
-	int whichRoute = 0; 
+	private int whichRoute = 0; 
 	
 	@WaypointReplace
 	public FRMainLayout() {
@@ -154,10 +154,16 @@ public class FRMainLayout extends CustomComponent {
 			else {
 				switchWindows(e, map, null);
 			}
+			
+			ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
+			for(FRInfoBox infoBox: listEdit){
+				infoBox.getEditButton().addClickListener(eve->{
+					switchWindows(null, map, infoBox);
+					map.enableEdit();
+				});
+			}
 		});
 		
-		ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
-			
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
@@ -210,16 +216,14 @@ public class FRMainLayout extends CustomComponent {
 		controls.getInfoPanel().getInfoBox().getDeleteBar().getYesButton().addClickListener(event->{
 			map.displayNoRoute();
 			map.exitEditMode();
-			//Notification.show("got here!");
 			controls.getInfoPanel().refreshRoutes();
 		});
 		
 		ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
-		
 		for(FRInfoBox infoBox: listEdit){
 			infoBox.getEditButton().addClickListener(eve->{
 				map.enableEdit();
-		});
+			});
 	
 		}
 		

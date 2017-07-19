@@ -33,11 +33,11 @@ public class FRInfoBox extends CustomComponent {
 	private String created;
 	private String modified;
 	private String length;
-	FRDeleteRoute delete = new FRDeleteRoute();
-	Button trashButton;
-	FlightRouteInfo finfo;
-	int index = 0;
-	Button editButton;
+	private FRDeleteRoute delete = new FRDeleteRoute();
+	private Button trashButton;
+	private FlightRouteInfo finfo;
+	private int index = 0;
+	private Button editButton;
 	
 	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	

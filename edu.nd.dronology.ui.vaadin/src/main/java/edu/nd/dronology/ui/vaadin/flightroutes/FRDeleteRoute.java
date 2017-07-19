@@ -21,16 +21,14 @@ public class FRDeleteRoute extends CustomComponent{
 
 	private static final long serialVersionUID = 6787319301316969492L;
 
-	Button yesButton = new Button("Yes");
-	Button noButton = new Button("No");
-	Label question = new Label("Are you sure you want to delete this route?");
-	HorizontalLayout buttonLayout = new HorizontalLayout();
-	VerticalLayout totalLayout = new VerticalLayout();
-	Window window = new Window();
-	FlightRouteInfo infoTobeDeleted = null;
-
-	
-	FRMapComponent mapComp;
+	private Button yesButton = new Button("Yes");
+	private Button noButton = new Button("No");
+	private Label question = new Label("Are you sure you want to delete this route?");
+	private HorizontalLayout buttonLayout = new HorizontalLayout();
+	private VerticalLayout totalLayout = new VerticalLayout();
+	private Window window = new Window();
+	private FlightRouteInfo infoTobeDeleted = null;
+	private FRMapComponent mapComp;
 	
 	public FRDeleteRoute(FRMapComponent mapComp){
 	
@@ -75,15 +73,11 @@ public class FRDeleteRoute extends CustomComponent{
 		
 		yesButton.addClickListener(e->{
 			window.close();
-		
-			if (infoTobeDeleted != null) {
-			
+			if (infoTobeDeleted != null) {	
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
 			}
-
-		});
-		
+		});	
 	}
 	public Button getYesButton(){
 		return yesButton;
@@ -108,9 +102,6 @@ public class FRDeleteRoute extends CustomComponent{
 						.getService(IFlightRouteplanningRemoteService.class);
 				//String id = routeinfo.getId();
 				service.deleteItem(routeinfo.getId());
-				
-		
-				
 			} catch (RemoteException | DronologyServiceException e) {
 				e.printStackTrace();
 			}
