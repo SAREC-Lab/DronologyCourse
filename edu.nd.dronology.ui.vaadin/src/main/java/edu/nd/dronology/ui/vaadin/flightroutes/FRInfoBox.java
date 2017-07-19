@@ -37,6 +37,7 @@ public class FRInfoBox extends CustomComponent {
 	Button trashButton;
 	FlightRouteInfo finfo;
 	int index = 0;
+	Button editButton;
 	
 	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	
@@ -72,7 +73,7 @@ public class FRInfoBox extends CustomComponent {
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/edit.png"));
 		FileResource trashIcon = new FileResource(new File(basepath+"/VAADIN/img/trashcan.png"));
 		
-		Button editButton = new Button();
+		editButton = new Button();
 		trashButton = new Button();
 		
 		editButton.setIcon(editIcon);
@@ -87,11 +88,6 @@ public class FRInfoBox extends CustomComponent {
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
-		/*
-		trashButton.addListener(e->{
-			UI.getCurrent().addWindow(delete.getWindow());
-		});
-		*/
 	}
 	
 	public FRInfoBox(String name, String id, String created, String modified, String length, FRInfoPanel panel){
@@ -164,6 +160,9 @@ public class FRInfoBox extends CustomComponent {
 	}
 	public Button getTrashButton(){
 		return trashButton;
+	}
+	public Button getEditButton(){
+		return editButton;
 	}
 }
 

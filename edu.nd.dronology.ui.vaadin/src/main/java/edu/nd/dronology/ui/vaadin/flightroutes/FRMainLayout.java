@@ -42,6 +42,7 @@ public class FRMainLayout extends CustomComponent {
 	private boolean isFirst = true;
 	private int componentCount;
 	private String name = "";
+	int whichRoute = 0; 
 	
 	@WaypointReplace
 	public FRMainLayout() {
@@ -155,6 +156,8 @@ public class FRMainLayout extends CustomComponent {
 			}
 		});
 		
+		ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
+			
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
@@ -196,8 +199,8 @@ public class FRMainLayout extends CustomComponent {
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
 		
 		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
-		for(FRInfoBox boxxy: list){
-			boxxy.getDeleteBar().getYesButton().addClickListener(even->{
+		for(FRInfoBox box: list){
+			box.getDeleteBar().getYesButton().addClickListener(even->{
 				map.displayNoRoute();
 				map.exitEditMode();
 				controls.getInfoPanel().refreshRoutes();
@@ -210,6 +213,15 @@ public class FRMainLayout extends CustomComponent {
 			//Notification.show("got here!");
 			controls.getInfoPanel().refreshRoutes();
 		});
+		
+		ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
+		
+		for(FRInfoBox infoBox: listEdit){
+			infoBox.getEditButton().addClickListener(eve->{
+				map.enableEdit();
+		});
+	
+		}
 		
 		List<Waypoint> flightWaypoints = new ArrayList();
 		if(routeLayout.getComponentIndex(child) != -1){
