@@ -1,6 +1,7 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
@@ -8,8 +9,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
 
 /**
  * 
@@ -28,6 +33,10 @@ public class FRInfoBox extends CustomComponent {
 	private String created;
 	private String modified;
 	private String length;
+	FRDeleteRoute delete = new FRDeleteRoute();
+	Button trashButton;
+	FlightRouteInfo finfo;
+	int index = 0;
 	
 	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	
@@ -64,7 +73,7 @@ public class FRInfoBox extends CustomComponent {
 		FileResource trashIcon = new FileResource(new File(basepath+"/VAADIN/img/trashcan.png"));
 		
 		Button editButton = new Button();
-		Button trashButton = new Button();
+		trashButton = new Button();
 		
 		editButton.setIcon(editIcon);
 		trashButton.setIcon(trashIcon);
@@ -78,6 +87,40 @@ public class FRInfoBox extends CustomComponent {
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
+		/*
+		trashButton.addListener(e->{
+			UI.getCurrent().addWindow(delete.getWindow());
+		});
+		*/
+	}
+	
+	public FRInfoBox(String name, String id, String created, String modified, String length, FRInfoPanel panel){
+		
+		this(name, id, created, modified, length);
+		
+		String whichBox = this.getId();
+		ArrayList<FRInfoBox> listBoxes = panel.getBoxList();
+		int counter = 0;
+		index = 0; 
+		for(FRInfoBox box: listBoxes){
+			if(box.getId() != null && whichBox.equals(box.getId())){
+				index = counter;
+			}
+			counter++;
+		}
+			
+		trashButton.addListener(e->{
+			UI.getCurrent().addWindow(delete.getWindow());
+			
+			finfo = panel.getFlight(index);
+			delete.setRouteInfoTobeDeleted(finfo);
+			panel.refreshRoutes();
+			
+		});
+		
+		delete.getYesButton().addClickListener(e->{
+			panel.refreshRoutes();
+		});
 	}
 	
 	//default if no parameters are passed
@@ -115,6 +158,12 @@ public class FRInfoBox extends CustomComponent {
 	
 	public void setLength(String length){
 		this.length = length;
+	}
+	public FRDeleteRoute getDeleteBar(){
+		return delete;
+	}
+	public Button getTrashButton(){
+		return trashButton;
 	}
 }
 

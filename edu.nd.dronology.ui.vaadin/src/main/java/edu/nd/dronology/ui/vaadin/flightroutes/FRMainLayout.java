@@ -13,6 +13,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -97,6 +98,8 @@ public class FRMainLayout extends CustomComponent {
 						map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
 					}
 				});
+				
+				controls.getInfoPanel().refreshRoutes();
 			}
 		});
 
@@ -191,6 +194,22 @@ public class FRMainLayout extends CustomComponent {
 
 		//gets the flight info for that route
 		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
+		
+		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
+		for(FRInfoBox boxxy: list){
+			boxxy.getDeleteBar().getYesButton().addClickListener(even->{
+				map.displayNoRoute();
+				map.exitEditMode();
+				controls.getInfoPanel().refreshRoutes();
+			});
+		}
+		
+		controls.getInfoPanel().getInfoBox().getDeleteBar().getYesButton().addClickListener(event->{
+			map.displayNoRoute();
+			map.exitEditMode();
+			//Notification.show("got here!");
+			controls.getInfoPanel().refreshRoutes();
+		});
 		
 		List<Waypoint> flightWaypoints = new ArrayList();
 		if(routeLayout.getComponentIndex(child) != -1){

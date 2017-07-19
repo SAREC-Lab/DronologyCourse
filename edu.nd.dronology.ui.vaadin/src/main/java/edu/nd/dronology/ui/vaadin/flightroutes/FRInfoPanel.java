@@ -57,6 +57,8 @@ public class FRInfoPanel extends CustomComponent {
 	private FlightRouteInfo drone;
 	FRNewRoute display;
 	TextField inputField;
+	FRInfoBox routeBox;
+	ArrayList<FRInfoBox> boxList = new ArrayList();
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
@@ -179,15 +181,17 @@ public class FRInfoPanel extends CustomComponent {
 	}
 
 	public void addRoute() {
-		FRInfoBox route = new FRInfoBox();
-		routes.addComponent(route);
+		routeBox = new FRInfoBox();
+		routes.addComponent(routeBox);
+		boxList.add(routeBox);
 		numberRoutes += 1;
 	}
 
 	public void addRoute(String name, String ID, String created, String modified, String length) {
 		
-		FRInfoBox route = new FRInfoBox(name, ID, created, modified, length);
-		routes.addComponent(route);
+		routeBox = new FRInfoBox(name, ID, created, modified, length, this);
+		routes.addComponent(routeBox);
+		boxList.add(routeBox);
 		numberRoutes += 1;
 	}
 	public boolean removeBox(String name) {
@@ -366,5 +370,15 @@ public FlightRouteInfo getRouteByName(String name){
 	}
 	public ArrayList getRouteList(){
 		return routeList;
+	}
+	public FRInfoBox getInfoBox(){
+		return routeBox;
+	}
+	public FRInfoBox getInfoBoxIndex(int index){
+		
+		return (FRInfoBox) routes.getComponent(index);
+	}
+	public ArrayList<FRInfoBox> getBoxList(){
+		return boxList;
 	}
 }

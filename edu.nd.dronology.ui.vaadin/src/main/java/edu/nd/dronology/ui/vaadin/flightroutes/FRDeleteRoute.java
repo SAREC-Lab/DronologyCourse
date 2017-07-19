@@ -6,6 +6,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -27,7 +28,7 @@ public class FRDeleteRoute extends CustomComponent{
 	VerticalLayout totalLayout = new VerticalLayout();
 	Window window = new Window();
 	FlightRouteInfo infoTobeDeleted = null;
-	int counter = 0;
+
 	
 	FRMapComponent mapComp;
 	
@@ -48,15 +49,39 @@ public class FRDeleteRoute extends CustomComponent{
 			window.close();
 			mapComp.exitEditMode();
 			
-			System.out.println(String.valueOf(counter));
-			counter++;
-			
 			if (infoTobeDeleted != null) {
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
 			}
 
 			mapComp.displayNoRoute();
+		});
+		
+	}
+	public FRDeleteRoute(){
+		buttonLayout.addComponents(yesButton, noButton);
+		totalLayout.addComponents(question, buttonLayout);
+		
+		//setCompositionRoot(totalLayout);
+		
+		window.setContent(totalLayout);
+		window.setResizable(false);
+		window.setClosable(false);
+		window.setPosition(800, 200);
+		
+		noButton.addClickListener(e->{
+			window.close();
+		});
+		
+		yesButton.addClickListener(e->{
+			window.close();
+		
+			if (infoTobeDeleted != null) {
+			
+				deleteRoute(infoTobeDeleted);
+				infoTobeDeleted = null;
+			}
+
 		});
 		
 	}
@@ -77,7 +102,7 @@ public class FRDeleteRoute extends CustomComponent{
 	public void deleteRoute(FlightRouteInfo routeinfo){
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-				
+	
 			try {
 				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 						.getService(IFlightRouteplanningRemoteService.class);
