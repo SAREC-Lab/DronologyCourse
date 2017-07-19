@@ -44,14 +44,17 @@ public class DronologyServiceRunner {
 
 			runtimeMode.setPhysicalEnvironment();
 		//	new SafetyCaseValidator(SafetyCaseGeneration.getUAVSafetyCase()).validate();
-			MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("H001", "localhost", 1234);
+			MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("HUEY", "huey.cse.nd.edu", 1234);
+			
+			//MAVLinkUAVConnector groundStation2 = new MAVLinkUAVConnector("ILIA", "ilia.cse.nd.edu", 1234);
 			
 			RemoteManager.getInstance().contributeService(IDroneSafetyRemoteService.class, DroneSafetyServiceRemoteFacade.getInstance());
 			
 			runtimeMode.registerCommandHandler(groundStation);
+			//runtimeMode.registerCommandHandler(groundStation2);
 
 			groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
-			groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
+			//groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
 			
 			
 

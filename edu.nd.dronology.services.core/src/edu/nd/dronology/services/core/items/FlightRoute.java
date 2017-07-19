@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 
@@ -15,7 +16,7 @@ public class FlightRoute implements IFlightRoute {
 	private String id;
 	private String category = "Default";
 	private LinkedList<Waypoint> waypoints;
-	private double takeoffaltitude = 5;
+	private double takeoffaltitude = DronologyConstants.TAKE_OFF_ALTITUDE;
 
 	public double setTakeoffAltitude() {
 		return takeoffaltitude;
@@ -24,7 +25,6 @@ public class FlightRoute implements IFlightRoute {
 	public FlightRoute() {
 		id = UUID.randomUUID().toString();
 		waypoints = new LinkedList<>();
-		waypoints.add(new Waypoint(new LlaCoordinate(0, 0, 0)));
 		name = id;
 	}
 
