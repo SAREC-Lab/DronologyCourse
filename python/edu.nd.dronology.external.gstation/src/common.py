@@ -1,5 +1,6 @@
 import os
 import json
+import time
 
 MISSION = 'mission'
 DRONOLOGY_LINK = 'dronology'
@@ -60,11 +61,30 @@ class DronologyMessage(object):
         self.data = {}
 
     def __str__(self):
-        return json.dumps({'type': self.m_type, 'uavid': self.uav_id, 'data': self.data})
+        return json.dumps({'type': self.m_type, 'sendtimestamp': int(round(time.time() * 1000)),
+                           'uavid': str(self.uav_id), 'data': self.data})
+
+    def __repr__(self):
+        return str(self)
 
     @classmethod
     def from_vehicle(cls, vehicle, v_id):
         raise NotImplementedError
+
+
+class DronologyHandshakeMessage(DronologyMessage):
+    def __init__(self, uav_id, battery):
+        super(DronologyHandshakeMessage, self).__init__('handshake', uav_id)
+        self.data = {'batterystatus': battery}
+
+    @classmethod
+    def from_vehicle(cls, vehicle, v_id):
+        battery = {
+            'voltage': vehicle.battery.voltage,
+            'current': vehicle.battery.current,
+            'level'	: vehicle.battery.level,
+        }
+        return cls(v_id, battery)
 
 
 class DronologyStateMessage(DronologyMessage):
@@ -78,7 +98,8 @@ class DronologyStateMessage(DronologyMessage):
                  armable,
                  groundpseed,
                  armed,
-                 mode):
+                 mode,
+                 battery):
         super(DronologyStateMessage, self).__init__('state', uav_id)
         self.location = {'x': lat, 'y': lon, 'z': alt}
         self.attitude = {'x': roll, 'y': pitch, 'z': yaw}
@@ -90,26 +111,34 @@ class DronologyStateMessage(DronologyMessage):
         self.groundspeed = groundpseed
         self.armed = armed
         self.mode = mode
+        self.battery = battery
         self.data = {'location': self.location, 'attitude': self.attitude, 'velocity': self.velocity,
                      'status': self.status, 'heading': self.heading, 'armable': self.armable,
-                     'groundspeed': self.groundspeed, 'armed': self.armed, 'mode': self.mode}
+                     'groundspeed': self.groundspeed, 'armed': self.armed, 'mode': self.mode,
+                     'batterystatus': self.battery}
 
     @classmethod
     def from_vehicle(cls, vehicle, v_id):
         lla = vehicle.location.global_frame
         att = vehicle.attitude
         vel = vehicle.velocity
+        battery = {
+            'voltage': vehicle.battery.voltage,
+            'current': vehicle.battery.current,
+            'level'	: vehicle.battery.level,
+        }
 
-        return DronologyStateMessage(v_id,
-                                     lla.lat, lla.lon, lla.alt,
-                                     att.roll, att.pitch, att.yaw,
-                                     vehicle.heading,
-                                     vel[0], vel[1], vel[2],
-                                     vehicle.system_status.state,
-                                     vehicle.is_armable,
-                                     vehicle.groundspeed,
-                                     vehicle.armed,
-                                     vehicle.mode.name)
+        return cls(v_id,
+                   lla.lat, lla.lon, lla.alt,
+                   att.roll, att.pitch, att.yaw,
+                   vehicle.heading,
+                   vel[0], vel[1], vel[2],
+                   vehicle.system_status.state,
+                   vehicle.is_armable,
+                   vehicle.groundspeed,
+                   vehicle.armed,
+                   vehicle.mode.name,
+                   battery)
 
 
 class Command(object):
@@ -132,6 +161,3 @@ class SetMonitorFrequency(Command):
     def from_string(cls, msg):
         d_msg = json.loads(msg)
         cls(d_msg['data'])
-
-
-

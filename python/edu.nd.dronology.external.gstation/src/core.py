@@ -3,7 +3,6 @@ import threading
 import util
 import dronekit
 import dronekit_sitl
-import time
 import Queue
 from pymavlink import mavutil
 from common import *
@@ -44,98 +43,6 @@ def get_commands(target):
     return commands
 
 
-class Connection:
-    _WAITING = 1
-    _CONNECTED = 2
-    _DEAD = -1
-
-    def __init__(self, host='127.0.0.1', port=1234, accept_timeout=5.0):
-        self._host = host
-        self._port = port
-        self._accept_timeout = accept_timeout
-        self._socket = None
-        self._conn = None
-        self._conn_lock = threading.Lock()
-        self._status = Connection._WAITING
-        self._status_lock = threading.Lock()
-        self._msg_buffer = ''
-
-    def get_status(self):
-        with self._status_lock:
-            return self._status
-
-    def set_status(self, status):
-        with self._status_lock:
-            self._status = status
-
-    def is_connected(self):
-        return self.get_status() == Connection._CONNECTED
-
-    def start(self):
-        threading.Thread(target=self._work).start()
-
-    def stop(self):
-        self.set_status(Connection._DEAD)
-
-    def send(self, msg):
-        success = False
-        if self._conn is not None:
-            with self._conn_lock:
-                try:
-                    self._conn.send(msg)
-                    success = True
-                except Exception as e:
-                    _LOG.warn('failed to send message! ({})'.format(e))
-
-        return success
-
-    def _work(self):
-        cont = True
-        while cont:
-            status = self.get_status()
-            if status == Connection._DEAD:
-                cont = False
-            elif status == Connection._WAITING:
-                self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self._socket.settimeout(self._accept_timeout)
-                self._socket.bind((self._host, self._port))
-                self._socket.listen(0)
-                conn = None
-                while conn is None and self.get_status() != Connection._DEAD:
-                    try:
-                        conn, addr = self._socket.accept()
-                        self._conn = conn
-                        self.set_status(Connection._CONNECTED)
-                    except socket.timeout:
-                        _LOG.debug('no connection attempted')
-            else:
-                try:
-                    msg = self._conn.recv(2048)
-                    if os.linesep in msg:
-                        toks = msg.split(os.linesep)
-                        msg_end = toks[0]
-                        _LOG.info('Command received: {}'.format(self._msg_buffer + msg_end))
-                        cmds = [SetMonitorFrequency.from_string(self._msg_buffer + msg_end)]
-
-                        for msg in toks[1:-1]:
-                            _LOG.info('Command received: {}'.format(msg))
-                            cmds.append(SetMonitorFrequency.from_string(msg))
-
-                        # TODO: put the commands in the cmd dict
-
-                        msg = toks[-1]
-                        self._msg_buffer = ''
-                    self._msg_buffer += msg
-                except socket.error as e:
-                    _LOG.warn('connection interrupted! ({})'.format(e))
-                    self._socket.close()
-                    self._socket = None
-                    self._conn.close()
-                    self._conn = None
-                    time.sleep(3)
-                    self.set_status(Connection._WAITING)
-
-
 def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
                          frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                          param1=0, param2=0, param3=0, param4=0,
@@ -166,10 +73,6 @@ def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
                 lat_or_param5, lon_or_param6, alt_or_param7]
 
     return dronekit.Command(*cmd_args)
-
-
-# def arm_vehicle(vehicle):
-#
 
 
 def connect_vehicle(vehicle_type, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, speed=1, rate=10,
@@ -229,6 +132,12 @@ def connect_vehicle(vehicle_type, vehicle_id=None, ip=None, instance=0, ardupath
 
 
 def set_armed(vehicle, armed=True):
+    """
+
+    :param vehicle:
+    :param armed:
+    :return:
+    """
     if vehicle.armed != armed:
         if armed:
             while not vehicle.is_armable:
@@ -241,6 +150,12 @@ def set_armed(vehicle, armed=True):
 
 
 def takeoff(vehicle, alt):
+    """
+
+    :param vehicle:
+    :param alt:
+    :return:
+    """
     cur_alt = 0
     vehicle.simple_takeoff(alt=alt)
 
@@ -250,6 +165,11 @@ def takeoff(vehicle, alt):
 
 
 def land(vehicle):
+    """
+
+    :param vehicle:
+    :return:
+    """
     vehicle.mode = dronekit.VehicleMode("LAND")
 
     while vehicle.location.global_frame.alt:
@@ -257,21 +177,45 @@ def land(vehicle):
 
 
 def goto_lla(vehicle, lat, lon, alt, groundspeed=None):
+    """
+
+    :param vehicle:
+    :param lat:
+    :param lon:
+    :param alt:
+    :param groundspeed:
+    :return:
+    """
     vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), groundspeed=groundspeed)
 
 
-def is_lla_reached(vehicle, lat, lon, alt, threshold=5):
+def is_lla_reached(vehicle, lat, lon, alt, threshold=1):
+    """
+
+    :param vehicle:
+    :param lat:
+    :param lon:
+    :param alt:
+    :param threshold:
+    :return:
+    """
     return vehicle_to_lla(vehicle).distance(util.Lla(lat, lon, alt)) <= threshold
 
 
 def _goto_sequential(vehicle, waypoints):
+    """
+
+    :param vehicle:
+    :param waypoints:
+    :return:
+    """
     is_complete = False
     waypoints = list(waypoints)
     cur_wp = waypoints.pop(0)
     goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
 
     while not is_complete:
-        if is_lla_reached(vehicle, *cur_wp.get_lla(), threshold=5):
+        if is_lla_reached(vehicle, *cur_wp.get_lla()):
             _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
             if waypoints:
                 cur_wp = waypoints.pop(0)
@@ -286,6 +230,7 @@ def goto_sequential(vehicle, waypoints, block=False):
         (lat, lon, alt, groundspeed)
     :param vehicle:
     :param waypoints:
+    :param block:
     :return:
     """
     if block:
@@ -301,6 +246,107 @@ def vehicle_to_lla(vehicle):
     return util.Lla(lla.lat, lla.lon, lla.alt)
 
 
+class Connection:
+    _WAITING = 1
+    _CONNECTED = 2
+    _DEAD = -1
 
+    def __init__(self, host='127.0.0.1', port=1234, accept_timeout=5.0):
+        self._host = host
+        self._port = port
+        self._accept_timeout = accept_timeout
+        self._socket = None
+        self._conn = None
+        self._conn_lock = threading.Lock()
+        self._status = Connection._WAITING
+        self._status_lock = threading.Lock()
+        self._msg_buffer = ''
 
+    def get_status(self):
+        with self._status_lock:
+            return self._status
+
+    def set_status(self, status):
+        with self._status_lock:
+            self._status = status
+
+    def is_connected(self):
+        return self.get_status() == Connection._CONNECTED
+
+    def start(self):
+        threading.Thread(target=self._work).start()
+
+    def stop(self):
+        self.set_status(Connection._DEAD)
+
+    def send(self, msg):
+        success = False
+        if self._conn is not None:
+            with self._conn_lock:
+                try:
+                    self._conn.send(msg)
+                    self._conn.send(os.linesep)
+                    success = True
+                    _LOG.info(msg)
+                except Exception as e:
+                    _LOG.warn('failed to send message! ({})'.format(e))
+
+        return success
+
+    def _work(self):
+        cont = True
+        while cont:
+            status = self.get_status()
+            if status == Connection._DEAD:
+                cont = False
+            elif status == Connection._WAITING:
+                try:
+                    self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    self._socket.settimeout(self._accept_timeout)
+                    self._socket.bind((self._host, self._port))
+                    self._socket.listen(0)
+                    conn = None
+                    while conn is None and self.get_status() == Connection._WAITING:
+                        _LOG.info('Waiting for Dronology connection.')
+                        try:
+                            conn, addr = self._socket.accept()
+                            self._conn = conn
+                            self._conn.settimeout(0.5)
+                            self.set_status(Connection._CONNECTED)
+                            _LOG.info('Established Dronology connection.')
+                            time.sleep(1.0)
+                        except socket.timeout:
+                            _LOG.debug('No connection attempted')
+                except socket.error as e:
+                    _LOG.debug('Socket error ({})'.format(e))
+                    if e.errno == socket.errno.EADDRINUSE:
+                        time.sleep(3.0)
+            else:
+                try:
+                    # msg = ''
+                    msg = self._conn.recv(2048)
+                    if os.linesep in msg:
+                        toks = msg.split(os.linesep)
+                        msg_end = toks[0]
+                        _LOG.info('Command received: {}'.format(self._msg_buffer + msg_end))
+                        cmds = [SetMonitorFrequency.from_string(self._msg_buffer + msg_end)]
+
+                        for msg in toks[1:-1]:
+                            _LOG.info('Command received: {}'.format(msg))
+                            cmds.append(SetMonitorFrequency.from_string(msg))
+
+                        # TODO: put the commands in the cmd dict
+
+                        msg = toks[-1]
+                        self._msg_buffer = ''
+                    self._msg_buffer += msg
+                except socket.timeout:
+                    pass
+                except socket.error as e:
+                    _LOG.warn('connection interrupted! ({})'.format(e))
+                    self._conn.close()
+                    self._conn = None
+                    time.sleep(1)
+                    self._socket.close()
+                    self.set_status(Connection._WAITING)
 

@@ -22,10 +22,7 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
     def gen_state_message(m_vehicle):
         msg = DronologyStateMessage.from_vehicle(m_vehicle, v_id)
         _LOG.debug(str(msg))
-
-        if connection.is_connected():
-            # send to Dronology
-            connection.send(str(msg))
+        connection.send(str(msg))
 
     # ARM & READY
     core.set_armed(vehicle, armed=True)
@@ -37,26 +34,27 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
     home = vehicle.home_location
     waypoints.append(Waypoint(home.lat, home.lon, bounds[-1][-1], groundpseed=10))
 
+    # SEND HANDSHAKE
+    dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
+
     # START MESSAGE TIMERS
-    dronology_handshake_complete = False
     send_state_message_timer = util.RepeatedTimer(1.0, gen_state_message, vehicle)
     send_monitor_message_timer = None
 
     # TAKEOFF
     core.takeoff(vehicle, alt=30)
     _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
+
     # FLY
     worker = core.goto_sequential(vehicle, waypoints, block=False)
 
     # HANDLE INCOMING MESSAGES
     while worker.isAlive():
         if not dronology_handshake_complete:
-            # TRY HANDSHAKE
-            pass
+            dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
 
         cmds = core.get_commands(v_id)
         if cmds:
-            dronology_handshake_complete = True
             for cmd in cmds:
                 # TODO: decide how to respond to this command
                 pass
@@ -76,6 +74,7 @@ def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUN
         # start a thread to monitor dronology connection
         connection = core.Connection(host=host, port=port)
         connection.start()
+        _LOG.info('Accepting connection on tcp:{}:{}'.format(host, port))
 
         # TODO: make this configurable
         mission_single_uav_sar(connection, vehicle_type, vehicle_id, bounds, ardupath=ardupath)
