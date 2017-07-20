@@ -4,10 +4,11 @@ import org.eclipse.swt.graphics.Image;
 
 import edu.nd.dronology.ui.cc.images.definitions.DefaultUI;
 import edu.nd.dronology.ui.cc.images.definitions.Launcher;
+import edu.nd.dronology.ui.cc.images.definitions.SAC;
 import edu.nd.dronology.ui.cc.images.definitions.Severity;
 import edu.nd.dronology.ui.cc.images.managed.ManagedImage;
 
-public abstract class ImageProvider implements Launcher, DefaultUI,Severity {
+public abstract class ImageProvider implements Launcher, DefaultUI,Severity,SAC {
 
 
 

@@ -17,17 +17,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 
-import com.sun.media.jfxmedia.events.NewFrameEvent;
-
+import edu.nd.dronology.core.mission.IMissionPlan;
 import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
-import edu.nd.dronology.services.core.info.RemoteInfoObject;
-import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.ui.cc.images.ImageProvider;
 import edu.nd.dronology.ui.cc.images.StyleProvider;
+import edu.nd.dronology.ui.cc.main.dialogs.PlanMissionDialog;
 import edu.nd.dronology.ui.cc.main.remote.ServiceProvider;
 import edu.nd.dronology.ui.cc.main.util.MenuCreationHelper;
 import edu.nd.dronology.ui.cc.main.util.UIRefreshThread;
@@ -96,6 +93,44 @@ public class DroneStatusViewer extends Composite {
 				() -> hover(remoteItem));
 		MenuCreationHelper.createMenuEntry(manager, "Return to Home", ImageProvider.IMG_DRONE_ACTIVATE_24,
 				() -> returnHome(remoteItem));
+
+		MenuCreationHelper.createMenuEntry(manager, "Hover in Place ", ImageProvider.IMG_DRONE_ACTIVATE_24,
+				() -> hoverInPlace(remoteItem));
+		MenuCreationHelper.createMenuEntry(manager, "Create Mission", ImageProvider.IMG_DRONE_ACTIVATE_24,
+				() -> createMission());
+
+	}
+
+	private void hoverInPlace(DroneStatus remoteItem) {
+		// TODO Auto-generated method stub
+		try {
+			IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider.getBaseServiceProvider()
+					.getRemoteManager().getService(IFlightManagerRemoteService.class);
+
+			service.pauseFlight(remoteItem.getID());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void createMission() {
+		PlanMissionDialog dlg = new PlanMissionDialog(Display.getCurrent().getActiveShell());
+		int result = dlg.open();
+		if (result == Window.OK) {
+			IMissionPlan plan = dlg.getMissionPlan();
+
+			try {
+				IFlightManagerRemoteService service = (IFlightManagerRemoteService) ServiceProvider
+						.getBaseServiceProvider().getRemoteManager().getService(IFlightManagerRemoteService.class);
+
+				service.planMission(plan);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
 
 	}
 

@@ -72,6 +72,18 @@ public class TestNVector {
 		 */
 		assertEquals(91.44, n1.distance(n2), 0.1524);
 	}
+	
+	@Test
+	public void testDistance2() {
+		/*
+		 * Suppose position B is 20 meters above position A. Then the distance
+		 * from A to B should be 20 meters
+		 */
+		NVector a = new LlaCoordinate(37.698276, -123.004222, 81.2).toNVector();
+		NVector b = new LlaCoordinate(37.698276, -123.004222, 101.2).toNVector();
+		
+		assertEquals(20.0, a.distance(b), 0.00001);
+	}
 
 	@Test
 	public void testGetters() {

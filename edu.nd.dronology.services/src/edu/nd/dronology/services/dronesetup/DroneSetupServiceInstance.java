@@ -23,10 +23,11 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneSetupServiceInstance.class);
 
-	
 	private AbstractDroneFleetFactory physicalDroneFleetFactory;
 	private AbstractDroneFleetFactory virtualDroneFleetFactory;
+
 	private List<IDroneStatusChangeListener> listenerList = new ArrayList<>();
+	private static final boolean IS_PYHSICAL = true;
 
 	public DroneSetupServiceInstance() {
 		super("DRONESETUP");
@@ -53,6 +54,7 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	protected void doStartService() throws Exception {
 		physicalDroneFleetFactory = PhysicalDroneFleetFactory.getInstance();
 		virtualDroneFleetFactory = VirtualDroneFleetFactory.getInstance();
+
 	}
 
 	@Override
@@ -60,8 +62,6 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 		// TODO Auto-generated method stub
 
 	}
-
-
 
 	@Override
 	public Map<String, DroneStatus> getDrones() {
@@ -82,14 +82,12 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	}
 
 	private void doInitDrone(DroneInitializationInfo di) throws DroneException {
-		if(di.getMode() == DroneMode.MODE_PHYSICAL){
+		if (di.getMode() == DroneMode.MODE_PHYSICAL) {
 			physicalDroneFleetFactory.initializeDrone(di.getId(), di.getType(), di.getInitialLocation());
-		}
-		else{
+		} else {
 			virtualDroneFleetFactory.initializeDrone(di.getId(), di.getType(), di.getInitialLocation());
 		}
-		
-		
+
 		DroneStatus drStat = DroneCollectionStatus.getInstance().getDrone(di.getId());
 		notifyDroneStatusChange(drStat);
 	}

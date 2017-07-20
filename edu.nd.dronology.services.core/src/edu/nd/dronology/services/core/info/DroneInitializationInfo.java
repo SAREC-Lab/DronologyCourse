@@ -18,6 +18,9 @@ public class DroneInitializationInfo extends RemoteInfoObject {
 	private String type;
 	private LlaCoordinate initialLocation;
 	private DroneMode mode;
+	private String safetyInformation;
+
+
 
 	public DroneInitializationInfo(String id, DroneMode mode, String type, LlaCoordinate initialLocation) {
 		super(id, id);
@@ -38,6 +41,14 @@ public class DroneInitializationInfo extends RemoteInfoObject {
 
 	public LlaCoordinate getInitialLocation() {
 		return initialLocation;
+	}
+	
+	public String getSafetyInformation() {
+		return safetyInformation;
+	}
+
+	public void setSafetyInformation(String safetyInformation) {
+		this.safetyInformation = safetyInformation;
 	}
 
 }

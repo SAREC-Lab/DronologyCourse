@@ -3,6 +3,8 @@ package edu.nd.dronology.core.flight.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.IFlightDirector;
 import edu.nd.dronology.core.util.LlaCoordinate;
@@ -30,15 +32,10 @@ public class SoloDirector implements IFlightDirector {
 
 	@Override
 	public LlaCoordinate flyToNextPoint() {
-		// targetCoordinates = flightDirector.flyToNextPoint();// Case: Drone is
-		// under safety directives and on a roundabout.
-
 		if (onRoundabout()) {
 			targetPosition = flyRoundAbout();
 		} else {
 			targetPosition = flyToNextWayPoint();
-			// System.out.println(drone.getCoordinates().toString() + " to " +
-			// targetPosition.toString());
 		}
 		return targetPosition;
 	}
@@ -52,56 +49,36 @@ public class SoloDirector implements IFlightDirector {
 		this.drone = managedDrone;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * controller.movement.iFlightDirector#setWayPoints(java.util.ArrayList)
-	 */
 	@Override
 	public void setWayPoints(List<Waypoint> wayPoints) {
 		this.wayPoints = new ArrayList<>(wayPoints);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see controller.movement.iFlightDirector#clearWayPoints()
-	 */
 	@Override
 	public void clearWayPoints() {
 		wayPoints.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see controller.movement.iFlightDirector#hasMoreWayPoints()
-	 */
 	@Override
 	public boolean hasMoreWayPoints() {
 		return !wayPoints.isEmpty();
 	}
 
+	@Discuss(discuss = "this is called way to often.. needs fixing")
 	private LlaCoordinate flyToNextWayPoint() {
 		// LOGGER.info("Flying to next waypoint");
 		if (!wayPoints.isEmpty()) {
-			LlaCoordinate nextWayPoint = wayPoints.get(0).getCoordinate(); // Always
-																			// get
-																			// the
-																			// top
-																			// one
-			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points
-			return nextWayPoint;
+			Waypoint nextWaypoint = wayPoints.get(0);
+			drone.flyTo(nextWaypoint.getCoordinate(), nextWaypoint.getApproachingspeed());
+			return nextWaypoint.getCoordinate();
 		}
 		return null;
 	}
 
 	private LlaCoordinate flyRoundAbout() {
 		if (!wayPoints.isEmpty()) {
-			LlaCoordinate nextWayPoint = roundaboutPath.get(0); // Always get
-																// the top one
-			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points
+			LlaCoordinate nextWayPoint = roundaboutPath.get(0);
+			drone.flyTo(nextWayPoint, null);
 			return nextWayPoint;
 		}
 		return null;
@@ -157,14 +134,14 @@ public class SoloDirector implements IFlightDirector {
 			// Start the roundabout
 			LlaCoordinate nextWayPoint = roundaboutPath.get(0); // Always get
 																// the top one
-			drone.flyTo(nextWayPoint); // @TD: Altitude not included in points
+			drone.flyTo(nextWayPoint, null); // @TD: Altitude not included in points
 
 		}
 	}
 
 	@Override
 	public void flyHome() {
-		drone.flyTo(drone.getBaseCoordinates());
+		drone.flyTo(drone.getBaseCoordinates(), DronologyConstants.RETURN_TO_HOME_SPEED);
 
 	}
 
