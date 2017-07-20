@@ -338,10 +338,13 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		}
 	}
 
+<
+	public void cancelPendingFlights(String uavid) throws DroneException {
+		PlanPoolManager.getInstance().cancelPendingPlans(uavid);
+
 	public void pauseFlight(String uavid) throws DroneException {
 		LOGGER.info(uavid + " Pause current flight");
 		ManagedDrone drone = droneFleet.getRegisteredDrone(uavid);
 		drone.haltInPlace(30000);
-
 	}
 }

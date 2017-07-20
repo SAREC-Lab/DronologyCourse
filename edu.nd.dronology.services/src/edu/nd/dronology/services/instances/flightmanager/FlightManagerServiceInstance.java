@@ -94,6 +94,10 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 	}
 
 	@Override
+	public void cancelPendingFlights(String uavid) throws Exception {
+		flightManager.cancelPendingFlights(uavid);
+
+    	@Override
 	public void planMission(IMissionPlan missionPlan) throws Exception {
 		missionManager.planMission(missionPlan);
 

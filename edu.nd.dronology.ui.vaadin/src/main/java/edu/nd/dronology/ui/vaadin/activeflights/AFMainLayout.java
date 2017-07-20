@@ -15,7 +15,7 @@ public class AFMainLayout extends CustomComponent {
 	private AFControlsComponent controls = new AFControlsComponent();
 	private AFMapComponent map = new AFMapComponent(
 			"VAADIN/sbtiles/{z}/{x}/{y}.png",
-			"South Bend");
+			"South Bend", controls.getPanel());
 	public AFMainLayout() {
 		addStyleName("main_layout");
 		

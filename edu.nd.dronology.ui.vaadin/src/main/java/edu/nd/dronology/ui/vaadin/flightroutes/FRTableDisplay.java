@@ -1,6 +1,4 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.ui.Button;
@@ -8,12 +6,10 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.components.grid.SingleSelectionModel;
 import com.vaadin.ui.renderers.ButtonRenderer;
 
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
@@ -28,15 +24,15 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
-	ArrayList<WayPoint> mapPoints = new ArrayList<>();
-	MapMarkerUtilities route;
+	private MapMarkerUtilities route;
 	
-	TextField latitude = new TextField();
-	TextField longitude = new TextField();
-	TextField altitude = new TextField();
-	TextField transitSpeed = new TextField();
+	private TextField latitude = new TextField();
+	private TextField longitude = new TextField();
+	private TextField altitude = new TextField();
+	private TextField transitSpeed = new TextField();
 	
 	public FRTableDisplay() {
+		grid.addStyleName("fr_table_component");
 		grid.getColumns().stream().forEach(c -> c.setSortable(false));
 		grid.getColumns().stream().forEach(c -> {
 			if (c.getCaption().equals("Id") || c.getCaption().equals("Reached")) {
@@ -47,62 +43,61 @@ public class FRTableDisplay {
 			}
 		});
 		
-		
-		
 		grid.setColumnOrder("order", "latitude", "longitude", "altitude", "transitSpeed");
 		grid.addColumn(event -> "Delete",
 			new ButtonRenderer<WayPoint> (clickEvent -> {
-				Window deletePanel = new Window(" ");
-				VerticalLayout deletePanelContent = new VerticalLayout();
-				HorizontalLayout buttons = new HorizontalLayout();
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				deletePanel.setContent(deletePanelContent);
+				if (route.isEditable()) {
+					Window deletePanel = new Window(" ");
+					VerticalLayout deletePanelContent = new VerticalLayout();
+					HorizontalLayout buttons = new HorizontalLayout();
+					Button yes = new Button("Yes");
+					Button no = new Button("No");
+					deletePanel.setContent(deletePanelContent);
 					
-				deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
-				deletePanel.setWidth("425px");
+					deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
+					deletePanel.setWidth("425px");
 					
-				buttons.addComponent(yes);
-				buttons.addComponent(no);
+					buttons.addComponent(yes);
+					buttons.addComponent(no);
 					
-				deletePanel.setModal(true);
-				deletePanel.setClosable(false);
-				deletePanel.setResizable(false);
+					deletePanel.setModal(true);
+					deletePanel.setClosable(false);
+					deletePanel.setResizable(false);
 					
-				yes.addClickListener(event -> {
-					WayPoint w = clickEvent.getItem();
-			    	for (int i = 0; i < route.getMapPoints().size(); i++) {
-			    		if (route.getMapPoints().get(i).getId().equals(w.getId())) {
-			    			route.getMapPoints().remove(route.getMapPoints().get(i));
-			    			route.getMap().removeComponent(route.getPins().get(i));
-			    			route.getPins().remove(route.getPins().get(i));
-			    		}
-			    	}
+					yes.addClickListener(event -> {
+						WayPoint w = clickEvent.getItem();
+						for (int i = 0; i < route.getMapPoints().size(); i++) {
+							if (route.getMapPoints().get(i).getId().equals(w.getId())) {
+								route.getMapPoints().remove(route.getMapPoints().get(i));
+								route.getMap().removeComponent(route.getPins().get(i));
+								route.getPins().remove(route.getPins().get(i));
+							}
+						}
 
-				   	route.removeAllLines(route.getPolylines());
-				   	route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
-				   	for(int i = 0; i < route.getPolylines().size(); i++){
-						route.getMap().addComponent(route.getPolylines().get(i));
-					}
+						route.removeAllLines(route.getPolylines());
+						route.drawLines(route.getMapPoints(), true, 1);
 
-					for (int i = 0; i < this.route.getMapPoints().size(); i++) {
-						this.route.getMapPoints().get(i).setOrder(i + 1);
-					}
+						for (int i = 0; i < this.route.getMapPoints().size(); i++) {
+							this.route.getMapPoints().get(i).setOrder(i + 1);
+						}
 					
-				   	grid.setItems(this.route.getMapPoints());
-				   	grid.setItems(route.getMapPoints());
-				   	UI.getCurrent().removeWindow(deletePanel);				   	
-				});
+						grid.setItems(this.route.getMapPoints());
+						grid.setItems(route.getMapPoints());
+						UI.getCurrent().removeWindow(deletePanel);				   	
+					});
+						
+					no.addClickListener(event -> {
+						UI.getCurrent().removeWindow(deletePanel);
+					});
+						
+					deletePanelContent.addComponent(buttons);
 					
-				no.addClickListener(event -> {
-					UI.getCurrent().removeWindow(deletePanel);
-				});
-					
-				deletePanelContent.addComponent(buttons);
-				
-				UI.getCurrent().addWindow(deletePanel);
+					UI.getCurrent().addWindow(deletePanel);
+				}
 			})
 		);
+		grid.setColumnResizeMode(null);
+		grid.setSelectionMode(SelectionMode.NONE);
 	}
 	
 	public Grid<WayPoint> getGrid() {
@@ -119,19 +114,9 @@ public class FRTableDisplay {
 			mapMarkers.updatePinForWayPoint(event.getBean());
 			grid.getEditor().cancel();
 		});
-		
-		//grid.asSingleSelect();
-
-		grid.setSelectionMode(SelectionMode.SINGLE);
-		
-		SingleSelectionModel<WayPoint> singleSelect =
-			      (SingleSelectionModel<WayPoint>) grid.getSelectionModel();
-			// disallow empty selection
-			singleSelect.setDeselectAllowed(true);
 	}
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {
-		grid.getEditor().cancel();
 		grid.getEditor().setEnabled(false);
 	}
 	
@@ -140,5 +125,8 @@ public class FRTableDisplay {
 	}
 	public void setGrid(List<WayPoint> points){
 		grid.setItems(points);
+		for (int i = 0; i < points.size(); i++) {
+			points.get(i).setOrder(i + 1);
+		}
 	}
 }

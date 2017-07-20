@@ -30,16 +30,14 @@ public class FRMetaInfo extends CustomComponent {
 	int numWaypoints;
 	CheckBox tableView;
 	Button editButton;
+	Button deleteButton;
 	
-	public FRMetaInfo(String name, int numCoords){
+	public FRMetaInfo(String name, int numCoords, FRMapComponent map){
 		//used if route is selected
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
 		Label nameLabel;
-		
-		content.setWidth("1075px");
-		content.setHeight("68px");
 		
 		routeName = name;
 		numWaypoints = numCoords;
@@ -52,11 +50,7 @@ public class FRMetaInfo extends CustomComponent {
 		}
 		
 		editButton = new Button("Edit");
-		Button deleteButton = new Button("Delete");
-		editButton.setWidth("55");
-		editButton.setHeight("28px");
-		deleteButton.setWidth("58");
-		deleteButton.setHeight("28px");
+		deleteButton = new Button("Delete");
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/editButtonFull.PNG"));
@@ -69,23 +63,31 @@ public class FRMetaInfo extends CustomComponent {
 		deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 			
 		tableView = new CheckBox("Table View");
-		tableView.setHeight("23px");
-		content.setStyleName("route_meta_info");
+		content.setStyleName("fr_route_meta_info");
+		content.addStyleName("has_route");
 		
 		tableView.setValue(true);
 		
 		buttons.addComponents(editButton, deleteButton);
 		controls.addComponents(buttons, tableView);
 		content.addComponents(nameLabel, controls);
-		content.setComponentAlignment(controls, Alignment.MIDDLE_RIGHT);
-		content.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
+
+		controls.addStyleName("route_meta_controls");
+		nameLabel.addStyleName("route_meta_name");
+		
+		editButton.addClickListener(e->{
+			map.editButton();
+		});
+		deleteButton.addClickListener(e->{
+			map.deleteClick();
+		});
 		
 		setCompositionRoot(content);
 		
 	}
-	public FRMetaInfo(FlightRouteInfo info){		
-		this(info.getName(), info.getWaypoints().size());	
-	}
+	public FRMetaInfo(FlightRouteInfo info, FRMapComponent map){		
+		this(info.getName(), info.getWaypoints().size(), map);	
+	}	
 	
 	public FRMetaInfo(){
 		//used if no route selected
@@ -93,9 +95,8 @@ public class FRMetaInfo extends CustomComponent {
 		routeName = "No Route Selected";
 		Label nameLabel = new Label(routeName);
 		
-		information.setStyleName("route_meta_info");
-		information.setWidth("1075px");
-		information.setHeight("68px");
+		information.setStyleName("fr_route_meta_info");
+		information.addStyleName("no_route");
 		
 		information.addComponent(nameLabel);
 		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
@@ -116,6 +117,9 @@ public class FRMetaInfo extends CustomComponent {
 	}
 	public Button getEditButton(){
 		return editButton;
+	}
+	public Button getDeleteButton(){
+		return deleteButton;
 	}
 	
 }
