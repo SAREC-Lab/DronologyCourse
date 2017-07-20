@@ -62,22 +62,23 @@ public abstract class AbstractPosition {
 	public double travelDistance(AbstractPosition other) {
 		return NVector.travelDistance(this.toNVector(), other.toNVector());
 	}
-	
+
 	/**
-	 * Calculate the rotation matrix representation of this position. This rotation
-	 * matrix can take displacement vectors in ECEF coordinates and rotate them into NED
-	 * coordinates at this position.
+	 * Calculate the rotation matrix representation of this position. This
+	 * rotation matrix can take displacement vectors in ECEF coordinates and
+	 * rotate them into NED coordinates at this position.
 	 * 
-	 * This position cannot be at the poles as north and east directions don't make
-	 * sense there.
+	 * This position cannot be at the poles as north and east directions don't
+	 * make sense there.
 	 * 
 	 * This is the matrix inverse of equation 11 in <a href=
 	 * "http://www.navlab.net/Publications/A_Nonsingular_Horizontal_Position_Representation.pdf">this
 	 * paper.</a>
 	 * 
 	 * 
-	 * @return a 3x3 rotation matrix where the rows can be interpreted as vectors
-	 *         pointing in the north, east and down directions respectively.
+	 * @return a 3x3 rotation matrix where the rows can be interpreted as
+	 *         vectors pointing in the north, east and down directions
+	 *         respectively.
 	 */
 	public RealMatrix toRotMatrix() {
 		NVector n = this.toNVector();
@@ -89,7 +90,18 @@ public abstract class AbstractPosition {
 		double[][] data = { north.toArray(), east.toArray(), down.toArray() };
 		return new Array2DRowRealMatrix(data);
 	}
-	
+
+	/**
+	 * Calculates the number of meters North, East and down (NED coordinates)
+	 * from this position to another global position.
+	 * 
+	 * @param other
+	 *            the terrestrial position to find the NED coordinates of
+	 * @return the NED coordinates as a vector with 3 elements where the first
+	 *         (0th) element is the number of meters north, the second element
+	 *         is the number of meters east and the last element is the number
+	 *         of meters down.
+	 */
 	public Vector3D findNED(AbstractPosition other) {
 		Vector3D self = makeVector3D(this);
 		Vector3D otherVec = makeVector3D(other);
@@ -97,7 +109,17 @@ public abstract class AbstractPosition {
 		RealMatrix tmp = new Array2DRowRealMatrix(displacement.toArray());
 		return new Vector3D(this.toRotMatrix().multiply(tmp).getColumn(0));
 	}
-	
+
+	/**
+	 * Calculates the latitude, longitude and altitude of a relative position
+	 * given the number of meters North, East, and down from this position.
+	 * 
+	 * @param ned
+	 *            a vector with three elements where the first is the number of
+	 *            meters north, the second is the number of meters east, and the
+	 *            last is the number of meters down.
+	 * @return the latitude longitude and altitude of the other position
+	 */
 	public LlaCoordinate findLla(Vector3D ned) {
 		Vector3D self = makeVector3D(this);
 		RealMatrix tmp = new Array2DRowRealMatrix(ned.toArray());
@@ -105,7 +127,7 @@ public abstract class AbstractPosition {
 		Vector3D p = self.add(d);
 		return new PVector(p.getX(), p.getY(), p.getZ()).toLlaCoordinate();
 	}
-	
+
 	private static Vector3D makeVector3D(AbstractPosition pos) {
 		PVector p = pos.toPVector();
 		return new Vector3D(p.getX(), p.getY(), p.getZ());
