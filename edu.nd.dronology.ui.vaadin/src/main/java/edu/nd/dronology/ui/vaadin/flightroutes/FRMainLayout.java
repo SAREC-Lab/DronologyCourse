@@ -91,6 +91,7 @@ public class FRMainLayout extends CustomComponent {
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					switchWindows(e, map, null);
+					map.exitEditMode();
 				});
 				
 				no.addClickListener(event -> {
