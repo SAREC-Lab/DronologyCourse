@@ -60,8 +60,9 @@ public class FRMapComponent extends CustomComponent {
 	private ArrayList<String> names = new ArrayList();
 	private PopupView popup;
 	private FlightRouteInfo selectedRoute;
+	private FRMainLayout mainLayout;
 
-	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName) {
+	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName, FRMainLayout layout) {
 		this.setWidth("100%");
 		addStyleName("map_component");
 		addStyleName("fr_map_component");
@@ -94,6 +95,7 @@ public class FRMapComponent extends CustomComponent {
 
 		setCompositionRoot(content);
 		content.addComponents(tableDisplay.getGrid());
+		mainLayout = layout;
 		
 		this.setRouteCenter();
 	}
@@ -523,5 +525,8 @@ public class FRMapComponent extends CustomComponent {
 		
 		route.disableRouteEditing();
 		leafletMap.setEnabled(false);
+	}
+	public FRMainLayout getMainLayout(){
+		return mainLayout;
 	}
 }

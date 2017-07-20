@@ -51,8 +51,10 @@ public class FRDeleteRoute extends CustomComponent{
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
 			}
-
+			
 			mapComp.displayNoRoute();
+			
+			mapComp.getMainLayout().deleteRouteUpdate();
 		});
 		
 	}
@@ -77,6 +79,7 @@ public class FRDeleteRoute extends CustomComponent{
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
 			}
+			
 		});	
 	}
 	public Button getYesButton(){

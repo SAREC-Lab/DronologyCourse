@@ -63,7 +63,7 @@ public class FRInfoPanel extends CustomComponent {
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
 	
-	public FRInfoPanel() {
+	public FRInfoPanel(FRControlsComponent controls) {
 
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
@@ -131,12 +131,11 @@ public class FRInfoPanel extends CustomComponent {
 		drawButton = display.getDrawButton();
 		inputField = display.getInputField();
 		
-		drawButton.addClickListener(e -> {
+		drawButton.addClickListener(e -> {		
 			
 			routeInputName = inputField.getValue();
 			if(!routeInputName.isEmpty()){
 			
-				
 				//sends route to dronology
 				drone = addRouteDronology(routeInputName);
 				
@@ -158,6 +157,9 @@ public class FRInfoPanel extends CustomComponent {
 				
 				inputField.clear();
 				UI.getCurrent().removeWindow(window);
+		
+				controls.getLayout().drawRoute();
+				
 			}
 		});
 		
