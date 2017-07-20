@@ -53,14 +53,18 @@ let   "sitlPORT = 5501 + 10 * $instance"
 let  "outPORTa = 14550 + 10 * $instance"
 let  "outPORTb = 14551 + 10 * $instance"
 
+export arducopterScreenName=ArduCopter_$instance
+export mavproxyScreenName=mavproxy_$instance
+
 export PATH=$PATH:$ardupath/../jsbsim/src
 export PATH=$PATH:$ardupath/Tools/autotest
 export PATH=/usr/lib/ccache:$PATH
 
 # $ardupath/Tools/autotest/run_in_terminal_window.sh ArduCopter $ardupath/build/sitl/bin/arducopter -S -I$instance --home $home --model + --speedup $speed --rate $rate --defaults $ardupath/Tools/autotest/default_params/copter.parm
-screen -dmS ArduCopter $ardupath/build/sitl/bin/arducopter -S -I$instance --home $home --model + --speedup $speed --rate $rate --defaults $ardupath/Tools/autotest/default_params/copter.parm
+screen -dmS $arducopterScreenName $ardupath/build/sitl/bin/arducopter -S -I$instance --home $home --model + --speedup $speed --rate $rate --defaults $ardupath/Tools/autotest/default_params/copter.parm
 # $ardupath/Tools/autotest/run_in_terminal_window.sh mavproxy mavproxy.py --master tcp:127.0.0.1:$masterPORT --sitl 127.0.0.1:$sitlPORT --out 127.0.0.1:$outPORTa --out 127.0.0.1:$outPORTb --map --console
-screen -dmS mavproxy mavproxy.py --master tcp:127.0.0.1:$masterPORT --sitl 127.0.0.1:$sitlPORT --out 127.0.0.1:$outPORTa --out 127.0.0.1:$outPORTb --map --console
+# screen -dmS $mavproxyScreenName mavproxy.py --master tcp:127.0.0.1:$masterPORT --sitl 127.0.0.1:$sitlPORT --out 127.0.0.1:$outPORTa --out 127.0.0.1:$outPORTb --map --console
+screen -dmS $mavproxyScreenName mavproxy.py --load-module DGPS --master tcp:127.0.0.1:$masterPORT --sitl 127.0.0.1:$sitlPORT --out 127.0.0.1:$outPORTa --out 127.0.0.1:$outPORTb --map --console
 
 cd ..
 

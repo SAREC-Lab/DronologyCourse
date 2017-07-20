@@ -1,9 +1,11 @@
 package edu.nd.dronology.core.flight.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.IFlightPlan;
 import edu.nd.dronology.core.util.FormatUtil;
@@ -36,7 +38,6 @@ public class FlightPlan implements IFlightPlan {
 	private long startTime = -1;
 	private long endTime = -1;
 	private String uavid;
-	private double takeoffAltitude = 5;
 
 
 	private enum Status {
@@ -54,12 +55,18 @@ public class FlightPlan implements IFlightPlan {
 
 	}
 
-	public FlightPlan(String uavid, String planName, List<Waypoint> wayPoints) {
-		this.wayPoints = wayPoints;
+	public FlightPlan(String uavid, String planName, List<Waypoint> wayPointsToAdd) {
+		this.wayPoints = new ArrayList<>();
+		for (Waypoint oldWP : wayPointsToAdd) {
+			Waypoint newWP = new Waypoint(oldWP.getCoordinate());
+			newWP.setApproachingspeed(oldWP.getApproachingspeed());
+			this.wayPoints.add(newWP);
+		}
+
 		this.uavid = uavid;
 		this.startLocation = wayPoints.get(0).getCoordinate();
-		if (wayPoints.size() > 0) {
-			this.endLocation = wayPoints.get(wayPoints.size() - 1).getCoordinate();
+		if (this.wayPoints.size() > 0) {
+			this.endLocation = this.wayPoints.get(this.wayPoints.size() - 1).getCoordinate();
 		} else {
 			endLocation = startLocation;
 		}
@@ -96,7 +103,8 @@ public class FlightPlan implements IFlightPlan {
 	}
 
 	/**
-	 * Returns the drone assigned to the flight plan. Will return null if no drone is yet assigned.
+	 * Returns the drone assigned to the flight plan. Will return null if no drone
+	 * is yet assigned.
 	 * 
 	 * @return iDrone
 	 */
@@ -212,12 +220,11 @@ public class FlightPlan implements IFlightPlan {
 	public boolean isCompleted() {
 		return status == Status.COMPLETED || waypointsReached();
 	}
-	
+
 	@Override
 	public double getTakeoffAltitude() {
-		return takeoffAltitude;
+		return DronologyConstants.TAKE_OFF_ALTITUDE;
 	}
-
 
 	private boolean waypointsReached() {
 		for (Waypoint wp : wayPoints) {

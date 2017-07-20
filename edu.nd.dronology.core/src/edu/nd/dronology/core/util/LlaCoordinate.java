@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Michael Murphy
  *
  */
-public class LlaCoordinate implements Serializable {
+public class LlaCoordinate  extends AbstractPosition  implements Serializable {
 
 	private static final long serialVersionUID = 1261660925357051253L;
 	@SerializedName("x")
@@ -108,6 +108,7 @@ public class LlaCoordinate implements Serializable {
 	/**
 	 * @return a terrestrial position defined by an N-vector plus altitude
 	 */
+	@Override
 	public NVector toNVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article called: "A Non-singular Horizontal Position Representation" by Kenneth Gade. You can find it at https://goo.gl/iCqdCn (see
@@ -127,6 +128,7 @@ public class LlaCoordinate implements Serializable {
 	/**
 	 * @return a terrestrial position defined by an x, y, and z coordinate in an Earth centered Earth fixed reference frame.
 	 */
+	@Override
 	public PVector toPVector() {
 		return this.toNVector().toPVector();
 	}
@@ -151,6 +153,11 @@ public class LlaCoordinate implements Serializable {
 			throw new IllegalArgumentException("Invalid longitude");
 		}
 		return longitude;
+	}
+
+	@Override
+	public LlaCoordinate toLlaCoordinate() {
+		return this;
 	}
 
 }

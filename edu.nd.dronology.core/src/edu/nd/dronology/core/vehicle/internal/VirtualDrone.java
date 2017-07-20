@@ -25,17 +25,15 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	IFlightSimulator simulator;
 
 	/**
-	 * Constructs drone without specifying its current position. This will be
-	 * used by the physical drone (later) where positioning status will be
-	 * acquired from the drone.
+	 * Constructs drone without specifying its current position. This will be used
+	 * by the physical drone (later) where positioning status will be acquired from
+	 * the drone.
 	 * 
 	 * @param drnName
 	 */
 	public VirtualDrone(String drnName) {
 		super(drnName);
 		simulator = SimulatorFactory.getSimulator(this);
-		// voltageSimulator = new DroneVoltageSimulator();
-		// flightSimulator = new FlightSimulator(this);
 	}
 
 	@Override
@@ -60,7 +58,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public void flyTo(LlaCoordinate targetCoordinates) {
+	public void flyTo(LlaCoordinate targetCoordinates, Double speed) {
 		NullUtil.checkNull(targetCoordinates);
 		// LOGGER.info("Flying to: "+ targetCoordinates.toString());
 		simulator.setFlightPath(currentPosition, targetCoordinates);

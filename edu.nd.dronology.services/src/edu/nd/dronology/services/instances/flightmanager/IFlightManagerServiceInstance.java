@@ -3,6 +3,7 @@ package edu.nd.dronology.services.instances.flightmanager;
 import java.util.Collection;
 import java.util.List;
 
+import edu.nd.dronology.core.mission.IMissionPlan;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IServiceInstance;
 import edu.nd.dronology.services.core.info.FlightInfo;
@@ -25,5 +26,7 @@ public interface IFlightManagerServiceInstance extends IServiceInstance {
 	Collection<FlightPlanInfo> getCurrentFlights();
 
 	public void cancelPendingFlights(String uavid) throws Exception;
+	public void planMission(IMissionPlan missionPlan) throws Exception;
+
 
 }

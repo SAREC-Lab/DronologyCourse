@@ -5,6 +5,8 @@
 		<ant antfile="build_dronology.util.xml" target="dronology-util" />
 		<ant antfile="build_dronology.core.xml" target="dronology-core" />
 		<ant antfile="build_dronology.services.core.xml" target="dronology-core" />
+		<ant antfile="build_dronology.services.xml" target="build" />
+		<ant antfile="build_dronology_monitoring.xml" target="build" />
 		<ant antfile="build_vaadin-ui.xml" target="build" />
 	  
 		<ant antfile="build-All.xml" target="copy-to-eclipselib" />

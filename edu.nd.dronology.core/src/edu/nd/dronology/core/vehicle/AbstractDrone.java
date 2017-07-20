@@ -102,4 +102,9 @@ public abstract class AbstractDrone implements IDrone {
 
 	}
 
+	public void updateBatteryLevel(double batteryLevel) {
+		droneStatus.updateBatteryLevel(batteryLevel);
+		
+	}
+
 }

@@ -1,7 +1,14 @@
 #! /usr/bin/env python
 
+from Logger import Logger
+
 class SimDrone(object):
-	def __init__(self,ConnectionData):
+	def __init__(self,ConnectionData,parent_logger=None):
+		self.logger = Logger("SimDrone",parent=parent_logger)
+		return
+	
+	def shutdown_handler(self,signal,frame):
+		# self.Drone.shutdown_handler(signal,frame)
 		return
 	
 	def gotoLocation(self,location):

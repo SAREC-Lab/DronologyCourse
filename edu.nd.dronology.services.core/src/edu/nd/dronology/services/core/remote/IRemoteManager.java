@@ -75,4 +75,7 @@ public interface IRemoteManager extends IRemotable {
 	public void initialize() throws RemoteException, DronologyServiceException;
 	public void tearDown()throws RemoteException, DronologyServiceException;
 
+
+	void contributeService(Class service, IRemoteableService serviceInstance) throws RemoteException, DronologyServiceException;
+
 }

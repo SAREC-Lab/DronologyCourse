@@ -60,96 +60,6 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		return droneFleet; // replace with iterator later.
 	}
 
-	// /**
-	// * Launches a single drone to its currently defined waypoints.
-	// *
-	// * @param strDroneID
-	// * @param startingLocation
-	// * @param wayPoints
-	// * @throws FlightZoneException
-	// */
-	// private void launchSingleDroneToWayPoints() throws FlightZoneException {
-	// // Check to make sure that there is a pending flight plan and available
-	// // drone.
-	// if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()) {
-	// ManagedDrone drone = droneFleet.getAvailableDrone();
-	// if (drone != null) {
-	// safetyMgr.attachDrone(drone);
-	// IFlightPlan flightPlan = flights.activateNextFlightPlan();
-	// LOGGER.info(flightPlan.getFlightID());
-	// IFlightDirector flightDirectives = new SoloDirector(drone);
-	//
-	// flightDirectives.setWayPoints(flightPlan.getWayPoints());
-	// drone.assignFlight(flightDirectives);
-	//
-	// drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
-	//
-	// // flightDirectives.flyToNextPoint();
-	// // flightPlan.setStatusToFlying(drone);
-	// }
-	// }
-	// }
-
-	// @Discuss(discuss = "Check if thread safe... re-organize flight
-	// management...")
-	// private ManagedDrone launchSingleDrone() throws FlightZoneException {
-	// // Check to make sure that there is a pending flight plan and available
-	// // drone.
-	// if (flights.hasPendingFlight() && droneFleet.hasAvailableDrone()) {
-	// IFlightPlan flightPlan = flights.getNextFlightPlan();
-	// ManagedDrone drone;
-	// if (flightPlan.getDesignatedDroneId() != null) {
-	// drone = droneFleet.getAvailableDrone(flightPlan.getDesignatedDroneId());
-	// } else {
-	// drone = droneFleet.getAvailableDrone();
-	// }
-	//
-	// if (drone != null) {
-	// safetyMgr.attachDrone(drone);
-	// flightPlan = flights.activateNextFlightPlan();
-	// LOGGER.info(flightPlan.getFlightID() + " assigned to " +
-	// drone.getDroneName());
-	// IFlightDirector flightDirectives = new SoloDirector(drone);
-	// flightDirectives.setWayPoints(flightPlan.getWayPoints());
-	// drone.assignFlight(flightDirectives);
-	// // this needs to be moved to launch....
-	// flightPlan.setStatusToFlying(drone);
-	// drone.getFlightModeState().setModeToAwaitingTakeOffClearance();
-	// return drone;
-	// }
-	// }
-	// return null;
-	//
-	// }
-
-	// private void launchToWaypoint(ManagedDrone drone) throws
-	// FlightZoneException {
-	// drone.getFlightDirective().flyToNextPoint();
-	// // flightPlan.setStatusToFlying(drone);
-	//
-	// }
-
-	// @Discuss(discuss = "not working.. remove or fix")
-	// public void checkForLandedFlights() throws FlightZoneException {
-	// ArrayList<IFlightPlan> justLanded = new ArrayList<>();
-	// for (IFlightPlan flightPlan : planPoolManager.getCurrentFlights()) {
-	// if (flightPlan.getAssignedDrone() != null) {
-	// ManagedDrone drone = flightPlan.getAssignedDrone();
-	// if (drone.getFlightModeState().isOnGround()) {
-	// safetyMgr.detachDrone(drone);
-	// justLanded.add(flightPlan);
-	// LOGGER.info(drone.getDroneName() + " ==> has landed.");
-	// }
-	// }
-	// }
-	// for (IFlightPlan flightPlan : justLanded) {
-	// flightPlan.setStatusToCompleted();
-	// ManagedDrone drone = flightPlan.getAssignedDrone();
-	// activeUAVS.decrementAndGet();
-	// droneFleet.returnDroneToAvailablePool(drone);
-	// }
-	// }
-
 	private ManagedDrone tryAssignUAV() throws DroneException, FlightZoneException {
 		IFlightPlan nextPlan = planPoolManager.getNextPendingPlan();
 		ManagedDrone drone;
@@ -229,7 +139,8 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 	}
 
 	/**
-	 * Checks if the next pending flight is able to takeoff. Currently takeoff occurs in order of pending list.
+	 * Checks if the next pending flight is able to takeoff. Currently takeoff
+	 * occurs in order of pending list.
 	 * 
 	 * @param droneFleet
 	 * @throws FlightZoneException
@@ -344,6 +255,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 				LOGGER.info("Drone '" + drone.getDroneName() + "' ready to land");
 
 				drone.land();
+				//land after alt <1
 				activeUAVS.decrementAndGet();
 				awaitingLandingFlights.remove(0);
 			} catch (FlightZoneException | DroneException e) {
@@ -405,7 +317,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		LlaCoordinate homeCoordinate = new LlaCoordinate(baseCoordinate.getLatitude(), baseCoordinate.getLongitude(),
 				HOME_ALTITUDE);
 		Waypoint wps = new Waypoint(homeCoordinate);
-		ArrayList wpsList = new ArrayList<>();
+		List<Waypoint> wpsList = new ArrayList<>();
 		wpsList.add(wps);
 		IFlightPlan homePlane = FlightPlanFactory.create(uavid, "Return to Home", wpsList);
 		try {
@@ -419,15 +331,20 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 			awaitingLandingFlights.add(homePlane);
 
 			drone.getFlightModeState().setModeToFlying();
+			drone.returnToHome();
 			homePlane.setStatusToFlying(drone);
 		} catch (FlightZoneException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 
+<
 	public void cancelPendingFlights(String uavid) throws DroneException {
 		PlanPoolManager.getInstance().cancelPendingPlans(uavid);
 
+	public void pauseFlight(String uavid) throws DroneException {
+		LOGGER.info(uavid + " Pause current flight");
+		ManagedDrone drone = droneFleet.getRegisteredDrone(uavid);
+		drone.haltInPlace(30000);
 	}
 }

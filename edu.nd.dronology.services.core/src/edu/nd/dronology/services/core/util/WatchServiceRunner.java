@@ -60,7 +60,7 @@ public class WatchServiceRunner implements Runnable {
 					Path context = (Path) watchEvent.context();
 					for (String ext : fileExtensions) {
 						if (context.getFileName().toString().endsWith(ext)) {
-
+							System.out.println(watchEvent.kind().toString());
 							if ("ENTRY_DELETE".equals(watchEvent.kind().toString())
 									|| "ENTRY_CREATE".equals(watchEvent.kind().toString())
 									|| "ENTRY_MODIFY".equals(watchEvent.kind().toString())) {
@@ -86,7 +86,7 @@ public class WatchServiceRunner implements Runnable {
 			return;
 		}
 		Timer timer = new Timer();
-		timer.schedule(new NotifyChangeTask(), 2000);
+		timer.schedule(new NotifyChangeTask(), 500);
 		notifyTask = new NotifyChangeTask();
 	}
 
@@ -111,8 +111,8 @@ public class WatchServiceRunner implements Runnable {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 				try {
-					if (dir.getFileName() != null
-							&& (dir.getFileName().toString().startsWith(".") || dir.getFileName().toString().startsWith("$"))) {
+					if (dir.getFileName() != null && (dir.getFileName().toString().startsWith(".")
+							|| dir.getFileName().toString().startsWith("$"))) {
 						return FileVisitResult.SKIP_SUBTREE;
 					}
 					register(dir);
@@ -138,7 +138,8 @@ public class WatchServiceRunner implements Runnable {
 	 */
 	private void register(Path dir) throws IOException {
 
-		// WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+		// WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE,
+		// ENTRY_MODIFY);
 		WatchKey key = dir.register(watcher, ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
 				StandardWatchEventKinds.ENTRY_DELETE);
 		if (true) {
