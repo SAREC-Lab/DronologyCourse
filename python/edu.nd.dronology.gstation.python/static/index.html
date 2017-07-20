@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http—equiv="X—UA—Compatib1e" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head
+		content must come *after* these tags -->
+		<title>Fuel System Control Interface</title> 
+		<!-- Bootstrap -->
+		<link href="bootstrap/cosmo/bootstrap.min.css" rel="stylesheet">
+		<!-- HTML5 shim and Respond. js for IE8 support of HTML5 elements and media
+		queries   -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file://  -->
+		<!--[if lt IE 9]> 
+		<script src="https://oss.maxcdn.com/htm15shiv/3.7.3/htm15shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js></script> 
+		<![endif]--> 
+	</head>
+	<body>
+		<div id="main_body">
+			<div id="io" class="container">
+				<h1>
+					I/O
+				</h1>
+				<div id="io_body">
+					<h4>LCD Panel:</h4>
+					<div id="io_screen" style="border-style: solid; float:left; background-color:#dbdb00; font-family:&quot;Courier New&quot;, Courier, monospace;">
+						Loading...
+					</div>
+					<div style="clear:left; height:0px;"></div>
+					<h4>Passcode:</h4>
+					<div class="input-group">
+						<input id="code_input" class="form-control" type="text" onkeypress="Javascript: if (event.keyCode==13) submit_code();">
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="button" onclick="submit_code();">#</button>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div id="pumped" class="container">
+				<h1>
+					Pumped Fuel
+				</h1>
+				<div id="pumped_body"></div>
+			</div>
+			<div id="user" class="container">
+				<h1>
+					Users
+				</h1>
+				<div id="user_body"></div>
+			</div>
+			<div id="vehicle" class="container">
+				<h1>
+					Vehicles
+				</h1>
+				<div id="vehicle_body"></div>
+			</div>
+			<div id="fuel_type" class="container">
+				<h1>
+					Fuel Types
+				</h1>
+				<div id="fuel_type_body"></div>
+			</div>
+		</div>
+		<div id="scripts" style="display:none;">
+			<script src="/static/js/WebRequest.js"></script>
+			<script src="/static/js/queued_request.js"></script>
+			<script src="/static/js/drone_funcs.js"></script>
+			<!-- jQuery (necessary for Bootstrap's JavaScript plugins)  -->
+			<script src="bootstrap/jquery.min.js"></script>
+			<!-- Include all compiled plugins (below) , or include individual  -->
+			<!-- needed -->
+			<script src="bootstrap/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+		</div>
+	</body>
+</html>

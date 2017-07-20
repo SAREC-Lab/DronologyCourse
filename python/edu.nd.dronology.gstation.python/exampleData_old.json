@@ -1,0 +1,270 @@
+# gotoLocation command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"gotoLocation",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 100
+		}
+	}
+}
+# takeoff command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"takeoff",
+		"data":{
+			"altitude": 100
+		}
+	}
+}
+# setVelocity command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setVelocity",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+# setGimbalRotation command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setGimbalRotation",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+# setGimbalTarget command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setGimbalTarget",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+# setHome command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setHome",
+		"data":{
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
+# setHeading command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setHeading",
+		"data":{
+			"heading": 0
+		}
+	}
+}
+# setAirspeed command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setAirspeed",
+		"data":{
+			"speed": 20
+		}
+	}
+}
+# setGroundspeed command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setGroundspeed",
+		"data":{
+			"speed": 20
+		}
+	}
+}
+# setArmed command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setArmed",
+		"data":{
+			"armed": true
+		}
+	}
+}
+# setMode command
+{
+	"type":"command",
+	"data":{
+		"id": "PHYS_0",
+		"command":"setMode",
+		"data":{
+			"mode": "land"
+		}
+	}
+}
+
+
+
+# Drone list - sent by GroundStation to Dronology periodically
+{
+	"type":"drone_list",
+	"data":{
+		"PHYS_1":{
+			"location": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"attitude": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"velocity": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"gimbalRotation": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"battery": {
+				"voltage": 12.5,
+				"current": 0,
+				"level": 100
+			},
+			"home": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"status": "STANDBY",
+			"heading": 0,
+			"armable": false,
+			"airspeed": 0,
+			"groundspeed": 0,
+			"armed": false,
+			"mode": "GUIDED",
+			"id": "PHYS_1"
+		},
+		"PHYS_2":{
+			"location": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"attitude": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"velocity": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"gimbalRotation": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"battery": {
+				"voltage": 12.5,
+				"current": 0,
+				"level": 100
+			},
+			"home": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"status": "STANDBY",
+			"heading": 0,
+			"armable": false,
+			"airspeed": 0,
+			"groundspeed": 0,
+			"armed": false,
+			"mode": "GUIDED",
+			"id": "PHYS_2"
+		}
+	}
+}
+
+# New Drone - sent by GroundStation to Dronology when a new drone is connected
+# not currently implemented, but might be added eventually.
+# instead, Dronology currently detects when a new drone has been added to the drone_list
+{
+	"type":"new_drone",
+	"data":{
+		"id": "PHYS_3",
+		"data":	{
+			"location": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"attitude": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"velocity": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"gimbalRotation": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"battery": {
+				"voltage": 12.5,
+				"current": 0,
+				"level": 100
+			},
+			"home": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"status": "STANDBY",
+			"heading": 0,
+			"armable": false,
+			"airspeed": 0,
+			"groundspeed": 0,
+			"armed": false,
+			"mode": "GUIDED",
+			"id": "PHYS_2"
+		}
+	}
+}
