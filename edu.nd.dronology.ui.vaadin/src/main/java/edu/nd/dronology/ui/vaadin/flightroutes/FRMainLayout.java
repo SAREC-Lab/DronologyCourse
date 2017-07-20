@@ -3,8 +3,8 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vaadin.addon.leaflet.LMarker;
-import org.vaadin.addon.leaflet.LPolyline;
+import org.vaadin.addon.leaflet.LeafletClickEvent;
+import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
@@ -13,10 +13,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -33,6 +31,22 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
  */
 
 public class FRMainLayout extends CustomComponent {
+	private class MapPinClickListener implements LeafletClickListener {
+
+		@Override
+		public void onClick(LeafletClickEvent event) {
+			drone = controls.getInfoPanel().getRoute();
+			droneName = controls.getInfoPanel().getName();
+			if(map.getUtils().getMapPoints().size() == 1 && isFirst){
+				map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
+				isFirst = false;
+			}
+			else{
+				map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
+			}
+		}
+	}
+	
 	private static final long serialVersionUID = 1L;
 	private int index = -1;
 	private FRControlsComponent controls = new FRControlsComponent(this);
@@ -42,7 +56,10 @@ public class FRMainLayout extends CustomComponent {
 	private boolean isFirst = true;
 	private int componentCount;
 	private String name = "";
-	private int whichRoute = 0; 
+	private FlightRouteInfo flightInfo;
+	private FlightRouteInfo drone;
+	private String droneName;
+
 	
 	@WaypointReplace
 	public FRMainLayout() {
@@ -228,9 +245,9 @@ public class FRMainLayout extends CustomComponent {
 			map.getUtils().getMapPoints().clear();
 			
 			//displays the drone information in the info bar
-			FlightRouteInfo drone = controls.getInfoPanel().getRoute();
+			drone = controls.getInfoPanel().getRoute();
 			int numCoords = drone.getWaypoints().size();
-			String droneName = controls.getInfoPanel().getName();
+			droneName = controls.getInfoPanel().getName();
 			map.displayByName(drone, droneName, numCoords, true);
 			
 			Point pt = new Point(0, 0);
@@ -252,6 +269,9 @@ public class FRMainLayout extends CustomComponent {
 			});
 			
 			controls.getInfoPanel().refreshRoutes();
+			flightInfo = controls.getInfoPanel().getFlight(index);
+			drone = controls.getInfoPanel().getRoute();
+			droneName = controls.getInfoPanel().getName();
 		}
 	}
 	public void deleteRouteUpdate(){

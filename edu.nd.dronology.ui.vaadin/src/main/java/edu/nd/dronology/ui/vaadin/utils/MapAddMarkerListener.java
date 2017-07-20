@@ -2,9 +2,7 @@ package edu.nd.dronology.ui.vaadin.utils;
 
 import java.awt.MouseInfo;
 import java.util.Iterator;
-import java.util.List;
 
-import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
@@ -32,7 +30,9 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	
 	@Override
 	public void onClick(LeafletClickEvent e) {
-		processOnClick(e.getPoint(), -1);
+		if (route.isEditable()) {
+			processOnClick(e.getPoint(), -1);
+		}
 	}
 	
 	public void processOnClick(Point p, int index) {
@@ -40,7 +40,6 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		window.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
 
 		UI.getCurrent().addWindow(window);
-		route.disableRouteEditing();
 		Button saveButton = (Button) getComponentByCaption(window, "Save");
 		Button cancelButton = (Button) getComponentByCaption(window, "Cancel");
 		TextField altitudeField = (TextField) getComponentByCaption(window, "Altitude: ");
@@ -52,7 +51,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			String caption = "";
 			if (altitude.isEmpty())
 				caption = "Altitude is the empty string.";
-			if (transitSpeed.isEmpty()) {
+			else if (transitSpeed.isEmpty()) {
 				if (altitude.isEmpty())
 					caption = caption + "\n" + "Approaching speed is the empty string.";
 				else
@@ -60,7 +59,6 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			}
 	    	if (!altitude.isEmpty() && !transitSpeed.isEmpty()) {
 	    		UI.getCurrent().removeWindow(window);
-				route.enableRouteEditing();
 	    		for (int i = 0; i < route.getMapPoints().size(); i++) {
 	    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
 	    				route.getMapPoints().get(i).setAltitude(altitude);
@@ -75,11 +73,10 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		});
 		
 		cancelButton.addClickListener(event -> {
-	    removeCurrentWayPoint();
+			removeCurrentWayPoint();
 
 			UI.getCurrent().removeWindow(window);
 
-			route.enableRouteEditing();
 			route.drawLines(route.getMapPoints(), true, 0);
 		});
 	}

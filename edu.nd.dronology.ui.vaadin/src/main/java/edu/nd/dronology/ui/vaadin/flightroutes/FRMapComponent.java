@@ -32,7 +32,6 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
-import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
@@ -57,7 +56,7 @@ public class FRMapComponent extends CustomComponent {
 	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
 	private FRDeleteRoute delete = new FRDeleteRoute(this);
-	private ArrayList<String> names = new ArrayList();
+	private ArrayList<String> names = new ArrayList<>();
 	private PopupView popup;
 	private FlightRouteInfo selectedRoute;
 	private FRMainLayout mainLayout;
@@ -69,8 +68,6 @@ public class FRMapComponent extends CustomComponent {
 
 		leafletMap = new LMap();
 		leafletMap.addStyleName("fr_leaflet_map");
-		
-		Configuration configuration = Configuration.getInstance();
 	
 		Window window = createWayPointWindow();
 		PopupView popup = createWayPointPopupView();
@@ -106,16 +103,16 @@ public class FRMapComponent extends CustomComponent {
 		Button cancelButton = new Button("Cancel");
 		buttons.addComponents(saveButton, cancelButton);
 
-		VerticalLayout popupContent = new VerticalLayout();
+		VerticalLayout windowContent = new VerticalLayout();
 		TextField altitudeField = new TextField("Altitude: ");
 		TextField transitSpeedField = new TextField("Transit Speed: ");
 
-		popupContent.addComponent(altitudeField);
-		popupContent.addComponent(transitSpeedField);
-		popupContent.addComponent(buttons);
+		windowContent.addComponent(altitudeField);
+		windowContent.addComponent(transitSpeedField);
+		windowContent.addComponent(buttons);
 
 		Window window;
-		window = new Window(null, popupContent);
+		window = new Window(null, windowContent);
 
 		window.setModal(true);
 		window.setClosable(false);
@@ -166,6 +163,7 @@ public class FRMapComponent extends CustomComponent {
 				route.getMapPoints().get(i).setOrder(i+1);
 			}
 		});
+		
 		toDelete.setId("toDelete");
 		popupContent.addComponent(toDelete);
 		
@@ -303,7 +301,6 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.setStyleName("fr_leaflet_map");
 		leafletMap.addStyleName("bring_back");
 		tableDisplay.getGrid().setStyleName("fr_table_component");
-		leafletMap.setEnabled(false);
 	}
 	public void setRouteCenter(){
 		//calculates the mean point and sets the route
@@ -393,11 +390,12 @@ public class FRMapComponent extends CustomComponent {
 		
 		route.drawLines(storedPoints, true, 0);
 		
+		route.disableRouteEditing();
+		
 		layout.removeComponent(editBar);
 		leafletMap.addStyleName("bring_back");
 		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-		leafletMap.setEnabled(false);
 	}
 	public void deleteClick(){
 		delete.setRouteInfoTobeDeleted(selectedRoute);
@@ -432,7 +430,7 @@ public class FRMapComponent extends CustomComponent {
 			inStream = new ByteArrayInputStream(information);
 			froute = routePersistor.loadItem(inStream);
 
-			ArrayList<Waypoint> oldCoords = new ArrayList(froute.getWaypoints());
+			ArrayList<Waypoint> oldCoords = new ArrayList<>(froute.getWaypoints());
 			for (Waypoint cord : oldCoords) {
 				froute.removeWaypoint(cord);
 			}
@@ -498,7 +496,6 @@ public class FRMapComponent extends CustomComponent {
 			way.setTransitSpeed(trans);
 			
 			storedPoints.add(way);
-			
 		}
 		
 		for (int i = 0; i < route.getMapPoints().size(); i++) {

@@ -1,6 +1,4 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.ui.Button;
@@ -26,7 +24,6 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
-	private ArrayList<WayPoint> mapPoints = new ArrayList<>();
 	private MapMarkerUtilities route;
 	
 	private TextField latitude = new TextField();
@@ -120,7 +117,6 @@ public class FRTableDisplay {
 	}
 	
 	public void makeUneditable(MapMarkerUtilities mapMarkers) {
-		grid.getEditor().cancel();
 		grid.getEditor().setEnabled(false);
 	}
 	

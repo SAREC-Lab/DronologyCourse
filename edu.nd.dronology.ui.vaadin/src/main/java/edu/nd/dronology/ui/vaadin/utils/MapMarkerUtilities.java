@@ -73,6 +73,14 @@ public class MapMarkerUtilities {
 					Label l = (Label)c;
 					l.setValue("Transit Speed: " + w.getTransitSpeed());
 				}
+				if (c.getId()!=null && c.getId().equals("toDelete")) {
+					if (isEditable) {
+						c.setVisible(true);
+					}
+					else {
+						c.setVisible(false);
+					}
+				}
 			}
 
 			ComponentPosition position = layout.getPosition(popup);
@@ -90,7 +98,7 @@ public class MapMarkerUtilities {
 
 		@Override
 		public void onMouseOut(LeafletMouseOutEvent event) {
-			if ((int) MouseInfo.getPointerInfo().getLocation().getX() >= x + popup.getWidth() &&
+			if (isEditable && (int) MouseInfo.getPointerInfo().getLocation().getX() >= x + popup.getWidth() &&
 					(int) MouseInfo.getPointerInfo().getLocation().getY() >= y + popup.getHeight()) {
 			}
 			else {
@@ -280,6 +288,7 @@ public class MapMarkerUtilities {
 	public void enableRouteEditing () {
 		map.setEnabled(true);
 		isEditable = true;
+		
 		List<LMarker> pins = getPins();
 		for (int i = 0; i < pins.size(); i++) {
 			registeredListeners.add(pins.get(i).addDragEndListener(new MarkerDragEndListener()));
@@ -304,7 +313,19 @@ public class MapMarkerUtilities {
 		}
 		registeredListeners.clear();
 		tableDisplay.makeUneditable(this);
-		map.setEnabled(false);
+		
+		List<LMarker> storedPins = getPins();
+		List<LMarker> pins = getPins();
+			
+		for (int i = 0; i < pins.size(); i++) {
+			LMarker newPin = new LMarker(pins.get(i).getPoint().getLat(), pins.get(i).getPoint().getLon());
+			storedPins.add(newPin);
+		}
+
+		for (int i = 0; i < storedPins.size(); i++) {
+			storedPins.get(i).addMouseOverListener(new MarkerMouseOverListener());
+			storedPins.get(i).addMouseOutListener(new MarkerMouseOutListener());
+		}
 	}
 	
 	public boolean isEditable () {
@@ -379,5 +400,11 @@ public class MapMarkerUtilities {
 	}
 	public LMarker getLeafletMarker() {
 		return leafletMarker;
+	}
+	public List<Registration> getRegisteredListeners() {
+		return registeredListeners;
+	}
+	public void setRegisteredListeners(List<Registration> registeredListeners) {
+		this.registeredListeners = registeredListeners;
 	}
 }
