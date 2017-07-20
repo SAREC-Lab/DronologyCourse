@@ -255,7 +255,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 				LOGGER.info("Drone '" + drone.getDroneName() + "' ready to land");
 
 				drone.land();
-				//land after alt <1
+				// land after alt <1
 				activeUAVS.decrementAndGet();
 				awaitingLandingFlights.remove(0);
 			} catch (FlightZoneException | DroneException e) {
@@ -338,9 +338,9 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		}
 	}
 
-<
 	public void cancelPendingFlights(String uavid) throws DroneException {
 		PlanPoolManager.getInstance().cancelPendingPlans(uavid);
+	}
 
 	public void pauseFlight(String uavid) throws DroneException {
 		LOGGER.info(uavid + " Pause current flight");

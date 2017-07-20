@@ -79,8 +79,9 @@ public class FlightManagerServiceRemoteFacade extends AbstractRemoteFacade imple
 	@Override
 	public void cancelPendingFlights(String uavid) throws RemoteException, Exception {
 		FlightManagerService.getInstance().cancelPendingFlights(uavid);
-    
-  	@Override
+	}
+
+	@Override
 	public void planMission(IMissionPlan missionPlan) throws RemoteException, Exception {
 		FlightManagerService.getInstance().planMission(missionPlan);
 
