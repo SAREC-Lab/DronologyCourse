@@ -44,7 +44,7 @@ class FileLogging():
 
 	def logcont(self):
 		self.still_logging = True
-		period = 0.1
+		period = 0.25
 		last_time = time.time() - period
 		while self.still_logging:
 			this_time = time.time()
