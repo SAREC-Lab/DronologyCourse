@@ -425,4 +425,9 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 			e.printStackTrace();
 		}
 	}
+
+	public void cancelPendingFlights(String uavid) throws DroneException {
+		PlanPoolManager.getInstance().cancelPendingPlans(uavid);
+
+	}
 }

@@ -37,6 +37,8 @@ public interface IFlightManagerRemoteService extends IRemoteableService {
 
 	FlightInfo getFlightInfo(String uavId) throws RemoteException, Exception;
 
-	Collection<FlightPlanInfo> getCurrentFlights() throws RemoteException;  
+	Collection<FlightPlanInfo> getCurrentFlights() throws RemoteException;
+
+	void cancelPendingFlights(String uavid) throws RemoteException, Exception;
 
 }

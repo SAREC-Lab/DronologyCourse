@@ -90,4 +90,10 @@ public class FlightManagerServiceInstance extends AbstractServiceInstance implem
 		return FlightInfoCreator.getCurrenctFlights();
 	}
 
+	@Override
+	public void cancelPendingFlights(String uavid) throws Exception {
+		flightManager.cancelPendingFlights(uavid);
+
+	}
+
 }

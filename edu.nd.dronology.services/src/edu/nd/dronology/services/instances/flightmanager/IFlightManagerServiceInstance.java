@@ -24,4 +24,6 @@ public interface IFlightManagerServiceInstance extends IServiceInstance {
 
 	Collection<FlightPlanInfo> getCurrentFlights();
 
+	public void cancelPendingFlights(String uavid) throws Exception;
+
 }

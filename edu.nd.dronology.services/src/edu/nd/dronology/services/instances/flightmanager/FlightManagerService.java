@@ -65,4 +65,8 @@ public class FlightManagerService extends AbstractServerService<IFlightManagerSe
 		return serviceInstance.getCurrentFlights();
 	}
 
+	public void cancelPendingFlights(String uavid) throws Exception {
+		serviceInstance.cancelPendingFlights(uavid);
+	}
+
 }

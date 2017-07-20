@@ -4,6 +4,9 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.vaadin.teemu.switchui.Switch;
 
@@ -30,7 +33,10 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import edu.nd.dronology.core.flight.IFlightPlan;
+import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
@@ -72,14 +78,18 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private Switch hoverSwitch = new Switch();
 	private Button returnToHome = new Button("Return to Home");
 	int index = -1;
+	private String name;
 	
 	private BaseServiceProvider provider = MyUI.getProvider();
 	private IFlightManagerRemoteService flightRouteService;
+	private FlightInfo flightRouteInfo = null;
+	private IFlightRouteplanningRemoteService flightInfoService;
 	
 	@SuppressWarnings("null")
 	public AFAssignRouteComponent(String name, String status, double batteryLife, String healthColor, double lat,
 			double lon, double alt, double speed){
 		
+		this.name = name;
 		panelContent = new AFDragLayout(name);
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
@@ -148,7 +158,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 		
 		topContent.addComponent(buttons);
 		
-		FlightInfo flightRouteInfo = null;
 		try {
 			flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
@@ -226,6 +235,30 @@ public class AFAssignRouteComponent extends CustomComponent{
 		
 		setCompositionRoot(content);
 		
+	}
+	
+	public Collection<FlightRouteInfo> getRoutesToAssign(){
+		Collection<FlightRouteInfo> current = new ArrayList<>();
+		Collection<FlightRouteInfo> items = null;
+		try {
+			flightInfoService = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			items = flightInfoService.getItems();
+		} catch (RemoteException | DronologyServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < panelContent.getComponentCount(); i++){
+			FRInfoBox box = (FRInfoBox) panelContent.getComponent(i);
+			for (FlightRouteInfo info : items){
+				if (box.getName().equals(info.getName())){
+					current.add(info);
+				}
+			}
+		}
+		
+		return current;
 	}
 	
 	public void addRoute(String name, String ID, String created, String modified, String length) {
