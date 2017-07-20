@@ -59,12 +59,14 @@ public class FRInfoPanel extends CustomComponent {
 	TextField inputField;
 	FRInfoBox routeBox;
 	ArrayList<FRInfoBox> boxList = new ArrayList();
+	FRControlsComponent controlComponent;
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
 	
 	public FRInfoPanel(FRControlsComponent controls) {
-
+		controlComponent = controls;
+				
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 
@@ -187,7 +189,7 @@ public class FRInfoPanel extends CustomComponent {
 	}
 
 	public void addRoute() {
-		routeBox = new FRInfoBox();
+		routeBox = new FRInfoBox(this);
 		routes.addComponent(routeBox);
 		boxList.add(routeBox);
 		numberRoutes += 1;
@@ -386,5 +388,8 @@ public FlightRouteInfo getRouteByName(String name){
 	}
 	public ArrayList<FRInfoBox> getBoxList(){
 		return boxList;
+	}
+	public FRControlsComponent getControls(){
+		return controlComponent;
 	}
 }

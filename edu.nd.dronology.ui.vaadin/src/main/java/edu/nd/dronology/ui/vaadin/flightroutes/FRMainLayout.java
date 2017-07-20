@@ -268,4 +268,7 @@ public class FRMainLayout extends CustomComponent {
 		switchWindows(null, map, infoBox);
 		map.enableEdit();
 	}
+	public void enableMapEdit(){
+		map.enableEdit();
+	}
 }
