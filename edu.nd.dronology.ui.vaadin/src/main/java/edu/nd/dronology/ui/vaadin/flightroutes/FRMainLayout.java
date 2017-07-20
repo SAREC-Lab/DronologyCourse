@@ -99,18 +99,9 @@ public class FRMainLayout extends CustomComponent {
 			}
 			else {
 				switchWindows(e, map, null);
-			}
-			
-			//move to info panel
-			ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
-			for(FRInfoBox infoBox: listEdit){
-				infoBox.getEditButton().addClickListener(eve->{
-					switchWindows(null, map, infoBox);
-					map.enableEdit();
-				});
-			}
+			}		
 		});
-		
+
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
@@ -158,20 +149,6 @@ public class FRMainLayout extends CustomComponent {
 				map.exitEditMode();
 				controls.getInfoPanel().refreshRoutes();
 			});
-		}
-		
-		controls.getInfoPanel().getInfoBox().getDeleteBar().getYesButton().addClickListener(event->{
-			map.displayNoRoute();
-			map.exitEditMode();
-			controls.getInfoPanel().refreshRoutes();
-		});
-		
-		ArrayList<FRInfoBox> listEdit = controls.getInfoPanel().getBoxList();
-		for(FRInfoBox infoBox: listEdit){
-			infoBox.getEditButton().addClickListener(eve->{
-				map.enableEdit();
-			});
-	
 		}
 		
 		List<Waypoint> flightWaypoints = new ArrayList();
@@ -285,5 +262,9 @@ public class FRMainLayout extends CustomComponent {
 				//need to refresh route counter too
 			});
 		}
+	}
+	public void editClick(FRInfoBox infoBox){
+		switchWindows(null, map, infoBox);
+		map.enableEdit();
 	}
 }

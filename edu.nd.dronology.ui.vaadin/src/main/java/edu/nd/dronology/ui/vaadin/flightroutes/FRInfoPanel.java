@@ -153,8 +153,6 @@ public class FRInfoPanel extends CustomComponent {
 				index = getRouteNumber(drone);
 				routes.getComponent(index).addStyleName("info_box_focus");	
 				
-				//addRoute(name, id, creationFormatted, modifiedFormatted, length);
-				
 				inputField.clear();
 				UI.getCurrent().removeWindow(window);
 		
@@ -174,6 +172,12 @@ public class FRInfoPanel extends CustomComponent {
 		routes.addLayoutClickListener(e -> {
 			isRouteSelected = true;
 		});
+		
+		for(FRInfoBox infoBox: boxList){
+			infoBox.getEditButton().addClickListener(e->{
+				controls.getLayout().editClick(infoBox);
+			});
+		}
 
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
