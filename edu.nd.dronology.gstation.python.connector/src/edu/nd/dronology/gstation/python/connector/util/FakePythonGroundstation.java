@@ -45,8 +45,9 @@ public class FakePythonGroundstation {
 			UAVHandshakeMessage handshake = new UAVHandshakeMessage("Drone1", "Drone1");
 			handshake.setHome(new LlaCoordinate(1, 2, 3));
 			handshake.setType(UAVHandshakeMessage.MESSAGE_TYPE);
-
-			String sac = FileUtils.readFileToString(new File("d:\\sacjson.txt"));
+			File file = new File("sac"+File.separator+"sacjson.txt");
+			System.out.println(file.getAbsolutePath());
+			String sac = FileUtils.readFileToString(file);
 			handshake.setSafetyCase(sac);
 
 			String handshakeString = GSON.toJson(handshake);

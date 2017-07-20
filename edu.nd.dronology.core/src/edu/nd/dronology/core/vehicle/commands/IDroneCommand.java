@@ -13,4 +13,6 @@ public interface IDroneCommand {
 
 	String toJsonString();
 
+	void timestamp();
+
 }

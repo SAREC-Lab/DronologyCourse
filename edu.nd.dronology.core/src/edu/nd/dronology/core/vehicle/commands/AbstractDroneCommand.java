@@ -8,6 +8,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+@SuppressWarnings("unused")
 public class AbstractDroneCommand implements IDroneCommand {
 
 	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
@@ -15,6 +16,7 @@ public class AbstractDroneCommand implements IDroneCommand {
 			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
 
 	protected final Map<String, Object> data = new HashMap<>();
+
 	private final String uavid;
 	private final String command;
 	private long sendtimestamp;
@@ -32,5 +34,10 @@ public class AbstractDroneCommand implements IDroneCommand {
 	@Override
 	public String toJsonString() {
 		return GSON.toJson(this);
+	} 
+
+	@Override
+	public void timestamp() {
+		sendtimestamp = System.currentTimeMillis();
 	}
 }

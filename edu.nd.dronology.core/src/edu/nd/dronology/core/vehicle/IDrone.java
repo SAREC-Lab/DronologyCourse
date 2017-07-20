@@ -6,12 +6,13 @@ import edu.nd.dronology.core.util.LlaCoordinate;
 
 /**
  * iDrone interface
+ * 
  * @author Jane Cleland-Huang
  * @version 0.01
  *
  */
 public interface IDrone {
-	
+
 	public DroneStatus getDroneStatus();
 
 	/**
@@ -31,12 +32,14 @@ public interface IDrone {
 	 * @return altitude of drone
 	 */
 	public double getAltitude();
-	
+
 	/**
 	 * Fly drone to target coordinates
+	 * 
 	 * @param targetCoordinates
+	 * @param speed
 	 */
-	public void flyTo(LlaCoordinate targetCoordinates);
+	public void flyTo(LlaCoordinate targetCoordinates, Double speed);
 
 	/**
 	 * 
@@ -51,25 +54,31 @@ public interface IDrone {
 	public String getDroneName();
 
 	/**
-	 * Land the drone.  Update status.
-	 * @throws FlightZoneException 
+	 * Land the drone. Update status.
+	 * 
+	 * @throws FlightZoneException
 	 */
 	void land() throws FlightZoneException;
-	
+
 	/**
-	 * Takeoff.  Update status.
-	 * @throws FlightZoneException 
+	 * Takeoff. Update status.
+	 * 
+	 * @throws FlightZoneException
 	 */
 	void takeOff(double altitude) throws FlightZoneException;
 
 	/**
 	 * Sets drones coordinates
-	 * @param lat latitude
-	 * @param lon Longitude
-	 * @param alt Altitude
+	 * 
+	 * @param lat
+	 *            latitude
+	 * @param lon
+	 *            Longitude
+	 * @param alt
+	 *            Altitude
 	 */
 	public void setCoordinates(double lat, double lon, double alt);
-	
+
 	public double getBatteryStatus();
 
 	public boolean move(double i);
@@ -81,9 +90,9 @@ public interface IDrone {
 	void setBaseCoordinates(LlaCoordinate basePosition);
 
 	public LlaCoordinate getBaseCoordinates();
-	
+
 	public void setGroundSpeed(double speed);
-	
+
 	public void setVelocity(double x, double y, double z);
 
 	void setCoordinates(LlaCoordinate coordinate);

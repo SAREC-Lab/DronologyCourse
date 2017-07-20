@@ -1,5 +1,6 @@
 package edu.nd.dronology.gstation.python.connector.dispatch;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -42,8 +43,9 @@ public class WriteDispatcher implements Runnable {
 				IDroneCommand toSend = outputQueue.take();
 
 				LOGGER.hwInfo("Sending Command to UAV -" + toSend.toString());
+				toSend.timestamp();
 				outputStream.write(toSend.toJsonString().getBytes());
-				outputStream.write('\n');
+				outputStream.write('\r');
 				outputStream.flush();
 			} catch (IOException | InterruptedException e) {
 				LOGGER.error(e);

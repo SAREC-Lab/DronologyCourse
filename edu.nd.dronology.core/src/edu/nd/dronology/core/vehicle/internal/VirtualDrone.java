@@ -58,7 +58,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public void flyTo(LlaCoordinate targetCoordinates) {
+	public void flyTo(LlaCoordinate targetCoordinates, Double speed) {
 		NullUtil.checkNull(targetCoordinates);
 		// LOGGER.info("Flying to: "+ targetCoordinates.toString());
 		simulator.setFlightPath(currentPosition, targetCoordinates);

@@ -132,7 +132,7 @@ public class DroneFleetManager {
 		notifyListeners(true, managedDrone);
 
 	}
-
+	
 	public void removeDrone(ManagedDrone managedDrone) throws DroneException {
 		ManagedDrone value = registeredDrones.remove(managedDrone.getDroneName());
 		if (value == null) {

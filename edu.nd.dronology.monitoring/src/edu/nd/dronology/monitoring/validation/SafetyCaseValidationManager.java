@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
 import edu.nd.dronology.monitoring.safety.internal.UAVSaeftyCase;
+import edu.nd.dronology.monitoring.trust.TrustManager;
 
 public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 
@@ -33,14 +34,18 @@ public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 		return INSTANCE;
 	}
 
+	public SafetyCaseValidationManager() {
+		TrustManager.getInstance().initialize();
+	}
+
 	@Override
 	public boolean validate(String uavid, String safetyCase) {
-
+		TrustManager.getInstance().initializeUAV(uavid);
 		UAVSaeftyCase sac = GSON.fromJson(safetyCase, UAVSaeftyCase.class);
 		sac.setUAVId(uavid);
 
 		ValidationResult result = new SafetyCaseValidator(sac).validate();
-
+		// initialize repuation manager
 		return result.validationPassed();
 	}
 

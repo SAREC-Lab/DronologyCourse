@@ -52,7 +52,7 @@ public class MonitoringDataHandler implements Runnable {
 
 			try {
 				UAVMonitoringMessage monitoringMesasge = queue.take();
-				//LOGGER.info("MONITORING MESSAGE RECEIVED");
+				//LOGGER.info("MONITORING MESSAGE RECEIVED"+ monitoringMesasge.toString());
 				MonitoringValidator validator = UAVMonitoringManager.getInstance()
 						.getValidator(monitoringMesasge.getUavid());
 				if (validator != null) {

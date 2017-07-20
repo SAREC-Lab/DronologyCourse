@@ -102,8 +102,8 @@ public class ReadDispatcher implements Runnable {
 
 	private void processMessage(AbstractUAVMessage<?> message) {
 		if (message instanceof UAVStateMessage) {
-			LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
-					+ " - " + message.toString());
+//			LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "] "+FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
+//					+ " - " + message.toString());
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
 		} else if (message instanceof UAVHandshakeMessage) {

@@ -1,13 +1,11 @@
 package edu.nd.dronology.core.fleet;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
-import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
