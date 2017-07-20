@@ -24,13 +24,23 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
         _LOG.debug(str(msg))
         connection.send(str(msg))
 
+    def gen_monitor_message(m_vehicle):
+        msg = DronologyMonitorMessage.from_vehicle(m_vehicle, v_id)
+        _LOG.debug(str(msg))
+        connection.send(str(msg))
+
     # ARM & READY
     core.set_armed(vehicle, armed=True)
     _LOG.info('Vehicle {} armed.'.format(v_id))
     vehicle.mode = dronekit.VehicleMode('GUIDED')
 
-    # TODO: make the route better (if we actually care)
-    waypoints = [Waypoint(lat, lon, alt, groundpseed=10) for lat, lon, alt in bounds]
+    # TODO: make the search better (if we actually care)
+    waypoints = []
+    if last_known_loc:
+        waypoints.append(Waypoint(*last_known_loc, groundpseed=10))
+    for lat, lon, alt in bounds:
+        waypoints.append(Waypoint(lat, lon, alt, groundpseed=10))
+
     home = vehicle.home_location
     waypoints.append(Waypoint(home.lat, home.lon, bounds[-1][-1], groundpseed=10))
 
@@ -39,10 +49,10 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
 
     # START MESSAGE TIMERS
     send_state_message_timer = util.RepeatedTimer(1.0, gen_state_message, vehicle)
-    send_monitor_message_timer = None
+    send_monitor_message_timer = util.RepeatedTimer(5.0, gen_monitor_message, vehicle)
 
     # TAKEOFF
-    core.takeoff(vehicle, alt=30)
+    core.takeoff(vehicle, alt=10)
     _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
     # FLY

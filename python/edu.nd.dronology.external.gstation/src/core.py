@@ -287,7 +287,6 @@ class Connection:
                     self._conn.send(msg)
                     self._conn.send(os.linesep)
                     success = True
-                    _LOG.info(msg)
                 except Exception as e:
                     _LOG.warn('failed to send message! ({})'.format(e))
 
