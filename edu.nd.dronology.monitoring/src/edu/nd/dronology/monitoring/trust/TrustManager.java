@@ -3,7 +3,6 @@ package edu.nd.dronology.monitoring.trust;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.io.FileNotFoundException;
@@ -125,98 +124,6 @@ public class TrustManager {
 			      .collect(Collectors.joining(System.getProperty("line.separator")));
 	}
 
-	
-	public class VehicleReputation {
-		private Map<String, ReputationRating> assumptions;
-
-		public ReputationRating getReputationRating(String assumptionId) throws IllegalArgumentException {
-			if (!assumptions.containsKey(assumptionId))
-				throw new IllegalArgumentException(String.format("unrecognized assumptionId %s", assumptionId));
-			return assumptions.get(assumptionId);
-		}
-		
-		/**
-		 * Get all assumption ids registered with this vehicle.
-		 * @return
-		 */
-		public Iterable<String> getAssumptionIds() {
-			return assumptions.keySet();
-		}
-		
-		/**
-		 * Get the assumption K, V pairs.
-		 * @return
-		 */
-		public Iterable<Entry<String, ReputationRating>> getAssumptionEntrySet() {
-			return assumptions.entrySet();
-		}
-
-		@Override
-		public String toString() {
-			return assumptions.entrySet()
-				          .stream()
-				          .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
-				          .collect(Collectors.joining(", "));
-		}
-	}
-	/**
-	 * The ReputationRating is based on the beta reputation system. 
-	 * Josang, Audun, and Roslan Ismail. "The beta reputation system."
-	 * 
-	 * Currently supports the base reputation rating (Equation 5) 
-	 */
-	public class ReputationRating {
-
-
-		private double r;
-		private double s;
-
-		public double getR() {
-			return r;
-		}
-
-		public double getS() {
-			return s;
-		}
-		
-		/**
-		 * Add feedback based on the result of some "interaction".
-		 *  @param success
-		 *  	1 if the interaction was successful otherwise -1
-		 */
-		public void addFeedback(int success) {
-			if (Math.abs(success) != 1) {
-				throw new IllegalArgumentException(
-						"the value of \"success\" should be 1 or -1.");
-			}
-			
-			if (success == -1) {
-				s += 1;
-			}
-			else {
-				r += 1;
-			}
-
-		}
-		
-		/**
-		 * Determine the reputation given:
-		 * 	 
-		 * 	 r (the number of positive results), and 
-		 *   s (the number of negative results). 
-		 *   
-		 * The rating is calculated using Equation 5.
-		 * Ratings range from (0, 1). 
-		 */
-		public double getReputationRating() {
-			return (r + 1) / (r + s + 2); 
-		}
-
-		@Override
-		public String toString() {
-			return String.format("%f", getReputationRating());
-		}
-	}
 	
 	private static class InternalMonitoringEvalListener extends RemoteObject 
 		implements IMonitoringValidationListener {
