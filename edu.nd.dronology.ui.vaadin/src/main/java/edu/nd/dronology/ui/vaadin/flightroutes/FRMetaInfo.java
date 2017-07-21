@@ -11,6 +11,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -31,13 +32,13 @@ public class FRMetaInfo extends CustomComponent {
 	CheckBox tableView;
 	Button editButton;
 	Button deleteButton;
+	Label nameLabel;
 	
 	public FRMetaInfo(String name, int numCoords, FRMapComponent map){
 		//used if route is selected
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
-		Label nameLabel;
 		
 		routeName = name;
 		numWaypoints = numCoords;
@@ -110,7 +111,18 @@ public class FRMetaInfo extends CustomComponent {
 		routeId = id;
 	}
 	public void setNumWaypoints(int num){
+		if (nameLabel == null) {
+			nameLabel = new Label();
+		}
 		numWaypoints = num;
+		if(numWaypoints == 1){
+			nameLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoint)");
+			nameLabel.setContentMode(ContentMode.HTML);
+		}
+		else{
+			nameLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoints)");
+			nameLabel.setContentMode(ContentMode.HTML);
+		}
 	}
 	public CheckBox getCheckBox(){
 		return tableView;

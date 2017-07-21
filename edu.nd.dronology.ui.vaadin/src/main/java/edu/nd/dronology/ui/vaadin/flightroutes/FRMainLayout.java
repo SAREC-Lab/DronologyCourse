@@ -3,8 +3,6 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vaadin.addon.leaflet.LeafletClickEvent;
-import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
@@ -30,23 +28,7 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
  * @author Jinghui Cheng
  */
 
-public class FRMainLayout extends CustomComponent {
-	private class MapPinClickListener implements LeafletClickListener {
-
-		@Override
-		public void onClick(LeafletClickEvent event) {
-			drone = controls.getInfoPanel().getRoute();
-			droneName = controls.getInfoPanel().getName();
-			if(map.getUtils().getMapPoints().size() == 1 && isFirst){
-				map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
-				isFirst = false;
-			}
-			else{
-				map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
-			}
-		}
-	}
-	
+public class FRMainLayout extends CustomComponent {	
 	private static final long serialVersionUID = 1L;
 	private int index = -1;
 	private FRControlsComponent controls = new FRControlsComponent(this);
@@ -54,13 +36,13 @@ public class FRMainLayout extends CustomComponent {
 	private FRMapComponent map;
 	private VerticalLayout routeLayout;
 	private boolean isFirst = true;
+	private boolean isNew = false;
 	private int componentCount;
 	private String name = "";
 	private FlightRouteInfo flightInfo;
 	private FlightRouteInfo drone;
 	private String droneName;
 
-	
 	@WaypointReplace
 	public FRMainLayout() {
 
@@ -137,6 +119,7 @@ public class FRMainLayout extends CustomComponent {
 	}
 	
 	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
+		isNew = false;
 		//gets box of route info and changes its style to show that it is selected
 		Component child = component; //to initialize the variable
 		if (e != null){
@@ -158,7 +141,7 @@ public class FRMainLayout extends CustomComponent {
 		index = routeLayout.getComponentIndex(child);
 
 		//gets the flight info for that route
-		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
+		flightInfo = controls.getInfoPanel().getFlight(index);
 		
 		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
 		for(FRInfoBox box: list){
@@ -222,12 +205,6 @@ public class FRMainLayout extends CustomComponent {
 			map.displayByName(flightInfo, null, 0, false);
 		}
 		
-		//click listener to update waypoint number 
-		map.getMapInstance().addClickListener(eve->{
-			if(toString().valueOf(map.isEnabled()).equalsIgnoreCase("true")){
-				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
-			}	
-		});
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.getTableDisplay().setGrid(waypoints);
 			map.getUtils().setMapPointsAltitude(waypoints);
@@ -236,6 +213,7 @@ public class FRMainLayout extends CustomComponent {
 	}
 	public void drawRoute(){
 		//tests whether a route was added or not
+		isNew = true;
 		if(!(componentCount == controls.getInfoPanel().getRouteList().size())){
 		
 			map.enableEdit();
@@ -256,22 +234,9 @@ public class FRMainLayout extends CustomComponent {
 			map.getTableDisplay().getGrid().setItems();
 			map.enableEdit();
 			
-			map.getMapInstance().addClickListener(eve->{
-				
-				//the size of mapPoints is received as 1 for the first two waypoints added
-				if(map.getUtils().getMapPoints().size() == 1 && isFirst){
-					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
-					isFirst = false;
-				}
-				else{
-					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
-				}
-			});
-			
 			controls.getInfoPanel().refreshRoutes();
+			
 			flightInfo = controls.getInfoPanel().getFlight(index);
-			drone = controls.getInfoPanel().getRoute();
-			droneName = controls.getInfoPanel().getName();
 		}
 	}
 	public void deleteRouteUpdate(){
@@ -290,5 +255,17 @@ public class FRMainLayout extends CustomComponent {
 	}
 	public void enableMapEdit(){
 		map.enableEdit();
+	}
+	public FlightRouteInfo getFlightInfo() {
+		return flightInfo;
+	}
+	public FlightRouteInfo getDrone() {
+		return drone;
+	}
+	public String getDroneName() {
+		return droneName;
+	}
+	public boolean isNew() {
+		return isNew;
 	}
 }

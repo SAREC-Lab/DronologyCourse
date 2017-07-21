@@ -29,6 +29,7 @@ import com.vaadin.ui.PopupView;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import edu.nd.dronology.ui.vaadin.flightroutes.FRMapComponent;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 
 /**
@@ -155,14 +156,16 @@ public class MapMarkerUtilities {
 	private WayPoint w = null;
 	private String selectedWayPointId = "";
 	private LMarker leafletMarker;
+	private FRMapComponent mapComponent;
 	
-	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window window, PopupView popup) {
+	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window window, PopupView popup, FRMapComponent mapComponent) {
 		this.map = map;
 		this.tableDisplay = tableDisplay;
 		this.grid = tableDisplay.getGrid();
 		this.layout = layout;
 		this.mapAddMarkerListener = new MapAddMarkerListener(this, window);
 		this.popup = popup;
+		this.mapComponent = mapComponent;
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
@@ -406,5 +409,8 @@ public class MapMarkerUtilities {
 	}
 	public void setRegisteredListeners(List<Registration> registeredListeners) {
 		this.registeredListeners = registeredListeners;
+	}
+	public FRMapComponent getMapComponent() {
+		return mapComponent;
 	}
 }

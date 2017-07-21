@@ -73,7 +73,7 @@ public class FRMapComponent extends CustomComponent {
 		Window window = createWayPointWindow();
 		PopupView popup = createWayPointPopupView();
 		mapAndPopup.addComponent(popup);
-		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, window, popup);
+		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, window, popup, this);
 
 		mapAndPopup.addStyleName("fr_mapabsolute_layout");
 		mapAndPopup.addComponent(leafletMap);
@@ -533,11 +533,19 @@ public class FRMapComponent extends CustomComponent {
 			}
 			
 			route.drawLines(storedPoints, true, 0);
-			}
-			route.disableRouteEditing();
-			leafletMap.setEnabled(false);
+		}
+		route.disableRouteEditing();
 	}
 	public FRMainLayout getMainLayout(){
 		return mainLayout;
+	}
+	public void onMapEdited(List<WayPoint> waypoints) {
+		bar.setNumWaypoints(waypoints.size());
+		if (mainLayout.isNew()) {
+			displayStillEdit(mainLayout.getDrone(), mainLayout.getDroneName(), route.getMapPoints().size(), true);
+		}
+		else {
+			displayStillEdit(mainLayout.getFlightInfo(), mainLayout.getFlightInfo().getName(), route.getMapPoints().size(), true);
+		}
 	}
 }

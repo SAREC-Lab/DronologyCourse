@@ -53,9 +53,9 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				caption = "Altitude is the empty string.";
 			else if (transitSpeed.isEmpty()) {
 				if (altitude.isEmpty())
-					caption = caption + "\n" + "Approaching speed is the empty string.";
+					caption = caption + "\n" + "Transit speed is the empty string.";
 				else
-					caption = "Approaching speed is the empty string.";
+					caption = "Transit speed is the empty string.";
 			}
 	    	if (!altitude.isEmpty() && !transitSpeed.isEmpty()) {
 	    		UI.getCurrent().removeWindow(window);
@@ -66,6 +66,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    				route.getGrid().setItems(route.getMapPoints());
 	    			}
 	    		}
+	    		route.getMapComponent().onMapEdited(route.getMapPoints());
 	    	}
 	    	else {
 	    		Notification.show(caption);
