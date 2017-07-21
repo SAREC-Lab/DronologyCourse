@@ -244,6 +244,23 @@ public class TrustManager {
 		}
 	
 	}
+	
+	public static void main(String[] args) {
+		TrustManager mger = TrustManager.getInstance();
+		mger.constraintEvaluated("UAV_1", "A1", -1);
+		mger.constraintEvaluated("UAV_1", "A1", -1);
+		mger.constraintEvaluated("UAV_1", "A1", 1);
+		mger.constraintEvaluated("UAV_1", "A1", 1);
+		mger.constraintEvaluated("UAV_1", "A1", 1);
+	
+		mger.constraintEvaluated("UAV_2", "A2", 1);
+		mger.constraintEvaluated("UAV_2", "A2", 1);
+		mger.constraintEvaluated("UAV_2", "A2", 1);
+		mger.constraintEvaluated("UAV_2", "A2", -1);
+		mger.constraintEvaluated("UAV_2", "A2", -1);
+		System.out.println(mger);
+	}
+
 
 }
 
