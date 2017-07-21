@@ -96,4 +96,12 @@ public class PlanPool {
 		}
 
 	}
+	
+	public void cancelPendingPlans(){
+		if (pendingPlans.size() > 0) {
+			LOGGER.info(pendingPlans.size() + " Pending flight plans cancelled");
+			LOGGER.missionError(pendingPlans.size() + " Pending flight plans for " + id + " cancelled");
+			pendingPlans.clear();
+		}
+	}
 }

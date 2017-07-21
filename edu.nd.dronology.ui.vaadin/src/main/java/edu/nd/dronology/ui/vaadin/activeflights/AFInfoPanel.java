@@ -271,6 +271,10 @@ public class AFInfoPanel extends CustomComponent{
 		return content;
 	}
 	
+	public int getNumUAVS(){
+		return numUAVs;
+	}
+	
 	public void refreshDrones(){
 		try {
 			Map<String, DroneStatus> newDrones;

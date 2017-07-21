@@ -2,6 +2,7 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.vaadin.teemu.switchui.Switch;
@@ -17,12 +18,18 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import edu.nd.dronology.core.exceptions.DroneException;
+import edu.nd.dronology.core.flight.IFlightPlan;
+import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.core.util.Waypoint;
+import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
@@ -117,10 +124,10 @@ public class AFInfoBox extends CustomComponent {
 		Image droneImage = new Image();
 		droneImage.setSource(resource);
 
-		statusInfo1.setValue(name);
+		statusInfo1.setValue(this.name);
 		statusInfo1.addStyleName("info_box_name");
 		statusInfo1.addStyleName(ValoTheme.LABEL_BOLD);
-		statusInfo2.setValue("Status: " + status);
+		statusInfo2.setValue("Status: " + this.status);
 		this.batteryLife = Math.round(this.batteryLife * 100);
 		this.batteryLife = this.batteryLife / 100;
 		statusInfo3.setValue("Battery Life: " + Double.toString(this.batteryLife) + " %");
@@ -146,7 +153,7 @@ public class AFInfoBox extends CustomComponent {
 		 * middle layer components
 		 */
 		locationInfo1.setValue("Latitude:\t" + Double.toString(Math.round((this.lat) * 1000000.0) / 1000000.0));
-		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon) * 1000000.0) / 100000.0));
+		locationInfo2.setValue("Longitude:\t" + Double.toString(Math.round((this.lon) * 1000000.0) / 1000000.0));
 		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + " meters");
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
@@ -211,7 +218,7 @@ public class AFInfoBox extends CustomComponent {
 			cancel.addClickListener(event -> {
 				UI.getCurrent().removeWindow(window);
 			});
-			window.addClickListener(event -> {
+			window.addClickListener(event -> { //will need to change to if flights are in left panel
 				if (frLayout.getControls().getInfoPanel().getIsRouteSelected())
 					apply.setEnabled(true);
 				else
@@ -297,6 +304,10 @@ public class AFInfoBox extends CustomComponent {
 		this.isChecked = check.getValue();
 		return this.isChecked;
 	}
+	
+	public CheckBox getCheckBox(){
+		return this.check;
+	}
 
 	public void setName(String name) {
 		this.name = name;
@@ -309,11 +320,11 @@ public class AFInfoBox extends CustomComponent {
 
 	public void setStatus(String status) {
 		this.status = status;
-		statusInfo2.setValue("Status: " + status);
-		if (this.status.equals("Hovering"))
+		statusInfo2.setValue("Status: " + this.status);
+		/*if (this.status.equals("Hovering"))
 			this.hoverSwitch.setValue(true);
 		else
-			this.hoverSwitch.setValue(false);
+			this.hoverSwitch.setValue(false);*/
 	}
 
 	public String getStatus() {
@@ -389,6 +400,92 @@ public class AFInfoBox extends CustomComponent {
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
 		if (this.hoverInPlace) {
+			Window window = new Window("Assign New Route");
+			
+			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
+					this.lon, this.alt, this.speed);
+			
+			content.getCancel().addClickListener(event -> {
+				UI.getCurrent().removeWindow(window);
+			});
+			
+			content.getApply().addClickListener( event -> {
+				Collection<FlightRouteInfo> routesToAssign = content.getRoutesToAssign();
+				Window confirm = new Window("Confirm");
+				VerticalLayout subContent = new VerticalLayout();
+				HorizontalLayout subButtons = new HorizontalLayout();
+				String routeNames = "";
+				Label label = new Label();
+				for (FlightRouteInfo e:routesToAssign){
+					if (routesToAssign.size() == 0){
+						label.setValue("Are you sure you want unassign all flight routes for " + this.name + "?");
+					}
+					else if (routesToAssign.size() == 1){
+						routeNames = e.getName();
+						label.setValue("Are you sure you want " + this.name + " to follow the route " + routeNames + "?");
+					}
+					else {
+						routeNames = routeNames + e.getName() + ", ";
+					}
+				}
+				if (routesToAssign.size() > 1){
+					routeNames = routeNames.substring(0, routeNames.length() - 2);
+					label.setValue("Are you sure you want " + this.name + " to follow the routes " + routeNames + "?");
+				}
+				 
+				Button yes = new Button("Yes");
+				Button no = new Button("No");
+				subButtons.addComponents(yes, no);
+				subContent.addComponents(label, subButtons);
+				confirm.setContent(subContent);
+				confirm.setModal(true);
+				confirm.center();
+				UI.getCurrent().addWindow(confirm);
+
+				no.addClickListener(subEvent -> {
+					UI.getCurrent().removeWindow(confirm);
+				});
+
+				yes.addClickListener(subEvent -> {
+					FlightInfo flightRouteInfo = null;
+					IFlightManagerRemoteService service;
+					try {
+						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+						flightRouteInfo = service.getFlightInfo(this.name);
+						
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				  try {
+				  	service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+						service.cancelPendingFlights(this.name);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				 
+				  
+  			  for (FlightRouteInfo e:routesToAssign){
+  			    try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					  activate(e);
+				  }			
+				  
+					UI.getCurrent().removeWindow(confirm);
+					UI.getCurrent().removeWindow(window);
+				});
+			});
+			
+			window.setContent(content);
+			window.setModal(true);
+			window.setWidth(1496, Unit.PIXELS);
+			UI.getCurrent().addWindow(window);
+			
 			this.status = "Hovering";
 			statusInfo2.setValue("Status: ");
 		} else {
@@ -399,6 +496,10 @@ public class AFInfoBox extends CustomComponent {
 
 	public boolean getHoverInPlace() {
 		return this.hoverInPlace;
+	}
+	
+	public Switch getHoverSwitch(){
+		return this.hoverSwitch;
 	}
 
 	public void setBoxVisible(boolean visible) {

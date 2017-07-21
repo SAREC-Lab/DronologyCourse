@@ -2,11 +2,10 @@ package edu.nd.dronology.ui.vaadin.utils;
 
 import java.awt.MouseInfo;
 import java.util.Iterator;
-import java.util.List;
 
-import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
+import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -21,69 +20,45 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	private String altitude = "";
 	private String transitSpeed = "";
 	private WayPoint currentWayPoint;
-	private boolean atEnd = false;
-	private boolean buttonSelected = false;
 	private MapMarkerUtilities route;
-	private Window popup;
+	private Window window;
 	
-	private static MapAddMarkerListener instance = null;
-	
-	public static MapAddMarkerListener getInstance(MapMarkerUtilities route, Window popup) {
-		if (instance == null) {
-			instance = new MapAddMarkerListener(route, popup);
-		}
-		return instance;
-	}
-	
-	private MapAddMarkerListener(MapMarkerUtilities route, Window popup) {
+	public MapAddMarkerListener(MapMarkerUtilities route, Window window) {
 		this.route = route;
-		this.popup = popup;
+		this.window = window;
 	}
 	
 	@Override
 	public void onClick(LeafletClickEvent e) {
-		if (atEnd && !buttonSelected) {
-	    	removeCurrentWayPoint();
+		if (route.isEditable()) {
+			processOnClick(e.getPoint(), -1);
 		}
-		
-		atEnd = false;
-		
-		if (route.getLineClicked()) {
-			//Notification.show("Line was clicked");
-		}
-			
-		currentWayPoint = route.addNewPin(e.getPoint(), route.getLineClicked());
-		popup.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
-		route.setLineClicked(false);
-			
-		buttonSelected = false;
+	}
+	
+	public void processOnClick(Point p, int index) {
+		currentWayPoint = route.addNewPin(p, index);
+		window.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
 
-		UI.getCurrent().addWindow(popup);
-		route.disableRouteEditing();
-		Button saveButton = (Button) getComponentByCaption(popup, "Save");
-		Button cancelButton = (Button) getComponentByCaption(popup, "Cancel");
-		TextField altitudeField = (TextField) getComponentByCaption(popup, "Altitude: ");
-		TextField transitSpeedField = (TextField) getComponentByCaption(popup, "Transit Speed: ");
-		
-		altitudeField.setRequiredIndicatorVisible(true);
-		transitSpeedField.setRequiredIndicatorVisible(true);
+		UI.getCurrent().addWindow(window);
+		Button saveButton = (Button) getComponentByCaption(window, "Save");
+		Button cancelButton = (Button) getComponentByCaption(window, "Cancel");
+		TextField altitudeField = (TextField) getComponentByCaption(window, "Altitude: ");
+		TextField transitSpeedField = (TextField) getComponentByCaption(window, "Transit Speed: ");
 		
 		saveButton.addClickListener(event -> {
 			altitude = altitudeField.getValue();
 			transitSpeed = transitSpeedField.getValue();
-			buttonSelected = true;
 			String caption = "";
 			if (altitude.isEmpty())
 				caption = "Altitude is the empty string.";
-			if (transitSpeed.isEmpty()) {
+			else if (transitSpeed.isEmpty()) {
 				if (altitude.isEmpty())
 					caption = caption + "\n" + "Approaching speed is the empty string.";
 				else
 					caption = "Approaching speed is the empty string.";
 			}
 	    	if (!altitude.isEmpty() && !transitSpeed.isEmpty()) {
-	    		UI.getCurrent().removeWindow(popup);
-				route.enableRouteEditing();
+	    		UI.getCurrent().removeWindow(window);
 	    		for (int i = 0; i < route.getMapPoints().size(); i++) {
 	    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
 	    				route.getMapPoints().get(i).setAltitude(altitude);
@@ -95,27 +70,15 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    	else {
 	    		Notification.show(caption);
 	    	}
-	    	
-	    	//Notification.show(route.getMapPoints().get(0).getAltitude());
 		});
 		
 		cancelButton.addClickListener(event -> {
-			buttonSelected = true;
-	    	removeCurrentWayPoint();
+			removeCurrentWayPoint();
 
-			UI.getCurrent().removeWindow(popup);
+			UI.getCurrent().removeWindow(window);
 
-			route.enableRouteEditing();
-			List<LPolyline> polylines = route.getPolylines();
-			for(int i = 0; i < polylines.size(); i++){
-				route.getMap().addComponent(polylines.get(i));
-			}
+			route.drawLines(route.getMapPoints(), true, 0);
 		});
-		atEnd = true;
-	}
-	
-	public boolean isButtonSelected () {
-		return buttonSelected;
 	}
 
 	public void removeCurrentWayPoint() {
@@ -124,14 +87,12 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getMapPoints().remove(route.getMapPoints().get(i));
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
-				route.setPolylines(route.drawLines(route.getMapPoints(), false, 1));
-				
+				route.drawLines(route.getMapPoints(), false, 1);
 			}
 		}
 		for (int i = 0; i < route.getPins().size(); i++) {
 			if (route.getPins().get(i).getId().equals(currentWayPoint.getId())) {
 				route.getMap().removeComponent(route.getPins().get(i));
-				route.getPins().remove(route.getPins().get(i));
 			}
 		}
 		for(int i = 0; i < route.getPolylines().size(); i++){

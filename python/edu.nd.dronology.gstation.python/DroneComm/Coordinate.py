@@ -36,6 +36,14 @@ def CoordFromLocation(loc):
 		return Coordinate(0,0,0)
 	return Coordinate(loc.lat,loc.lon,loc.alt)
 
+def CoordFromNED(loc):
+	if loc==None:
+		return Coordinate(0,0,0)
+	down = loc.down
+	if down!=None:
+		down = -1*down
+	return Coordinate(loc.north,loc.east,down)
+
 def CoordFromRotation(rot):
 	if rot==None or rot.pitch==None:
 		return Coordinate(0,0,0)
