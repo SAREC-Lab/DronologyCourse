@@ -16,6 +16,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -480,7 +481,9 @@ public class FRMapComponent extends CustomComponent {
 			e1.printStackTrace();
 		}
 		
-		for(int i = storedPoints.size(); i < route.getMapPoints().size(); i++){
+		if(storedPoints.size() < route.getMapPoints().size()){
+		storedPoints.clear();
+		for(int i = 0; i < route.getMapPoints().size(); i++){
 			String alt = route.getMapPoints().get(i).getAltitude();
 			String lon = route.getMapPoints().get(i).getLongitude();
 			String lat = route.getMapPoints().get(i).getLatitude();
@@ -519,7 +522,8 @@ public class FRMapComponent extends CustomComponent {
 		}
 		
 		route.drawLines(storedPoints, true, 0);
-		
+			Notification.show("added");
+		}
 		route.disableRouteEditing();
 		leafletMap.setEnabled(false);
 	}
