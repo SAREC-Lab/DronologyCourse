@@ -140,7 +140,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 		locationInfo3.setValue("Altitude:\t" + Double.toString(alt) + " meters");
 		speed = Math.round(speed * 100);
 		speed = speed / 100;
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(speed) + " mph");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(speed) + " m/s");
 		
 		coordinates.addComponents(locationInfo1, locationInfo2);
 		altAndSpeed.addComponents(locationInfo3, locationInfo4);
