@@ -404,7 +404,7 @@ public class FRMapComponent extends CustomComponent {
 	public void saveClick(){
 		exitEditMode();
 
-		List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
+		List<WayPoint> newWaypoints = route.getMapPoints();
 		
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 		ByteArrayInputStream inStream;
@@ -479,46 +479,6 @@ public class FRMapComponent extends CustomComponent {
 		} catch (PersistenceException e1) {
 			e1.printStackTrace();
 		}
-		
-		for(int i = storedPoints.size(); i < route.getMapPoints().size(); i++){
-			String alt = route.getMapPoints().get(i).getAltitude();
-			String lon = route.getMapPoints().get(i).getLongitude();
-			String lat = route.getMapPoints().get(i).getLatitude();
-			String trans = route.getMapPoints().get(i).getTransitSpeed();
-			
-			Point pt = new Point();
-			
-			pt.setLat(Double.valueOf(lat));
-			pt.setLon(Double.valueOf(lon));
-			
-			WayPoint way = new WayPoint(pt, false);
-			way.setAltitude(alt);
-			way.setTransitSpeed(trans);
-			
-			storedPoints.add(way);
-		}
-		
-		for (int i = 0; i < route.getMapPoints().size(); i++) {
-			route.getMapPoints().remove(i);
-		}
-		
-		route.getMapPoints().clear();
-		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			route.getMapPoints().add(storedPoints.get(i));
-		}
-		
-		route.getGrid().setItems(route.getMapPoints());
-		
-		route.removeAllMarkers(route.getPins());
-		route.removeAllLines(route.getPolylines());
-		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			WayPoint point = storedPoints.get(i);
-			route.addPinForWayPoint(point);
-		}
-		
-		route.drawLines(storedPoints, true, 0);
 		
 		route.disableRouteEditing();
 		leafletMap.setEnabled(false);
