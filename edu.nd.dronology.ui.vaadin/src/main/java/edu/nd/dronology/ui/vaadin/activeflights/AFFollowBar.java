@@ -25,7 +25,7 @@ public class AFFollowBar extends CustomComponent{
 		}
 		UAVNames = UAVNames + uavs.get(uavs.size() - 1);
 		smallText.setValue(UAVNames);
-		setStyleName("fr_edit_bar");
+		setStyleName("af_follow_bar");
 		textLabel.setStyleName("large_text");
 		smallText.setStyleName("small_text");
 		

@@ -64,6 +64,9 @@ public class AFMapComponent extends CustomComponent {
 	private List<List<LPolyline>> flightRoutes = new ArrayList<>();
 	private List<List<LMarker>> wayPointMarkers = new ArrayList<>();
 	private boolean follow = false;
+  private VerticalLayout content = new VerticalLayout();
+	private AbsoluteLayout followLayout = new AbsoluteLayout();
+	private AFFollowBar followBar;
 	private AbsoluteLayout layout = new AbsoluteLayout();
 	private PopupView popup;
 	private PopupView dronePopup;
@@ -87,8 +90,6 @@ public class AFMapComponent extends CustomComponent {
 
 		leafletMap = new LMap();
 		utilities = new MapMarkerUtilities(leafletMap);
-
-		VerticalLayout content = new VerticalLayout();
 
 		LTileLayer tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
@@ -436,6 +437,11 @@ public class AFMapComponent extends CustomComponent {
 	}
 
 	public void setAverageCenter() {
+	   if (content.getComponentIndex(layout) == -1){
+			content.removeAllComponents();
+			leafletMap.removeStyleName("af_leaflet_map_edit_mode");
+			content.addComponent(layout);
+		}
 		Configuration configuration = Configuration.getInstance();
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
@@ -554,6 +560,22 @@ public class AFMapComponent extends CustomComponent {
 				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
 			}
 			leafletMap.setCenter(point, zoom);
+			if(content.getComponentIndex(layout) != -1){
+				leafletMap.addStyleName("af_leaflet_map_edit_mode");
+				followBar = new AFFollowBar(this, names);
+				followLayout.addStyleName("af_mapabsolute_layout");
+				followBar.addStyleName("bring_front");
+				double screenHeight = UI.getCurrent().getPage().getBrowserWindowHeight();
+				int layoutHeight = (int) Math.rint(screenHeight * 0.9);
+				followLayout.setHeight(Integer.toString(layoutHeight) + "px");
+				followLayout.addComponent(layout);
+				followLayout.addComponent(followBar);
+				content.removeAllComponents();
+				content.addComponent(followLayout);
+			}
+			else{
+				followBar.updateUAVList(names);
+			}
 		} catch (RemoteException | DronologyServiceException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

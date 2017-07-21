@@ -404,7 +404,39 @@ $valo-menu-background-color: #eee;
 			}
 		}
 	}
-
+	.af_mapabsolute_layout {
+		height: $screen-height !important;
+		width: 100%;
+		>div>.v-absolutelayout-margin>.v-absolutelayout-wrapper:first-child {
+			top:0 !important;
+			left:0 !important;
+			width: 100%;
+		}
+	}
+	.af_leaflet_map_edit_mode {
+		height: $screen-height !important;
+		border-style: solid;
+		border-width: 5px; 
+		border-color: $color-dark-4;
+		z-index: 0 !important;
+	}
+	.af_follow_bar{
+		background-color: $color-dark-4;
+		color: white;
+		width: 880px !important;
+		.v-button {
+			height: 22px !important;
+			margin: 5px 0;
+			font-size: 12px;
+		}
+		.large_text{
+			padding: 4px 4px 4px 20px;
+		}
+		.small_text{
+			font-size: 60%;
+			padding: 10px 80px 6px 8px;
+		}
+	}
 	.v-margin-top {
 		padding-top:0px;
 	}
