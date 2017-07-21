@@ -3,6 +3,10 @@ import json
 import time
 
 
+SEARCH_ZIGZAG = 'zigzag'
+SEARCH_SPIRAL = 'spiral'
+
+
 ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
 DRONE_TYPE_SITL_PHYS = 'PHYS'
 DRONE_TYPE_SITL_VRTL = 'VRTL'

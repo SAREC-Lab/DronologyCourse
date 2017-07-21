@@ -1,14 +1,13 @@
 import logging
 import logging.config
 import sys
-import os
 import shutil
 import subprocess
 import signal
 import numpy as np
 import nvector as nv
-import matplotlib.path as mpl_path
 import yaml
+from common import *
 from threading import Timer
 
 
@@ -32,11 +31,48 @@ NV_A = SEMI_MAJOR
 NV_F = 1 - (SEMI_MINOR / SEMI_MAJOR)
 
 
-def get_search_path(vertices):
+def _distance_2d(p0, p1):
+    return np.sqrt(np.sum((p1 - p0) **2))
+
+
+def _get_search_path_spiral(start, vertices):
+    _LOG.warn('Spiral search not implemented yet.')
+
+    return vertices
+
+
+def _get_search_path_zigzag(start, vertices):
+    start_ = arr(start.to_pvector().as_array()[:-1])
+    grid = arr([v.to_pvector().as_array()[:-1] for v in vertices])
+    dists = [_distance_2d(start_, p1) for p1 in grid]
+
+    path = [grid[np.argmin(dists)]]
+    
+
+    return vertices
+
+_search_strats = {
+    SEARCH_ZIGZAG: _get_search_path_zigzag,
+    SEARCH_SPIRAL: _get_search_path_spiral
+}
+
+
+def get_search_path(start, vertices, strat=SEARCH_ZIGZAG, last_known_loc=None):
+    """
+
+    :param start: the starting location of the drone (Position)
+    :param vertices: the vertices of the search space (List<Position>)
+    :param strat: the search strategy (choose from search strategies in common.py)
+    :param last_known_loc: the last known location of the target (optional)
+    :return:
+    """
     if len(vertices) < 3:
         raise ValueError('invalid search area, must have 3 vertices.')
 
-    return mpl_path.Path(vertices)
+    if strat not in _search_strats:
+        raise ValueError('invalid search strategy specified {}'.format(strat))
+
+    return _search_strats[strat](start, vertices)
 
 
 def column_vector(a):
@@ -87,63 +123,15 @@ class Earth:
 
 # noinspection PyPep8Naming
 class Position(object):
+    def __getitem__(self, item):
+        return self.as_array()[item]
+
     def as_array(self, flat=True):
         a = self._as_array()
         if not flat:
             a = a.reshape(-1, 1)
 
         return a
-
-    # def update(self, v_EB_N, t=0.1):
-    #     """
-    #     Given a position and NED, we *might* be able to use equations 12, 14, 15 to determine an exact solution
-    #     for an updated position at some point in the future.
-    #         Gade, Kenneth. "A non-singular horizontal position representation."
-    #         The journal of navigation 63.3 (2010): 395-417.
-    #
-    #     This would be great for simulation. Not sure if we can do it though.
-    #
-    #     :param v_EB_N: north east down (3x1 ndarray)
-    #     :param t: time step for update
-    #     :return:
-    #     """
-    #     n_EB_E_and_h = self.to_nvector().as_array(flat=False)
-    #     n_EB_E = n_EB_E_and_h[:-1, :]
-    #     h_B = n_EB_E_and_h[-1, 0]
-    #
-    #     R_EN = nv.n_E2R_EN(n_EB_E)
-    #     # we want to go from N to E, so need to transpose
-    #     R_NE = np.transpose(R_EN)
-    #     v_EB_E = np.dot(R_NE, v_EB_N)
-    #
-    #     temp = column_vector([0, 0, 1])
-    #     # temp = [0, 0, 1]
-    #     # Equation 9
-    #     v_EB_E_east = np.cross(v_EB_E.ravel(), temp.ravel())
-    #     # Equation 10
-    #     v_EB_E_north = np.cross(v_EB_E_east, temp.ravel())
-    #
-    #     lla = self.to_lla()
-    #     lat = lla.get_latitude()
-    #
-    #     v_EB_E_north_scaled = v_EB_E_north / Earth.meridional_radius_curvature(lat)
-    #     v_EB_E_east_scaled = v_EB_E_east / Earth.transverse_radius_curvature(lat)
-    #     # Equation 12: the angular velocity in E
-    #     omega_EL_E = np.cross(n_EB_E.ravel(), (v_EB_E_north_scaled + v_EB_E_east_scaled))
-    #
-    #     # Equation 14: derivative wrt time
-    #     n_EB_E_prime = np.cross(omega_EL_E, n_EB_E.ravel())
-    #     h_B_prime = np.dot(n_EB_E.ravel(), v_EB_E)
-    #
-    #     update_n_EB_E = n_EB_E_prime * t
-    #     update_h_B = h_B_prime * t
-    #
-    #     new_x, new_y, new_z = n_EB_E.ravel() + update_n_EB_E
-    #     new_depth = h_B + update_h_B[0]
-    #
-    #     new_self = Nvector(new_x, new_y, new_z, new_depth)
-    #
-    #     return self.coerce(new_self)
 
     # noinspection PyTypeChecker
     def distance(self, other):
@@ -167,6 +155,12 @@ class Position(object):
                 return other.to_pvector()
         else:
             return other
+
+    def __repr__(self):
+        return '{}'.format(self.as_array())
+
+    def __str__(self):
+        return repr(self)
 
     # noinspection PyTypeChecker
     def __eq__(self, other):
@@ -296,10 +290,10 @@ class Pvector(Position):
 
 def mean_position(positions):
     nvecs = arr([pos.to_nvector().as_array() for pos in positions]).T
-    p_EM_E = nv.mean_horizontal_position(nvecs)
-    x, y, z = p_EM_E.ravel()
+    n_EM_E = nv.mean_horizontal_position(nvecs[:-1, :]).ravel()
+    m_Z = np.mean(nvecs[-1, :])
 
-    return Pvector(x, y, z)
+    return Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z)
 
 
 class RepeatedTimer(object):
@@ -356,7 +350,7 @@ def clean_up_run():
 
 
 if __name__ == '__main__':
-    args = sys.argv
-    if len(args) > 1:
-        if args[1] == 'kill':
-            clean_up_run()
+    bounds = [Lla(*pos) for pos in DEFAULT_SAR_BOUNDS]
+    start = mean_position([bounds[0], bounds[1]]).to_lla()
+
+    get_search_path(start, bounds)

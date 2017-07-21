@@ -34,7 +34,11 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
     _LOG.info('Vehicle {} armed.'.format(v_id))
     vehicle.mode = dronekit.VehicleMode('GUIDED')
 
-    # TODO: make the search better (if we actually care)
+    home = vehicle.home_location
+    home_lla = util.Lla(home.lat, home.lon, 0)
+    vertices = [util.Lla(lat, lon, alt) for lat, lon, alt in bounds]
+    bounds = util.get_search_path(home_lla, vertices, last_known_loc=last_known_loc)
+
     waypoints = []
     if last_known_loc:
         waypoints.append(Waypoint(*last_known_loc, groundpseed=10))
