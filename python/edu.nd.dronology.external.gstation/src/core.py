@@ -324,16 +324,20 @@ class Connection:
                 try:
                     # msg = ''
                     msg = self._conn.recv(2048)
+                    _LOG.debug('Message received: {}'.format(msg))
                     if os.linesep in msg:
                         toks = msg.split(os.linesep)
                         msg_end = toks[0]
-                        _LOG.info('Command received: {}'.format(self._msg_buffer + msg_end))
-                        cmds = [SetMonitorFrequency.from_string(self._msg_buffer + msg_end)]
+                        new_msgs = [self._msg_buffer + msg_end]
 
-                        for msg in toks[1:-1]:
-                            _LOG.info('Command received: {}'.format(msg))
-                            cmds.append(SetMonitorFrequency.from_string(msg))
+                        for msg_ in toks[1:-1]:
+                            new_msgs.append(msg_)
 
+                        for msg_ in new_msgs:
+                            _LOG.info('Command received: {}'.format(msg_))
+                            cmd = CommandFactory.get_command(msg_)
+                            if isinstance(cmd, (SetMonitorFrequency,)):
+                                put_command(cmd.get_target(), cmd)
                         # TODO: put the commands in the cmd dict
 
                         msg = toks[-1]

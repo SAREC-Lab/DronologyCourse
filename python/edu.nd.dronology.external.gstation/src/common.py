@@ -88,7 +88,7 @@ class DronologyStateMessage(DronologyMessage):
             'armable': vehicle.is_armable,
             'groundspeed': vehicle.groundspeed,
             'armed': vehicle.armed,
-            'mode': vehicle.mode,
+            'mode': vehicle.mode.name,
             'batterystatus': battery
         }
 
@@ -97,7 +97,7 @@ class DronologyStateMessage(DronologyMessage):
 
 class DronologyMonitorMessage(DronologyMessage):
     def __init__(self, uav_id, data):
-        super(DronologyMonitorMessage, self).__init__('monitor', uav_id, data)
+        super(DronologyMonitorMessage, self).__init__('monitoring', uav_id, data)
 
     @classmethod
     def from_vehicle(cls, vehicle, v_id):
@@ -108,22 +108,31 @@ class DronologyMonitorMessage(DronologyMessage):
 
 
 class Command(object):
-    def __init__(self, vehicle_id, time_stamp, command_type):
+    def __init__(self, vehicle_id, time_stamp, data):
         self._vid = vehicle_id
         self._timestamp = time_stamp
-        self._c_type = command_type
+        self._data = data
 
-    @classmethod
-    def from_string(cls, msg):
-        pass
+    def get_target(self):
+        return self._vid
+
+    def get_timestamp(self):
+        return self._timestamp
 
 
 class SetMonitorFrequency(Command):
-    def __init__(self, data, *args):
-        self.data = data
+    def __init__(self, *args):
         super(SetMonitorFrequency, self).__init__(*args)
 
-    @classmethod
-    def from_string(cls, msg):
-        d_msg = json.loads(msg)
-        cls(d_msg['data'])
+    def get_monitor_frequency(self):
+        return self._data['frequency']
+
+
+class CommandFactory:
+    @staticmethod
+    def get_command(msg):
+        cmd = json.loads(msg)
+        args = [cmd[s] for s in ['uavid', 'sendtimestamp', 'data']]
+
+        if cmd['command'] == 'setMonitorFrequency':
+            return SetMonitorFrequency(*args)

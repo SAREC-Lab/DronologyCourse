@@ -45,7 +45,7 @@ public class WriteDispatcher implements Runnable {
 				LOGGER.hwInfo("Sending Command to UAV -" + toSend.toString());
 				toSend.timestamp();
 				outputStream.write(toSend.toJsonString().getBytes());
-				outputStream.write('\r');
+				outputStream.write(System.getProperty("line.separator").getBytes());
 				outputStream.flush();
 			} catch (IOException | InterruptedException e) {
 				LOGGER.error(e);

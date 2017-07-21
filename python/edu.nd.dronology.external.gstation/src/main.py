@@ -60,14 +60,23 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
 
     # HANDLE INCOMING MESSAGES
     while worker.isAlive():
+        if not connection.is_connected():
+            dronology_handshake_complete = False
+
         if not dronology_handshake_complete:
             dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
 
         cmds = core.get_commands(v_id)
-        if cmds:
-            for cmd in cmds:
-                # TODO: decide how to respond to this command
-                pass
+        for cmd in cmds:
+            if isinstance(cmd, (SetMonitorFrequency,)):
+                # stop the timer
+                send_monitor_message_timer.stop()
+                # send a message
+                gen_monitor_message(vehicle)
+                # reset the interval
+                send_monitor_message_timer.set_interval(cmd.get_monitor_frequency() / 1000)
+                # start the timer
+                send_monitor_message_timer.start()
 
     worker.join()
     
