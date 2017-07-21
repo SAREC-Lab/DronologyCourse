@@ -86,8 +86,7 @@ public class TrustManager {
 	}
 
 	public void initialize() {
-        DroneSafetyService.getInstance().addValidationListener(new InternalMonitoringEvalListener());
-
+        	DroneSafetyService.getInstance().addValidationListener(new InternalMonitoringEvalListener());
 	}
 
 	public void initializeUAV(String uavid) {
@@ -101,11 +100,9 @@ public class TrustManager {
 	 * @param success the result (1 or -1)
 	 * @throws IllegalArgumentException
 	 */
-	public void constraintEvaluated(String vid, String assumptionid, int success) 
-			throws IllegalArgumentException {
+	public void constraintEvaluated(String vid, String assumptionid, int success) throws IllegalArgumentException {
 		if (!history.containsKey(vid)) 
-			throw new IllegalArgumentException(
-					String.format("vehicle %s not recognized", vid));
+			throw new IllegalArgumentException(String.format("vehicle %s not recognized", vid));
 
 		history.get(vid).getReputationRating(assumptionid).addFeedback(success);
 	}
@@ -122,22 +119,19 @@ public class TrustManager {
 
 	@Override
 	public String toString() {
-		return history.entrySet().stream().map(
-				entry -> String.format("%s: %s", 
-						entry.getKey(), 
-						entry.getValue().toString())).
-				collect(Collectors.joining(System.getProperty("line.separator")));
+		return history.entrySet()
+			      .stream()
+			      .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
+			      .collect(Collectors.joining(System.getProperty("line.separator")));
 	}
 
 	
 	public class VehicleReputation {
 		private Map<String, ReputationRating> assumptions;
 
-		public ReputationRating getReputationRating(String assumptionId) 
-				throws IllegalArgumentException {
+		public ReputationRating getReputationRating(String assumptionId) throws IllegalArgumentException {
 			if (!assumptions.containsKey(assumptionId))
-				throw new IllegalArgumentException(
-						String.format("unrecognized assumptionId %s", assumptionId));
+				throw new IllegalArgumentException(String.format("unrecognized assumptionId %s", assumptionId));
 			return assumptions.get(assumptionId);
 		}
 		
@@ -159,21 +153,20 @@ public class TrustManager {
 
 		@Override
 		public String toString() {
-			return assumptions.entrySet().stream().map(
-					entry -> String.format("%s: %s", 
-							entry.getKey(), 
-							entry.getValue().toString())).
-					collect(Collectors.joining(", "));
+			return assumptions.entrySet()
+				          .stream()
+				          .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
+				          .collect(Collectors.joining(", "));
 		}
 	}
-
+	/**
+	 * The ReputationRating is based on the beta reputation system. 
+	 * Josang, Audun, and Roslan Ismail. "The beta reputation system."
+	 * 
+	 * Currently supports the base reputation rating (Equation 5) 
+	 */
 	public class ReputationRating {
-		/**
-		 * The ReputationRating is based on the beta reputation system. 
-		 * Josang, Audun, and Roslan Ismail. "The beta reputation system."
-		 * 
-		 * Currently supports the base reputation rating (Equation 5) 
-		 */
+
 
 		private double r;
 		private double s;
@@ -231,7 +224,7 @@ public class TrustManager {
         private static final long serialVersionUID = -3045122339587951628L;
 		@Override
 		public void constraintEvaluated(String vid, String assumptionid, String message, Result result)
-				throws RemoteException {
+			throws RemoteException {
 			// TODO: figure out what whether or not this was a success from the result
 			int success = 1;
 			try {
