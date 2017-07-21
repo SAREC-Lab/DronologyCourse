@@ -404,7 +404,7 @@ public class FRMapComponent extends CustomComponent {
 	public void saveClick(){
 		exitEditMode();
 
-		List<WayPoint> newWaypoints = route.getMapPoints(); //probably here
+		List<WayPoint> newWaypoints = route.getMapPoints();
 		
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 		ByteArrayInputStream inStream;
