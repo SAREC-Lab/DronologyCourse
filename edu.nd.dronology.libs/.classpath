@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="lib/logging/log4j-api-2.7.jar"/>
 	<classpathentry kind="lib" path="lib/stateless/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="lib/logging/log4j-core-2.7.jar"/>
-	<classpathentry kind="lib" path="lib/logging/conf"/>
 	<classpathentry exported="true" kind="lib" path="lib/mapdb/mapdb-2.0-beta6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
