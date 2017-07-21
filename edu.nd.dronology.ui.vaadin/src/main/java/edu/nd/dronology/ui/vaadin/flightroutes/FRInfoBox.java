@@ -89,16 +89,7 @@ public class FRInfoBox extends CustomComponent {
 		
 		setCompositionRoot(allContent);
 		
-		String whichBox = this.getId();
-		ArrayList<FRInfoBox> listBoxes = panel.getBoxList();
-		int counter = 0;
-		index = 0; 
-		for(FRInfoBox box: listBoxes){
-			if(box.getId() != null && whichBox.equals(box.getId())){
-				index = counter;
-			}
-			counter++;
-		}
+		getIndex(panel);
 			
 		trashButton.addListener(e->{
 			UI.getCurrent().addWindow(delete.getWindow());
@@ -115,6 +106,7 @@ public class FRInfoBox extends CustomComponent {
 		
 		editButton.addClickListener(e->{
 			panel.getControls().getLayout().enableMapEdit();
+			panel.getControls().getLayout().editClick(this);
 		});
 	}
 		
@@ -213,6 +205,19 @@ public class FRInfoBox extends CustomComponent {
 	}
 	public Button getEditButton(){
 		return editButton;
+	}
+	public int getIndex(FRInfoPanel panel){
+		String whichBox = this.getId();
+		ArrayList<FRInfoBox> listBoxes = panel.getBoxList();
+		int counter = 0;
+		index = 0; 
+		for(FRInfoBox box: listBoxes){
+			if(box.getId() != null && whichBox.equals(box.getId())){
+				index = counter;
+			}
+			counter++;
+		}
+		return index;
 	}
 }
 
