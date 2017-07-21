@@ -157,7 +157,7 @@ public class AFInfoBox extends CustomComponent {
 		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + " meters");
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " m/s");
 		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
 
 		/**
@@ -389,7 +389,7 @@ public class AFInfoBox extends CustomComponent {
 		this.speed = speed;
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " m/s");
 	}
 
 	public double getSpeed() {

@@ -517,10 +517,21 @@ public class AFMapComponent extends CustomComponent {
 	public void followDrones(List<String> names) {
 		if (names.size() < 1) {
 			this.follow = false;
+			if (content.getComponentIndex(layout) == -1){
+				content.removeAllComponents();
+				leafletMap.removeStyleName("af_leaflet_map_edit_mode");
+				content.addComponent(layout);
+			}
 			return;
 		}
-		if (this.follow == false)
+		if (this.follow == false){
+			if (content.getComponentIndex(layout) == -1){
+				content.removeAllComponents();
+				leafletMap.removeStyleName("af_leaflet_map_edit_mode");
+				content.addComponent(layout);
+			}
 			return;
+		}
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			drones = service.getDrones();
