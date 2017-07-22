@@ -11,6 +11,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
@@ -46,14 +47,17 @@ public class MyUI extends UI {
 			t.scheduleAtFixedRate(new TimerTask() {
 			    @Override
 			    public void run() {
-			      access(() -> {
-			      	navigationBar.getAFLayout().getControls().getPanel().refreshDrones();
-			      	String focused = navigationBar.getAFLayout().getControls().getPanel().getFocusedName();
-			      	List<String> checkedNames = navigationBar.getAFLayout().getControls().getPanel().getChecked();
-			      	navigationBar.getAFLayout().getAFMap().updateDroneMarkers(focused, checkedNames);
-			      	navigationBar.getAFLayout().getAFMap().updateActiveFlightRoutes(focused, checkedNames);
-			      	navigationBar.getAFLayout().continueFollowing();
-			      });
+			    	VaadinSession session = getSession();
+			    	if (session != null){
+			    		access(() -> {
+			    			navigationBar.getAFLayout().getControls().getPanel().refreshDrones();
+			    			String focused = navigationBar.getAFLayout().getControls().getPanel().getFocusedName();
+			    			List<String> checkedNames = navigationBar.getAFLayout().getControls().getPanel().getChecked();
+			    			navigationBar.getAFLayout().getAFMap().updateDroneMarkers(focused, checkedNames);
+			    			navigationBar.getAFLayout().getAFMap().updateActiveFlightRoutes(focused, checkedNames);
+			    			navigationBar.getAFLayout().continueFollowing();
+			    		});
+			    	}
 			    }
 			}, configuration.getRefreshRate(), configuration.getRefreshRate());
     }

@@ -19,12 +19,14 @@ To run the GroundStation in a linux environment:
 Open a terminal and cd into Dronology/python/edu.nd.dronology.gstation.python/
 Run the python file ./GroundStation.py
 The GroundStation will make connections to all of the configured drones, and start the SITL drone simulator if necessary.
-Connecting to the GroundStation from Dronology currently requires changing line 72 of edu.nd.dronology.gstation.python.connector/PythonBase.java to use the hostname of the GroundStation.
-Also, a flag somewhere in the code (I can't currently find the flag - [TODO: ask Michael Vierhauser]) must be set to connect Dronology to a Physical Drone, rather than the internal Virtual Drone.
+Connecting to the GroundStation from Dronology currently requires changing line 47 of DronologyServiceRunner.java to use the hostname of the GroundStation.
+
+To configure new drones on the GroundStation:
+Create a file "Dronology/python/edu.nd.dronology.gstation.python/initial_connection_lists/location.override.conf" containing the name of a 
+configuration file in the initial_connection_lists directory that describes which drones should be connected to initially. 
+If a configuration file does not exist for the desired combination of drones, create another configuration file as desired.
+If the file location.override.conf does not exist, the configuration file listed in location.default.conf (SITL.json) is used instead.
 
 To close the GroundStation:
-Due to an infinite while loop in the GroundStation which does not respond to the SIGTERM signal for the process, currently the GroundStation does not properly close with the Ctrl+C shortcut.
-Instead, the GroundStation must be closed using a shell script, which force closes all python processes.
-To close the GroundStation, open another terminal and cd into Dronology/python/edu.nd.dronology.gstation.python/
-Run the bash script ./killPY.sh
-This will force close all python processes on the machine (including the GroundStation) and any instances of SITL (arducopter) that are running.
+The GroundStation can now be properly closed by simply pressing Ctrl+C in the terminal window of the GroundStation.
+If the GroundStation doesn't properly close this way, you can run the file ./killPY.sh in a separate terminal to force close the GroundStation.

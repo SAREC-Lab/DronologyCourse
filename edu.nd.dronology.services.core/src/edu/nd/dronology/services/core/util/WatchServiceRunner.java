@@ -2,7 +2,6 @@ package edu.nd.dronology.services.core.util;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -26,9 +25,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 public class WatchServiceRunner implements Runnable {
-
+	private static final ILogger LOGGER = LoggerProvider.getLogger(WatchServiceRunner.class);
 	private boolean recursive;
 	private IFileChangeNotifyable manager;
 	private String[] fileExtensions;
@@ -44,24 +45,19 @@ public class WatchServiceRunner implements Runnable {
 	private String dir;
 	private Object notifyTask;
 	private List<String> changeList = new ArrayList<>();
-	private static Map<WatchKey, Path> keys = new HashMap<WatchKey, Path>();
+	private static Map<WatchKey, Path> keys = new HashMap<>();
 
 	@Override
 	public void run() {
 
 		try {
 			watcher = FileSystems.getDefault().newWatchService();
-			// registerAll(Paths.get(dir));
 			register(Paths.get(dir));
 
 			while (true) {
 				WatchKey watchKey = watcher.take();
 				for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
-					// System.out.println(watchEvent.kind() + " " + watchEvent.context());
 					Path context = (Path) watchEvent.context();
-					File f = context.toFile();
-					// LogProcessor.process(dir+"\\"+context.getFileName());
-					// System.out.println(dir + "\\" + context.getFileName());
 					for (String ext : fileExtensions) {
 						if (context.getFileName().toString().endsWith(ext)) {
 							System.out.println(watchEvent.kind().toString());
@@ -73,17 +69,13 @@ public class WatchServiceRunner implements Runnable {
 						}
 					}
 				}
-
 				watchKey.reset();
 			}
 		} catch (ClosedWatchServiceException e) {
-			// watcher shut down.
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 
 	}
@@ -168,8 +160,7 @@ public class WatchServiceRunner implements Runnable {
 		try {
 			watcher.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 
