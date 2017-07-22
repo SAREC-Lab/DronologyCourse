@@ -119,7 +119,8 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 						LOGGER.error(e);
 					}
 
-				} else if (hasAwaitingTakeOff()) {
+				}
+				if (hasAwaitingTakeOff() && activeUAVS.get() < MAX_IN_AIR) {
 					LOGGER.info("Awaiting Takeoff:" + getAwaitingTakeOffFlights().get(0).getFlightID());
 					try {
 						checkForTakeOffReadiness();
