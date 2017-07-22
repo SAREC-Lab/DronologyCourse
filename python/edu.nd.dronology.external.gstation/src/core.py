@@ -1,5 +1,7 @@
 import socket
 import threading
+
+import mathutil
 import util
 import dronekit
 import dronekit_sitl
@@ -173,7 +175,14 @@ def land(vehicle):
     vehicle.mode = dronekit.VehicleMode("LAND")
 
     while vehicle.location.global_frame.alt:
-        time.sleep(1)
+        time.sleep(2)
+
+
+def return_to_launch(vehicle):
+    vehicle.mode = dronekit.Vehicle("RTL")
+
+    while vehicle.location.global_frame.alt:
+        time.sleep(2)
 
 
 def goto_lla(vehicle, lat, lon, alt, groundspeed=None):
@@ -199,7 +208,7 @@ def is_lla_reached(vehicle, lat, lon, alt, threshold=1):
     :param threshold:
     :return:
     """
-    return vehicle_to_lla(vehicle).distance(util.Lla(lat, lon, alt)) <= threshold
+    return vehicle_to_lla(vehicle).distance(mathutil.Lla(lat, lon, alt)) <= threshold
 
 
 def _goto_sequential(vehicle, waypoints):
@@ -214,7 +223,7 @@ def _goto_sequential(vehicle, waypoints):
     cur_wp = waypoints.pop(0)
     goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
 
-    while not is_complete:
+    while not is_complete and vehicle.mode.name == 'GUIDED':
         if is_lla_reached(vehicle, *cur_wp.get_lla()):
             _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
             if waypoints:
@@ -243,7 +252,7 @@ def goto_sequential(vehicle, waypoints, block=False):
 
 def vehicle_to_lla(vehicle):
     lla = vehicle.location.global_frame
-    return util.Lla(lla.lat, lla.lon, lla.alt)
+    return mathutil.Lla(lla.lat, lla.lon, lla.alt)
 
 
 class Connection:

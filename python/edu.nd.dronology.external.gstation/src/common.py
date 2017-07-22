@@ -3,8 +3,8 @@ import json
 import time
 
 
-SEARCH_ZIGZAG = 'zigzag'
-SEARCH_SPIRAL = 'spiral'
+SEARCH_DEFAULT = 'search_default'
+
 
 
 ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
@@ -15,10 +15,10 @@ DRONE_1 = (DRONE_TYPE_SITL_VRTL, {'instance': 0, 'home': (41.519408, -86.239996,
 DRONE_2 = (DRONE_TYPE_SITL_VRTL, {'instance': 1, 'home': (41.519408, -86.239496, 0, 0)})
 
 DEFAULT_DRONE_SPECS = (DRONE_1,)
-DEFAULT_SAR_BOUNDS = ((41.519367, -86.240419, 10),
-                      (41.519277, -86.240405, 10),
-                      (41.519395, -86.239418, 10),
-                      (41.519313, -86.239417, 10))
+DEFAULT_SAR_BOUNDS = ((41.519367, -86.240419, 0),
+                      (41.519277, -86.240405, 0),
+                      (41.519395, -86.239418, 0),
+                      (41.519313, -86.239417, 0))
 
 
 class Waypoint:

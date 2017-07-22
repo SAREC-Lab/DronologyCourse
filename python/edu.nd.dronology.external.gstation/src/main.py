@@ -1,5 +1,7 @@
 import core
 import argparse
+import mathutil
+import sar
 import util
 import dronekit
 from common import *
@@ -7,16 +9,37 @@ from common import *
 _LOG = util.get_logger()
 
 
-def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None, ip=None, instance=0,
-                           ardupath=ARDUPATH, speed=1, rate=10, home=(41.519508, -86.239996, 0, 0), baud=115200):
+def mission_single_uav_sar(connection, v_type, v_id, bounds, point_last_seen=None, altitude=10, groundspeed=10,
+                           ip=None, instance=0, ardupath=ARDUPATH, baud=115200,
+                           speed=1, rate=10, home=(41.519508, -86.239996, 0, 0)):
+    """
+    Conduct a search and rescue mission with a single UAV using waypoint navigation.
+
+    :param connection: core.Connection object used to talk to Dronology
+    :param v_type: vehicle type (PHYS or VRTL)
+    :param v_id: vehicle id
+    :param bounds: the bounds of the search space ([(lat, lon, alt), ...])
+                   NOTE: alt will be ignored but still must be provided
+    :param point_last_seen: the last point the target was seen (lat, lon, alt)
+    :param altitude: the altitude at which the uav should fly during the search (meters)
+    :param groundspeed: the speed at which the uav should fly (m/s)
+    :param ip: the ip used to connect to the vehicle (only necessary for a physical drone)
+    :param instance: the SITL instance (only necessary if multiple simulated uavs are required)
+    :param ardupath: the path to the ardupilot repository
+    :param baud: internal SITL parameter (see documentation)
+    :param speed: internal SITL parameter (see documentation)
+    :param rate: internal SITL parameter (see documentation)
+    :param home: internal SITL parameter (see documentation)
+
+    """
     vehicle, shutdown_cb = core.connect_vehicle(v_type, vehicle_id=v_id, ip=ip, instance=instance,
                                                 ardupath=ardupath, speed=speed, rate=rate, home=home, baud=baud)
 
     # SET UP CALLBACKS
-    @vehicle.on_attribute('mode')
-    def mode_listener(_, name, value):
-        # should stop doing whatever we are doing if mode changes
-        pass
+    # @vehicle.on_attribute('mode')
+    # def mode_listener(_, name, value):
+    #     # should stop doing whatever we are doing if mode changes
+    #     pass
 
     # SET UP TIMERS
     def gen_state_message(m_vehicle):
@@ -35,18 +58,16 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
     vehicle.mode = dronekit.VehicleMode('GUIDED')
 
     home = vehicle.home_location
-    home_lla = util.Lla(home.lat, home.lon, 0)
-    vertices = [util.Lla(lat, lon, alt) for lat, lon, alt in bounds]
-    bounds = util.get_search_path(home_lla, vertices, last_known_loc=last_known_loc)
+    start = mathutil.Lla(home.lat, home.lon, 0)
+    vertices = [mathutil.Lla(lat, lon, 0) for lat, lon, _ in bounds]
+    path = sar.get_search_path(start, vertices, point_last_seen=point_last_seen)
 
     waypoints = []
-    if last_known_loc:
-        waypoints.append(Waypoint(*last_known_loc, groundpseed=10))
-    for lat, lon, alt in bounds:
-        waypoints.append(Waypoint(lat, lon, alt, groundpseed=10))
+    if point_last_seen:
+        waypoints.append(Waypoint(*point_last_seen, groundpseed=groundspeed))
+    for lat, lon, _ in path:
+        waypoints.append(Waypoint(lat, lon, altitude, groundpseed=groundspeed))
 
-    home = vehicle.home_location
-    waypoints.append(Waypoint(home.lat, home.lon, bounds[-1][-1], groundpseed=10))
 
     # SEND HANDSHAKE
     dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
@@ -56,7 +77,7 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
     send_monitor_message_timer = util.RepeatedTimer(5.0, gen_monitor_message, vehicle)
 
     # TAKEOFF
-    core.takeoff(vehicle, alt=10)
+    core.takeoff(vehicle, alt=altitude)
     _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
     # FLY
@@ -73,18 +94,14 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, last_known_loc=None
         cmds = core.get_commands(v_id)
         for cmd in cmds:
             if isinstance(cmd, (SetMonitorFrequency,)):
-                # stop the timer
+                # stop the timer, send message, reset interval, restart timer
                 send_monitor_message_timer.stop()
-                # send a message
                 gen_monitor_message(vehicle)
-                # reset the interval
                 send_monitor_message_timer.set_interval(cmd.get_monitor_frequency() / 1000)
-                # start the timer
                 send_monitor_message_timer.start()
 
     worker.join()
-    
-    core.land(vehicle)
+    core.return_to_launch(vehicle)
     _LOG.info('Vehicle {} landed.'.format(v_id))
     core.set_armed(vehicle, armed=False)
     _LOG.info('Vehicle {} disarmed.'.format(v_id))
