@@ -13,7 +13,7 @@ public class FReditBar extends CustomComponent{
 	Button saveButton = new Button("Save");
 	
 	Label textLabel = new Label("Editing Route");
-	Label smallText = new Label("Left click to add a new waypoint. Right click to finish drawing and add a finish point. Drag waypoints to move.");
+	Label smallText = new Label("Left click to add a new waypoint. Drag waypoints to move.");
 	
 	public FReditBar(FRMapComponent map) {
 		setStyleName("fr_edit_bar");

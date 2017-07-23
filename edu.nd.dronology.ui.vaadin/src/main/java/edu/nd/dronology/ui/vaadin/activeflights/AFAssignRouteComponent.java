@@ -88,6 +88,10 @@ public class AFAssignRouteComponent extends CustomComponent{
 	@SuppressWarnings("null")
 	public AFAssignRouteComponent(String name, String status, double batteryLife, String healthColor, double lat,
 			double lon, double alt, double speed){
+		this.addStyleName("af_assign_route");
+		topContent.addStyleName("af_assign_route_top_content");
+		sideContent.addStyleName("af_assign_route_middle_content");
+		bottomButtons.addStyleName("af_assign_route_bottom_content");
 		
 		this.name = name;
 		panelContent = new AFDragLayout(name);
@@ -229,8 +233,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 		sidePanel.setContent(panelContent);
 		sideContent.addComponents(sidePanel, sideButtons, frLayout);
 		bottomButtons.addComponents(cancel, apply);
-		bottomButtons.setComponentAlignment(cancel, Alignment.MIDDLE_RIGHT);
-		bottomButtons.setComponentAlignment(apply, Alignment.MIDDLE_RIGHT);
+		apply.addStyleName("btn-okay");
 		content.addComponents(topContent, sideContent, bottomButtons);
 		
 		setCompositionRoot(content);

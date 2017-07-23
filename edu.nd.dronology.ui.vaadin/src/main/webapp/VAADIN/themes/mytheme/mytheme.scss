@@ -103,6 +103,24 @@ $valo-menu-background-color: #eee;
 		background-color: $color-danger-hover;
 		border-color: $color-danger-hover-border;
 	}
+
+	.btn-okay {
+		color: $color-light-5;
+		background-color: $color-okay-main;
+		border-color: $color-okay-main-border;
+		border-width: 1px;
+	}
+	.btn-okay:focus,
+	.btn-okay.focus {
+		color: $color-light-5;
+		background-color: $color-okay-main;
+		border-color: $color-okay-main-border;
+	}
+	.btn-okay:hover {
+		color: $color-light-5;
+		background-color: $color-okay-hover;
+		border-color: $color-okay-hover-border;
+	}
 	
 	.main_layout {
 		max-width: 100%;
@@ -242,7 +260,6 @@ $valo-menu-background-color: #eee;
 	.fr_edit_bar{
 		background-color: $color-dark-4;
 		color: white;
-		padding-right: 90px;
 		width: 880px !important;
 		.v-button {
 			height: 22px !important;
@@ -254,7 +271,13 @@ $valo-menu-background-color: #eee;
 		}
 		.small_text{
 			font-size: 60%;
-			padding: 10px 80px 6px 8px;
+			padding: 10px 8px 6px 8px;
+		}
+		.v-horizontallayout {
+			width: 100%;
+		}
+		.v-slot-small_text {
+			width: calc(100% - 300px);
 		}
 	}
 	.fr_table_component {
@@ -435,6 +458,128 @@ $valo-menu-background-color: #eee;
 		.small_text{
 			font-size: 60%;
 			padding: 10px 80px 6px 8px;
+		}
+	}
+	.af_assign_route {
+		.af_assign_route_top_content {
+			background-color: $color-dark-5;
+			color: $color-light-5;
+			padding: 5px 0;
+			font-size: 13px;
+			width: 100%;
+			
+			>.v-slot:nth-child(1) {
+				.v-image {
+					width: 100px;
+					padding: 10px 20px;
+					-webkit-filter: invert(100%);
+				}
+			}
+			>.v-slot:nth-child(2) {
+				.info_box_name {
+					font-size: 16px;
+				}
+			}
+			>.v-slot:nth-child(3) {
+				padding: 2px 10px;
+			}
+			>.v-slot:nth-child(4) {
+				line-height:120%;
+				border-radius: 10px;
+				background-color: $color-light-4;
+				color: $color-dark-5;
+				padding: 10px 30px;
+				margin: 5px 50px;
+				
+				.v-slot {
+					padding: 0 5px;
+				}
+			}
+			>.v-slot:nth-child(5) {
+				background-color: $color-light-3;
+				color: $color-dark-5;
+			    padding: 5px 30px;
+			    margin-right: 2px;
+			    border-radius: 2px;
+				float: right;
+				.v-button {
+					height: 28px;
+					width:100%;
+				}
+			}
+		}
+		.af_assign_route_middle_content {
+			$af_assign_route_middle_content_height: 80vh;
+			$af_assign_route_map_height: 45vh;
+			height: $af_assign_route_middle_content_height;
+			width: 100%;
+			.fr_new_route_button {
+				font-size: 10px;
+				top: 65px;
+				left: 240px;
+			}
+			.fr_info_panel {
+				height: $af_assign_route_middle_content_height  !important;
+			}
+			.fr_mapabsolute_layout {
+				height: $af_assign_route_map_height  !important;
+			}
+			.fr_map_component {
+				.v-leaflet {
+					height: $af_assign_route_map_height  !important;
+				}
+			}
+			.fr_map_component_no_table {
+				.v-leaflet {
+					height: calc(#{$af_assign_route_middle_content_height} - #{$fr-top-bar-height} - 6px) !important;
+				}
+			}
+			.fr_table_component {
+				height: calc(#{$af_assign_route_middle_content_height} - #{$af_assign_route_map_height} - #{$fr-top-bar-height} - 12px) !important;
+			}
+			.fr_table_component_edit_mode {
+				.v-grid-tablewrapper {
+					height: calc(#{$af_assign_route_middle_content_height} - #{$af_assign_route_map_height} - #{$fr-top-bar-height} - 12px - 10px) !important;
+				}
+			}
+			>.v-slot:nth-child(1) {
+				width: 360px;
+				.v-widget {
+					width: 100%
+				}
+			}
+			>.v-slot:nth-child(3) {
+				padding: calc(#{$af_assign_route_middle_content_height}/2 - 220px) 0;
+				.v-button {
+					padding: 0;
+					width: 18px;
+					height: 200px;
+					margin: 10px 0;
+				}
+			}
+			>.v-slot:nth-child(5) {
+				width: calc(100% - 392px);
+				.v-absolutelayout-wrapper-fr_edit_bar {
+					left: calc(100%/2 - 300px) !important;
+				}
+				.fr_edit_bar {
+					width: 600px !important;
+				}
+				.v-widget {
+					width: 100%
+				}
+			}
+		}
+		.af_assign_route_bottom_content {
+			height: inherit;
+			width: 100%;
+			padding-left: calc(100% - 240px);
+			padding-top: 10px;
+			padding-bottom: 10px;
+			.v-button {
+				width: 100px;
+				margin: 0 5px;
+			}
 		}
 	}
 	.v-margin-top {
