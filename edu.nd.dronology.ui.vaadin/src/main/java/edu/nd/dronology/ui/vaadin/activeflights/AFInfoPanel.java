@@ -62,10 +62,21 @@ public class AFInfoPanel extends CustomComponent{
 		emergency.getHome().addClickListener( e-> {
 			List<String> checked = this.getChecked();
 			String message = "";
+			boolean sendHome = true;
 			if (checked.size() > 0){
 				if (checked.size() == 1){
+					for(int i = 1; i < numUAVs + 1; i++){
+						AFInfoBox box = (AFInfoBox) content.getComponent(i);
+						if (box.getName().equals(checked.get(0))){
+							if (box.getStatus().equals("ON_GROUND")){
+								Notification.show(checked.get(0) + " is already home.");
+								sendHome = false;
+							} else{
+								message = "Are you sure you want to send " + checked.get(0) + " to its home?";
+							}
+						}
+					}
 					
-					message = "Are you sure you want to send " + checked.get(0) + " to its home?";
 				}
 				else{
 					String drones = "";
@@ -91,13 +102,22 @@ public class AFInfoPanel extends CustomComponent{
 				try {
 					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
 					if (checked.size() > 0){
-						for (int i = 0; i < checked.size(); i++)
-							service.returnToHome(checked.get(i));
+						for (int i = 0; i < checked.size(); i++){
+							for(int j = 1; j < numUAVs + 1; j++){
+								AFInfoBox box = (AFInfoBox) content.getComponent(j);
+								if (box.getName().equals(checked.get(i))){
+									if (!box.getStatus().equals("ON_GROUND")){
+										service.returnToHome(checked.get(i));
+									}
+								}
+							}
+						}
 					}
 					else {
 						for (int i = 1; i < numUAVs + 1; i++){
 							AFInfoBox box = (AFInfoBox) content.getComponent(i);
-							service.returnToHome(box.getName());
+							if (!box.getStatus().equals("ON_GROUND"))
+								service.returnToHome(box.getName());
 						}
 					}
 				} catch (Exception exc) {
@@ -115,7 +135,8 @@ public class AFInfoPanel extends CustomComponent{
 			confirm.setContent(subContent);
 			confirm.setModal(true);
 			confirm.center();
-			UI.getCurrent().addWindow(confirm);
+			if (sendHome)
+				UI.getCurrent().addWindow(confirm);
 			
 		});
 
@@ -268,7 +289,6 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (!box.getIsChecked())
 				checked = false;
-				
 		}
 		return checked;
 	}
@@ -279,7 +299,6 @@ public class AFInfoPanel extends CustomComponent{
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getIsChecked())
 				notChecked = false;
-				
 		}
 		return notChecked;
 	}
@@ -296,8 +315,7 @@ public class AFInfoPanel extends CustomComponent{
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (!box.getBoxVisible())
-				visible = false;
-				
+				visible = false;	
 		}
 		return visible;
 	}
@@ -307,8 +325,7 @@ public class AFInfoPanel extends CustomComponent{
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getBoxVisible())
-				notVisible = false;
-				
+				notVisible = false;			
 		}
 		return notVisible;
 	}

@@ -463,7 +463,7 @@ public class AFInfoBox extends CustomComponent {
 
 	private void returnHome(Window parent){
 		if (this.status.equals("ON_GROUND")){
-			Notification.show("Drone is already Home");
+			Notification.show(this.name + " is already home.");
 			return;
 		}
 		Window confirm = new Window("Confirm");
