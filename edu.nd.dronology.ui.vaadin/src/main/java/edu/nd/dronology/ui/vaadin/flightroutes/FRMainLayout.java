@@ -37,6 +37,7 @@ public class FRMainLayout extends CustomComponent {
 	private VerticalLayout routeLayout;
 	private boolean isFirst = true;
 	private boolean isNew = false;
+	private boolean toDo = true;
 	private int componentCount;
 	private String name = "";
 	private FlightRouteInfo flightInfo;
@@ -45,13 +46,12 @@ public class FRMainLayout extends CustomComponent {
 
 	@WaypointReplace
 	public FRMainLayout() {
-
 		addStyleName("main_layout");
 		CssLayout content = new CssLayout();
 		content.setSizeFull();
 
 		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend",
-				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite", this);
+				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite", this, toDo);
 		
 		this.map = map;
 		
@@ -163,6 +163,7 @@ public class FRMainLayout extends CustomComponent {
 		// removes old pins, polylines, and style when switching routes
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
+			map.getUtils().removeAllLines(map.getUtils().getPolylines());
 		}
 
 		int numComponents;
@@ -198,11 +199,12 @@ public class FRMainLayout extends CustomComponent {
 			if (i != index) {
 				routeLayout.getComponent(i).removeStyleName("info_box_focus");
 			}
-		}	
-		map.setRouteCenter();
+		}
+
+		map.setRouteCenter(map.getToDo());
 		
 		if(routeLayout.getComponentIndex(child) != -1){
-			map.displayByName(flightInfo, null, 0, false);
+			map.displayByName(flightInfo, null, 0, false, map.getToDo());
 		}
 		
 		if(routeLayout.getComponentIndex(child) != -1){
@@ -226,7 +228,7 @@ public class FRMainLayout extends CustomComponent {
 			drone = controls.getInfoPanel().getRoute();
 			int numCoords = drone.getWaypoints().size();
 			droneName = controls.getInfoPanel().getName();
-			map.displayByName(drone, droneName, numCoords, true);
+			map.displayByName(drone, droneName, numCoords, true, map.getToDo());
 			
 			Point pt = new Point(0, 0);
 			way = new WayPoint(pt, true);

@@ -24,8 +24,8 @@ public class NavigationBar extends CustomComponent {
 
 	private static final long serialVersionUID = -511507929126974047L;
 	private VerticalLayout content = new VerticalLayout();
-	private AFMainLayout activeflights = new AFMainLayout();
-	private FRMainLayout flightroutes = new FRMainLayout();
+	private AFMainLayout activeFlights = new AFMainLayout();
+	private FRMainLayout flightRoutes = new FRMainLayout();
 	public NavigationBar(){
 		
 		class NavigationBarCommand implements MenuBar.Command {
@@ -35,11 +35,11 @@ public class NavigationBar extends CustomComponent {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
 				if (selectedItem.getText().equals("Active Flights")) {
-					content.removeComponent(flightroutes);
-					content.addComponent(activeflights);
+					content.removeComponent(flightRoutes);
+					content.addComponent(activeFlights);
 				} else if (selectedItem.getText().equals("Flight Routes")) {
-					content.removeComponent(activeflights);
-					content.addComponent(flightroutes);
+					content.removeComponent(activeFlights);
+					content.addComponent(flightRoutes);
 				} else {
 					return;
 				}
@@ -58,8 +58,8 @@ public class NavigationBar extends CustomComponent {
 		
 		NavigationBarCommand menubarCommand = new NavigationBarCommand();
 		
-		activeflights.setSizeFull();
-		flightroutes.setSizeFull();
+		activeFlights.setSizeFull();
+		flightRoutes.setSizeFull();
 		
 		MenuBar menuBar = new MenuBar();
 		menuBar.setWidth("100%");
@@ -78,6 +78,10 @@ public class NavigationBar extends CustomComponent {
 	}
 	
 	public AFMainLayout getAFLayout(){
-		return activeflights;
+		return activeFlights;
+	}
+	
+	public FRMainLayout getFRLayout(){
+		return flightRoutes;
 	}
 }

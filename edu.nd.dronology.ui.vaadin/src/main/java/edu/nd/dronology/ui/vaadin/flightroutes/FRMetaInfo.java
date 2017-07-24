@@ -11,7 +11,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -29,15 +28,19 @@ public class FRMetaInfo extends CustomComponent {
 	String routeName;
 	String routeId; 
 	int numWaypoints;
+	CheckBox autoZooming;
 	CheckBox tableView;
 	Button editButton;
 	Button deleteButton;
 	Label nameLabel;
+	boolean toDo;
 	
-	public FRMetaInfo(String name, int numCoords, FRMapComponent map){
+	public FRMetaInfo(String name, int numCoords, FRMapComponent map, boolean toDo){
 		//used if route is selected
 		HorizontalLayout content = new HorizontalLayout();
+		HorizontalLayout zoomContent = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
+		HorizontalLayout checkboxes = new HorizontalLayout();
 		VerticalLayout controls = new VerticalLayout();
 		
 		routeName = name;
@@ -62,7 +65,14 @@ public class FRMetaInfo extends CustomComponent {
 		
 		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-			
+
+		autoZooming = new CheckBox("Zoom to Route");
+		zoomContent.setStyleName("fr_route_meta_info");
+		zoomContent.addStyleName("has_route");
+		
+		this.toDo = toDo;
+		autoZooming.setValue(toDo);
+		
 		tableView = new CheckBox("Table View");
 		content.setStyleName("fr_route_meta_info");
 		content.addStyleName("has_route");
@@ -70,7 +80,8 @@ public class FRMetaInfo extends CustomComponent {
 		tableView.setValue(true);
 		
 		buttons.addComponents(editButton, deleteButton);
-		controls.addComponents(buttons, tableView);
+		checkboxes.addComponents(autoZooming, tableView);
+		controls.addComponents(buttons, checkboxes);
 		content.addComponents(nameLabel, controls);
 
 		controls.addStyleName("route_meta_controls");
@@ -86,8 +97,8 @@ public class FRMetaInfo extends CustomComponent {
 		setCompositionRoot(content);
 		
 	}
-	public FRMetaInfo(FlightRouteInfo info, FRMapComponent map){		
-		this(info.getName(), info.getWaypoints().size(), map);	
+	public FRMetaInfo(FlightRouteInfo info, FRMapComponent map, boolean toDo){
+		this(info.getName(), info.getWaypoints().size(), map, toDo);	
 	}	
 	
 	public FRMetaInfo(){
@@ -123,6 +134,9 @@ public class FRMetaInfo extends CustomComponent {
 			nameLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoints)");
 			nameLabel.setContentMode(ContentMode.HTML);
 		}
+	}
+	public CheckBox getAutoZooming(){
+		return autoZooming;
 	}
 	public CheckBox getCheckBox(){
 		return tableView;
