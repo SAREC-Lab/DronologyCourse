@@ -177,32 +177,40 @@ public class AFInfoBox extends CustomComponent {
 			this.returnHome(null);
 		});
 
-		assignNewRoute.addClickListener(e -> {
+		assignNewRoute.addClickListener(assignEvent -> {
 			Window window = new Window("Assign New Route");
-			VerticalLayout content = new VerticalLayout();
-			FRMainLayout frLayout = new FRMainLayout();
-			HorizontalLayout buttons = new HorizontalLayout();
-
-			Button cancel = new Button("Cancel");
-			Button apply = new Button("Apply");
-			apply.setEnabled(false);
-			cancel.addClickListener(event -> {
+			
+			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
+					this.lon, this.alt, this.speed);
+			
+			content.getCancel().addClickListener(event -> {
 				UI.getCurrent().removeWindow(window);
 			});
-			window.addClickListener(event -> { //will need to change to if flights are in left panel
-				if (frLayout.getControls().getInfoPanel().getIsRouteSelected())
-					apply.setEnabled(true);
-				else
-					apply.setEnabled(false);
-			});
-
-			apply.addClickListener(event -> {
+			
+			content.getApply().addClickListener( event -> {
+				Collection<FlightRouteInfo> routesToAssign = content.getRoutesToAssign();
 				Window confirm = new Window("Confirm");
 				VerticalLayout subContent = new VerticalLayout();
 				HorizontalLayout subButtons = new HorizontalLayout();
-				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
-				String routeName = selectedFlight.getName();
-				Label label = new Label("Are you sure you want " + this.name + " to follow the route " + routeName + "?");
+				String routeNames = "";
+				Label label = new Label();
+				for (FlightRouteInfo e:routesToAssign){
+					if (routesToAssign.size() == 0){
+						label.setValue("Are you sure you want unassign all flight routes for " + this.name + "?");
+					}
+					else if (routesToAssign.size() == 1){
+						routeNames = e.getName();
+						label.setValue("Are you sure you want " + this.name + " to follow the route " + routeNames + "?");
+					}
+					else {
+						routeNames = routeNames + e.getName() + ", ";
+					}
+				}
+				if (routesToAssign.size() > 1){
+					routeNames = routeNames.substring(0, routeNames.length() - 2);
+					label.setValue("Are you sure you want " + this.name + " to follow the routes " + routeNames + "?");
+				}
+				 
 				Button yes = new Button("Yes");
 				Button no = new Button("No");
 				subButtons.addComponents(yes, no);
@@ -217,17 +225,49 @@ public class AFInfoBox extends CustomComponent {
 				});
 
 				yes.addClickListener(subEvent -> {
-					activate(selectedFlight);
+					FlightInfo flightRouteInfo = null;
+					IFlightManagerRemoteService service;
+					try {
+						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+						flightRouteInfo = service.getFlightInfo(this.name);					
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				  try {
+				  	service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+						service.cancelPendingFlights(this.name);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				 
+				  
+  			  for (FlightRouteInfo e:routesToAssign){
+					  activate(e);
+				  }			
+				  
 					UI.getCurrent().removeWindow(confirm);
 					UI.getCurrent().removeWindow(window);
 				});
 			});
-			buttons.addComponents(cancel, apply);
-			content.addComponents(frLayout, buttons);
-
+			
+			content.getHover().addValueChangeListener( e-> {
+				if (content.getHover().getValue()){
+					this.setHoverInPlace(true);
+				}
+				else {
+					this.setHoverInPlace(false);
+				}
+			});
+			
+			content.getReturnToHome().addClickListener( e -> {
+				this.returnHome(window);
+			});
+			
 			window.setContent(content);
 			window.setModal(true);
-			window.setWidth(1296, Unit.PIXELS);
+			window.setWidth(1496, Unit.PIXELS);
 			UI.getCurrent().addWindow(window);
 		});
 
@@ -371,102 +411,7 @@ public class AFInfoBox extends CustomComponent {
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
 		if (this.hoverInPlace) {
-			Window window = new Window("Assign New Route");
 			
-			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
-					this.lon, this.alt, this.speed);
-			
-			content.getCancel().addClickListener(event -> {
-				UI.getCurrent().removeWindow(window);
-			});
-			
-			content.getApply().addClickListener( event -> {
-				Collection<FlightRouteInfo> routesToAssign = content.getRoutesToAssign();
-				Window confirm = new Window("Confirm");
-				VerticalLayout subContent = new VerticalLayout();
-				HorizontalLayout subButtons = new HorizontalLayout();
-				String routeNames = "";
-				Label label = new Label();
-				for (FlightRouteInfo e:routesToAssign){
-					if (routesToAssign.size() == 0){
-						label.setValue("Are you sure you want unassign all flight routes for " + this.name + "?");
-					}
-					else if (routesToAssign.size() == 1){
-						routeNames = e.getName();
-						label.setValue("Are you sure you want " + this.name + " to follow the route " + routeNames + "?");
-					}
-					else {
-						routeNames = routeNames + e.getName() + ", ";
-					}
-				}
-				if (routesToAssign.size() > 1){
-					routeNames = routeNames.substring(0, routeNames.length() - 2);
-					label.setValue("Are you sure you want " + this.name + " to follow the routes " + routeNames + "?");
-				}
-				 
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				subButtons.addComponents(yes, no);
-				subContent.addComponents(label, subButtons);
-				confirm.setContent(subContent);
-				confirm.setModal(true);
-				confirm.center();
-				UI.getCurrent().addWindow(confirm);
-
-				no.addClickListener(subEvent -> {
-					UI.getCurrent().removeWindow(confirm);
-				});
-
-				yes.addClickListener(subEvent -> {
-					FlightInfo flightRouteInfo = null;
-					IFlightManagerRemoteService service;
-					try {
-						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-						flightRouteInfo = service.getFlightInfo(this.name);
-						
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				  try {
-				  	service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-						service.cancelPendingFlights(this.name);
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				 
-				  
-  			  for (FlightRouteInfo e:routesToAssign){
-					  activate(e);
-				  }			
-				  
-					UI.getCurrent().removeWindow(confirm);
-					UI.getCurrent().removeWindow(window);
-				});
-			});
-			
-			content.getHover().addValueChangeListener( e-> {
-				if (content.getHover().getValue()){
-					//this.setHoverInPlace(true);
-					this.hoverInPlace = true;
-					hoverSwitch.setValue(this.hoverInPlace);
-				}
-				else {
-					//this.setHoverInPlace(false);
-					this.hoverInPlace = false;
-					hoverSwitch.setValue(this.hoverInPlace);
-				}
-			});
-			
-			content.getReturnToHome().addClickListener( e -> {
-				this.returnHome(window);
-			});
-			
-			window.setContent(content);
-			window.setModal(true);
-			window.setWidth(1496, Unit.PIXELS);
-			UI.getCurrent().addWindow(window);
 			
 			this.status = "Hovering";
 			statusInfo2.setValue("Status: ");
