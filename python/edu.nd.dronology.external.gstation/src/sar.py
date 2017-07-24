@@ -1,6 +1,6 @@
 import numpy as np
 import util
-import mathutil
+from mathutil import Lla, GeoPoly
 from common import *
 
 _LOG = util.get_logger()
@@ -8,17 +8,15 @@ _LOG = util.get_logger()
 arr = np.array
 
 
-
-def _distance_2d(p0, p1):
-    return np.sqrt(np.sum((p1 - p0) **2))
-
-
-def tsp_greedy(start, points):
+def tsp_greedy(start, points, point_last_seen=None):
     to_visit = points
     path = [start]
 
+    if point_last_seen is not None:
+        path.append(point_last_seen)
+
     while to_visit.size:
-        dists = np.sqrt(np.sum((to_visit - path[-1]) ** 2, axis=1))
+        dists = [path[-1].distance(b) for b in to_visit]
         i = np.argmin(dists)
         path.append(to_visit[i])
         to_visit = np.delete(to_visit, i, axis=0)
@@ -26,25 +24,34 @@ def tsp_greedy(start, points):
     return arr(path)
 
 
-def _get_search_path_default(start, vertices, step=10):
-    start_2d = start.to_pvector()[:-1]
-    grid_2d = arr([v.to_pvector()[:-1] for v in vertices])
-    z = start.to_pvector()[-1]
+def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
+    p_ES_E = start.to_pvector()
+    grid = GeoPoly(vertices)
 
-    x_min, x_max = [f(grid_2d[:, 0]) for f in (np.min, np.max)]
-    y_min, y_max = [f(grid_2d[:, 1]) for f in (np.min, np.max)]
+    p_EA_E = grid.sw_vertex()
+    p_EC_E = grid.ne_vertex()
+    p_ED_E = grid.se_vertex()
+    p_furthest_north_E = grid.furthest_north()
 
-    x = np.linspace(x_min, x_max, num=max((x_max - x_min) / step, 3))
-    y = np.linspace(y_min, y_max, num=max((y_max - y_min) / step, 3))
+    R_EN = p_EA_E.n_E2R_EN()
+    p_AD_N = R_EN.T.dot(p_ED_E - p_EA_E)
+    p_AC_N = R_EN.T.dot(p_EC_E - p_EA_E)
+    e_dist = int(max(p_AD_N[1], p_AC_N[1]))
+    azimuth = np.rad2deg(np.arctan2(p_AD_N[1], p_AD_N[0]))
 
-    xx, yy = np.meshgrid(x, y)
-    S = np.c_[xx.ravel(), yy.ravel()]
+    S = []
 
-    path_2d = tsp_greedy(start_2d, S)
+    for x in range(0, e_dist + step, step):
+        p_EA1_E = p_EA_E.move_azimuth_distance(azimuth, x)
+        p_A1FN_E = p_furthest_north_E - p_EA1_E
+        p_A1FN_N = p_EA1_E.n_E2R_EN().T.dot(p_A1FN_E)
+        n_dist = int(p_A1FN_N[0])
+        for y in range(0, n_dist + step, step):
+            p_new = p_EA1_E.move_azimuth_distance(0, y)
+            S.append(p_new)
 
-    return [mathutil.Pvector(x, y, z).to_lla() for x, y in path_2d]
-
-
+    path = tsp_greedy(p_ES_E, arr(S), point_last_seen=point_last_seen)
+    return [pos.to_lla() for pos in path]
 
 
 _search_strats = {
@@ -52,28 +59,34 @@ _search_strats = {
 }
 
 
-def get_search_path(start, vertices, strat=SEARCH_DEFAULT, point_last_seen=None):
+def get_search_path(start, vertices, strat=SEARCH_DEFAULT, step=10, point_last_seen=None):
     """
 
-    :param start: the starting location of the drone (mathutil.Position)
-    :param vertices: the vertices of the search space ([mathutil.Position, ... ])
+    :param start: the starting location of the drone (Position)
+    :param vertices: the vertices of the search space ([Position, ... ])
     :param strat: the search strategy (choose from search strategies in common.py)
+    :param step: the number of meters between each waypoint
     :param point_last_seen: optional, the last known location of the target (lat, lon, alt)
     :return:
     """
-    if len(vertices) < 3:
-        raise ValueError('invalid search area, must have at least 3 vertices.')
+    if len(vertices) != 4:
+        # TODO: support arbitrary polygon
+        raise ValueError('invalid search area, must have exactly 4 vertices.')
 
     if strat not in _search_strats:
         raise ValueError('invalid search strategy specified {}'.format(strat))
 
-    return _search_strats[strat](start, vertices)
+    return _search_strats[strat](start, vertices, step=step, point_last_seen=point_last_seen)
+
+
+def main():
+    bounds = DEFAULT_SAR_BOUNDS
+    s = Lla(*DEFAULT_SAR_START)
+    v = [Lla(*loc) for loc in bounds]
+
+    p = get_search_path(s, v)
+    print('\n'.join([','.join(map(str, x[:-1])) for x in p]))
 
 
 if __name__ == '__main__':
-    bounds = DEFAULT_SAR_BOUNDS
-    s = mathutil.Lla(*bounds[0])
-    v = [mathutil.Lla(*loc) for loc in bounds]
-
-    p = get_search_path(s, v)
-    print(p)
+    main()

@@ -11,7 +11,7 @@ _LOG = util.get_logger()
 
 def mission_single_uav_sar(connection, v_type, v_id, bounds, point_last_seen=None, altitude=10, groundspeed=10,
                            ip=None, instance=0, ardupath=ARDUPATH, baud=115200,
-                           speed=1, rate=10, home=(41.519508, -86.239996, 0, 0)):
+                           speed=1, rate=10, home=(41.519412, -86.239830, 0, 0)):
     """
     Conduct a search and rescue mission with a single UAV using waypoint navigation.
 

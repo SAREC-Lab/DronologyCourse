@@ -17,7 +17,48 @@ def column_vector(a):
 
     return arr(a).reshape(-1, 1)
 
+
+class GeoShape(object):
+    def __init__(self, vertices):
+        self._verts = vertices
+        self._grid = arr([v.to_pvector() for v in vertices])
+
+
+class GeoPoly(GeoShape):
+    def __init__(self, vertices):
+        super(GeoPoly, self).__init__(vertices)
+        self._sw = None
+        self._nw = None
+        self._se = None
+        self._ne = None
+
+    def sw_vertex(self):
+        if self._sw is None:
+            self._sw = min(self._grid, key=lambda l: (l[0] + l[2]))
+        return self._sw
+
+    def nw_vertex(self):
+        if self._nw is None:
+            self._nw = min(self._grid, key=lambda l: (l[0] - l[2]))
+        return self._nw
+
+    def se_vertex(self):
+        if self._se is None:
+            self._se = max(self._grid, key=lambda l: (l[0] - l[2]))
+        return self._se
+
+    def ne_vertex(self):
+        if self._ne is None:
+            self._ne = max(self._grid, key=lambda l: (l[0] + l[2]))
+        return self._ne
+
+    def furthest_north(self):
+        return max(self._grid, key=lambda l: l[2])
+
+
+
 class Earth:
+    radius_m = 6371E3
     @staticmethod
     def meridional_radius_curvature(latitude, a=SEMI_MAJOR, b=SEMI_MINOR):
         """
@@ -90,8 +131,29 @@ class Position(object):
         else:
             return other
 
+    def n_E2R_EN(self):
+        n_E = self.to_nvector().get_xyz(shape=(3, 1))
+        R_EN = nv.n_E2R_EN(n_E)
+
+        return R_EN
+
+    def move_azimuth_distance(self, azimuth, distance):
+        """
+        Find the destination point B that is distance away from this point on the given azimuth.
+        :param azimuth: degrees relative to north (clockwise)
+        :param distance: distance to travel (m)
+        :return: the destination, B
+        """
+        n_EA_E = self.to_nvector().get_xyz(shape=(3, 1))
+        az_rad = nv.rad(azimuth)
+
+        distance_rad = distance / Earth.radius_m
+        n_EB_E = nv.n_EA_E_distance_and_azimuth2n_EB_E(n_EA_E, distance_rad, az_rad).ravel()
+
+        return self.coerce(Nvector(n_EB_E[0], n_EB_E[1], n_EB_E[2], 0))
+
     def __repr__(self):
-        return '{}'.format(self.as_array())
+        return '{}'.format(','.join(self.as_array().astype(str)))
 
     def __str__(self):
         return repr(self)
@@ -170,6 +232,9 @@ class Nvector(Position):
     def get_z(self):
         return self.n_EB_E[2, 0]
 
+    def get_xyz(self, shape=(1, 3)):
+        return self.n_EB_E.reshape(shape)
+
     def get_depth(self):
         return self.depth
 
@@ -194,6 +259,9 @@ class Nvector(Position):
 class Pvector(Position):
     def __init__(self, x, y, z):
         self.p_EB_E = arr([x, y, z]).astype(np.float64).reshape(-1, 1)
+
+    def __sub__(self, other):
+        return self.p_EB_E.ravel() - other.p_EB_E.ravel()
 
     def get_x(self):
         return self.p_EB_E[0, 0]
@@ -224,4 +292,4 @@ def mean_position(positions):
     n_EM_E = nv.mean_horizontal_position(nvecs[:-1, :]).ravel()
     m_Z = np.mean(nvecs[-1, :])
 
-    return Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z)
+    return positions[0].coerce(Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z))

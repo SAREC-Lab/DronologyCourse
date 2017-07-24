@@ -179,7 +179,7 @@ def land(vehicle):
 
 
 def return_to_launch(vehicle):
-    vehicle.mode = dronekit.Vehicle("RTL")
+    vehicle.mode = dronekit.VehicleMode("RTL")
 
     while vehicle.location.global_frame.alt:
         time.sleep(2)
@@ -315,7 +315,7 @@ class Connection:
                     self._socket.listen(0)
                     conn = None
                     while conn is None and self.get_status() == Connection._WAITING:
-                        _LOG.info('Waiting for Dronology connection.')
+                        _LOG.debug('Waiting for Dronology connection.')
                         try:
                             conn, addr = self._socket.accept()
                             self._conn = conn
