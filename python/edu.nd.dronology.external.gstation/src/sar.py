@@ -9,7 +9,7 @@ arr = np.array
 
 
 def tsp_greedy(start, points, point_last_seen=None):
-    to_visit = points
+    to_visit = arr(points)
     path = [start]
 
     if point_last_seen is not None:
@@ -52,7 +52,7 @@ def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
 
     # TODO: implement a filter to remove all points in S that do not intersect with the GeoPoly
 
-    path = tsp_greedy(p_ES_E, arr(S), point_last_seen=point_last_seen)
+    path = tsp_greedy(p_ES_E, S, point_last_seen=point_last_seen)
     return [pos.to_lla() for pos in path]
 
 
@@ -83,7 +83,7 @@ def main():
     v = [Lla(*loc) for loc in bounds]
 
     p = get_search_path(s, v)
-    print('\n'.join([','.join(map(str, x[:-1])) for x in p]))
+    print('\n'.join([','.join(x[:-1].astype(str)) for x in p]))
 
 
 if __name__ == '__main__':
