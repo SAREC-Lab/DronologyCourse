@@ -51,7 +51,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			String caption = "";
 			if (altitude.isEmpty())
 				caption = "Altitude is the empty string.";
-			else if (transitSpeed.isEmpty()) {
+			if (transitSpeed.isEmpty()) {
 				if (altitude.isEmpty())
 					caption = caption + "\n" + "Transit speed is the empty string.";
 				else
