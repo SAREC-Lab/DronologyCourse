@@ -112,7 +112,7 @@ public class FRTableDisplay {
 						}
 
 						route.removeAllLines(route.getPolylines());
-						route.drawLines(route.getMapPoints(), true, 1);
+						route.drawLines(route.getMapPoints(), true, 1, false);
 
 						for (int i = 0; i < this.route.getMapPoints().size(); i++) {
 							this.route.getMapPoints().get(i).setOrder(i + 1);

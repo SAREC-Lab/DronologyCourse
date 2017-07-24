@@ -121,7 +121,7 @@ public class MapMarkerUtilities {
 	    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
 	    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
 	    	removeAllLines(getPolylines());
-	    	drawLines(mapPoints, true, 1);
+	    	drawLines(mapPoints, true, 1, false);
 	    	grid.setItems(mapPoints);
 		}
 	}
@@ -192,7 +192,7 @@ public class MapMarkerUtilities {
 		}
 		
 		removeAllLines(getPolylines());
-		drawLines(mapPoints, true, 1);
+		drawLines(mapPoints, true, 1, false);
 		grid.setItems(mapPoints);
 		
 		return p;
@@ -208,7 +208,7 @@ public class MapMarkerUtilities {
 		}
 		mapPoints.add(p);
 		removeAllLines(getPolylines());
-		drawLines(mapPoints, false, 1);
+		drawLines(mapPoints, false, 1, false);
 		grid.setItems(mapPoints);
 		
 		for (int i = 0; i < mapPoints.size(); i++) {
@@ -252,7 +252,7 @@ public class MapMarkerUtilities {
 		}
 	}
 	
-	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode) {
+	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
 		List<LPolyline> polylines = new ArrayList<>();
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
 			WayPoint current =	mapPoints.get(i);
@@ -270,6 +270,9 @@ public class MapMarkerUtilities {
 				polyline.setColor("#249b09");
 			}
 			else if(i>0 && mapPoints.get(i - 1).isReached()){
+				polyline.setColor("#249b09");
+			}
+			else if (i == 0 && fromActive){
 				polyline.setColor("#249b09");
 			}
 			if (drawOnMap)

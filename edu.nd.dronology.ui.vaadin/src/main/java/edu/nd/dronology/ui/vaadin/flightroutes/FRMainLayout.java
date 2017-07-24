@@ -191,7 +191,7 @@ public class FRMainLayout extends CustomComponent {
 		}
 
 		//adds the lines to the map
-		map.getUtils().drawLines(waypoints, true, 1);
+		map.getUtils().drawLines(waypoints, true, 1, false);
 
 		numComponents = routeLayout.getComponentCount();
 		// when one route is clicked, the others go back to default background color

@@ -78,7 +78,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 
 			UI.getCurrent().removeWindow(window);
 
-			route.drawLines(route.getMapPoints(), true, 0);
+			route.drawLines(route.getMapPoints(), true, 0, false);
 		});
 	}
 
@@ -88,7 +88,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				route.getMapPoints().remove(route.getMapPoints().get(i));
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
-				route.drawLines(route.getMapPoints(), false, 1);
+				route.drawLines(route.getMapPoints(), false, 1, false);
 			}
 		}
 		for (int i = 0; i < route.getPins().size(); i++) {

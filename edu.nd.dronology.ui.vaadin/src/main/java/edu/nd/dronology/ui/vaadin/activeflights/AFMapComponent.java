@@ -173,17 +173,17 @@ public class AFMapComponent extends CustomComponent {
 				}
 				List<LPolyline> polyLines = new ArrayList<>();
 				if (e.getDroneId().equals(focused))
-					polyLines = utilities.drawLines(wayPoints, true, 2);
+					polyLines = utilities.drawLines(wayPoints, true, 2, true);
 				else {
 					boolean drawn = false;
 					for (String name : checked){
 						if (e.getDroneId().equals(name)){
-							polyLines = utilities.drawLines(wayPoints, true, 1);
+							polyLines = utilities.drawLines(wayPoints, true, 1, true);
 							drawn = true;
 						}
 					}
 					if (!drawn)
-						polyLines = utilities.drawLines(wayPoints, true, 0);
+						polyLines = utilities.drawLines(wayPoints, true, 0, true);
 				}
 				flightRoutes.add(polyLines);
 				if (wayPointMarkers.size() != currentFlights.size())

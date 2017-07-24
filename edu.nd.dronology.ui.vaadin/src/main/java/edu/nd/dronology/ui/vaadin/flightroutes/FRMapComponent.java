@@ -160,7 +160,7 @@ public class FRMapComponent extends CustomComponent {
 			
 			route.getMap().removeComponent(route.getLeafletMarker());
 			route.removeAllLines(route.getPolylines());
-			route.drawLines(route.getMapPoints(), true, 1);
+			route.drawLines(route.getMapPoints(), true, 1, false);
 			route.getGrid().setItems(route.getMapPoints());
 			onMapEdited(storedPoints);
 			
@@ -407,7 +407,7 @@ public class FRMapComponent extends CustomComponent {
 			route.addPinForWayPoint(point);
 		}
 		
-		route.drawLines(storedPoints, true, 0);
+		route.drawLines(storedPoints, true, 0, false);
 		
 		route.disableRouteEditing();
 		
@@ -542,7 +542,7 @@ public class FRMapComponent extends CustomComponent {
 				route.addPinForWayPoint(point);
 			}
 			
-			route.drawLines(storedPoints, true, 0);
+			route.drawLines(storedPoints, true, 0, false);
 		}
 		route.disableRouteEditing();
 	}
