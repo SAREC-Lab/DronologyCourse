@@ -51,7 +51,7 @@ public abstract class AbstractPosition {
 	 * Calculates the distance a drone would realistically travel to get from
 	 * this position to the other position.
 	 * 
-	 * Warning! this code slow, the time it takes to run is proportional to the
+	 * Warning! this code is slow. The time it takes to run is proportional to the
 	 * distance from this to other.
 	 * 
 	 * @param other
@@ -77,7 +77,7 @@ public abstract class AbstractPosition {
 	 * 
 	 * 
 	 * @return a 3x3 rotation matrix where the rows can be interpreted as
-	 *         vectors pointing in the north, east and down directions
+	 *         unit vectors pointing in the north, east and down directions
 	 *         respectively.
 	 */
 	public RealMatrix toRotMatrix() {
@@ -96,13 +96,14 @@ public abstract class AbstractPosition {
 	 * from this position to another global position.
 	 * 
 	 * @param other
-	 *            the terrestrial position to find the NED coordinates of
+	 *            the terrestrial position to transform into NED coordinates
+	 *            using this position as the origin
 	 * @return the NED coordinates as a vector with 3 elements where the first
 	 *         (0th) element is the number of meters north, the second element
-	 *         is the number of meters east and the last element is the number
+	 *         is the number of meters east and the third element is the number
 	 *         of meters down.
 	 */
-	public Vector3D findNED(AbstractPosition other) {
+	public Vector3D findNed(AbstractPosition other) {
 		Vector3D self = makeVector3D(this);
 		Vector3D otherVec = makeVector3D(other);
 		Vector3D displacement = otherVec.subtract(self);
@@ -112,12 +113,12 @@ public abstract class AbstractPosition {
 
 	/**
 	 * Calculates the latitude, longitude and altitude of a relative position
-	 * given the number of meters North, East, and down from this position.
+	 * given as the number of meters North, East, and down from this position.
 	 * 
 	 * @param ned
 	 *            a vector with three elements where the first is the number of
 	 *            meters north, the second is the number of meters east, and the
-	 *            last is the number of meters down.
+	 *            third is the number of meters down.
 	 * @return the latitude longitude and altitude of the other position
 	 */
 	public LlaCoordinate findLla(Vector3D ned) {

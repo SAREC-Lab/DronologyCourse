@@ -88,7 +88,7 @@ public class TestLlaCoordinate {
 	public void testToNVector2() {
 		NVector n = new NVector(0.0, 1.0, 0.0, -230.3);
 		LlaCoordinate x = new LlaCoordinate(0, 90, -230.3);
-		assertEquals(0, n.distance(x.toNVector()), 0.0);
+		assertEquals(0, n.distance(x.toNVector()), 1e-9);
 	}
 
 }

@@ -20,7 +20,7 @@ public class TestAbstractPosition {
 		double y = 18.3;
 		LlaCoordinate s = new LlaCoordinate(y, x, 0);
 		LlaCoordinate t = new LlaCoordinate(y, x + 0.004, 0);
-		Vector3D ned = s.findNED(t);
+		Vector3D ned = s.findNed(t);
 		System.out.println(ned);
 		System.out.println(s.findLla(ned));
 		System.out.println(t);
