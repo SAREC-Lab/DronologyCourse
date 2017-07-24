@@ -283,6 +283,28 @@ public class AFInfoPanel extends CustomComponent{
 		}
 	}
 	
+	private boolean getAllVisible(){
+		boolean visible = true;
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (!box.getBoxVisible())
+				visible = false;
+				
+		}
+		return visible;
+	}
+	
+	private boolean getAllNotVisible(){
+		boolean notVisible = true;
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (box.getBoxVisible())
+				notVisible = false;
+				
+		}
+		return notVisible;
+	}
+	
 	public void setAllToHover(){
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
@@ -307,6 +329,15 @@ public class AFInfoPanel extends CustomComponent{
 		else if (this.getAllNotChecked() && selectButton.getCaption().equals("Deselect all")){
 			selectButton.setCaption("Select all");
   		selectAll = true;
+		}
+		//update expand/collapse all button
+		if (this.getAllVisible() && visibleButton.getCaption().equals("Expand all")){
+			visibleButton.setCaption("Collapse all");
+			visible = true;
+		}
+		else if (this.getAllNotVisible() && visibleButton.getCaption().equals("Collapse all")){
+			visibleButton.setCaption("Expand all");
+			visible = false;
 		}
 		try {
 			Map<String, DroneStatus> newDrones;
