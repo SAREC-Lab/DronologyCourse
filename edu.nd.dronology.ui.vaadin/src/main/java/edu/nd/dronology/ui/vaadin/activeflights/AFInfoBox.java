@@ -517,6 +517,10 @@ public class AFInfoBox extends CustomComponent {
 	}
 
 	private void returnHome(Window parent){
+		if (this.status.equals("ON_GROUND")){
+			Notification.show("Drone is already Home");
+			return;
+		}
 		Window confirm = new Window("Confirm");
 		VerticalLayout subContent = new VerticalLayout();
 		HorizontalLayout subButtons = new HorizontalLayout();
