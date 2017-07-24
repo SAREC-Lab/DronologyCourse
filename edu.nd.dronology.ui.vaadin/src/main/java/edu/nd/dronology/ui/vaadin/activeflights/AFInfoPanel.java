@@ -63,8 +63,10 @@ public class AFInfoPanel extends CustomComponent{
 			List<String> checked = this.getChecked();
 			String message = "";
 			if (checked.size() > 0){
-				if (checked.size() == 1)
+				if (checked.size() == 1){
+					
 					message = "Are you sure you want to send " + checked.get(0) + " to its home?";
+				}
 				else{
 					String drones = "";
 					for (int i = 0; i < checked.size() - 1; i++){
@@ -328,11 +330,11 @@ public class AFInfoPanel extends CustomComponent{
 	
 	public void refreshDrones(){
 		//update select/deselect all button
-		if (this.getAllChecked() && selectButton.getCaption().equals("Select all")){
+		if (this.getAllChecked() && selectButton.getCaption().equals("Select all") && numUAVs != 0){
   		selectButton.setCaption("Deselect all");
   		selectAll = false;
 		}
-		else if (this.getAllNotChecked() && selectButton.getCaption().equals("Deselect all")){
+		else if (this.getAllNotChecked() && selectButton.getCaption().equals("Deselect all") && numUAVs != 0){
 			selectButton.setCaption("Select all");
   		selectAll = true;
 		}
