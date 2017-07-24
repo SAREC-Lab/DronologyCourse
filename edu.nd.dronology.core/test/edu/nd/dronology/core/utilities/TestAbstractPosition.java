@@ -13,9 +13,10 @@ import edu.nd.dronology.core.util.LlaCoordinate;
 public class TestAbstractPosition {
 
 	private static final double EPSILON = 0.0000000001;
-	
+	private static final double EPSILON2 = 0.005;
+
 	@Test
-	public void testFindNED() {
+	public void testFindNed() {
 		double x = 12.24;
 		double y = 18.3;
 		LlaCoordinate s = new LlaCoordinate(y, x, 0);
@@ -24,6 +25,364 @@ public class TestAbstractPosition {
 		System.out.println(ned);
 		System.out.println(s.findLla(ned));
 		System.out.println(t);
+	}
+
+	/*
+	 * Each NED test should do 2 things. It should make sure the NED coordinates
+	 * are correct and it should make sure that going back to LLA from NED is
+	 * correct
+	 */
+	@Test
+	public void testNed() {
+		double northExpected = 0;
+		double eastExpected = 0;
+		double downExpected = 0;
+		LlaCoordinate a = new LlaCoordinate(0, 0, 0);
+		LlaCoordinate b = new LlaCoordinate(0, 0, 0);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON);
+		assertEquals(eastExpected, ned.getY(), EPSILON);
+		assertEquals(downExpected, ned.getZ(), EPSILON);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON);
+	}
+
+	@Test
+	public void testNed1() {
+		double northExpected = 0.0004210013966812198304978664964437484741210937500000;
+		double eastExpected = 96.4864313962120121459520305506885051727294921875000000;
+		double downExpected = 0.0007291958091037997746752807870507240295410156250000;
+		LlaCoordinate a = new LlaCoordinate(30.0000000000000000000000000000000000000000000000000000,
+				20.0000000000000000000000000000000000000000000000000000,
+				10.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(30.0000000000000000000000000000000000000000000000000000,
+				20.0010000000000012221335055073723196983337402343750000,
+				10.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed2() {
+		double northExpected = -0.0000000002153797140636015683412551879882812500000000;
+		double eastExpected = -0.0000000000060822458181064575910568237304687500000000;
+		double downExpected = 439.9999999997825739228574093431234359741210937500000000;
+		LlaCoordinate a = new LlaCoordinate(37.6002420000000014965735317673534154891967773437500000,
+				-122.4298959999999993897290551103651523590087890625000000,
+				440.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(37.6002420000000014965735317673534154891967773437500000,
+				-122.4298959999999993897290551103651523590087890625000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed3() {
+		double northExpected = 431.2306148905269083115854300558567047119140625000000000;
+		double eastExpected = -379.0204788415589973737951368093490600585937500000000000;
+		double downExpected = 0.0258671343935361619514878839254379272460937500000000;
+		LlaCoordinate a = new LlaCoordinate(37.6002420000000014965735317673534154891967773437500000,
+				-122.4298959999999993897290551103651523590087890625000000,
+				440.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(37.6041269999999983042471285443753004074096679687500000,
+				-122.4341880000000060135789681226015090942382812500000000,
+				440.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed4() {
+		double northExpected = 96.9660677025763817482584272511303424835205078125000000;
+		double eastExpected = -4.4951683697038173903592905844561755657196044921875000;
+		double downExpected = -0.0772596944661927409470081329345703125000000000000000;
+		LlaCoordinate a = new LlaCoordinate(41.6979660000000009745235729496926069259643554687500000,
+				-86.2340059999999937190295895561575889587402343750000000,
+				275.5230000000000245563569478690624237060546875000000000);
+		LlaCoordinate b = new LlaCoordinate(41.6988389999999995438884070608764886856079101562500000,
+				-86.2340599999999994906829670071601867675781250000000000,
+				275.6009999999999990905052982270717620849609375000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed5() {
+		double northExpected = 6356752.3142451792955398559570312500000000000000000000000000;
+		double eastExpected = 0.0000000000000000000000000000000000000000000000000000;
+		double downExpected = 6378137.0000000009313225746154785156250000000000000000000000;
+		LlaCoordinate a = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(90.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed6() {
+		double northExpected = -6356752.3142451792955398559570312500000000000000000000000000;
+		double eastExpected = 0.0000000000000000000000000000000000000000000000000000;
+		double downExpected = 6378137.0000000009313225746154785156250000000000000000000000;
+		LlaCoordinate a = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(-90.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed7() {
+		double northExpected = 0.0000000000000000000000000000000000000000000000000000;
+		double eastExpected = 0.0000000007810965061573302778924622925284769470177793;
+		double downExpected = 12756274.0000000018626451492309570312500000000000000000000000;
+		LlaCoordinate a = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				180.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed8() {
+		double northExpected = 0.0000000000000000000000000000000000000000000000000000;
+		double eastExpected = 6378137.0000000009313225746154785156250000000000000000000000;
+		double downExpected = 6378137.0000000009313225746154785156250000000000000000000000;
+		LlaCoordinate a = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				90.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed9() {
+		double northExpected = 0.0000000000000000000000000000000000000000000000000000;
+		double eastExpected = -6378137.0000000009313225746154785156250000000000000000000000;
+		double downExpected = 6378137.0000000009313225746154785156250000000000000000000000;
+		LlaCoordinate a = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(0.0000000000000000000000000000000000000000000000000000,
+				-90.0000000000000000000000000000000000000000000000000000,
+				0.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed10() {
+		double northExpected = 2066.1630647435013088397681713104248046875000000000000000;
+		double eastExpected = -190.4227875552502382561215199530124664306640625000000000;
+		double downExpected = 0.3384805124719605373684316873550415039062500000000000;
+		LlaCoordinate a = new LlaCoordinate(37.8109269999999995093276083935052156448364257812500000,
+				-122.4775419999999996889528119936585426330566406250000000,
+				76.2000000000000028421709430404007434844970703125000000);
+		LlaCoordinate b = new LlaCoordinate(37.8295419999999964488779369276016950607299804687500000,
+				-122.4797049999999956071405904367566108703613281250000000,
+				76.2000000000000028421709430404007434844970703125000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed11() {
+		double northExpected = 533.1862234204299966222606599330902099609375000000000000;
+		double eastExpected = 332.0479342412079972746141720563173294067382812500000000;
+		double downExpected = -4.9689993526169189408392412588000297546386718750000000;
+		LlaCoordinate a = new LlaCoordinate(-33.8575459999999992533048498444259166717529296875000000,
+				151.2152529999999899246176937595009803771972656250000000,
+				3.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(-33.8527389999999996916812960989773273468017578125000000,
+				151.2188409999999976207618601620197296142578125000000000,
+				8.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed12() {
+		double northExpected = 29513.0208067589883285108953714370727539062500000000000000;
+		double eastExpected = 69448.8442556710942881181836128234863281250000000000000000;
+		double downExpected = 449.2381543573665112489834427833557128906250000000000000;
+		LlaCoordinate a = new LlaCoordinate(34.0084730000000021732375898864120244979858398437500000,
+				-120.0469190000000025975168682634830474853515625000000000,
+				9.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(34.2722320000000024720065994188189506530761718750000000,
+				-119.2927490000000005920810508541762828826904296875000000,
+				6.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed13() {
+		double northExpected = 903.8185348586144982618861831724643707275390625000000000;
+		double eastExpected = 1128.7957148820189559046411886811256408691406250000000000;
+		double downExpected = -1.2760642987232131417840719223022460937500000000000000;
+		LlaCoordinate a = new LlaCoordinate(40.7820809999999980277607392054051160812377929687500000,
+				-73.9690949999999958208718453533947467803955078125000000,
+				64.7699999999999960209606797434389591217041015625000000);
+		LlaCoordinate b = new LlaCoordinate(40.7902190000000004488356353249400854110717773437500000,
+				-73.9557209999999969340933603234589099884033203125000000,
+				66.2099999999999937472239253111183643341064453125000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed14() {
+		double northExpected = 231.5480231838842541947087738662958145141601562500000000;
+		double eastExpected = -469.4153231960073640038899611681699752807617187500000000;
+		double downExpected = 4.0214437249378107708253082819283008575439453125000000;
+		LlaCoordinate a = new LlaCoordinate(51.4172810000000026775524020195007324218750000000000000,
+				-0.0674239999999999978230746933149930555373430252075195,
+				62.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(51.4193619999999995684447640087455511093139648437500000,
+				-0.0741720000000000018181012251261563505977392196655273,
+				58.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed15() {
+		double northExpected = -1653.4837700961847986036445945501327514648437500000000000;
+		double eastExpected = -4098.3908212053047463996335864067077636718750000000000000;
+		double downExpected = 8.5287863614503294229507446289062500000000000000000000;
+		LlaCoordinate a = new LlaCoordinate(48.8730580000000003337845555506646633148193359375000000,
+				2.3500440000000000217994511331198737025260925292968750,
+				22.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(48.8581760000000002719389158301055431365966796875000000,
+				2.2941919999999997870077095285523682832717895507812500,
+				15.0000000000000000000000000000000000000000000000000000);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
+	}
+
+	@Test
+	public void testNed16() {
+		double northExpected = -618.5387868498007719608722254633903503417968750000000000;
+		double eastExpected = 3809.6486743787941122718621045351028442382812500000000000;
+		double downExpected = 1.5673500078306403793249046429991722106933593750000000;
+		LlaCoordinate a = new LlaCoordinate(22.3046700000000015506884665228426456451416015625000000,
+				114.1919840000000050395101425237953662872314453125000000,
+				2.0000000000000000000000000000000000000000000000000000);
+		LlaCoordinate b = new LlaCoordinate(22.2990800000000000125055521493777632713317871093750000,
+				114.2289549999999991314325598068535327911376953125000000,
+				1.6000000000000000888178419700125232338905334472656250);
+		Vector3D ned = a.findNed(b);
+		assertEquals(northExpected, ned.getX(), EPSILON2);
+		assertEquals(eastExpected, ned.getY(), EPSILON2);
+		assertEquals(downExpected, ned.getZ(), EPSILON2);
+		LlaCoordinate b2 = a.findLla(ned);
+		assertEquals(b.getLatitude(), b2.getLatitude(), EPSILON);
+		assertEquals(b.getLongitude(), b2.getLongitude(), EPSILON);
+		assertEquals(b.getAltitude(), b2.getAltitude(), EPSILON2);
 	}
 
 	@Test
