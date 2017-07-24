@@ -389,12 +389,12 @@ public class MapMarkerUtilities {
 		
 	}
 	public void setMapPointsAltitude(List<WayPoint> wayPoints){
-		for(int i = 0; i < mapPoints.size(); i++){
+		for(int i = 0; i < wayPoints.size(); i++){
 			mapPoints.get(i).setAltitude(wayPoints.get(i).getAltitude());
 		}
 	}
 	public void setMapPointsTransit(List<WayPoint> wayPoints){
-		for(int i = 0; i < mapPoints.size(); i++){
+		for(int i = 0; i < wayPoints.size(); i++){
 			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
 		}
 	}

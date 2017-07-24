@@ -163,6 +163,7 @@ public class FRMainLayout extends CustomComponent {
 		// removes old pins, polylines, and style when switching routes
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
+			map.getUtils().removeAllLines(map.getUtils().getPolylines());
 		}
 
 		int numComponents;
