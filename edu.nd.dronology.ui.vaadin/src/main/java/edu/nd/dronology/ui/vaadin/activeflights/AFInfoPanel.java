@@ -40,7 +40,7 @@ public class AFInfoPanel extends CustomComponent{
 	private int numUAVs = 0;
 	private boolean selectAll = true;
 	private boolean visible = false;
-	private String focused;
+	private String focused = "";
 	private AFMapViewOperations mapView = new AFMapViewOperations();
 	private Map<String, DroneStatus> drones;
 	private IDroneSetupRemoteService service;
@@ -136,7 +136,8 @@ public class AFInfoPanel extends CustomComponent{
 				}
 				else{
 					child.removeStyleName("info_box_focus");
-					focused = "";
+					if (focused.equals(child.getName()))
+						focused = "";
 				}
 			}
 		});
@@ -241,6 +242,11 @@ public class AFInfoPanel extends CustomComponent{
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setIsChecked(select);
+			if (!select && focused.equals(box.getName())){
+				box.removeStyleName("info_box_focus");
+				box.setCheckClick(false);
+				focused = "";
+			}
 		}
 	}
 	
