@@ -624,6 +624,7 @@ public class AFMapComponent extends CustomComponent {
 							box.setIsChecked(panelBox.getIsChecked());
 							box.setHealthColor(panelBox.getHealthColor());
 							box.setHoverInPlace(panelBox.getHoverInPlace());
+							box.setStatus(e.getValue().getStatus());
 						}
 					}
 					box.getRouteButton().addClickListener(click -> {
@@ -636,7 +637,6 @@ public class AFMapComponent extends CustomComponent {
 						dronePopup.setPopupVisible(false);
 					});
 					box.getCheckBox().addValueChangeListener(click -> {
-						
 						if (box.getCheckBox().getValue()){
 							for(int i = 1; i < numUAVs + 1; i++){
 								AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
