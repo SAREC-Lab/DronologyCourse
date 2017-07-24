@@ -184,15 +184,20 @@ public class AFAssignRouteComponent extends CustomComponent{
 		left.addClickListener( e-> {
 			if (frLayout.getIndex() != -1){
 				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
-				long creationTime = selectedFlight.getDateCreated();
-				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
-				String creationFormatted = sdf.format(new Date(creationTime));
-				
-				long modifiedTime = selectedFlight.getDateModified();
-				String modifiedFormatted = sdf.format(new Date(modifiedTime));
-				
-				String length = String.valueOf(selectedFlight.getLenght());
-				addRoute(selectedFlight.getName(), selectedFlight.getId(), creationFormatted, modifiedFormatted, length);
+				if (selectedFlight.getWaypoints().size() < 1){
+					Notification.show("There is no waypoint defined in " + selectedFlight.getName() +". You cannot assign an empty route to a UAV.");
+				}
+				else {
+					long creationTime = selectedFlight.getDateCreated();
+					SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
+					String creationFormatted = sdf.format(new Date(creationTime));
+					
+					long modifiedTime = selectedFlight.getDateModified();
+					String modifiedFormatted = sdf.format(new Date(modifiedTime));
+					
+					String length = String.valueOf(selectedFlight.getLenght());
+					addRoute(selectedFlight.getName(), selectedFlight.getId(), creationFormatted, modifiedFormatted, length);
+				}
 			}
 			else
 				Notification.show("Please select route to assign.");
