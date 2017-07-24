@@ -162,7 +162,7 @@ public class AFDragLayout extends VerticalLayout {
 			int index = 0;
 			while (componentIterator.hasNext()) {
 				next = (WrappedComponent) componentIterator.next();
-				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName())){
+				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName()) && component.getId().equals(next.getContent().getId())){
 					return index;
 				}
 				else {
@@ -191,7 +191,7 @@ public class AFDragLayout extends VerticalLayout {
 			boolean cont = true;
 			while (cont && componentIterator.hasNext()) {
 				next = (WrappedComponent) componentIterator.next();
-				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName())){
+				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName()) && component.getId().equals(next.getContent().getId())){
 					layout.removeComponent(next);
 					cont = false;
 				}

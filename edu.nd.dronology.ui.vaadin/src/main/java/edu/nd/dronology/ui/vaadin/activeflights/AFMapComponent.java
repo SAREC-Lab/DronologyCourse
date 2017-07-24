@@ -565,12 +565,14 @@ public class AFMapComponent extends CustomComponent {
 			}
 			Point point = new Point(avgLat, avgLon);
 			double zoom;
-			if (farthestLat == 0 && farthestLon == 0) {
+			if (farthestLat == 0 && farthestLon == 0) { 
 				zoom = 17;
 			} else {
 				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
 			}
-			leafletMap.setCenter(point, zoom);
+		  //zoom is disabled for now. Delete the setCenter(point) function and uncomment the line below to enable automatic zoom
+			//leafletMap.setCenter(point, zoom);
+			leafletMap.setCenter(point);
 			if(content.getComponentIndex(layout) != -1){
 				leafletMap.addStyleName("af_leaflet_map_edit_mode");
 				followBar = new AFFollowBar(this, names);
@@ -624,6 +626,7 @@ public class AFMapComponent extends CustomComponent {
 							box.setIsChecked(panelBox.getIsChecked());
 							box.setHealthColor(panelBox.getHealthColor());
 							box.setHoverInPlace(panelBox.getHoverInPlace());
+							box.setStatus(e.getValue().getStatus());
 						}
 					}
 					box.getRouteButton().addClickListener(click -> {
@@ -636,7 +639,6 @@ public class AFMapComponent extends CustomComponent {
 						dronePopup.setPopupVisible(false);
 					});
 					box.getCheckBox().addValueChangeListener(click -> {
-						
 						if (box.getCheckBox().getValue()){
 							for(int i = 1; i < numUAVs + 1; i++){
 								AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);

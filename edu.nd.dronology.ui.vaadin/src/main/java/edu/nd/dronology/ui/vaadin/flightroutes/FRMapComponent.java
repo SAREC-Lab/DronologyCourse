@@ -162,6 +162,7 @@ public class FRMapComponent extends CustomComponent {
 			route.removeAllLines(route.getPolylines());
 			route.drawLines(route.getMapPoints(), true, 1);
 			route.getGrid().setItems(route.getMapPoints());
+			onMapEdited(storedPoints);
 			
 			for (int i = 0; i < route.getMapPoints().size(); i++) {
 				route.getMapPoints().get(i).setOrder(i+1);
