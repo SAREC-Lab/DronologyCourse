@@ -565,12 +565,14 @@ public class AFMapComponent extends CustomComponent {
 			}
 			Point point = new Point(avgLat, avgLon);
 			double zoom;
-			if (farthestLat == 0 && farthestLon == 0) {
+			if (farthestLat == 0 && farthestLon == 0) { 
 				zoom = 17;
 			} else {
 				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
 			}
-			leafletMap.setCenter(point, zoom);
+		  //zoom is disabled for now. Delete the setCenter(point) function and uncomment the line below to enable automatic zoom
+			//leafletMap.setCenter(point, zoom);
+			leafletMap.setCenter(point);
 			if(content.getComponentIndex(layout) != -1){
 				leafletMap.addStyleName("af_leaflet_map_edit_mode");
 				followBar = new AFFollowBar(this, names);
