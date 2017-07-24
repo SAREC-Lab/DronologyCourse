@@ -78,7 +78,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private Switch hoverSwitch = new Switch();
 	private Button returnToHome = new Button("Return to Home");
 	int index = -1;
-	private String name;
 	
 	private BaseServiceProvider provider = MyUI.getProvider();
 	private IFlightManagerRemoteService flightRouteService;
@@ -93,7 +92,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 		sideContent.addStyleName("af_assign_route_middle_content");
 		bottomButtons.addStyleName("af_assign_route_bottom_content");
 		
-		this.name = name;
 		panelContent = new AFDragLayout(name);
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
@@ -217,8 +215,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 				frLayout.switchWindows(null, frLayout.getMap(), ((FRInfoBox) childContent));
 			}
 			index = panelContent.getComponentIndex(childContent);
-			//will use when connecting to Dronology
-			FlightRouteInfo flightInfo = frLayout.getControls().getInfoPanel().getFlight(index);
 			
 			int numComponents = panelContent.getComponentCount();
 			
@@ -283,6 +279,14 @@ public class AFAssignRouteComponent extends CustomComponent{
 	
 	public Button getApply(){
 		return apply;
+	}
+	
+	public Button getReturnToHome(){
+		return returnToHome;
+	}
+	
+	public Switch getHover(){
+		return hoverSwitch;
 	}
 	
 }

@@ -174,36 +174,7 @@ public class AFInfoBox extends CustomComponent {
 		assignNewRoute.setHeight("30px");
 
 		returnToHome.addClickListener(e -> {
-			Window confirm = new Window("Confirm");
-			VerticalLayout subContent = new VerticalLayout();
-			HorizontalLayout subButtons = new HorizontalLayout();
-			Label label = new Label("Are you sure you want to send " + this.name + " to its home?");
-			Button yes = new Button("Yes");
-			Button no = new Button("No");
-
-			yes.addClickListener(subEvent -> {
-				UI.getCurrent().removeWindow(confirm);
-				IFlightManagerRemoteService service;
-				try {
-					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-					service.returnToHome(this.name);
-				} catch (Exception exc) {
-					exc.printStackTrace();
-				}
-				
-			});
-
-			no.addClickListener(subEvent -> {
-				UI.getCurrent().removeWindow(confirm);
-			});
-
-			subButtons.addComponents(yes, no);
-			subContent.addComponents(label, subButtons);
-			confirm.setContent(subContent);
-			confirm.setModal(true);
-			confirm.center();
-			UI.getCurrent().addWindow(confirm);	
-
+			this.returnHome(null);
 		});
 
 		assignNewRoute.addClickListener(e -> {
@@ -467,18 +438,29 @@ public class AFInfoBox extends CustomComponent {
 				 
 				  
   			  for (FlightRouteInfo e:routesToAssign){
-  			    try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
 					  activate(e);
 				  }			
 				  
 					UI.getCurrent().removeWindow(confirm);
 					UI.getCurrent().removeWindow(window);
 				});
+			});
+			
+			content.getHover().addValueChangeListener( e-> {
+				if (content.getHover().getValue()){
+					//this.setHoverInPlace(true);
+					this.hoverInPlace = true;
+					hoverSwitch.setValue(this.hoverInPlace);
+				}
+				else {
+					//this.setHoverInPlace(false);
+					this.hoverInPlace = false;
+					hoverSwitch.setValue(this.hoverInPlace);
+				}
+			});
+			
+			content.getReturnToHome().addClickListener( e -> {
+				this.returnHome(window);
 			});
 			
 			window.setContent(content);
@@ -534,6 +516,41 @@ public class AFInfoBox extends CustomComponent {
 		this.checkClicked = checkClicked;
 	}
 
+	private void returnHome(Window parent){
+		Window confirm = new Window("Confirm");
+		VerticalLayout subContent = new VerticalLayout();
+		HorizontalLayout subButtons = new HorizontalLayout();
+		Label label = new Label("Are you sure you want to send " + this.name + " to its home?");
+		Button yes = new Button("Yes");
+		Button no = new Button("No");
+
+		yes.addClickListener(subEvent -> {
+			UI.getCurrent().removeWindow(confirm);
+			if (parent != null){
+				UI.getCurrent().removeWindow(parent);
+			}
+			IFlightManagerRemoteService service;
+			try {
+				service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+				service.returnToHome(this.name);
+			} catch (Exception exc) {
+				exc.printStackTrace();
+			}
+			
+		});
+
+		no.addClickListener(subEvent -> {
+			UI.getCurrent().removeWindow(confirm);
+		});
+
+		subButtons.addComponents(yes, no);
+		subContent.addComponents(label, subButtons);
+		confirm.setContent(subContent);
+		confirm.setModal(true);
+		confirm.center();
+		UI.getCurrent().addWindow(confirm);	
+	}
+	
 	@WaypointReplace
 	private void activate(FlightRouteInfo remoteItem) {
 		IFlightManagerRemoteService service;
