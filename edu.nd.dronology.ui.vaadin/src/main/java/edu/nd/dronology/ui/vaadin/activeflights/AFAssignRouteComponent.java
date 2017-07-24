@@ -77,7 +77,8 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private int numRoutes = 0;
 	private Switch hoverSwitch = new Switch();
 	private Button returnToHome = new Button("Return to Home");
-	int index = -1;
+	private int index = -1;
+	private int boxID = 0;
 	
 	private BaseServiceProvider provider = MyUI.getProvider();
 	private IFlightManagerRemoteService flightRouteService;
@@ -267,6 +268,8 @@ public class AFAssignRouteComponent extends CustomComponent{
 	
 	public void addRoute(String name, String ID, String created, String modified, String length) {
 		FRInfoBox box = new FRInfoBox(name, ID, created, modified, length);
+		box.setId(Integer.toString(this.boxID));
+		this.boxID++;
 		panelContent.addNewComponent(box);
 		numRoutes += 1;
 		sidePanel.setCaption(numRoutes + " Routes Assigned");
