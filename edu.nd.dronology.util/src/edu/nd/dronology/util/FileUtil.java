@@ -34,34 +34,36 @@ public class FileUtil {
 	public static final String DIR_SEP = "/";
 
 	/**
-	 * Write a string to a file. Overwrite previous content. Create the file if it does not exist.
+	 * Write a string to a file. Overwrite previous content. Create the file if
+	 * it does not exist.
 	 * 
 	 * @param str
-	 *          The string to write.
+	 *            The string to write.
 	 * @param file
-	 *          The file where the string is written to.
+	 *            The file where the string is written to.
 	 */
 	public static void writeStringToFile(String str, File file) {
 		writeStringToFile(str, file, false);
 	}
 
 	/**
-	 * Write a string to a file. Overwrite previous content. Create the file if it does not exist.
+	 * Write a string to a file. Overwrite previous content. Create the file if
+	 * it does not exist.
 	 * 
 	 * @param str
-	 *          The string to write.
+	 *            The string to write.
 	 * @param file
-	 *          The file where the string is written to.
+	 *            The file where the string is written to.
 	 * @param append
-	 *          append to existing file content.
+	 *            append to existing file content.
 	 */
 	public static void writeStringToFile(String str, File file, boolean append) {
 		PrintWriter out = null;
 		try {
-			if(!file.exists()){
-			file.createNewFile();
+			if (!file.exists()) {
+				file.createNewFile();
 			}
-			out = new PrintWriter(new FileWriter(file,append));
+			out = new PrintWriter(new FileWriter(file, append));
 			out.println(str);
 
 		} catch (IOException e) {
@@ -75,12 +77,13 @@ public class FileUtil {
 	}
 
 	/**
-	 * Write a string to a file. Overwrite previous content. Create the file if it does not exist.
+	 * Write a string to a file. Overwrite previous content. Create the file if
+	 * it does not exist.
 	 * 
 	 * @param str
-	 *          The string to write.
+	 *            The string to write.
 	 * @param resourceUrl
-	 *          The URL of the file where the string is written to.
+	 *            The URL of the file where the string is written to.
 	 */
 	public static void writeStringToFile(String str, URL resourceUrl) {
 		writeStringToFile(str, resourceUrl.getPath());
@@ -88,12 +91,13 @@ public class FileUtil {
 	}
 
 	/**
-	 * Write a string to a file. Overwrite previous content. Create the file if it does not exist.
+	 * Write a string to a file. Overwrite previous content. Create the file if
+	 * it does not exist.
 	 * 
 	 * @param str
-	 *          The string to write.
+	 *            The string to write.
 	 * @param filePath
-	 *          The path to the file where the string is written to.
+	 *            The path to the file where the string is written to.
 	 */
 	public static void writeStringToFile(String str, String filePath) {
 		writeStringToFile(str, new File(filePath));
@@ -103,7 +107,7 @@ public class FileUtil {
 	 * Read a file and return its contents as a string.
 	 * 
 	 * @param absolutePath
-	 *          The absolute path to the file.
+	 *            The absolute path to the file.
 	 * @return The contents of the file.
 	 */
 	public static String readFile(String absolutePath) {
@@ -142,7 +146,7 @@ public class FileUtil {
 	 * Get a buffered reader for a file.
 	 * 
 	 * @param absolutePath
-	 *          The absolute path to the file that will be read.
+	 *            The absolute path to the file that will be read.
 	 * @return The buffered reader for the file.
 	 */
 	public static BufferedReader getBufferedFileReader(String absolutePath) {
@@ -350,7 +354,7 @@ public class FileUtil {
 		FileInputStream stream = null;
 		try {
 			if (!file.exists()) {
-				LOGGER.info("File not found: " + file.getAbsolutePath());
+				LOGGER.info("File not found: " + file.getPath());
 				return null;
 			}
 
@@ -378,11 +382,11 @@ public class FileUtil {
 				LOGGER.info("Deleting old file");
 				file.delete();
 			}
-			stream = new FileOutputStream(file.getAbsolutePath());
+			stream = new FileOutputStream(file.getPath());
 			stream.write(content);
 			stream.flush();
 
-			LOGGER.info("File saved@ " + file.getAbsolutePath());
+			LOGGER.info("File saved@ " + file.getPath());
 			return true;
 		} catch (IOException e) {
 			LOGGER.error(e);
@@ -420,11 +424,11 @@ public class FileUtil {
 	}
 
 	public static String concatPath(String... path) {
-		NullUtil.checkNull(path);
+		NullUtil.checkArrayNull(path);
 		StringBuilder sb = new StringBuilder();
 		for (String s : path) {
 			sb.append(reverseBackSlashes(s));
-			sb.append("/");
+			sb.append(File.separator);
 		}
 		return sb.toString();
 	}

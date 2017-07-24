@@ -1,0 +1,294 @@
+package edu.nd.dronology.ui.vaadin.flightroutes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.vaadin.addon.leaflet.LeafletClickEvent;
+import org.vaadin.addon.leaflet.LeafletClickListener;
+import org.vaadin.addon.leaflet.shared.Point;
+
+import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+
+import edu.nd.dronology.core.util.Waypoint;
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
+
+/**
+ * This is the main layout for the Flight Routes UI
+ * 
+ * @author Jinghui Cheng
+ */
+
+public class FRMainLayout extends CustomComponent {
+	private class MapPinClickListener implements LeafletClickListener {
+
+		@Override
+		public void onClick(LeafletClickEvent event) {
+			drone = controls.getInfoPanel().getRoute();
+			droneName = controls.getInfoPanel().getName();
+			if(map.getUtils().getMapPoints().size() == 1 && isFirst){
+				map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
+				isFirst = false;
+			}
+			else{
+				map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
+			}
+		}
+	}
+	
+	private static final long serialVersionUID = 1L;
+	private int index = -1;
+	private FRControlsComponent controls = new FRControlsComponent(this);
+	private WayPoint way;
+	private FRMapComponent map;
+	private VerticalLayout routeLayout;
+	private boolean isFirst = true;
+	private int componentCount;
+	private String name = "";
+	private FlightRouteInfo flightInfo;
+	private FlightRouteInfo drone;
+	private String droneName;
+
+	
+	@WaypointReplace
+	public FRMainLayout() {
+
+		addStyleName("main_layout");
+		CssLayout content = new CssLayout();
+		content.setSizeFull();
+
+		FRMapComponent map = new FRMapComponent("VAADIN/sbtiles/{z}/{x}/{y}.png", "South Bend",
+				"VAADIN/sateltiles/{z}/{x}/{y}.png", "Satellite", this);
+		
+		this.map = map;
+		
+		map.setCenter(41.68, -86.25);
+		map.setZoomLevel(13);
+
+		routeLayout = controls.getInfoPanel().getRoutes();	
+		componentCount = controls.getInfoPanel().getRouteList().size();
+		
+		map.display();
+		name = controls.getInfoPanel().getName();
+		
+		// adds click listener to route list
+		routeLayout.addLayoutClickListener(e -> {
+			if (map.getUtils().isEditable()) {
+				HorizontalLayout buttons = new HorizontalLayout();
+				Button yes = new Button("Yes");
+				Button no = new Button("No");
+				buttons.addComponents(yes, no);
+				
+				VerticalLayout windowContent = new VerticalLayout();
+				Label statement = new Label("You have unsaved changes on " + name + ".");
+				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
+				
+				windowContent.addComponents(statement, question, buttons);
+				
+				Window warning;
+				warning = new Window(null, windowContent);
+				
+				warning.setModal(true);
+				warning.setClosable(false);
+				warning.setResizable(false);
+				
+				UI.getCurrent().addWindow(warning);
+				
+				yes.addClickListener(event -> {
+					UI.getCurrent().removeWindow(warning);
+					switchWindows(e, map, null);
+					map.exitEditMode();
+				});
+				
+				no.addClickListener(event -> {
+					UI.getCurrent().removeWindow(warning);
+				});
+			}
+			else {
+				switchWindows(e, map, null);
+			}		
+		});
+
+		content.addComponents(controls, map);
+		setCompositionRoot(content);
+	}
+	
+	public FRControlsComponent getControls() {
+		return controls;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public FRMapComponent getMap() {
+		return map;
+	}
+	
+	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
+		//gets box of route info and changes its style to show that it is selected
+		Component child = component; //to initialize the variable
+		if (e != null){
+			child = e.getChildComponent();
+		}
+		else {
+			for (int i = 0; i < routeLayout.getComponentCount(); i++){
+				if (component.getid().equals(((FRInfoBox) routeLayout.getComponent(i)).getid())){
+					child = routeLayout.getComponent(i);
+				}
+			}
+		}
+		
+		if(routeLayout.getComponentIndex(child) != -1){
+			child.addStyleName("info_box_focus");
+		}
+		
+		//child.addStyleName("info_box_focus");
+		index = routeLayout.getComponentIndex(child);
+
+		//gets the flight info for that route
+		FlightRouteInfo flightInfo = controls.getInfoPanel().getFlight(index);
+		
+		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
+		for(FRInfoBox box: list){
+			box.getDeleteBar().getYesButton().addClickListener(even->{
+				map.displayNoRoute();
+				map.exitEditMode();
+				controls.getInfoPanel().refreshRoutes();
+			});
+		}
+		
+		List<Waypoint> flightWaypoints = new ArrayList();
+		if(routeLayout.getComponentIndex(child) != -1){
+			flightWaypoints = flightInfo.getWaypoints();
+			name = flightInfo.getName();
+		}else{
+			flightWaypoints = new ArrayList();
+		}
+		
+		// removes old pins, polylines, and style when switching routes
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.getUtils().removeAllMarkers(map.getUtils().getPins());
+		}
+
+		int numComponents;
+		boolean first = true;
+
+		List<WayPoint> waypoints = new ArrayList<>();
+		Point pt = new Point();
+		
+		//iterates through the flight info and adds to internal waypoints list
+		for (Waypoint coor : flightWaypoints) {
+			
+			String altitude = String.valueOf(coor.getCoordinate().getAltitude());
+			String approachingSpeed = String.valueOf(coor.getApproachingspeed());
+			
+			pt.setLat(coor.getCoordinate().getLatitude());
+			pt.setLon(coor.getCoordinate().getLongitude());
+			
+			WayPoint way = new WayPoint(pt, false);
+			way.setAltitude(altitude);
+			way.setTransitSpeed(approachingSpeed);
+			map.getUtils().addNewPinRemoveOld(pt, first);
+			
+			waypoints.add(way);
+			first = false;
+		}
+
+		//adds the lines to the map
+		map.getUtils().drawLines(waypoints, true, 1);
+
+		numComponents = routeLayout.getComponentCount();
+		// when one route is clicked, the others go back to default background color
+		for (int i = 0; i < numComponents; i++) {
+			if (i != index) {
+				routeLayout.getComponent(i).removeStyleName("info_box_focus");
+			}
+		}	
+		map.setRouteCenter();
+		
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.displayByName(flightInfo, null, 0, false);
+		}
+		
+		//click listener to update waypoint number 
+		map.getMapInstance().addClickListener(eve->{
+			if(toString().valueOf(map.isEnabled()).equalsIgnoreCase("true")){
+				map.displayStillEdit(flightInfo, flightInfo.getName(), map.getUtils().getMapPoints().size()+1, true);
+			}	
+		});
+		if(routeLayout.getComponentIndex(child) != -1){
+			map.getTableDisplay().setGrid(waypoints);
+			map.getUtils().setMapPointsAltitude(waypoints);
+			map.getUtils().setMapPointsTransit(waypoints);
+		}
+	}
+	public void drawRoute(){
+		//tests whether a route was added or not
+		if(!(componentCount == controls.getInfoPanel().getRouteList().size())){
+		
+			map.enableEdit();
+			//to get rid of points and lines from previous routes
+			map.getUtils().removeAllMarkers(map.getUtils().getPins());
+			map.getUtils().removeAllLines(map.getUtils().getPolylines());
+			map.getUtils().getMapPoints().clear();
+			
+			//displays the drone information in the info bar
+			drone = controls.getInfoPanel().getRoute();
+			int numCoords = drone.getWaypoints().size();
+			droneName = controls.getInfoPanel().getName();
+			map.displayByName(drone, droneName, numCoords, true);
+			
+			Point pt = new Point(0, 0);
+			way = new WayPoint(pt, true);
+			
+			map.getTableDisplay().getGrid().setItems();
+			map.enableEdit();
+			
+			map.getMapInstance().addClickListener(eve->{
+				
+				//the size of mapPoints is received as 1 for the first two waypoints added
+				if(map.getUtils().getMapPoints().size() == 1 && isFirst){
+					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size(), true);
+					isFirst = false;
+				}
+				else{
+					map.displayStillEdit(drone, droneName, map.getUtils().getMapPoints().size()+1, true);
+				}
+			});
+			
+			controls.getInfoPanel().refreshRoutes();
+			flightInfo = controls.getInfoPanel().getFlight(index);
+			drone = controls.getInfoPanel().getRoute();
+			droneName = controls.getInfoPanel().getName();
+		}
+	}
+	public void deleteRouteUpdate(){
+		VaadinSession session = getSession();
+		if(session != null){
+			UI.getCurrent().access(() -> {
+			
+				controls.getInfoPanel().refreshRoutes();
+				//need to refresh route counter too
+			});
+		}
+	}
+	public void editClick(FRInfoBox infoBox){
+		switchWindows(null, map, infoBox);
+		map.enableEdit();
+	}
+	public void enableMapEdit(){
+		map.enableEdit();
+	}
+}

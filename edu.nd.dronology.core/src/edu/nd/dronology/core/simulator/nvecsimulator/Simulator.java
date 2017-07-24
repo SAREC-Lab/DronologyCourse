@@ -1,6 +1,5 @@
 package edu.nd.dronology.core.simulator.nvecsimulator;
 
-import edu.nd.dronology.core.air_traffic_control.DistanceUtil;
 import edu.nd.dronology.core.simulator.IFlightSimulator;
 import edu.nd.dronology.core.simulator.simplesimulator.FlightSimulator;
 import edu.nd.dronology.core.util.LlaCoordinate;

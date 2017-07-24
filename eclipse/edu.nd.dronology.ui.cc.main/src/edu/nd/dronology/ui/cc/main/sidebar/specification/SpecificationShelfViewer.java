@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Display;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
+import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
 import edu.nd.dronology.services.core.info.RemoteInfoObject;
 import edu.nd.dronology.services.core.info.TypeSpecificationInfo;
@@ -178,10 +179,10 @@ public class SpecificationShelfViewer extends AbstractSidebarViewer<TypeSpecific
 			setupService = (IDroneSetupRemoteService) ServiceProvider.getBaseServiceProvider().getRemoteManager()
 					.getService(IDroneSetupRemoteService.class);
 
-			DroneInitializationInfo item = new DroneInitializationInfo(remoteItem.getName(), remoteItem.getName(),
+			DroneInitializationInfo item = new DroneInitializationInfo(remoteItem.getName(), DroneMode.MODE_VIRTUAL, remoteItem.getName(),
 					new LlaCoordinate(41.760000, -86.222901, 0));
-			// "41760000", "-86222901", "0"
-			setupService.initializeDrones(item);
+//			// "41760000", "-86222901", "0"
+//			setupService.initializeDrones(item);
 		} catch (RemoteException | DronologyServiceException e) {
 			new ExtendedErrorDialog(Display.getDefault().getActiveShell(), "Error when adding Drone",
 					"Error when adding Drone", e.getMessage()).open();

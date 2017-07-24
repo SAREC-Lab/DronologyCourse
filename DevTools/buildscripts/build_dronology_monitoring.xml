@@ -1,0 +1,78 @@
+<project name="build-dronology.core" default="build">
+	<import file="./buildutils.xml" />
+
+
+	<target name="build">
+		<property name="result.filename" value="${jar.monitoring}" />
+		<property name="build.dir" value="${tmp.dir}/build" />
+		<echo>Output set to: ${tmp.dir}</echo>
+		<echo>Building jar on ${os.name} ${os.version} ${os.arch}, java architecture: ${sun.arch.data.model}, java version: ${java.version}</echo>
+
+		<antcall target="check-preconditions" inheritall="true" />
+		<antcall target="prepare" inheritall="true" />
+
+		<antcall target="copy-libs" inheritall="true" />
+
+		<antcall target="-copy-logger" inheritall="true" />
+		<antcall target="-copy-util" inheritall="true" />
+		<antcall target="-copy-core" inheritall="true" />
+
+		<antcall target="copy-source" inheritall="true" />
+
+
+		<antcall target="-copy-core" inheritall="true" />
+		<antcall target="-copy-service-core" inheritall="true" />
+		<antcall target="-copy-services" inheritall="true" />
+		<antcall target="-copy-logger" inheritall="true" />
+		<antcall target="-copy-util" inheritall="true" />
+
+		<antcall target="compile" inheritall="true" />
+		<antcall target="pack" inheritall="true" />
+		<antcall target="publish-jar" inheritall="true" />
+		<antcall target="cleanup" inheritall="true" />
+
+		<!--<antcall target="copy-libs" inheritall="true" />
+		
+		
+	-->
+
+
+
+	</target>
+
+	<target name="publish-jar">
+		<copy file="${tmp.dir}\jar\${result.filename}" tofile="${publish.dir}\${result.filename}" overwrite="true" />
+	</target>
+
+	<target name="copy-source">
+		<!-- Copy required files -->
+		<echo>copy: ${sourceCodeDir} to : ${build.dir}/src  </echo>
+
+
+		<copy todir="${build.dir}/src">
+			<fileset dir="${src.dir}/../edu.nd.dronology.monitoring/src" />
+		</copy>
+
+		
+		<copy todir="${build.dir}/src">
+					<fileset dir="${src.dir}/../edu.nd.dronology.gstation.python.connector/src" />
+				</copy>
+
+	</target>
+
+	<target name="compile">
+		<!-- Compile files -->
+		<path id="classpath">
+			<fileset dir="${build.dir}/lib" includes="*.jar" />
+		</path>
+		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
+			<compilerarg line="-g" />
+
+			<include name="edu/nd/dronology/monitoring/**/*.java" />
+			<include name="edu/nd/dronology/gstation/python/connector/**/*.java" />
+
+
+		</javac>
+	</target>
+
+</project>

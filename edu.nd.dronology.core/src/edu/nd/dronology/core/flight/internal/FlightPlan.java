@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.IFlightPlan;
+import edu.nd.dronology.core.util.FormatUtil;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
 
 /**
  * Stores flight information including its waypoints and current status.
@@ -18,6 +23,9 @@ import edu.nd.dronology.core.vehicle.ManagedDrone;
  *
  */
 public class FlightPlan implements IFlightPlan {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightPlan.class);
+
 	private static int flightNumber = 0;
 	private String flightID;
 
@@ -29,9 +37,11 @@ public class FlightPlan implements IFlightPlan {
 
 	private long startTime = -1;
 	private long endTime = -1;
+	private String uavid;
+
 
 	private enum Status {
-		PLANNED, FLYING, COMPLETED;
+		PLANNED, FLYING, COMPLETED, ON_HOLD;
 
 		@Override
 		public String toString() {
@@ -40,31 +50,29 @@ public class FlightPlan implements IFlightPlan {
 
 	}
 
-	/**
-	 * Loads flight information and assigns a flight ID. ID's are generated automatically and are unique in each run of the simulation.
-	 * 
-	 * @param start
-	 *          Starting coordinates
-	 * @param wayPoints
-	 */
-	public FlightPlan(String planName, LlaCoordinate start, List<LlaCoordinate> wayPoints) {
-		this.wayPoints = createWayPoints(wayPoints);
-		this.startLocation = start;
-		if (wayPoints.size() > 0) {
-			this.endLocation = wayPoints.get(wayPoints.size() - 1);
+	public FlightPlan(String planName, List<Waypoint> wayPoints) {
+		this(null, planName, wayPoints);
+
+	}
+
+	public FlightPlan(String uavid, String planName, List<Waypoint> wayPointsToAdd) {
+		this.wayPoints = new ArrayList<>();
+		for (Waypoint oldWP : wayPointsToAdd) {
+			Waypoint newWP = new Waypoint(oldWP.getCoordinate());
+			newWP.setApproachingspeed(oldWP.getApproachingspeed());
+			this.wayPoints.add(newWP);
+		}
+
+		this.uavid = uavid;
+		this.startLocation = wayPoints.get(0).getCoordinate();
+		if (this.wayPoints.size() > 0) {
+			this.endLocation = this.wayPoints.get(this.wayPoints.size() - 1).getCoordinate();
 		} else {
 			endLocation = startLocation;
 		}
 		this.flightID = "DF-" + Integer.toString(++flightNumber) + " - " + planName;
 		status = Status.PLANNED;
-	}
 
-	private List<Waypoint> createWayPoints(List<LlaCoordinate> coordinates) {
-		List<Waypoint> waypoints = new ArrayList<>();
-		for (LlaCoordinate coordinate : coordinates) {
-			waypoints.add(new Waypoint(coordinate));
-		}
-		return waypoints;
 	}
 
 	/**
@@ -95,7 +103,8 @@ public class FlightPlan implements IFlightPlan {
 	}
 
 	/**
-	 * Returns the drone assigned to the flight plan. Will return null if no drone is yet assigned.
+	 * Returns the drone assigned to the flight plan. Will return null if no drone
+	 * is yet assigned.
 	 * 
 	 * @return iDrone
 	 */
@@ -121,6 +130,7 @@ public class FlightPlan implements IFlightPlan {
 			status = Status.FLYING;
 			startTime = System.currentTimeMillis();
 			this.drone = drone;
+			LOGGER.missionInfo("Flight Plan '" + getFlightID() + "'" + drone.getDroneName() + "' started ");
 			return true;
 		} else
 			throw new FlightZoneException("Only currently planned flights can have their status changed to flying");
@@ -137,6 +147,8 @@ public class FlightPlan implements IFlightPlan {
 		if (status == Status.FLYING) {
 			status = Status.COMPLETED;
 			endTime = System.currentTimeMillis();
+			LOGGER.missionInfo("Flight Plan '" + getFlightID() + "'" + drone.getDroneName() + "' completed "
+					+ FormatUtil.formatTimestamp(startTime) + "-" + FormatUtil.formatTimestamp(endTime));
 			return true; // success (may add real check here later)
 		} else
 			throw new FlightZoneException("Only currently flying flights can have their status changed to completed");
@@ -196,5 +208,30 @@ public class FlightPlan implements IFlightPlan {
 	@Override
 	public long getEndTime() {
 		return endTime;
+	}
+
+	@Override
+	public String getDesignatedDroneId() {
+		return uavid;
+	}
+
+	@Override
+	@Discuss(discuss = "unessecary double check of plan complete.. needs to be fixed")
+	public boolean isCompleted() {
+		return status == Status.COMPLETED || waypointsReached();
+	}
+
+	@Override
+	public double getTakeoffAltitude() {
+		return DronologyConstants.TAKE_OFF_ALTITUDE;
+	}
+
+	private boolean waypointsReached() {
+		for (Waypoint wp : wayPoints) {
+			if (!wp.isReached()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

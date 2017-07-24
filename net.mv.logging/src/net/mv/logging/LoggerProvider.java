@@ -28,8 +28,8 @@ public class LoggerProvider {
 	private static boolean init = false;
 
 	private static String logFilePath;
-	private static final String LOGFILE_NAME_GENERAL = "net.mv.log";
-	private static final String LOG_EXTENSION = ".log.txt";
+	private static final String LOGFILE_NAME_GENERAL = "logfile";
+	private static final String LOG_EXTENSION = ".txt";
 	private static final boolean USE_PER_VM_LOGFILE_NAME = false;
 
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
@@ -44,7 +44,7 @@ public class LoggerProvider {
 			init = true;
 
 			// Determine full logfile names.
-			final String logFileDir = getJarPath() + "/net.mv.logger/";
+			final String logFileDir = getJarPath() + File.separator+"net.mv.logger"+File.separator;
 			final String dateTime = dateFormat.format(Calendar.getInstance().getTime());
 			String logfileSuffix;
 
@@ -70,7 +70,6 @@ public class LoggerProvider {
 			String jarPath = null;
 			jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
 			String parentPath = new File(jarPath).getParentFile().getPath();
-			parentPath = parentPath + File.separator;
 
 			return parentPath;
 

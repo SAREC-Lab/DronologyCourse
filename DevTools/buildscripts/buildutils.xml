@@ -26,6 +26,9 @@
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/stateless/slf4j-simple-1.7.25.jar"   todir="${build.dir}/lib" />
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/stateless/stateless4j-2.5.0.jar"   todir="${build.dir}/lib" />
 		
+		
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/mapdb/mapdb-2.0-beta6.jar"   todir="${build.dir}/lib" />
+		
 	</target> 
 
 
@@ -38,6 +41,15 @@
 	<target name="-copy-core">
 		<copy file="${publish.dir}/${jar.core}" tofile="${build.dir}/lib/${jar.core}" overwrite="true" />
 	</target>
+	
+	<target name="-copy-service-core">
+			<copy file="${publish.dir}/${jar.services.core}" tofile="${build.dir}/lib/${jar.services.core}" overwrite="true" />
+		</target>
+	
+	<target name="-copy-services">
+				<copy file="${publish.dir}/${jar.services}" tofile="${build.dir}/lib/${jar.services}" overwrite="true" />
+			</target>
+
 
 	<target name="-copy-util">
 		<copy file="${publish.dir}/${jar.util}" tofile="${build.dir}/lib/${jar.util}" overwrite="true" />

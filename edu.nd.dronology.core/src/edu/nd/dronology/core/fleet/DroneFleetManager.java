@@ -39,13 +39,15 @@ public class DroneFleetManager {
 	}
 
 	/**
-	 * Specifies whether virtual or physical drones will be created according to the previously specified runtime drone type. (See RuntimeDroneTypes.java)
+	 * Specifies whether virtual or physical drones will be created according to
+	 * the previously specified runtime drone type. (See RuntimeDroneTypes.java)
 	 */
 	protected DroneFleetManager() {
 		// if (RuntimeDroneTypes.getInstance().isSimulation())
 		// availableDrones = VirtualDroneFleetFactory.getInstance().getDrones();
 		// else
-		// availableDrones = PhysicalDroneFleetFactory.getInstance().getDrones();
+		// availableDrones =
+		// PhysicalDroneFleetFactory.getInstance().getDrones();
 		registeredDrones = new ConcurrentSkipListMap();
 		availableDrones = new ConcurrentLinkedQueue<>();
 		busyDrones = new ArrayList<>();
@@ -76,7 +78,30 @@ public class DroneFleetManager {
 			return null;
 	}
 
-
+	public ManagedDrone getAvailableDrone(String designatedDroneId) {
+		synchronized (availableDrones) {
+			ManagedDrone found = null;
+			if (!availableDrones.isEmpty()) {
+				for (ManagedDrone d : availableDrones) {
+					if (d.getDroneName().equals(designatedDroneId)) {
+						found = d;
+						break;
+					}
+				}
+				if (found != null) {
+					boolean success = availableDrones.remove(found);
+					if (success) {
+						busyDrones.add(found);
+						return found;
+					} else {
+						LOGGER.error("Error when queuing uav '" + designatedDroneId + "'");
+					}
+				}
+				//LOGGER.error("Error when retrieving uav '" + designatedDroneId + "'");
+			}
+			return null;
+		}
+	}
 
 	private void notifyListeners(boolean add, ManagedDrone managedDrone) {
 		// TODO Auto-generated method stub
@@ -84,7 +109,8 @@ public class DroneFleetManager {
 	}
 
 	/**
-	 * When a drone completes a mission, returns it to the pool of available drones.
+	 * When a drone completes a mission, returns it to the pool of available
+	 * drones.
 	 * 
 	 * @param drone
 	 */
@@ -92,6 +118,7 @@ public class DroneFleetManager {
 		if (busyDrones.contains(drone)) {
 			busyDrones.remove(drone);
 		}
+		//LOGGER.info("Drone '"+drone.getDroneName()+"' added to available drone pool");
 		availableDrones.offer(drone);
 
 	}
@@ -111,7 +138,16 @@ public class DroneFleetManager {
 		if (value == null) {
 			throw new DroneException("Drone '" + managedDrone.getDroneName() + "' not found registered");
 		}
+		LOGGER.info("Drone '"+managedDrone.getDroneName()+"' removed from available dron pool");
 		notifyListeners(false, managedDrone);
+	}
+
+	public ManagedDrone getRegisteredDrone(String uavid) throws DroneException {
+		if (!registeredDrones.containsKey(uavid)) {
+			throw new DroneException("Drone '" + uavid + "' not found registered");
+		}
+		return registeredDrones.get(uavid);
+
 	}
 
 }

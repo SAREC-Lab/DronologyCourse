@@ -48,7 +48,9 @@ public interface ILogger {
 
 	void hwFatal(Object message);
 
-	
+	void missionInfo(Object message);
+
+	void missionError(Object message);
 
 
 }

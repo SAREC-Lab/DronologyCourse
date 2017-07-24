@@ -15,7 +15,7 @@ public class FlightPlanInfo extends RemoteInfoObject {
 	 */
 	private static final long serialVersionUID = 256865471183839829L;
 	private String droneId;
-	private List<Waypoint> waypoints;
+	private List<Waypoint> waypoints = new ArrayList<>();
 	private LlaCoordinate startLocation;
 	private long startTime;
 	private long endTime;
@@ -50,7 +50,8 @@ public class FlightPlanInfo extends RemoteInfoObject {
 	}
 
 	public void setWaypoints(List<Waypoint> waypoints) {
-		this.waypoints = new ArrayList<>(waypoints);
+		this.waypoints.clear();
+		this.waypoints.addAll(waypoints);
 
 	}
 

@@ -1,120 +1,199 @@
+// setMonitorFrequency command
 {
-	"type":"command",
+	"command": "setMonitorFrequency",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
 	"data":{
-		"id": 0,
-		"command":"gotoLocation",
-		"data":{
-			"x": 0,
-			"y": 0,
-			"z": 100
+		"frequency": 5000
+	}
+}
+// setStateFrequency command
+{
+	"command": "setStateFrequency",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"frequency": 100
+	}
+}
+// gotoLocation command
+{
+	"command": "gotoLocation",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"x": 0,
+		"y": 0,
+		"z": 100
+	}
+}
+// takeoff command
+{
+	"command": "takeoff",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"altitude": 100
+	}
+}
+// setVelocity command
+{
+	"command": "setVelocity",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"x": 0,
+		"y": 0,
+		"z": 0
+	}
+}
+// setGimbalRotation command
+{
+	"command": "setGimbalRotation",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"x": 0,
+		"y": 0,
+		"z": 0
+	}
+}
+// setGimbalTarget command
+{
+	"command": "setGimbalTarget",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"x": 0,
+		"y": 0,
+		"z": 0
+	}
+}
+// setHome command
+{
+	"command": "setHome",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"x": 0,
+		"y": 0,
+		"z": 0
+	}
+}
+// setHeading command
+{
+	"command": "setHeading",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"heading": 0
+	}
+}
+// setAirspeed command
+{
+	"command": "setAirspeed",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"speed": 20
+	}
+}
+// setGroundspeed command
+{
+	"command": "setGroundspeed",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"speed": 20
+	}
+}
+// setArmed command
+{
+	"command": "setArmed",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"armed": true
+	}
+}
+// setMode command
+{
+	"command": "setMode",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data":{
+		"mode": "land"
+	}
+}
+
+
+
+// state update
+{
+	"type": "state",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data": {
+		"location": {
+			"x": 3.0,
+			"y": 4.0,
+			"z": 5.0
+		},
+		"attitude": {
+			"x": 1.0,
+			"y": 2.0,
+			"z": 3.0
+		},
+		"velocity": {
+			"x": 5.0,
+			"y": 6.0,
+			"z": 7.0
+		},
+		"status": "ACTIVE",
+		"mode": "CIRCLE",
+		"armed": true,
+		"armable": true,
+		"groundspeed": 25.3,
+		"batterystatus": {
+			"current": 0.0,
+			"voltage": 0.0,
+			"level": 0.0
 		}
 	}
 }
+
+// monitoring update
 {
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"takeoff",
-		"data":{
-			"altitude": 100
-		}
+	"type": "monitoring",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data": {
+		"NR_SATELITES": 5,
+		"CURRENT_SPEED": 5.25,
+		"GPS_BIAS": 3.125
 	}
 }
+  
+// handshake message
 {
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setVelocity",
-		"data":{
-			"x": 0,
-			"y": 0,
-			"z": 0
+	"type": "handshake",
+	"uavid": "PHYS_0",
+	"sendtimestamp": 1500310150000,
+	"data": {
+		"yyy": "more parameters...",
+		"xxx": "abc",
+		"home": {
+			"x": 3.0,
+			"y": 5.0,
+			"z": 8.0
 		}
 	}
-}
+}  
+
+// connection loss message - not implemented yet
 {
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setGimbalRotation",
-		"data":{
-			"x": 0,
-			"y": 0,
-			"z": 0
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setGimbalTarget",
-		"data":{
-			"x": 0,
-			"y": 0,
-			"z": 0
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setHome",
-		"data":{
-			"x": 0,
-			"y": 0,
-			"z": 0
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setHeading",
-		"data":{
-			"heading": 0
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setAirspeed",
-		"data":{
-			"speed": 20
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setGroundspeed",
-		"data":{
-			"speed": 20
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setArmed",
-		"data":{
-			"armed": true
-		}
-	}
-}
-{
-	"type":"command",
-	"data":{
-		"id": 0,
-		"command":"setMode",
-		"data":{
-			"mode": "land"
-		}
-	}
+	"type":"connectionloss",
+	"uavid": "PHYS_3",
+	"sendtimestamp": 1500310150000,
+	"data": null
 }

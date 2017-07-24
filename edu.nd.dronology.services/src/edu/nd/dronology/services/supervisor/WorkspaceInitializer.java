@@ -17,10 +17,6 @@ public class WorkspaceInitializer {
 	private static WorkspaceInitializer instance = new WorkspaceInitializer();
 
 	private void prepareRoot() throws DronologyServiceException {
-		// if (root == null) {
-		// root =
-		// GlobalConfReader.getGlobalProperty(DistributorConstants.GLB_PROP_SERVER_ROOT);
-		// }
 		if (root == null) {
 			root = getDefaultRootFolder();
 		}
@@ -28,18 +24,21 @@ public class WorkspaceInitializer {
 			root = DronologyConstants.DEFAULT_ROOT_FOLDER;
 		}
 
+		//Replace file path in Windows
 		root = root.replace("file:\\", "");
+		//Replace file path on Linux/MAC
+		root = root.replace("file:/", "/");
 
 		LOGGER.info("Server workspace root location is: '" + root + "'");
 
 		File f = new File(root);
-		LOGGER.info("Absolute path is: '" + f.getAbsolutePath().toString() + "'");
+		LOGGER.info("Absolute path is: '" + f.getPath().toString() + "'");
 		if (!f.exists()) {
 			f.mkdirs();
 		}
 		try {
-			root = f.getCanonicalPath();
-		} catch (IOException e) {
+			root = f.getPath();
+		} catch (Exception e) {
 			throw new DronologyServiceException("Error when setting workspace root '" + root + "'");
 		}
 	}
@@ -57,7 +56,7 @@ public class WorkspaceInitializer {
 			return null;
 		}
 
-		return ws.getPath() + "\\" + DronologyConstants.DRONOLOGY_ROOT_FOLDER;
+		return ws.getPath() + File.separator + DronologyConstants.DRONOLOGY_ROOT_FOLDER;
 	}
 
 	public void prepareServerWorkspace(String workspace) throws DronologyServiceException {
@@ -82,6 +81,7 @@ public class WorkspaceInitializer {
 			f.mkdirs();
 		}
 	}
+
 	private void prepareSpecificationWorkspace() {
 		String folderPath = getDroneSpecificationLocation();
 		File f = new File(folderPath);
@@ -89,25 +89,22 @@ public class WorkspaceInitializer {
 			f.mkdirs();
 		}
 	}
-	
-	
 
 	String getWorkspaceLocation() {
 		return root;
 	}
 
 	String getFlightRouteLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_FLIGHTROUTE;
-	}
-	
-	public String getSimScenarioLocation() {
-		return root + "\\" + DronologyConstants.FOLDERN_SIM_SCENARIO;
-	}
-	
-	public String getDroneSpecificationLocation() {
-		return root + "\\" + DronologyConstants.FOLDER_SPECIFICATION;
+		return root + File.separator + DronologyConstants.FOLDER_FLIGHTROUTE;
 	}
 
+	public String getSimScenarioLocation() {
+		return root + File.separator + DronologyConstants.FOLDERN_SIM_SCENARIO;
+	}
+
+	public String getDroneSpecificationLocation() {
+		return root + File.separator + DronologyConstants.FOLDER_SPECIFICATION;
+	}
 
 	public static WorkspaceInitializer getInstance() {
 		return instance;
@@ -130,7 +127,7 @@ public class WorkspaceInitializer {
 
 	private boolean importFlightPath(String fileName, byte[] content, boolean overwrite) {
 		String location = getFlightRouteLocation();
-		String fName = location + "\\" + fileName;
+		String fName = location + File.separator + fileName;
 		return importFile(fName, content, overwrite);
 
 	}
@@ -142,8 +139,5 @@ public class WorkspaceInitializer {
 		}
 		return FileUtil.saveByteArrayToFile(f, content);
 	}
-
-
-
 
 }

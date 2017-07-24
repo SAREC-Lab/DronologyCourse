@@ -61,6 +61,7 @@ public class PVector  extends AbstractPosition {
 	/**
 	 * @return the n-vector plus altitude for this position
 	 */
+	@Override
 	public NVector toNVector() {
 		/*
 		 * The formula this code is based on can be found in a journal article
@@ -98,6 +99,7 @@ public class PVector  extends AbstractPosition {
 	/**
 	 * @return the latitude, longitude, and altitude for this position
 	 */
+	@Override
 	public LlaCoordinate toLlaCoordinate() {
 		return toNVector().toLlaCoordinate();
 	}

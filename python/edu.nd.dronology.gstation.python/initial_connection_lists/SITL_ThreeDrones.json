@@ -1,0 +1,23 @@
+[
+	{
+		"type":"SITL",
+		"ConnectionData":{
+			"inst":0,
+			"home":"41.519408,-86.239996,0,0"
+		}
+	},
+	{
+		"type":"SITL",
+		"ConnectionData":{
+			"inst":1,
+			"home":"41.519408,-86.239829,0,0"
+		}
+	},
+	{
+		"type":"SITL",
+		"ConnectionData":{
+			"inst":2,
+			"home":"41.519408,-86.239687,0,0"
+		}
+	}
+]
