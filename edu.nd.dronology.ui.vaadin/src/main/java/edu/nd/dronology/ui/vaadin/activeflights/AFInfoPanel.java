@@ -34,6 +34,8 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
 public class AFInfoPanel extends CustomComponent{
 	private static final long serialVersionUID = -3663049148276256302L;
 	private Panel panel = new Panel();
+	private Button selectButton = new Button("Select all");
+	private Button visibleButton = new Button("Expand all");
 	private VerticalLayout content = new VerticalLayout();
 	private int numUAVs = 0;
 	private boolean selectAll = true;
@@ -142,10 +144,9 @@ public class AFInfoPanel extends CustomComponent{
 		sideBar.addComponents(panel, mapView, emergency);
 		setCompositionRoot(sideBar);
 		
-		Button selectButton = new Button("Select all");
+		
 	  selectButton.addStyleName(ValoTheme.BUTTON_LINK);
 	  selectButton.addStyleName("small_button_link");
-	  Button visibleButton = new Button("Expand all");
 	  visibleButton.addStyleName(ValoTheme.BUTTON_LINK);
 	  visibleButton.addStyleName("small_button_link");
 	  
@@ -253,6 +254,28 @@ public class AFInfoPanel extends CustomComponent{
 		return names;
 	}
 	
+	private boolean getAllChecked(){
+		boolean checked = true;
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (!box.getIsChecked())
+				checked = false;
+				
+		}
+		return checked;
+	}
+	
+	private boolean getAllNotChecked(){
+		boolean notChecked = true;
+		for(int i = 1; i < numUAVs + 1; i++){
+			AFInfoBox box = (AFInfoBox) content.getComponent(i);
+			if (box.getIsChecked())
+				notChecked = false;
+				
+		}
+		return notChecked;
+	}
+	
 	public void setVisibility(boolean visible){
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
@@ -276,6 +299,15 @@ public class AFInfoPanel extends CustomComponent{
 	}
 	
 	public void refreshDrones(){
+		//update select/deselect all button
+		if (this.getAllChecked() && selectButton.getCaption().equals("Select all")){
+  		selectButton.setCaption("Deselect all");
+  		selectAll = false;
+		}
+		else if (this.getAllNotChecked() && selectButton.getCaption().equals("Deselect all")){
+			selectButton.setCaption("Select all");
+  		selectAll = true;
+		}
 		try {
 			Map<String, DroneStatus> newDrones;
 			newDrones = service.getDrones();
