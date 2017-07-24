@@ -16,7 +16,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -61,8 +60,9 @@ public class FRMapComponent extends CustomComponent {
 	private PopupView popup;
 	private FlightRouteInfo selectedRoute;
 	private FRMainLayout mainLayout;
+	private boolean toDo = true;
 
-	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName, FRMainLayout layout) {
+	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName, FRMainLayout layout, boolean toDo) {
 		this.setWidth("100%");
 		addStyleName("map_component");
 		addStyleName("fr_map_component");
@@ -95,7 +95,9 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponents(tableDisplay.getGrid());
 		mainLayout = layout;
 		
-		this.setRouteCenter();
+		this.toDo = toDo;
+		
+		this.setRouteCenter(toDo);
 	}
 
 	private Window createWayPointWindow() {
@@ -195,7 +197,7 @@ public class FRMapComponent extends CustomComponent {
 	}
 	
 	@WaypointReplace
-	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName) {
+	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName, boolean toDo) {
 		//displays with selected route info based on either the FlightRouteInfo object or the name and coordinate number passed in
 		selectedRoute = info;
 		route.disableRouteEditing();
@@ -204,11 +206,15 @@ public class FRMapComponent extends CustomComponent {
 		layout.addStyleName("fr_mapabsolute_layout");
 		
 		if (whichName) {
-			selectedBar = new FRMetaInfo(routeName, numCoords, this);
+			selectedBar = new FRMetaInfo(routeName, numCoords, this, toDo);
 		} else {
-			selectedBar = new FRMetaInfo(info, this);
+			selectedBar = new FRMetaInfo(info, this, toDo);
 		}
-		 
+		
+		getMetaInfo().getAutoZooming().addValueChangeListener(event -> {
+			this.toDo = getMetaInfo().getAutoZooming().getValue();
+		});
+		
 		editBar = new FReditBar(this);
 		CheckBox tableBox = selectedBar.getCheckBox();
 		
@@ -233,9 +239,9 @@ public class FRMapComponent extends CustomComponent {
 		tableDisplay.setGrid(route.getMapPoints());	
 	}
 	
-	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName){
+	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName, boolean toDo){
 		//Displays the route determined by the FlightRouteInfo object and then re-enables edit mode
-		displayByName(info, routeName, numCoords, whichName);
+		displayByName(info, routeName, numCoords, whichName, toDo);
 		
 		route.enableRouteEditing();
 		leafletMap.setEnabled(true);
@@ -309,45 +315,48 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("bring_back");
 		tableDisplay.getGrid().setStyleName("fr_table_component");
 	}
-	public void setRouteCenter(){
-		//calculates the mean point and sets the route
-		double meanLat = 0;
-		double meanLon = 0;
-		int numberPoints;
-		double farthestLat = 0;
-		double farthestLon = 0;
-		double zoom;
-		
-		List<WayPoint> currentWayPoints = route.getMapPoints();
-		numberPoints = route.getMapPoints().size();
-		
-		for(WayPoint p: currentWayPoints){
-				meanLat += Double.valueOf(p.getLatitude());
-				meanLon += Double.valueOf(p.getLongitude());
-		}
-		
-		meanLat /= (numberPoints * 1.0);
-		meanLon /= (numberPoints * 1.0);
-		
-		//finds farthest latitude and longitude from mean
-		for(WayPoint p: currentWayPoints){
-			if((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)){
-				farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
-			}
-			if((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)){
-				farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
-			}
-		}  
-		
-		Point centerPoint = new Point(meanLat, meanLon);
-		if(farthestLat == 0 && farthestLon == 0){
-			zoom = 17;
-		}else{
-			zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
-		}
+	public void setRouteCenter(boolean toDo){
+		if (toDo) {
+			//calculates the mean point and sets the route
+			double meanLat = 0;
+			double meanLon = 0;
+			int numberPoints;
+			double farthestLat = 0;
+			double farthestLon = 0;
+			double zoom;
 			
-		leafletMap.setCenter(centerPoint, zoom+1);
-						
+			List<WayPoint> currentWayPoints = route.getMapPoints();
+			numberPoints = route.getMapPoints().size();
+			
+			for(WayPoint p: currentWayPoints){
+					meanLat += Double.valueOf(p.getLatitude());
+					meanLon += Double.valueOf(p.getLongitude());
+			}
+			
+			meanLat /= (numberPoints * 1.0);
+			meanLon /= (numberPoints * 1.0);
+			
+			//finds farthest latitude and longitude from mean
+			for(WayPoint p: currentWayPoints){
+				if((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)){
+					farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
+				}
+				if((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)){
+					farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
+				}
+			}  
+			
+			Point centerPoint = new Point(meanLat, meanLon);
+			if(farthestLat == 0 && farthestLon == 0){
+				zoom = 17;
+			}else{
+				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
+			}
+				
+			leafletMap.setCenter(centerPoint, zoom+1);
+		}
+		if (selectedBar != null)
+			selectedBar.getAutoZooming().setValue(toDo);
 	}
 	public FRMetaInfo getMetaBar(){
 		return selectedBar;
@@ -542,10 +551,16 @@ public class FRMapComponent extends CustomComponent {
 	public void onMapEdited(List<WayPoint> waypoints) {
 		bar.setNumWaypoints(waypoints.size());
 		if (mainLayout.isNew()) {
-			displayStillEdit(mainLayout.getDrone(), mainLayout.getDroneName(), route.getMapPoints().size(), true);
+			displayStillEdit(mainLayout.getDrone(), mainLayout.getDroneName(), route.getMapPoints().size(), true, toDo);
 		}
 		else {
-			displayStillEdit(mainLayout.getFlightInfo(), mainLayout.getFlightInfo().getName(), route.getMapPoints().size(), true);
+			displayStillEdit(mainLayout.getFlightInfo(), mainLayout.getFlightInfo().getName(), route.getMapPoints().size(), true, toDo);
 		}
+	}
+	public FRMetaInfo getMetaInfo() {
+		return selectedBar;
+	}
+	public boolean getToDo() {
+		return toDo;
 	}
 }
