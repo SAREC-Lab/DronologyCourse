@@ -356,11 +356,11 @@ public class AFInfoPanel extends CustomComponent{
   		selectAll = true;
 		}
 		//update expand/collapse all button
-		if (this.getAllVisible() && visibleButton.getCaption().equals("Expand all")){
+		if (this.getAllVisible() && visibleButton.getCaption().equals("Expand all") && numUAVs != 0){
 			visibleButton.setCaption("Collapse all");
 			visible = true;
 		}
-		else if (this.getAllNotVisible() && visibleButton.getCaption().equals("Collapse all")){
+		else if (this.getAllNotVisible() && visibleButton.getCaption().equals("Collapse all") && numUAVs != 0){
 			visibleButton.setCaption("Expand all");
 			visible = false;
 		}
