@@ -50,6 +50,8 @@ def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
             p_new = p_EA1_E.move_azimuth_distance(0, y)
             S.append(p_new)
 
+    # TODO: implement a filter to remove all points in S that do not intersect with the GeoPoly
+
     path = tsp_greedy(p_ES_E, arr(S), point_last_seen=point_last_seen)
     return [pos.to_lla() for pos in path]
 
@@ -69,10 +71,6 @@ def get_search_path(start, vertices, strat=SEARCH_DEFAULT, step=10, point_last_s
     :param point_last_seen: optional, the last known location of the target (lat, lon, alt)
     :return:
     """
-    if len(vertices) != 4:
-        # TODO: support arbitrary polygon
-        raise ValueError('invalid search area, must have exactly 4 vertices.')
-
     if strat not in _search_strats:
         raise ValueError('invalid search strategy specified {}'.format(strat))
 
