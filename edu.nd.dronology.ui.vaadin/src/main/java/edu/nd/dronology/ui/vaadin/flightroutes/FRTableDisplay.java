@@ -44,6 +44,43 @@ public class FRTableDisplay {
 		});
 		
 		grid.setColumnOrder("order", "latitude", "longitude", "altitude", "transitSpeed");
+		addButtonColumn();
+		grid.setColumnResizeMode(null);
+		grid.setSelectionMode(SelectionMode.NONE);
+	}
+	
+	public Grid<WayPoint> getGrid() {
+		return grid;
+	}
+	
+	public void makeEditable(MapMarkerUtilities mapMarkers) {
+		grid.getColumn("latitude").setEditorComponent(latitude);
+		grid.getColumn("longitude").setEditorComponent(longitude);
+		grid.getColumn("altitude").setEditorComponent(altitude);
+		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
+		grid.getEditor().setEnabled(true);
+		grid.getEditor().addSaveListener(event -> {
+			mapMarkers.updatePinForWayPoint(event.getBean());
+			grid.getEditor().cancel();
+		});
+		addButtonColumn();
+	}
+	
+	public void makeUneditable(MapMarkerUtilities mapMarkers) {
+		grid.getEditor().setEnabled(false);
+		removeButtonColumn();
+	}
+	
+	public void setRoute(MapMarkerUtilities route) {
+		this.route = route;
+	}
+	public void setGrid(List<WayPoint> points){
+		grid.setItems(points);
+		for (int i = 0; i < points.size(); i++) {
+			points.get(i).setOrder(i + 1);
+		}
+	}
+	public void addButtonColumn() {
 		grid.addColumn(event -> "Delete",
 			new ButtonRenderer<WayPoint> (clickEvent -> {
 				if (route.isEditable()) {
@@ -96,37 +133,14 @@ public class FRTableDisplay {
 				}
 			})
 		);
-		grid.setColumnResizeMode(null);
-		grid.setSelectionMode(SelectionMode.NONE);
 	}
-	
-	public Grid<WayPoint> getGrid() {
-		return grid;
-	}
-	
-	public void makeEditable(MapMarkerUtilities mapMarkers) {
-		grid.getColumn("latitude").setEditorComponent(latitude);
-		grid.getColumn("longitude").setEditorComponent(longitude);
-		grid.getColumn("altitude").setEditorComponent(altitude);
-		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
-		grid.getEditor().setEnabled(true);
-		grid.getEditor().addSaveListener(event -> {
-			mapMarkers.updatePinForWayPoint(event.getBean());
-			grid.getEditor().cancel();
+	public void removeButtonColumn() {
+		grid.getColumns().stream().forEach(c -> {
+			if (!c.getCaption().equals("Id") && !c.getCaption().equals("Reached") && !c.getCaption().equals("Latitude") && 
+					!c.getCaption().equals("Longitude") && !c.getCaption().equals("#") && !c.getCaption().equals("Altitude") &&
+							!c.getCaption().equals("Transit Speed")) {
+				grid.removeColumn(c);
+			}
 		});
-	}
-	
-	public void makeUneditable(MapMarkerUtilities mapMarkers) {
-		grid.getEditor().setEnabled(false);
-	}
-	
-	public void setRoute(MapMarkerUtilities route) {
-		this.route = route;
-	}
-	public void setGrid(List<WayPoint> points){
-		grid.setItems(points);
-		for (int i = 0; i < points.size(); i++) {
-			points.get(i).setOrder(i + 1);
-		}
 	}
 }
