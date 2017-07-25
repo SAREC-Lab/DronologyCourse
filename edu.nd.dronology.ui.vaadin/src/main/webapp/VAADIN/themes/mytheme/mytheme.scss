@@ -215,6 +215,9 @@ $valo-menu-background-color: #eee;
 			left:0 !important;
 			width: 100%;
 		}
+		path.leaflet-interactive {
+			stroke-width: 4px;
+		}
 	}
 	.fr_leaflet_map {
 		height: $fr-map-height !important;
@@ -225,6 +228,16 @@ $valo-menu-background-color: #eee;
 		border-width: 5px; 
 		border-color: $color-dark-4;
 		z-index: 0 !important;
+		.leaflet-grab {
+			cursor: crosshair;
+		}
+		path.leaflet-interactive {
+			stroke-width: 6px;
+			cursor: crosshair;
+		}
+		path.leaflet-interactive:hover {
+			stroke: rgb(70,130,200);
+		}
 	}
 	.fr_route_meta_info{
 		padding: 5px 15px;
