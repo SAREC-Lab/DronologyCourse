@@ -427,4 +427,7 @@ public class MapMarkerUtilities {
 	public void setIsPolyline(boolean isPolyline) {
 		this.isPolyline = isPolyline;
 	}
+	public FRTableDisplay getTableDisplay() {
+		return tableDisplay;
+	}
 }
