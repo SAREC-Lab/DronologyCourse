@@ -55,11 +55,11 @@ public class FRInfoPanel extends CustomComponent {
 	private Button drawButton;
 	private Collection<FlightRouteInfo> items;
 	private FlightRouteInfo drone;
-	FRNewRoute display;
-	TextField inputField;
-	FRInfoBox routeBox;
-	ArrayList<FRInfoBox> boxList = new ArrayList();
-	FRControlsComponent controlComponent;
+	private FRNewRoute display;
+	private TextField inputField;
+	private FRInfoBox routeBox;
+	private ArrayList<FRInfoBox> boxList = new ArrayList();
+	private FRControlsComponent controlComponent;
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
