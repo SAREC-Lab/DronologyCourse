@@ -1,8 +1,10 @@
 package edu.nd.dronology.core.vehicle;
 
+import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
 
 /**
  * iDrone interface
@@ -96,5 +98,7 @@ public interface IDrone {
 	public void setVelocity(double x, double y, double z);
 
 	void setCoordinates(LlaCoordinate coordinate);
+
+	public void sendCommand(AbstractDroneCommand command) throws DroneException;
 
 }

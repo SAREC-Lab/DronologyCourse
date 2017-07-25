@@ -1,11 +1,15 @@
 package edu.nd.dronology.core.vehicle.internal;
 
+import com.google.common.util.concurrent.RateLimiter;
+
+import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.simulator.IFlightSimulator;
 import edu.nd.dronology.core.simulator.SimulatorFactory;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
+import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
 import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -81,14 +85,13 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 		droneStatus.updateBatteryLevel(simulator.getVoltage());
 		return simulator.getVoltage();
 	}
-
+	RateLimiter limiter = RateLimiter.create(5);
 	@Override
 	public boolean move(double i) { // ALSO NEEDS THINKING ABOUT FOR non-VIRTUAL
 		getBatteryStatus();
+		//limiter.acquire();
 		boolean moveStatus = simulator.move(2);
 		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());
-
-		// DroneCollectionStatus.getInstance().testStatus();
 		return moveStatus;
 	}
 
@@ -113,6 +116,12 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	public void setVelocity(double x, double y, double z) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void sendCommand(AbstractDroneCommand command) throws DroneException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

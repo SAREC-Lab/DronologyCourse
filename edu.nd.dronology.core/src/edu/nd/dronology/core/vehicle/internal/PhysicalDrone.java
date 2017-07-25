@@ -11,6 +11,7 @@ import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
+import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
 import edu.nd.dronology.core.vehicle.commands.GoToCommand;
 import edu.nd.dronology.core.vehicle.commands.SetGroundSpeedCommand;
 import edu.nd.dronology.core.vehicle.commands.SetModeCommand;
@@ -173,5 +174,11 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IUAVProperty
 	@Override
 	public void updateVelocity(double velocity) {
 		super.setVelocity(velocity);
+	}
+
+	@Override
+	public void sendCommand(AbstractDroneCommand command) throws DroneException {
+		baseStation.sendCommand(command);
+		
 	}
 }

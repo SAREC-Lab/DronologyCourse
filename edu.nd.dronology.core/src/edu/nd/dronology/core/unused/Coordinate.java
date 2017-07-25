@@ -1,3 +1,4 @@
+package edu.nd.dronology.core.unused;
 ///**
 // * Stores and manages a single coordinate using the Signed degrees format (DDD.dddd) used by Google Maps. For example: University of Notre Dame Basilica has coordinates 41.707762 (latitude),
 // * -86.226880 (longitude). This simulation uses relative altitude and so we initial set altitude = 0.
