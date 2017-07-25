@@ -68,7 +68,6 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, point_last_seen=Non
     for lat, lon, _ in path:
         waypoints.append(Waypoint(lat, lon, altitude, groundpseed=groundspeed))
 
-
     # SEND HANDSHAKE
     dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
 

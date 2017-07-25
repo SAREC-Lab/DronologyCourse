@@ -1,5 +1,6 @@
 import numpy as np
 import nvector as nv
+from shapely.geometry import Polygon, Point
 
 
 arr = np.array
@@ -21,7 +22,9 @@ def column_vector(a):
 class GeoShape(object):
     def __init__(self, vertices):
         self._verts = vertices
-        self._grid = arr([v.to_pvector() for v in vertices])
+        self._grid_xyz = arr([v.to_pvector() for v in vertices])
+        self._grid_lla = arr([v.to_lla() for v in vertices])
+        self._poly = Polygon([v.to_pvector()[:] for v in vertices])
 
 
 class GeoPoly(GeoShape):
@@ -31,30 +34,55 @@ class GeoPoly(GeoShape):
         self._nw = None
         self._se = None
         self._ne = None
+        self._n_max = None
+        self._e_max = None
+        self._s_max = None
+        self._w_max = None
 
     def sw_vertex(self):
         if self._sw is None:
-            self._sw = min(self._grid, key=lambda l: (l[0] + l[2]))
+            self._sw = min(self._grid_xyz, key=lambda l: (l[0] + l[2]))
         return self._sw
 
     def nw_vertex(self):
         if self._nw is None:
-            self._nw = min(self._grid, key=lambda l: (l[0] - l[2]))
+            self._nw = min(self._grid_xyz, key=lambda l: (l[0] - l[2]))
         return self._nw
 
     def se_vertex(self):
         if self._se is None:
-            self._se = max(self._grid, key=lambda l: (l[0] - l[2]))
+            self._se = max(self._grid_xyz, key=lambda l: (l[0] - l[2]))
         return self._se
 
     def ne_vertex(self):
         if self._ne is None:
-            self._ne = max(self._grid, key=lambda l: (l[0] + l[2]))
+            self._ne = max(self._grid_xyz, key=lambda l: (l[0] + l[2]))
         return self._ne
 
     def furthest_north(self):
-        return max(self._grid, key=lambda l: l[2])
+        if not self._n_max:
+            self._n_max = max(self._grid_xyz, key=lambda l: l[2])
+        return self._n_max
 
+    def furthest_east(self):
+        if not self._e_max:
+            self._e_max = max(self._grid_xyz, key=lambda l: l[0])
+        return self._e_max
+
+    def furthest_west(self):
+        if not self._w_max:
+            self._w_max = min(self._grid_xyz, key=lambda l: l[0])
+        return self._w_max
+
+    def furthest_south(self):
+        if not self._s_max:
+            self._s_max = min(self._grid_xyz, key=lambda l: l[2])
+        return self._s_max
+
+    def contains(self, p):
+        ll = p.to_pvector()[:]
+        p_ = Point(*ll)
+        return p_.within(self._poly) or p_.touches(self._poly)
 
 
 class Earth:
@@ -232,8 +260,8 @@ class Nvector(Position):
     def get_z(self):
         return self.n_EB_E[2, 0]
 
-    def get_xyz(self, shape=(1, 3)):
-        return self.n_EB_E.reshape(shape)
+    def get_xyz(self, shape=(3,)):
+        return self.n_EB_E.ravel().reshape(shape)
 
     def get_depth(self):
         return self.depth
@@ -272,6 +300,10 @@ class Pvector(Position):
     def get_z(self):
         return self.p_EB_E[2, 0]
 
+    def get_xyz(self, shape=(3,)):
+        xyz = self.p_EB_E.ravel().reshape(shape)
+        return xyz
+
     def to_nvector(self):
         (x, y, z), depth = nv.p_EB_E2n_EB_E(self.p_EB_E, a=NV_A, f=NV_F)
 
@@ -293,3 +325,5 @@ def mean_position(positions):
     m_Z = np.mean(nvecs[-1, :])
 
     return positions[0].coerce(Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z))
+
+

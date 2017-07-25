@@ -1,17 +1,33 @@
 import unittest
-
 import mathutil
-import util
 import numpy as np
+from common import DEFAULT_SAR_BOUNDS
 
 
-class TestPosition(unittest.TestCase):
-    def test_update(self):
-        a = mathutil.Lla(41.697987, -86.233922, 261.9)
-        ned = np.array([[91.44], [0], [0]])
-        a_new = a.update(ned, t=1.0)
+class TestGeoPoly(unittest.TestCase):
+    def setUp(self):
+        self.verts = map(lambda args: mathutil.Lla(*args), DEFAULT_SAR_BOUNDS)
+        self.gp = mathutil.GeoPoly(self.verts)
 
-        print(a_new.as_array())
+    def test_furthest_east(self):
+        expected = mathutil.Lla(41.519028, -86.239411, 0)
+        actual = self.gp.furthest_east().to_lla()
+        self.assertEqual(expected, actual)
+
+    def test_furthest_west(self):
+        expected = mathutil.Lla(41.519007, -86.240396, 0)
+        actual = self.gp.furthest_west().to_lla()
+        self.assertEqual(expected, actual)
+
+    def test_furthest_north(self):
+        expected = mathutil.Lla(41.519391, -86.239414, 0)
+        actual = self.gp.furthest_north().to_lla()
+        self.assertEqual(expected, actual)
+
+    def test_furthest_south(self):
+        expected = mathutil.Lla(41.519007, -86.240396, 0)
+        actual = self.gp.furthest_south().to_lla()
+        self.assertEqual(expected, actual)
 
 
 class TestNVector(unittest.TestCase):
@@ -99,42 +115,42 @@ class TestDistance(unittest.TestCase):
 class TestEarth(unittest.TestCase):
     def test_meridional_radius_curvature_1(self):
         lat = 0
-        expected = (util.SEMI_MINOR ** 2) / util.SEMI_MAJOR
+        expected = (mathutil.SEMI_MINOR ** 2) / mathutil.SEMI_MAJOR
         actual = mathutil.Earth.meridional_radius_curvature(lat)
 
         self.assertAlmostEqual(expected, actual, places=6)
 
     def test_meridional_radius_curvature_2(self):
         lat = 90
-        expected = (util.SEMI_MAJOR ** 2) / util.SEMI_MINOR
+        expected = (mathutil.SEMI_MAJOR ** 2) / mathutil.SEMI_MINOR
         actual = mathutil.Earth.meridional_radius_curvature(lat)
 
         self.assertAlmostEqual(expected, actual, places=6)
 
     def test_meridional_radius_curvature_3(self):
         lat = -90
-        expected = (util.SEMI_MAJOR ** 2) / util.SEMI_MINOR
+        expected = (mathutil.SEMI_MAJOR ** 2) / mathutil.SEMI_MINOR
         actual = mathutil.Earth.meridional_radius_curvature(lat)
 
         self.assertAlmostEqual(expected, actual, places=6)
 
     def test_transverse_radius_curvature_1(self):
         lat = 0
-        expected = util.SEMI_MAJOR
+        expected = mathutil.SEMI_MAJOR
         actual = mathutil.Earth.transverse_radius_curvature(lat)
 
         self.assertAlmostEqual(expected, actual, places=6)
 
     def test_transverse_radius_curvature_2(self):
         lat = 90
-        expected = (util.SEMI_MAJOR ** 2) / util.SEMI_MINOR
+        expected = (mathutil.SEMI_MAJOR ** 2) / mathutil.SEMI_MINOR
         actual = mathutil.Earth.transverse_radius_curvature(lat)
 
         self.assertAlmostEqual(expected, actual, places=6)
 
     def test_transverse_radius_curvature_3(self):
         lat = -90
-        expected = (util.SEMI_MAJOR ** 2) / util.SEMI_MINOR
+        expected = (mathutil.SEMI_MAJOR ** 2) / mathutil.SEMI_MINOR
         actual = mathutil.Earth.transverse_radius_curvature(lat)
 
         self.assertAlmostEqual(expected, actual, places=6)

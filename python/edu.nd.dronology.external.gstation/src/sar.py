@@ -1,5 +1,8 @@
 import numpy as np
 import util
+import networkx as nx
+import itertools
+import matplotlib.pyplot as plt
 from mathutil import Lla, GeoPoly
 from common import *
 
@@ -8,13 +11,30 @@ _LOG = util.get_logger()
 arr = np.array
 
 
-def tsp_greedy(start, points, point_last_seen=None):
-    to_visit = arr(points)
+def _init_tsp(start, point_last_seen):
     path = [start]
 
     if point_last_seen is not None:
         path.append(point_last_seen)
 
+    return path
+
+
+def tsp_christofides(start, points, point_last_seen=None):
+    path = _init_tsp(start, point_last_seen)
+
+    g = nx.Graph()
+    for a, b in itertools.combinations(points, 2):
+        g.add_edge(a, b, weight=a.distance(b))
+
+    T = nx.minimum_spanning_tree(g)
+
+    return path
+
+
+def tsp_greedy(start, points, point_last_seen=None):
+    path = _init_tsp(start, point_last_seen)
+    to_visit = arr(points)
     while to_visit.size:
         dists = [path[-1].distance(b) for b in to_visit]
         i = np.argmin(dists)
@@ -29,8 +49,11 @@ def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
     grid = GeoPoly(vertices)
 
     p_EA_E = grid.sw_vertex()
+    _LOG.debug('SW SAR corner: {}'.format(p_EA_E.to_lla()))
     p_EC_E = grid.ne_vertex()
+    _LOG.debug('NE SAR corner: {}'.format(p_EC_E.to_lla()))
     p_ED_E = grid.se_vertex()
+    _LOG.debug('SE SAR corner: {}'.format(p_ED_E.to_lla()))
     p_furthest_north_E = grid.furthest_north()
 
     R_EN = p_EA_E.n_E2R_EN()
@@ -50,8 +73,8 @@ def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
             p_new = p_EA1_E.move_azimuth_distance(0, y)
             S.append(p_new)
 
-    # TODO: implement a filter to remove all points in S that do not intersect with the GeoPoly
-
+    # TODO: fix the filter 
+    # S = [s for s in S if grid.contains(s)]
     path = tsp_greedy(p_ES_E, S, point_last_seen=point_last_seen)
     return [pos.to_lla() for pos in path]
 
@@ -78,7 +101,11 @@ def get_search_path(start, vertices, strat=SEARCH_DEFAULT, step=10, point_last_s
 
 
 def main():
+    v1 = 41.5190146513, -86.2400358089, 0
+    v2 = 41.5192946477, -86.239555554, 0
+    v3 = 41.5190274009, -86.2394354903, 0
     bounds = DEFAULT_SAR_BOUNDS
+    # bounds = [v1, v2, v3]
     s = Lla(*DEFAULT_SAR_START)
     v = [Lla(*loc) for loc in bounds]
 
