@@ -59,7 +59,7 @@ public class MonitoringDataHandler implements Runnable {
 					validator.validate(monitoringMesasge);
 				}
 				else {
-					LOGGER.error("No validator found for "+ monitoringMesasge.getUavid());
+					//LOGGER.error("No validator found for "+ monitoringMesasge.getUavid());
 				}
 
 			} catch (Exception e) {

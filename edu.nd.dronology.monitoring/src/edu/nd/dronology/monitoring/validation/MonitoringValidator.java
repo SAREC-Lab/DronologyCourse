@@ -10,6 +10,7 @@ import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.monitoring.monitoring.ValidationResultManager;
 import edu.nd.dronology.monitoring.safety.ISACAssumption;
 import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
+import edu.nd.dronology.monitoring.util.BenchmarkLogger;
 import edu.nd.dronology.monitoring.validation.ValidationResult.Result;
 import edu.nd.dronology.monitoring.validation.engine.EngineFactory;
 import edu.nd.dronology.monitoring.validation.engine.EvaluationEngineException;
@@ -59,6 +60,7 @@ public class MonitoringValidator {
 	private void evaluate(EvalFunction f, UAVMonitoringMessage monitoringMesasge) throws EvaluationException {
 		PreciseTimestamp ts = PreciseTimestamp.create();
 		StringBuilder params = new StringBuilder();
+		long startTimestamp = System.nanoTime();
 		for (String param : f.getParameters()) {
 			if (SafetyCaseValidator.isISACParam(param)) {
 				ISACAssumption ass = SafetyCaseGeneration.getSafetyCase().getAssumption(f.getId());
@@ -101,6 +103,8 @@ public class MonitoringValidator {
 			}
 			ValidationEntry validationResult = new ValidationEntry(f.getId(), res);
 			validationResult.setTimestamp(ts);
+			long endTimestamp = System.nanoTime();
+			BenchmarkLogger.reportMonitor(uavid, f.getId(), (endTimestamp - startTimestamp), result.toString());
 			if (!result.booleanValue()) {
 				LOGGER.warn("Evaluation failed: " + f.getFunctionString() + " with parameters " + callString);
 			} else {

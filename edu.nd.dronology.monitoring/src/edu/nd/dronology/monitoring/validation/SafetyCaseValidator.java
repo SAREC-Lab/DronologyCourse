@@ -12,6 +12,7 @@ import edu.nd.dronology.monitoring.safety.IExternalSafetyCase;
 import edu.nd.dronology.monitoring.safety.ISACAssumption;
 import edu.nd.dronology.monitoring.safety.internal.InfrastructureSafetyCase;
 import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
+import edu.nd.dronology.monitoring.util.BenchmarkLogger;
 import edu.nd.dronology.monitoring.validation.ValidationResult.Result;
 import edu.nd.dronology.monitoring.validation.engine.EngineFactory;
 import edu.nd.dronology.monitoring.validation.engine.EvaluationEngineException;
@@ -112,6 +113,7 @@ public class SafetyCaseValidator {
 	private void validateStaticEntries(ValidationResult validationResult) {
 		List<ISACAssumption> staticassumptions = INSTANCE_SAFETY_CASE.getStaticEvaluateableAssumptions();
 		boolean passed = true;
+		long startTimestamp = System.nanoTime();
 		for (ISACAssumption ass : staticassumptions) {
 			Boolean result;
 			ValidationEntry entry;
@@ -137,6 +139,8 @@ public class SafetyCaseValidator {
 			validationResult.addValidationEntry(entry);
 
 		}
+		long endTimestamp = System.nanoTime();
+		BenchmarkLogger.reportStatic(safetyCase.getUAVId(), (endTimestamp - startTimestamp), Boolean.toString(passed));
 		if (passed) {
 			LOGGER.info("Validation of static constraints passed!");
 		} else {
