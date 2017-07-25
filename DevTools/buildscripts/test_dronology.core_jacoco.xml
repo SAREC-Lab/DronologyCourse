@@ -33,7 +33,7 @@
 		<antcall target="compile" inheritall="true" />
 		<antcall target="test" inheritall="true" />
 		<antcall target="report" inheritall="true" />
-		<antcall target="cleanup" inheritall="true" />
+		<!--<antcall target="cleanup" inheritall="true" />-->
 
 		<delete dir="${result.dir}" />
 
