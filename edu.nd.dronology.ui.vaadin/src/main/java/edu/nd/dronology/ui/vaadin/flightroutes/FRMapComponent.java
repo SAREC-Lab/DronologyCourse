@@ -568,4 +568,39 @@ public class FRMapComponent extends CustomComponent {
 	public boolean getToDo() {
 		return toDo;
 	}
+	public void setRouteName(String name){
+		//sets the name of a selected route
+		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+		ByteArrayInputStream inStream;
+		IFlightRoute froute;
+
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+		//sends the information to dronology to be saved
+		try {
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+
+			String id = selectedRoute.getId();
+			
+
+			byte[] information = service.requestFromServer(id);
+			inStream = new ByteArrayInputStream(information);
+			froute = routePersistor.loadItem(inStream);
+
+			froute.setName(name);
+			ByteArrayOutputStream outs = new ByteArrayOutputStream();
+			routePersistor.saveItem(froute, outs);
+			byte[] bytes = outs.toByteArray();
+
+			service.transmitToServer(froute.getId(), bytes);
+
+		} catch (DronologyServiceException | RemoteException e1) {
+			e1.printStackTrace();
+		} catch (PersistenceException e1) {
+			e1.printStackTrace();
+		}
+		//mainLayout.getControls().getInfoPanel().refreshRoutes();
+		
+	}
 }
