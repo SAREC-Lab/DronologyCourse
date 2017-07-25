@@ -26,7 +26,7 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
 	private MapMarkerUtilities route;
-	
+	private boolean hasDeleteColumn;
 	private TextField latitude = new TextField();
 	private TextField longitude = new TextField();
 	private TextField altitude = new TextField();
@@ -82,61 +82,65 @@ public class FRTableDisplay {
 		}
 	}
 	public void addButtonColumn() {
-		grid.addColumn(event -> "Delete",
-			new ButtonRenderer<WayPoint> (clickEvent -> {
-				if (route.isEditable()) {
-					Window deletePanel = new Window(" ");
-					VerticalLayout deletePanelContent = new VerticalLayout();
-					HorizontalLayout buttons = new HorizontalLayout();
-					Button yes = new Button("Yes");
-					Button no = new Button("No");
-					deletePanel.setContent(deletePanelContent);
-					
-					deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
-					deletePanel.setWidth("425px");
-					
-					buttons.addComponent(yes);
-					buttons.addComponent(no);
-					
-					deletePanel.setModal(true);
-					deletePanel.setClosable(false);
-					deletePanel.setResizable(false);
-					
-					WayPoint w = clickEvent.getItem();
-					
-					yes.addClickListener(event -> {
-						route.removeAllLines(route.getPolylines());
+		if (!hasDeleteColumn) {
+			hasDeleteColumn = true;
+			grid.addColumn(event -> "Delete",
+				new ButtonRenderer<WayPoint> (clickEvent -> {
+					if (route.isEditable()) {
+						Window deletePanel = new Window(" ");
+						VerticalLayout deletePanelContent = new VerticalLayout();
+						HorizontalLayout buttons = new HorizontalLayout();
+						Button yes = new Button("Yes");
+						Button no = new Button("No");
+						deletePanel.setContent(deletePanelContent);
 						
-						for (int i = 0; i < route.getMapPoints().size(); i++) {
-							if (route.getMapPoints().get(i).getId().equals(w.getId())) {
-								route.getMapPoints().remove(route.getMapPoints().get(i));
-								route.getMap().removeComponent(route.getPins().get(i));
+						deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
+						deletePanel.setWidth("425px");
+						
+						buttons.addComponent(yes);
+						buttons.addComponent(no);
+						
+						deletePanel.setModal(true);
+						deletePanel.setClosable(false);
+						deletePanel.setResizable(false);
+						
+						WayPoint w = clickEvent.getItem();
+						
+						yes.addClickListener(event -> {
+							route.removeAllLines(route.getPolylines());
+							
+							for (int i = 0; i < route.getMapPoints().size(); i++) {
+								if (route.getMapPoints().get(i).getId().equals(w.getId())) {
+									route.getMapPoints().remove(route.getMapPoints().get(i));
+									route.getMap().removeComponent(route.getPins().get(i));
+								}
 							}
-						}
+							
+							route.drawLines(route.getMapPoints(), true, 1, false);
+	
+							for (int i = 0; i < this.route.getMapPoints().size(); i++) {
+								this.route.getMapPoints().get(i).setOrder(i + 1);
+							}
 						
-						route.drawLines(route.getMapPoints(), true, 1, false);
-
-						for (int i = 0; i < this.route.getMapPoints().size(); i++) {
-							this.route.getMapPoints().get(i).setOrder(i + 1);
-						}
-					
-						grid.setItems(this.route.getMapPoints());
-						grid.setItems(route.getMapPoints());
-						UI.getCurrent().removeWindow(deletePanel);				   	
-					});
+							grid.setItems(this.route.getMapPoints());
+							grid.setItems(route.getMapPoints());
+							UI.getCurrent().removeWindow(deletePanel);				   	
+						});
+							
+						no.addClickListener(event -> {
+							UI.getCurrent().removeWindow(deletePanel);
+						});
+							
+						deletePanelContent.addComponent(buttons);
 						
-					no.addClickListener(event -> {
-						UI.getCurrent().removeWindow(deletePanel);
-					});
-						
-					deletePanelContent.addComponent(buttons);
-					
-					UI.getCurrent().addWindow(deletePanel);
-				}
-			})
-		);
+						UI.getCurrent().addWindow(deletePanel);
+					}
+				})
+			);
+		}
 	}
 	public void removeButtonColumn() {
+		hasDeleteColumn = false;
 		grid.getColumns().stream().forEach(c -> {
 			if (!c.getCaption().equals("Id") && !c.getCaption().equals("Reached") && !c.getCaption().equals("Latitude") && 
 					!c.getCaption().equals("Longitude") && !c.getCaption().equals("#") && !c.getCaption().equals("Altitude") &&
