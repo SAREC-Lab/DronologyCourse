@@ -26,14 +26,14 @@
 		<antcall target="check-preconditions" inheritall="true" />
 		<antcall target="prepare-test" inheritall="true" />
 		<antcall target="copy-source" inheritall="true" />
-			<antcall target="copy-libs" inheritall="true" />
+		<antcall target="copy-libs" inheritall="true" />
 		<antcall target="-copy-logger" inheritall="true" />
 		<antcall target="-copy-util" inheritall="true" />
 		<antcall target="copy-tests" inheritall="true" />
 		<antcall target="compile" inheritall="true" />
 		<antcall target="test" inheritall="true" />
 		<antcall target="report" inheritall="true" />
-		<!--<antcall target="cleanup" inheritall="true" />-->
+		<antcall target="cleanup" inheritall="true" />
 
 		<delete dir="${result.dir}" />
 
@@ -65,7 +65,7 @@
 		<path id="classpath">
 			<fileset dir="${build.dir}/lib" includes="*.jar" />
 		</path>
-		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true">
+		<javac sourcepath="" srcdir="${build.dir}/src" destdir="${build.dir}/bin" classpathref="classpath" nowarn="true" debug="true" verbose="true">
 			<compilerarg line="-g" />
 
 			<include name="edu/nd/dronology/core/**/*.java" />
@@ -89,7 +89,7 @@
 	</path>
 
 
-	<target name="test" >
+	<target name="test">
 		<!--
 	 Step 2: Wrap test execution with the JaCoCo coverage task 
 	-->
@@ -120,7 +120,7 @@
 
 		</jacoco:coverage>
 	</target>
-	<target name="report" >
+	<target name="report">
 		<!--  Step 3: Create coverage report  -->
 		<jacoco:report>
 			<!--
@@ -132,8 +132,8 @@
 			<!--  the class files and optional source files ...  -->
 			<structure name="JaCoCo Dronology Code Coverage">
 				<classfiles>
-					<fileset dir="${build.dir}/bin" >
-						<exclude name="**/*Test*.class"/>
+					<fileset dir="${build.dir}/bin">
+						<exclude name="**/*Test*.class" />
 					</fileset>
 				</classfiles>
 				<sourcefiles encoding="UTF-8">
