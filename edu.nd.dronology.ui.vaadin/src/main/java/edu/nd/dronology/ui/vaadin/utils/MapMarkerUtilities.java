@@ -130,14 +130,16 @@ public class MapMarkerUtilities {
 
 		@Override
 		public void onClick(LeafletClickEvent event) {
-			isPolyline = true;
-			LPolyline polyline = (LPolyline)event.getSource();
-		List<LPolyline> polylines = getPolylines();
-			for (int j = 0; j < polylines.size(); j++) {
-				if (polylines.get(j).getId().equals(polyline.getId())) {
-					int index = j+1;
-					mapAddMarkerListener.processOnClick(event.getPoint(), index);
-					break;
+			if (isEditable) {
+				isPolyline = true;
+				LPolyline polyline = (LPolyline)event.getSource();
+			List<LPolyline> polylines = getPolylines();
+				for (int j = 0; j < polylines.size(); j++) {
+					if (polylines.get(j).getId().equals(polyline.getId())) {
+						int index = j+1;
+						mapAddMarkerListener.processOnClick(event.getPoint(), index);
+						break;
+					}
 				}
 			}
 		}
