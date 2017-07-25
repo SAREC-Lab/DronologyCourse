@@ -131,7 +131,7 @@ public class MapMarkerUtilities {
 		@Override
 		public void onClick(LeafletClickEvent event) {
 			LPolyline polyline = (LPolyline)event.getSource();
-    	List<LPolyline> polylines = getPolylines();
+			List<LPolyline> polylines = getPolylines();
 			for (int j = 0; j < polylines.size(); j++) {
 				if (polylines.get(j).getId().equals(polyline.getId())) {
 					int index = j+1;
@@ -278,7 +278,6 @@ public class MapMarkerUtilities {
 			if (drawOnMap)
 				map.addComponent(polyline);
 
-			polyline.addClickListener(new PolylineClickListener());
 			polylines.add(polyline);
 		}
 		return polylines;
@@ -302,7 +301,8 @@ public class MapMarkerUtilities {
 			pins.get(i).addMouseOutListener(new MarkerMouseOutListener());
 		}
 
-  	List<LPolyline> polylines = getPolylines();
+		List<LPolyline> polylines = getPolylines();
+		
 		for (int i = 0; i < polylines.size(); i++) {
 			registeredListeners.add(polylines.get(i).
 					addListener(LeafletClickEvent.class, new PolylineClickListener(), LeafletClickListener.METHOD));
