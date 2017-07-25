@@ -50,18 +50,46 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		TextField transitSpeedField = (TextField) getComponentByCaption(window, "Transit Speed: ");
 		
 		saveButton.addClickListener(event -> {
-			altitude = altitudeField.getValue();
-			transitSpeed = transitSpeedField.getValue();
+			boolean canSave = true;
+			boolean transitSpeedInvalid = false;
 			String caption = "";
-			if (altitude.isEmpty())
-				caption = "Altitude is the empty string.";
-			if (transitSpeed.isEmpty()) {
-				if (altitude.isEmpty())
-					caption = caption + "\n" + "Transit speed is the empty string.";
-				else
-					caption = "Transit speed is the empty string.";
+			
+			altitude = altitudeField.getValue();
+			try {
+				float alt = Float.valueOf(altitude);
+			} catch (NumberFormatException ex) {
+				caption = "Altitude must be a number.";
+				canSave = false;
 			}
-	    	if (!altitude.isEmpty() && !transitSpeed.isEmpty()) {
+			
+			if (altitude.isEmpty()) {
+				caption = "Altitude must be a number.";
+				canSave = false;
+			}
+			
+			transitSpeed = transitSpeedField.getValue();
+			try {
+				float tra = Float.valueOf(transitSpeed);
+			} catch (NumberFormatException ex) {
+				if (caption.isEmpty()) {
+					caption = "Transit speed must be a number.";
+				} else {
+					caption = caption + "\n" + "Transit speed must be a number.";
+				}
+				canSave = false;
+				transitSpeedInvalid = true;
+			}
+			
+			if (transitSpeed.isEmpty() && !transitSpeedInvalid) {
+				if (caption.isEmpty()) {
+					caption = "Transit speed must be a number.";
+				} else {
+					caption = caption + "\n" + "Transit speed must be a number.";
+				}
+				canSave = false;
+			}
+			
+	    	if (canSave) {
 	    		UI.getCurrent().removeWindow(window);
 	    		for (int i = 0; i < route.getMapPoints().size(); i++) {
 	    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
@@ -79,9 +107,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		
 		cancelButton.addClickListener(event -> {
 			removeCurrentWayPoint();
-
 			UI.getCurrent().removeWindow(window);
-
 			route.drawLines(route.getMapPoints(), true, 0, false);
 		});
 	}
