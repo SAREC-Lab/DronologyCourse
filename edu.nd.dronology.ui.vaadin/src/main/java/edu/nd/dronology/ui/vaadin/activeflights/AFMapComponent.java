@@ -746,8 +746,32 @@ public class AFMapComponent extends CustomComponent {
 				}
 			}
 
-			layout.addComponent(popup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150)
-			+ "px;left:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
+			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.9;
+			
+			double xDegreeDifference = -(leafletMap.getCenter().getLon() - leafletMarker.getPoint().getLon());
+			double yDegreeDifference = leafletMap.getCenter().getLat() - leafletMarker.getPoint().getLat();
+			double degreePerZoom = (360.0/(Math.pow(2, leafletMap.getZoomLevel())));
+			double degreePerPixel = degreePerZoom / mapWidth;
+			double xPixelDifference = (xDegreeDifference / degreePerPixel) / 3.0;
+			double yPixelDifference = (yDegreeDifference / degreePerPixel) / 3.0;
+
+			xPixelDifference = xPixelDifference * 0.55;
+			yPixelDifference = yPixelDifference * 0.6;
+			
+			double pixelsToLeftBorder = (mapWidth / 2.0) + xPixelDifference;
+			double pixelsToTopBorder = (mapHeight / 2.0) + yPixelDifference;
+			double mouseX = MouseInfo.getPointerInfo().getLocation().getX();
+			double mouseY = MouseInfo.getPointerInfo().getLocation().getY();
+			double mapTopLeftX = mouseX - pixelsToLeftBorder;
+			double mapTopLeftY = mouseY - pixelsToTopBorder;
+			
+			double adjustedXLocation = mouseX - mapTopLeftX;
+			double adjustedYLocation = mouseY - mapTopLeftY;
+			
+			layout.addComponent(popup, "top:" + String.valueOf((int) adjustedYLocation)
+			+ "px;left:" + String.valueOf((int) adjustedXLocation) + "px");
+
 			popup.setVisible(true);
 			popup.setPopupVisible(true);
 		}		
