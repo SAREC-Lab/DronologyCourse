@@ -13,6 +13,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -217,7 +218,7 @@ public class FRMainLayout extends CustomComponent {
 		//tests whether a route was added or not
 		isNew = true;
 		if(!(componentCount == controls.getInfoPanel().getRouteList().size())){
-		
+			
 			map.enableEdit();
 			//to get rid of points and lines from previous routes
 			map.getUtils().removeAllMarkers(map.getUtils().getPins());
@@ -235,10 +236,11 @@ public class FRMainLayout extends CustomComponent {
 			
 			map.getTableDisplay().getGrid().setItems();
 			map.enableEdit();
-			
-			controls.getInfoPanel().refreshRoutes();
+
+			//controls.getInfoPanel().refreshRoutes();
 			
 			flightInfo = controls.getInfoPanel().getFlight(index);
+			
 		}
 	}
 	public void deleteRouteUpdate(){
