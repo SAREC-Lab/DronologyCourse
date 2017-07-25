@@ -102,6 +102,41 @@ public class FRMainLayout extends CustomComponent {
 				switchWindows(e, map, null);
 			}		
 		});
+		
+		controls.getInfoPanel().getNewRouteButton().addClickListener(e->{
+			if (map.getUtils().isEditable()) {
+				HorizontalLayout buttons = new HorizontalLayout();
+				Button yes = new Button("Yes");
+				Button no = new Button("No");
+				buttons.addComponents(yes, no);
+				
+				VerticalLayout windowContent = new VerticalLayout();
+				Label statement = new Label("You have unsaved changes on " + name + ".");
+				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
+				
+				windowContent.addComponents(statement, question, buttons);
+				
+				Window warning;
+				warning = new Window(null, windowContent);
+				
+				warning.setModal(true);
+				warning.setClosable(false);
+				warning.setResizable(false);
+				
+				UI.getCurrent().addWindow(warning);
+				
+				yes.addClickListener(event -> {
+					UI.getCurrent().removeWindow(warning);
+					map.displayNoRoute();
+					map.exitEditMode();
+				});
+				
+				no.addClickListener(event -> {
+					UI.getCurrent().removeWindow(warning);
+					controls.getInfoPanel().removeWindow();
+				});
+			}
+		});
 
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
