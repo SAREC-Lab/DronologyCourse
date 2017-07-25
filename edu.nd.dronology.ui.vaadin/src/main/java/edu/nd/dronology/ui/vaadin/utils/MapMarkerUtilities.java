@@ -26,6 +26,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupView;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -83,11 +84,47 @@ public class MapMarkerUtilities {
 					}
 				}
 			}
+			
+			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
+			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.55;
+			
+			double xDegreeDifference = -(map.getCenter().getLon() - leafletMarker.getPoint().getLon());
+			double yDegreeDifference = map.getCenter().getLat() - leafletMarker.getPoint().getLat();
+			double degreePerZoom = (360.0/(Math.pow(2, map.getZoomLevel())));
+			double degreePerPixel = degreePerZoom / mapWidth;
+			double xPixelDifference = (xDegreeDifference / degreePerPixel) / 3.0;
+			double yPixelDifference = (yDegreeDifference / degreePerPixel) / 3.0;
+
+			xPixelDifference = xPixelDifference * 0.55;
+			yPixelDifference = yPixelDifference * 0.6;
+			
+			double pixelsToLeftBorder = (mapWidth / 2.0) + xPixelDifference;
+			double pixelsToTopBorder = (mapHeight / 2.0) + yPixelDifference;
+			double mouseX = MouseInfo.getPointerInfo().getLocation().getX();
+			double mouseY = MouseInfo.getPointerInfo().getLocation().getY();
+			double mapTopLeftX = mouseX - pixelsToLeftBorder;
+			double mapTopLeftY = mouseY - pixelsToTopBorder;
+			
+			double xAdjust = 0;
+			if (mouseX - mapTopLeftX > mapWidth / 2)
+				xAdjust = 140;
+			else 
+				xAdjust = 90;
+			
+			double yAdjust = 0;
+			if (mouseY - mapTopLeftY > mapHeight / 2)
+				yAdjust = 140;
+			else
+				yAdjust = 90;
+			
+			double adjustedXLocation = mouseX - mapTopLeftX + xAdjust;
+			double adjustedYLocation = mouseY - mapTopLeftY + yAdjust;
 
 			ComponentPosition position = layout.getPosition(popup);
 			x = (int) MouseInfo.getPointerInfo().getLocation().getX();
 			y = (int) MouseInfo.getPointerInfo().getLocation().getY();
-			position.setCSSString("top:" + String.valueOf(y - 100) + "px;left:" + String.valueOf(x - 240) + "px;");
+			position.setCSSString("top:" + String.valueOf(adjustedYLocation) + "px;left:" + String.valueOf(adjustedXLocation) + "px;");
+			
 			layout.setPosition(popup, position);
 
 			popup.setVisible(true);
