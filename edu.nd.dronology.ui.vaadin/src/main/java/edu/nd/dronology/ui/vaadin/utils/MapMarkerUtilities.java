@@ -130,13 +130,16 @@ public class MapMarkerUtilities {
 
 		@Override
 		public void onClick(LeafletClickEvent event) {
-			LPolyline polyline = (LPolyline)event.getSource();
-    	List<LPolyline> polylines = getPolylines();
-			for (int j = 0; j < polylines.size(); j++) {
-				if (polylines.get(j).getId().equals(polyline.getId())) {
-					int index = j+1;
-					mapAddMarkerListener.processOnClick(event.getPoint(), index);
-					break;
+			if (isEditable) {
+				isPolyline = true;
+				LPolyline polyline = (LPolyline)event.getSource();
+			List<LPolyline> polylines = getPolylines();
+				for (int j = 0; j < polylines.size(); j++) {
+					if (polylines.get(j).getId().equals(polyline.getId())) {
+						int index = j+1;
+						mapAddMarkerListener.processOnClick(event.getPoint(), index);
+						break;
+					}
 				}
 			}
 		}
@@ -148,6 +151,7 @@ public class MapMarkerUtilities {
 	private List<WayPoint> mapPoints = new ArrayList<>();
 	private List<Registration> registeredListeners = new ArrayList<>();
 	private boolean isEditable = false;
+	private boolean isPolyline = false;
 	private AbsoluteLayout layout;
 	private MapAddMarkerListener mapAddMarkerListener;
 	private PopupView popup;
@@ -302,7 +306,8 @@ public class MapMarkerUtilities {
 			pins.get(i).addMouseOutListener(new MarkerMouseOutListener());
 		}
 
-  	List<LPolyline> polylines = getPolylines();
+	List<LPolyline> polylines = getPolylines();
+		
 		for (int i = 0; i < polylines.size(); i++) {
 			registeredListeners.add(polylines.get(i).
 					addListener(LeafletClickEvent.class, new PolylineClickListener(), LeafletClickListener.METHOD));
@@ -415,5 +420,14 @@ public class MapMarkerUtilities {
 	}
 	public FRMapComponent getMapComponent() {
 		return mapComponent;
+	}
+	public boolean isPolyline() {
+		return isPolyline;
+	}
+	public void setIsPolyline(boolean isPolyline) {
+		this.isPolyline = isPolyline;
+	}
+	public FRTableDisplay getTableDisplay() {
+		return tableDisplay;
 	}
 }

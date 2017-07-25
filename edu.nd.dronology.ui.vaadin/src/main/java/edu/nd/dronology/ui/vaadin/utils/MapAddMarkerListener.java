@@ -30,13 +30,17 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	
 	@Override
 	public void onClick(LeafletClickEvent e) {
-		if (route.isEditable()) {
+		if (route.isEditable() && !route.isPolyline()) {
 			processOnClick(e.getPoint(), -1);
+		}
+		else {
+			route.setIsPolyline(false);
 		}
 	}
 	
 	public void processOnClick(Point p, int index) {
 		currentWayPoint = route.addNewPin(p, index);
+		
 		window.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
 
 		UI.getCurrent().addWindow(window);

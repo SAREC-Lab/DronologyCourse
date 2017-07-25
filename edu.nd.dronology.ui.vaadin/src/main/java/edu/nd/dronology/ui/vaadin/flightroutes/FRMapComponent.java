@@ -16,6 +16,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -397,7 +398,8 @@ public class FRMapComponent extends CustomComponent {
 			route.getMapPoints().add(storedPoints.get(i));
 		}
 		
-		route.getGrid().setItems(route.getMapPoints());
+//		route.getGrid().setItems(route.getMapPoints());
+		route.getTableDisplay().setGrid(route.getMapPoints());
 		
 		route.removeAllMarkers(route.getPins());
 		route.removeAllLines(route.getPolylines());
@@ -423,6 +425,7 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public void saveClick(){
 		//called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct waypoints on the map
+		route.disableRouteEditing();
 		
 		exitEditMode();
 		
@@ -531,6 +534,7 @@ public class FRMapComponent extends CustomComponent {
 			for (int i = 0; i < storedPoints.size(); i++) {
 				route.getMapPoints().add(storedPoints.get(i));
 			}
+			
 			//then, the map has the points and lines redrawn
 			route.getGrid().setItems(route.getMapPoints());
 			

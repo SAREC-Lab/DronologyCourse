@@ -55,11 +55,13 @@ public class FRInfoPanel extends CustomComponent {
 	private Button drawButton;
 	private Collection<FlightRouteInfo> items;
 	private FlightRouteInfo drone;
-	FRNewRoute display;
-	TextField inputField;
-	FRInfoBox routeBox;
-	ArrayList<FRInfoBox> boxList = new ArrayList();
-	FRControlsComponent controlComponent;
+	private FRNewRoute display;
+	private TextField inputField;
+	private FRInfoBox routeBox;
+	private ArrayList<FRInfoBox> boxList = new ArrayList();
+	private FRControlsComponent controlComponent;
+	private Button newRoute;
+	private Window window;
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
@@ -114,7 +116,7 @@ public class FRInfoPanel extends CustomComponent {
 		panel.addStyleName("fr_info_panel");
 		panel.addStyleName("control_panel");
 
-		Button newRoute = new Button("+ Add a new route");
+		newRoute = new Button("+ Add a new route");
 		newRoute.addStyleName("fr_new_route_button");
 
 		VerticalLayout popupContent = new VerticalLayout();
@@ -124,7 +126,7 @@ public class FRInfoPanel extends CustomComponent {
 		popupContent.addComponent(display);
 		PopupView popup = new PopupView(null, popupContent);
 		
-		Window window = new Window();
+		window = new Window();
 		window.setContent(display);
 		window.setPosition(200, 80);
 		window.setResizable(false);
@@ -184,7 +186,7 @@ public class FRInfoPanel extends CustomComponent {
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
 		totalLayout.addComponents(buttons, routes);
-
+		
 		setCompositionRoot(panel);
 	}
 
@@ -392,4 +394,17 @@ public FlightRouteInfo getRouteByName(String name){
 	public FRControlsComponent getControls(){
 		return controlComponent;
 	}
+	public HorizontalLayout getButtonLayout(){
+		return buttons;
+	}
+	public VerticalLayout getTotalLayout(){
+		return totalLayout;
+	}
+	public Button getNewRouteButton(){
+		return newRoute;
+	}
+	public void removeWindow(){
+		UI.getCurrent().removeWindow(window);
+	}
+	
 }

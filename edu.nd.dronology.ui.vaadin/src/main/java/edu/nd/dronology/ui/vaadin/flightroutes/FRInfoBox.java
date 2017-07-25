@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -38,11 +39,13 @@ public class FRInfoBox extends CustomComponent {
 	private FlightRouteInfo finfo;
 	private int index = 0;
 	private Button editButton;
+	int counter;
+	String whichBox;
 	
 	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	
 	public FRInfoBox(String name, String id, String created, String modified, String length, FRInfoPanel panel){
-			
+	
 		this.name = name;
 		this.id = id;
 		this.created = created;
@@ -88,16 +91,21 @@ public class FRInfoBox extends CustomComponent {
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
-		
-		getIndex(panel);
-			
+
 		trashButton.addListener(e->{
 			UI.getCurrent().addWindow(delete.getWindow());
-			
+			whichBox = this.getid();
+			for(int i = 0; i < panel.getRoutes().getComponentCount(); i++){
+				FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
+				if(local.getid().equals(whichBox)){
+					index = counter;
+				}else{
+					counter++;
+				}
+			}
 			finfo = panel.getFlight(index);
 			delete.setRouteInfoTobeDeleted(finfo);
-			panel.refreshRoutes();
-			
+			panel.refreshRoutes();	
 		});
 		
 		delete.getYesButton().addClickListener(e->{
