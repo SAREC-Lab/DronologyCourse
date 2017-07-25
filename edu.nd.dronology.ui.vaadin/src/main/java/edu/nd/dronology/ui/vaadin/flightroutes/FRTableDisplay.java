@@ -6,6 +6,7 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -101,17 +102,18 @@ public class FRTableDisplay {
 					deletePanel.setClosable(false);
 					deletePanel.setResizable(false);
 					
+					WayPoint w = clickEvent.getItem();
+					
 					yes.addClickListener(event -> {
-						WayPoint w = clickEvent.getItem();
+						route.removeAllLines(route.getPolylines());
+						
 						for (int i = 0; i < route.getMapPoints().size(); i++) {
 							if (route.getMapPoints().get(i).getId().equals(w.getId())) {
 								route.getMapPoints().remove(route.getMapPoints().get(i));
 								route.getMap().removeComponent(route.getPins().get(i));
-								route.getPins().remove(route.getPins().get(i));
 							}
 						}
-
-						route.removeAllLines(route.getPolylines());
+						
 						route.drawLines(route.getMapPoints(), true, 1, false);
 
 						for (int i = 0; i < this.route.getMapPoints().size(); i++) {
