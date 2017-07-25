@@ -1,6 +1,8 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
+import java.awt.Frame;
 import java.awt.MouseInfo;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -20,8 +22,10 @@ import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
 import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
+import com.vaadin.event.MouseEvents;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
+import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -659,10 +663,35 @@ public class AFMapComponent extends CustomComponent {
 					popupContent.addComponent(box);
 				}
 			}
-			layout.addComponent(dronePopup, "top:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getY() - 150)
-			+ "px;left:" + String.valueOf((int) MouseInfo.getPointerInfo().getLocation().getX() - 360) + "px");
+			
+			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
+			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.9;
+			
+			double xDegreeDifference = -(leafletMap.getCenter().getLon() - leafletMarker.getPoint().getLon());
+			double yDegreeDifference = leafletMap.getCenter().getLat() - leafletMarker.getPoint().getLat();
+			double degreePerZoom = (360.0/(Math.pow(2, leafletMap.getZoomLevel())));
+			double degreePerPixel = degreePerZoom / mapWidth;
+			double xPixelDifference = (xDegreeDifference / degreePerPixel) / 3.0;
+			double yPixelDifference = (yDegreeDifference / degreePerPixel) / 3.0;
+
+			xPixelDifference = xPixelDifference * 0.55;
+			
+			double pixelsToLeftBorder = (mapWidth / 2.0) + xPixelDifference;
+			double pixelsToTopBorder = (mapHeight / 2.0) + yPixelDifference;
+			double mouseX = MouseInfo.getPointerInfo().getLocation().getX();
+			double mouseY = MouseInfo.getPointerInfo().getLocation().getY();
+			double mapTopLeftX = mouseX - pixelsToLeftBorder;
+			double mapTopLeftY = mouseY - pixelsToTopBorder;
+			
+			double adjustedXLocation = mouseX - mapTopLeftX;
+			double adjustedYLocation = mouseY - mapTopLeftY;
+			
+			layout.addComponent(dronePopup, "top:" + String.valueOf((int) adjustedYLocation)
+			+ "px;left:" + String.valueOf((int) adjustedXLocation) + "px");
+			
 			dronePopup.setVisible(true);
 			dronePopup.setPopupVisible(true);
+			
 		}
 	}
 
