@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
 import edu.nd.dronology.monitoring.safety.internal.UAVSaeftyCase;
 import edu.nd.dronology.monitoring.trust.TrustManager;
+import edu.nd.dronology.monitoring.trust.TrustPersistenceManager;
 
 public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 
@@ -23,7 +24,7 @@ public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 	 * @return The singleton instance.
 	 */
 	public static SafetyCaseValidationManager getInstance() {
-
+		new TrustPersistenceManager();
 		if (INSTANCE == null) {
 			synchronized (SafetyCaseValidationManager.class) {
 				if (INSTANCE == null) {

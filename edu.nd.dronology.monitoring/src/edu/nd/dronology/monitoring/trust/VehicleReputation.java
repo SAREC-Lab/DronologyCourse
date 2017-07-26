@@ -20,10 +20,10 @@ public class VehicleReputation {
 		assumptions = new HashMap<String, ReputationRating>();
 	}
 	
-	public void addFeedback(String assumptionid, int success) {
+	public void addFeedback(String assumptionid, double r, double s) {
 		if (!assumptions.containsKey(assumptionid))
 			assumptions.put(assumptionid, new ReputationRating(assumptionid));
-		assumptions.get(assumptionid).addFeedback(success);
+		assumptions.get(assumptionid).addFeedback(r, s);
 	}
 	
 	public ReputationRating getReputationRating(String assumptionId) throws IllegalArgumentException {

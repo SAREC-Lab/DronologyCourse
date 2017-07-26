@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
@@ -33,14 +34,11 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 
 	private Timer timer;
 
-	private static final int MAX_IN_AIR = 3;
 	private AtomicInteger activeUAVS = new AtomicInteger(0);
 
 	private final List<IFlightPlan> awaitingTakeOffFlights = Collections.synchronizedList(new ArrayList<>());
 
 	private List<IFlightPlan> awaitingLandingFlights = Collections.synchronizedList(new ArrayList<>());
-
-	private static final double HOME_ALTITUDE = 5;
 
 	/**
 	 * Constructs a new FlightZoneManager.
@@ -108,7 +106,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 					LOGGER.error(e);
 				}
 
-				if (activeUAVS.get() == MAX_IN_AIR) {
+				if (activeUAVS.get() == DronologyConstants.MAX_IN_AIR) {
 					checkPendingForFlying();
 
 				} else if (planPoolManager.hasPendingFlights()) {
@@ -119,7 +117,8 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 						LOGGER.error(e);
 					}
 
-				} else if (hasAwaitingTakeOff()) {
+				}
+				if (hasAwaitingTakeOff() && activeUAVS.get() < DronologyConstants.MAX_IN_AIR) {
 					LOGGER.info("Awaiting Takeoff:" + getAwaitingTakeOffFlights().get(0).getFlightID());
 					try {
 						checkForTakeOffReadiness();
@@ -315,7 +314,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		LlaCoordinate baseCoordinate = drone.getBaseCoordinates();
 
 		LlaCoordinate homeCoordinate = new LlaCoordinate(baseCoordinate.getLatitude(), baseCoordinate.getLongitude(),
-				HOME_ALTITUDE);
+				DronologyConstants.HOME_ALTITUDE);
 		Waypoint wps = new Waypoint(homeCoordinate);
 		List<Waypoint> wpsList = new ArrayList<>();
 		wpsList.add(wps);

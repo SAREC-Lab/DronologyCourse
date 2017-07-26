@@ -73,10 +73,11 @@ public class DispatchQueueManager {
 			if (queueMap.containsKey(id)) {
 				success = queueMap.get(id).offer(status);
 			} else {
-				LinkedBlockingQueue<UAVStateMessage> newQueue = new LinkedBlockingQueue<>(100);
-				queueMap.put(id, newQueue);
-				registerNewDrone(id, status);
-				success = true;
+//				LinkedBlockingQueue<UAVStateMessage> newQueue = new LinkedBlockingQueue<>(100);
+//				queueMap.put(id, newQueue);
+//				registerNewDrone(id, status);
+//				success = true;
+				LOGGER.hwFatal("No uav with id '"+id+"' registered!");
 			}
 			if (!success) {
 				LOGGER.hwFatal("Buffer overflow! '" + id + "'");
@@ -84,11 +85,24 @@ public class DispatchQueueManager {
 		}
 	}
 
-	private void registerNewDrone(String id, UAVStateMessage status) {
-		LOGGER.hwInfo("New drone registered with  '" + id + "' -> " + status.toString());
+//	private void registerNewDrone(String id, UAVStateMessage status) {
+//		LOGGER.hwInfo("New drone registered with  '" + id + "' -> " + status.toString());
+//		DroneInitializationInfo info = new DroneInitializationInfo(
+//				PysicalDroneIdGenerator.generate(id, groundstationid), DroneMode.MODE_PHYSICAL, id,
+//				status.getLocation());
+//		try {
+//			DroneSetupService.getInstance().initializeDrones(info);
+//		} catch (DronologyServiceException e) {
+//			LOGGER.error(e);
+//		}
+//
+//	}
+
+	private void registerNewDrone(String uavid, UAVHandshakeMessage message) {
+		LOGGER.hwInfo("New drone registered with  '" + uavid + "' -> " + message.toString());
 		DroneInitializationInfo info = new DroneInitializationInfo(
-				PysicalDroneIdGenerator.generate(id, groundstationid), DroneMode.MODE_PHYSICAL, id,
-				status.getLocation());
+				PysicalDroneIdGenerator.generate(uavid, groundstationid), DroneMode.MODE_PHYSICAL, uavid,
+				message.getHome());
 		try {
 			DroneSetupService.getInstance().initializeDrones(info);
 		} catch (DronologyServiceException e) {
@@ -157,6 +171,7 @@ public class DispatchQueueManager {
 	}
 
 	public void postDoneHandshakeMessage(String uavid, UAVHandshakeMessage message) {
+		registerNewDrone(uavid, message);
 		if (validator != null) {
 			validator.validate(uavid, message.getSafetyCase());
 		}

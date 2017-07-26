@@ -4,17 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import edu.nd.dronology.core.util.PreciseTimestamp;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.monitoring.monitoring.ValidationResultManager;
 import edu.nd.dronology.monitoring.safety.ISACAssumption;
 import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
+import edu.nd.dronology.monitoring.util.BenchmarkLogger;
 import edu.nd.dronology.monitoring.validation.ValidationResult.Result;
 import edu.nd.dronology.monitoring.validation.engine.EngineFactory;
 import edu.nd.dronology.monitoring.validation.engine.EvaluationEngineException;
 import edu.nd.dronology.monitoring.validation.engine.IEvaluationEngine;
 import edu.nd.dronology.util.NullUtil;
+import edu.nd.dronology.util.Pair;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -27,6 +30,10 @@ public class MonitoringValidator {
 	private List<EvalFunction> functions = new ArrayList<>();
 
 	IEvaluationEngine engine = EngineFactory.getEngine();
+	
+	
+	Map<String,List<Pair>> monitoredData= new ConcurrentHashMap<>();
+	
 
 	public MonitoringValidator(String uavid) {
 		NullUtil.checkNull(uavid);
@@ -52,13 +59,19 @@ public class MonitoringValidator {
 				LOGGER.error(e.getMessage());
 			}
 
-		}
+		}	
+		storeMessageData(monitoringMesasge);
+	}
 
+	private void storeMessageData(UAVMonitoringMessage monitoringMesasge) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void evaluate(EvalFunction f, UAVMonitoringMessage monitoringMesasge) throws EvaluationException {
 		PreciseTimestamp ts = PreciseTimestamp.create();
 		StringBuilder params = new StringBuilder();
+		long startTimestamp = System.nanoTime();
 		for (String param : f.getParameters()) {
 			if (SafetyCaseValidator.isISACParam(param)) {
 				ISACAssumption ass = SafetyCaseGeneration.getSafetyCase().getAssumption(f.getId());
@@ -101,6 +114,8 @@ public class MonitoringValidator {
 			}
 			ValidationEntry validationResult = new ValidationEntry(f.getId(), res);
 			validationResult.setTimestamp(ts);
+			long endTimestamp = System.nanoTime();
+			BenchmarkLogger.reportMonitor(uavid, f.getId(), (endTimestamp - startTimestamp), result.toString());
 			if (!result.booleanValue()) {
 				LOGGER.warn("Evaluation failed: " + f.getFunctionString() + " with parameters " + callString);
 			} else {

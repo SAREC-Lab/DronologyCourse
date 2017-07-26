@@ -11,15 +11,12 @@ public class PreciseTimestamp implements Serializable {
 	private long nanotime;
 	private long timestamp;
 	private boolean isPrecise;
-	// private static final Clock c = new SystemClockImpl();
 	static final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
 
 	public PreciseTimestamp(long timestamp, boolean isPrecise) {
 		this.timestamp = timestamp;
 		this.isPrecise = isPrecise;
 		this.nanotime = System.nanoTime();
-		// long[] tsarray = Clock.nativeTime();
-		// this.timestamp = (tsarray[0] * 1000L) + (tsarray[1] / 1000000L);
 	}
 
 	public long getNanotime() {
@@ -27,7 +24,6 @@ public class PreciseTimestamp implements Serializable {
 	}
 
 	public long getTimestamp() {
-		//return (timestamp - NUM_100NS_INTERVALS_SINCE_UUID_EPOCH) / 10000;
 		return timestamp;
 	}
 
@@ -68,7 +64,7 @@ public class PreciseTimestamp implements Serializable {
 		return true;
 	}
 
-	public static final int compareTimeStamps(long start, long comp) {
+	private  int compareTimeStamps(long start, long comp) {
 		if (start == comp) {
 			return 0;
 		}
