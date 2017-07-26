@@ -62,6 +62,8 @@ public class FRInfoPanel extends CustomComponent {
 	private FRControlsComponent controlComponent;
 	private Button newRoute;
 	private Window window;
+	private TextField descriptionField;
+	private String routeDescription;
 	
 	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	ByteArrayInputStream inStream;
@@ -134,14 +136,17 @@ public class FRInfoPanel extends CustomComponent {
 		
 		drawButton = display.getDrawButton();
 		inputField = display.getInputField();
+		descriptionField = display.getDescriptionField();
 		
 		drawButton.addClickListener(e -> {		
-			
+		
 			routeInputName = inputField.getValue();
+			routeDescription = descriptionField.getValue();
+			
 			if(!routeInputName.isEmpty()){
 			
 				//sends route to dronology
-				drone = addRouteDronology(routeInputName);
+				drone = addRouteDronology(routeInputName, routeDescription);
 				
 				//because dronology takes some time
 				try {
@@ -158,6 +163,7 @@ public class FRInfoPanel extends CustomComponent {
 				routes.getComponent(index).addStyleName("info_box_focus");	
 				
 				inputField.clear();
+				descriptionField.clear();
 				UI.getCurrent().removeWindow(window);
 		
 				controls.getLayout().drawRoute();
@@ -249,7 +255,7 @@ public class FRInfoPanel extends CustomComponent {
 	public void setIsRouteSelected(boolean selected) {
 		isRouteSelected = selected;
 	}
-	public FlightRouteInfo addRouteDronology(String name){
+	public FlightRouteInfo addRouteDronology(String name, String description){
 		//sends a route to dronology to be saved, and returns the flight route info
 		
 		IFlightRouteplanningRemoteService service;
@@ -269,6 +275,8 @@ public class FRInfoPanel extends CustomComponent {
 			inStream = new ByteArrayInputStream(information);
 			froute = routePersistor.loadItem(inStream);
 			froute.setName(name);
+			froute.setDescription(description);
+			
 			
 			ByteArrayOutputStream outs = new ByteArrayOutputStream();
 			routePersistor.saveItem(froute, outs);
