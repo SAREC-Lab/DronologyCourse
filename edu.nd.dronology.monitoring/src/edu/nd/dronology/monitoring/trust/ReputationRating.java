@@ -8,10 +8,16 @@ package edu.nd.dronology.monitoring.trust;
  */
 public class ReputationRating {
 
-
+	private String id;
 	private double r;
 	private double s;
-
+	
+	public ReputationRating(String id) {
+		this.id = id;
+		this.r = 0.0;
+		this.s = 0.0;
+	}
+	
 	public double getR() {
 		return r;
 	}

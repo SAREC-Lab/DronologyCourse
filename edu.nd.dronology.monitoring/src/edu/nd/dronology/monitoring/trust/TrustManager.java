@@ -90,6 +90,7 @@ public class TrustManager {
 
 	public void initializeUAV(String uavid) {
 		LOGGER.info("new uav initialized: " + uavid);
+		history.put(uavid, new VehicleReputation(uavid));
 	}
 	
 	/**

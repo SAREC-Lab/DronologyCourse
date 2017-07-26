@@ -1,5 +1,6 @@
 package edu.nd.dronology.monitoring.trust;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -11,8 +12,20 @@ import java.util.stream.Collectors;
  *
  */
 public class VehicleReputation {
+	private String id;
 	private Map<String, ReputationRating> assumptions;
-
+	
+	public VehicleReputation(String vid) {
+		this.id = vid;
+		assumptions = new HashMap<String, ReputationRating>();
+	}
+	
+	public void addFeedback(String assumptionid, int success) {
+		if (!assumptions.containsKey(assumptionid))
+			assumptions.put(assumptionid, new ReputationRating(assumptionid));
+		assumptions.get(assumptionid).addFeedback(success);
+	}
+	
 	public ReputationRating getReputationRating(String assumptionId) throws IllegalArgumentException {
 		if (!assumptions.containsKey(assumptionId))
 			throw new IllegalArgumentException(String.format("unrecognized assumptionId %s", assumptionId));
