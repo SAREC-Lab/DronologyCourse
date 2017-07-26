@@ -8,7 +8,6 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -90,34 +89,11 @@ public class FRTableDisplay {
 		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
-			boolean canSave = true;
-			
-			Notification.show(event.getBean().getId());
-			
-			try {
-				float lat = Float.valueOf(event.getBean().getLatitude());
-				float lon = Float.valueOf(event.getBean().getLongitude());
-				float alt = Float.valueOf(event.getBean().getAltitude());
-				float tra = Float.valueOf(event.getBean().getTransitSpeed());
-				Notification.show("Latitude: " + String.valueOf(lat) + "\n" + "Longitude: " + String.valueOf(lon) + "\n" +
-						"Altitude: " + String.valueOf(alt) + "\n" + "Transit Speed: " + String.valueOf(tra));
-			} catch (NumberFormatException ex) {
-				canSave = false;
-				Notification.show("Latitude: " + event.getBean().getLatitude() + "\n" + "Longitude: " + event.getBean().getLongitude() + "\n" +
-						"Altitude: " + event.getBean().getAltitude() + "\n" + "Transit Speed: " + event.getBean().getTransitSpeed());
-			}
-
-			if(canSave) {
-				mapMarkers.updatePinForWayPoint(event.getBean());
-				route.removeAllLines(route.getPolylines());
-				route.drawLines(route.getMapPoints(), true, 1, false);
-				grid.setItems(route.getMapPoints());
-				grid.getEditor().cancel();
-			} else {
-				grid.setItems(route.getMapPoints());
-				Notification.show("Invalid input.");
-				grid.getEditor().cancel();
-			}
+			mapMarkers.updatePinForWayPoint(event.getBean());
+			grid.getEditor().cancel();
+			route.removeAllLines(route.getPolylines());
+			grid.setItems(route.getMapPoints());
+			grid.getEditor().cancel();
 		});
 		addButtonColumn();
 	}
