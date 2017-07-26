@@ -18,6 +18,7 @@ public class Assumption implements ISACAssumption {
 	private boolean isMonitorable;
 	private boolean isStatic;
 	private boolean isPlugable;
+	private double weight = 1;
 	private Map<String, String> params = new HashMap<>();
 	private Map<String, String> mapping = new HashMap<>();
 
@@ -87,6 +88,11 @@ public class Assumption implements ISACAssumption {
 	}
 
 	@Override
+	public double getWeight() {
+		return weight;
+	}
+
+	@Override
 	public String getParameterValue(String param) {
 		return params.get(param);
 	}
@@ -111,7 +117,7 @@ public class Assumption implements ISACAssumption {
 	@Override
 	public EvalFunction getFunction() {
 
-		EvalFunction function = new EvalFunction(id);
+		EvalFunction function = new EvalFunction(id, weight);
 		Matcher matcher = VARIABLE_PATTERN.matcher(expression);
 		while (matcher.find()) {
 			String param = matcher.group(1);

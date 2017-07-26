@@ -40,4 +40,6 @@ public interface ISACAssumption {
 
 	EvalFunction getFunction();
 
+	double getWeight();
+
 }

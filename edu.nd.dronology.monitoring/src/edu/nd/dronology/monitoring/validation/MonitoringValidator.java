@@ -30,10 +30,8 @@ public class MonitoringValidator {
 	private List<EvalFunction> functions = new ArrayList<>();
 
 	IEvaluationEngine engine = EngineFactory.getEngine();
-	
-	
-	Map<String,List<Pair>> monitoredData= new ConcurrentHashMap<>();
-	
+
+	Map<String, List<Pair>> monitoredData = new ConcurrentHashMap<>();
 
 	public MonitoringValidator(String uavid) {
 		NullUtil.checkNull(uavid);
@@ -59,13 +57,13 @@ public class MonitoringValidator {
 				LOGGER.error(e.getMessage());
 			}
 
-		}	
+		}
 		storeMessageData(monitoringMesasge);
 	}
 
 	private void storeMessageData(UAVMonitoringMessage monitoringMesasge) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void evaluate(EvalFunction f, UAVMonitoringMessage monitoringMesasge) throws EvaluationException {
@@ -85,7 +83,7 @@ public class MonitoringValidator {
 				Object value = monitoringMesasge.getProperty(mappedParam);
 				if (value == null) {
 					ValidationResultManager.getInstance().forwardResult(uavid,
-							new ValidationEntry(f.getId(), Result.MONITORING_CHECK_ERROR));
+							new ValidationEntry(f.getId(), f.getWeight(), Result.MONITORING_CHECK_ERROR));
 					throw new EvaluationException("Parameter '" + mappedParam + "' not found in monitoring message");
 				}
 
@@ -112,7 +110,7 @@ public class MonitoringValidator {
 			} else {
 				res = Result.MONITORING_CHECK_FAILED;
 			}
-			ValidationEntry validationResult = new ValidationEntry(f.getId(), res);
+			ValidationEntry validationResult = new ValidationEntry(f.getId(),f.getWeight(), res);
 			validationResult.setTimestamp(ts);
 			long endTimestamp = System.nanoTime();
 			BenchmarkLogger.reportMonitor(uavid, f.getId(), (endTimestamp - startTimestamp), result.toString());
