@@ -56,7 +56,6 @@ public class TrustManager {
 	}
 
 	public TrustManager(String pathToHistory, double forgettingFactor) {
-		new TrustPersistenceManager();
 		this.pathToHistory = pathToHistory;
 		this.forgettingFactor = forgettingFactor;
 		this.history = new HashMap<String, VehicleReputation>();

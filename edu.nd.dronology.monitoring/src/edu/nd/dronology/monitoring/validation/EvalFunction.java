@@ -11,10 +11,12 @@ public class EvalFunction {
 	private final String id;
 	private String functionString;
 	private final List<String> parameterList;
+	private double weight;
 
-	public EvalFunction(String id) {
+	public EvalFunction(String id,double weight) {
 		NullUtil.checkNull(id);
 		this.id = id;
+		this.weight = weight;
 		parameterList = new ArrayList<>();
 	}
 
@@ -41,6 +43,10 @@ public class EvalFunction {
 
 	public String getId() {
 		return id;
+	}
+
+	public double getWeight() {
+		return weight;
 	}
 
 }
