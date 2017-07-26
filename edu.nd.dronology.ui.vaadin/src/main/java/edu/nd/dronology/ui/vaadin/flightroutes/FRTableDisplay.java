@@ -64,7 +64,7 @@ public class FRTableDisplay {
 		grid.addStyleName("fr_table_component");
 		grid.getColumns().stream().forEach(c -> c.setSortable(false));
 		grid.getColumns().stream().forEach(c -> {
-			if (/*c.getCaption().equals("Id") || */c.getCaption().equals("Reached")) {
+			if (c.getCaption().equals("Id") || c.getCaption().equals("Reached")) {
 				grid.removeColumn(c);
 			}
 			else if (c.getCaption().equals("Order")) {
