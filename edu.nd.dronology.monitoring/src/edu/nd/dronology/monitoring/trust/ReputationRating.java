@@ -32,8 +32,10 @@ public class ReputationRating {
 	/**
 	 * Add feedback based on the result of some "interaction".
 	 * 
-	 * @param success
-	 *            1 if the interaction was successful otherwise -1
+	 * @param r 
+	 * 			positive feedback
+	 * @param s 
+	 * 			negative feedback
 	 */
 	public void addFeedback(double r, double s) {
 			this.r += r;
@@ -43,14 +45,12 @@ public class ReputationRating {
 	/**
 	 * Determine the reputation given:
 	 * 
-	 * r (the number of positive results), and s (the number of negative results).
+	 * r (the amount of positive feedback), and s (the amount of negative feedback).
 	 * 
 	 * The rating is calculated using Equation 5. Ratings range from (0, 1).
 	 */
 	public double getReputationRating() {
 		return (r + 1) / (r + s + 2);
-//		BenchmarkLogger.reportTrust("vid", "assid", rating, 0);
-//		return rating;
 	}
 
 	@Override

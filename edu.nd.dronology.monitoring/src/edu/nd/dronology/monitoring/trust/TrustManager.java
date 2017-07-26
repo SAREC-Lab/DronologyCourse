@@ -118,8 +118,10 @@ public class TrustManager {
 	 *            the vehicle id
 	 * @param assumptionid
 	 *            the assumption id
-	 * @param success
-	 *            the result (1 or -1)
+	 * @param r
+	 * 			positive feedback
+	 * @param s
+	 * 			negative feedback  
 	 * @throws IllegalArgumentException
 	 */
 	public void constraintEvaluated(String vid, String assumptionid, double r, double s) throws IllegalArgumentException {
@@ -145,7 +147,9 @@ public class TrustManager {
 	public String toString() {
 		return history.entrySet()
 					  .stream()
-					  .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
+					  .map(entry -> 
+					  	String.format("%s (%f): %s", 
+					  			entry.getKey(), entry.getValue().getReputation(), entry.getValue().toString()))
 					  .collect(Collectors.joining(System.getProperty("line.separator")));
 	}
 
@@ -184,7 +188,7 @@ public class TrustManager {
 		mger.constraintEvaluated("UAV1", "A1", 2.0, 0.0);
 		mger.constraintEvaluated("UAV1", "A2", 0.0, 1.0);
 		mger.constraintEvaluated("UAV1", "A2", 2.0, 0.0);
-		System.out.println(mger.getReputationRating("UAV1"));
+		System.out.println(mger);
 		mger.shutDown();
 	}
 
