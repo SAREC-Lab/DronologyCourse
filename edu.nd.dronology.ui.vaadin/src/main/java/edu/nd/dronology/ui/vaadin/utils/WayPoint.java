@@ -88,4 +88,36 @@ public class WayPoint {
 	public int getOrder() {
 		return order;
 	}
+	
+	public float getLatitudeFloat() {
+		return Float.valueOf(latitude);
+	}
+	
+	public void setLatitudeFloat(float latitude) {
+		this.latitude = String.valueOf(latitude);
+	}
+	
+	public float getLongitudeFloat() {
+		return Float.valueOf(longitude);
+	}
+	
+	public void setLongitudeFloat(float longitude) {
+		this.longitude = String.valueOf(longitude);
+	}
+	
+	public float getAltitudeFloat() {
+		return Float.valueOf(altitude);
+	}
+	
+	public void setAltitudeFloat(float altitude) {
+		this.altitude = String.valueOf(altitude);
+	}
+	
+	public float getTransitSpeedFloat() {
+		return Float.valueOf(transitSpeed);
+	}
+	
+	public void setTransitSpeedFloat(float transitSpeed) {
+		this.transitSpeed = String.valueOf(transitSpeed);
+	}
 }

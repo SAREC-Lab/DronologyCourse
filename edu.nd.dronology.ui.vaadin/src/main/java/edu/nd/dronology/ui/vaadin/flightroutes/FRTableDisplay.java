@@ -1,6 +1,8 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.List;
 
+import com.vaadin.data.Binder;
+import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
@@ -31,12 +33,39 @@ public class FRTableDisplay {
 	private TextField longitude = new TextField();
 	private TextField altitude = new TextField();
 	private TextField transitSpeed = new TextField();
+	private Binder<WayPoint> binder = new Binder<>();
 	
 	public FRTableDisplay() {
+		binder = grid.getEditor().getBinder();
+
+		binder.forField(latitude)
+			.withConverter(
+				new StringToFloatConverter("Must enter a number."))
+			.withValidator(latitude -> latitude >= -90 && latitude <= 90, "Must be between -90 and 90.")
+			.bind(WayPoint::getLatitudeFloat, WayPoint::setLatitudeFloat);
+		
+		binder.forField(longitude)
+			.withConverter(
+				new StringToFloatConverter("Must enter a number."))
+			.withValidator(longitude -> longitude >= -180 && longitude <= 180, "Must be between -180 and 180.")
+			.bind(WayPoint::getLongitudeFloat, WayPoint::setLongitudeFloat);
+		
+		binder.forField(altitude)
+			.withConverter(
+				new StringToFloatConverter("Must enter a number."))
+			.withValidator(altitude -> altitude > 0 && altitude <= 100, "Must be between 0 and 100.")
+			.bind(WayPoint::getAltitudeFloat, WayPoint::setAltitudeFloat);
+		
+		binder.forField(transitSpeed)
+			.withConverter(
+				new StringToFloatConverter("Must be a number."))
+			.withValidator(transitSpeed -> transitSpeed > 0, "Must be greater than zero.")
+			.bind(WayPoint::getTransitSpeedFloat, WayPoint::setTransitSpeedFloat);
+		
 		grid.addStyleName("fr_table_component");
 		grid.getColumns().stream().forEach(c -> c.setSortable(false));
 		grid.getColumns().stream().forEach(c -> {
-			if (c.getCaption().equals("Id") || c.getCaption().equals("Reached")) {
+			if (/*c.getCaption().equals("Id") || */c.getCaption().equals("Reached")) {
 				grid.removeColumn(c);
 			}
 			else if (c.getCaption().equals("Order")) {
@@ -61,8 +90,34 @@ public class FRTableDisplay {
 		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
-			mapMarkers.updatePinForWayPoint(event.getBean());
-			grid.getEditor().cancel();
+			boolean canSave = true;
+			
+			Notification.show(event.getBean().getId());
+			
+			try {
+				float lat = Float.valueOf(event.getBean().getLatitude());
+				float lon = Float.valueOf(event.getBean().getLongitude());
+				float alt = Float.valueOf(event.getBean().getAltitude());
+				float tra = Float.valueOf(event.getBean().getTransitSpeed());
+				Notification.show("Latitude: " + String.valueOf(lat) + "\n" + "Longitude: " + String.valueOf(lon) + "\n" +
+						"Altitude: " + String.valueOf(alt) + "\n" + "Transit Speed: " + String.valueOf(tra));
+			} catch (NumberFormatException ex) {
+				canSave = false;
+				Notification.show("Latitude: " + event.getBean().getLatitude() + "\n" + "Longitude: " + event.getBean().getLongitude() + "\n" +
+						"Altitude: " + event.getBean().getAltitude() + "\n" + "Transit Speed: " + event.getBean().getTransitSpeed());
+			}
+
+			if(canSave) {
+				mapMarkers.updatePinForWayPoint(event.getBean());
+				route.removeAllLines(route.getPolylines());
+				route.drawLines(route.getMapPoints(), true, 1, false);
+				grid.setItems(route.getMapPoints());
+				grid.getEditor().cancel();
+			} else {
+				grid.setItems(route.getMapPoints());
+				Notification.show("Invalid input.");
+				grid.getEditor().cancel();
+			}
 		});
 		addButtonColumn();
 	}
