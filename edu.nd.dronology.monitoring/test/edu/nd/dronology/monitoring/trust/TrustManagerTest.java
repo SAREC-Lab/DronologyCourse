@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class TrustManagerTest extends TrustManager {
+public class TrustManagerTest {
 
 	@Test
 	public void test() {
