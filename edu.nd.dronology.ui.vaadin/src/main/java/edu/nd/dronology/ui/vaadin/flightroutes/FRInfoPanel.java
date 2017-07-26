@@ -167,6 +167,7 @@ public class FRInfoPanel extends CustomComponent {
 				UI.getCurrent().removeWindow(window);
 		
 				controls.getLayout().drawRoute();
+				panel.setCaption(String.valueOf(routes.getComponentCount()) + " routes in database");
 				
 			}
 		});
@@ -189,6 +190,10 @@ public class FRInfoPanel extends CustomComponent {
 			});
 		}
 
+		routeBox.getTrashButton().addClickListener(e->{
+			controls.getLayout().getMap().displayNoRoute();
+		});
+		
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
 		totalLayout.addComponents(buttons, routes);
