@@ -57,12 +57,27 @@ public class DronologyServiceRunner {
 
 			runtimeMode.registerCommandHandler(groundStation);
 
-			//BenchmarkLogger.init();
-			//groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
+			// BenchmarkLogger.init();
+			// groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
 			//groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
 
-		} catch (DronologyServiceException | DroneException | FlightZoneException | RemoteException e) {
+			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					System.out.println("ASD");
+
+				}
+
+			}));
+
+		} catch (DronologyServiceException | DroneException | FlightZoneException |
+
+				RemoteException e) {
 			LOGGER.error(e);
+		}
+		finally {
+			System.out.println("XXXXXX");
 		}
 
 	}

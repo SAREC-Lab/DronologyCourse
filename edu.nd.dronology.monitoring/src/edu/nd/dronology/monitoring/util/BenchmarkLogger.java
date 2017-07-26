@@ -47,19 +47,21 @@ public class BenchmarkLogger {
 	private static final String FILE_NAME_STATIC = "run[X]_ST.txt";
 	private static final String FILE_NAME_MONITOR = "run[X]_RT.txt";
 	private static final String FILE_NAME_FREQUENCY = "run[X]_FR.txt";
-	private static final String FILE_NAME_TRUST = "run[X]_TR.txt";
+	private static final String FILE_NAME_TRUST = "run[X]_AT.txt";
+	private static final String FILE_NAME_UAV_TRUST = "run[X]_UT.txt";
 	public static final String SEPARATOR = ";";
 	static SimpleDateFormat df2 = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 
 	private static List<String> staticList = Collections.synchronizedList(new ArrayList<>());
 	private static List<String> monitorList = Collections.synchronizedList(new ArrayList<>());
 	private static List<String> trustList = Collections.synchronizedList(new ArrayList<>());
+	private static List<String> trustUAVList = Collections.synchronizedList(new ArrayList<>());
 	private static List<String> frequencyList = Collections.synchronizedList(new ArrayList<>());
 
 	static final int BENCHMARK_FRAME = 30000;
 	public static final int WARMUP_TIME = 0 * 60000;
 
-	public static void reportStatic(String uavid, long duration, String result) {
+	public static synchronized void reportStatic(String uavid, long duration, String result) {
 		if (!ACTIVE) {
 			return;
 		}
@@ -84,36 +86,53 @@ public class BenchmarkLogger {
 		}
 	}
 
-	public static void reportTrust(String uavid, String passed, long duration) {
+	public static void reportTrust(String uavid, String assumptionid, double rating, long duration) {
 		if (!ACTIVE) {
 			return;
 		}
 		long logTime = System.currentTimeMillis();
-		FileWriter writer = null;
 		try {
-			writer = new FileWriter(new File(FOLDER_NAME + FILE_NAME_STATIC.replace("X", Integer.toString(run))), true);
+			StringBuilder stringBuilder = new StringBuilder();
 			String date = df2.format(new Date(logTime));
-			writer.append(date);
-			writer.append(SEPARATOR);
-			writer.append(Long.toString(logTime));
-			writer.append(SEPARATOR);
-			writer.append(uavid);
-			writer.append(SEPARATOR);
-			writer.append(passed);
-			writer.append(SEPARATOR);
-			writer.append(Long.toString(duration));
+			stringBuilder.append(date);
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(Long.toString(logTime));
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(uavid);
+			stringBuilder.append(SEPARATOR);
+			// writer.append(passed);
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(Long.toString(duration));
+
+			trustList.add(stringBuilder.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static synchronized void reportUAVTrust(String uavid, double reputation, long duration) {
+		if (!ACTIVE) {
+			return;
+		}
+		long logTime = System.currentTimeMillis();
+		try {
+			StringBuilder stringBuilder = new StringBuilder();
+			String date = df2.format(new Date(logTime));
+			stringBuilder.append(date);
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(Long.toString(logTime));
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(uavid);
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(Double.toString(reputation));
+			stringBuilder.append(SEPARATOR);
+			stringBuilder.append(Long.toString(duration));
+
+			trustUAVList.add(stringBuilder.toString());
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (writer != null) {
-					writer.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
 		}
 	}
 
@@ -198,6 +217,7 @@ public class BenchmarkLogger {
 			List<String> monitorWrite;
 			List<String> trustWrite;
 			List<String> frequencyWrite;
+			List<String> trustUAVWrite;
 			synchronized (staticList) {
 				staticWrite = new ArrayList<>(staticList);
 				staticList.clear();
@@ -209,6 +229,11 @@ public class BenchmarkLogger {
 			synchronized (trustList) {
 				trustWrite = new ArrayList<>(trustList);
 				trustList.clear();
+			}
+			
+			synchronized (trustUAVList) {
+				trustUAVWrite = new ArrayList<>(trustUAVList);
+				trustUAVList.clear();
 			}
 			synchronized (frequencyList) {
 				frequencyWrite = new ArrayList<>(frequencyList);
@@ -223,6 +248,9 @@ public class BenchmarkLogger {
 					+ System.getProperty("line.separator");
 			String frequencyString = frequencyWrite.stream().collect(
 					Collectors.joining(System.getProperty("line.separator"))) + System.getProperty("line.separator");
+			
+			String uavTrustString = trustUAVWrite.stream().collect(
+					Collectors.joining(System.getProperty("line.separator"))) + System.getProperty("line.separator");
 
 			try {
 
@@ -234,6 +262,8 @@ public class BenchmarkLogger {
 						trustString.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 				Files.write(Paths.get(FOLDER_NAME + FILE_NAME_FREQUENCY.replace("X", Integer.toString(run))),
 						frequencyString.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				Files.write(Paths.get(FOLDER_NAME + FILE_NAME_UAV_TRUST.replace("X", Integer.toString(run))),
+						uavTrustString.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
