@@ -42,7 +42,6 @@ public class FRMetaInfo extends CustomComponent {
 	private Label nameOnly;
 	private boolean toDo;
 	private TextField textField = new TextField();
-	private Panel labelHolder = new Panel();
 	
 	public FRMetaInfo(String name, int numCoords, FRMapComponent map, boolean toDo){
 		//used if route is selected
@@ -115,15 +114,7 @@ public class FRMetaInfo extends CustomComponent {
 		
 		//textField.setPropertyDataSource(nameLabel);
 		textField.setValue(name);
-		/*
-		labels.addLayoutClickListener(e->{
-			content.removeAllComponents();
-			HorizontalLayout textLayout = new HorizontalLayout();
-			textLayout.addComponents(textField, nameLabel);
-			content.addComponents(textLayout, controls);
-			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
-		});
-		*/
+
 		//double click
 		labels.addLayoutClickListener(new LayoutClickListener(){
 	
@@ -159,13 +150,11 @@ public class FRMetaInfo extends CustomComponent {
 			controls.addStyleName("route_meta_controls");
 			map.setRouteName(routeName);
 			textField.setValue(routeName);
-			nameOnly.setValue(routeName);
 			
 			//waits to refresh routes so dronology can save
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
