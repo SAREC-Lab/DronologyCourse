@@ -29,6 +29,7 @@ public class AFMainLayout extends CustomComponent {
 			
 		controls.getPanel().getMapView().getFollowButton().addClickListener(e -> {
 			map.setFollow(true);
+			map.setFollowZoom(true);
 			List<String> names = controls.getPanel().getChecked();
 			map.followDrones(names);	
 		});

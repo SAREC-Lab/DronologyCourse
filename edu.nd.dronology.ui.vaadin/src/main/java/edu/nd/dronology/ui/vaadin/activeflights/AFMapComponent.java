@@ -68,6 +68,7 @@ public class AFMapComponent extends CustomComponent {
 	private List<List<LPolyline>> flightRoutes = new ArrayList<>();
 	private List<List<LMarker>> wayPointMarkers = new ArrayList<>();
 	private boolean follow = false;
+	private boolean followZoom = false;
   private VerticalLayout content = new VerticalLayout();
 	private AbsoluteLayout followLayout = new AbsoluteLayout();
 	private AFFollowBar followBar;
@@ -517,6 +518,14 @@ public class AFMapComponent extends CustomComponent {
 	public void setFollow(boolean follow) {
 		this.follow = follow;
 	}
+	
+	public boolean getFollowZoom(){
+		return this.followZoom;
+	}
+	
+	public void setFollowZoom(boolean followZoom){
+		this.followZoom = followZoom;
+	}
 
 	public void followDrones(List<String> names) {
 		if (names.size() < 1) {
@@ -568,15 +577,19 @@ public class AFMapComponent extends CustomComponent {
 				}
 			}
 			Point point = new Point(avgLat, avgLon);
-			double zoom;
-			if (farthestLat == 0 && farthestLon == 0) { 
-				zoom = 17;
-			} else {
-				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
+			if (this.followZoom){
+				double zoom;
+				if (farthestLat == 0 && farthestLon == 0) { 
+					zoom = 17;
+				} else {
+					zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
+				}
+			  leafletMap.setCenter(point, zoom);
+			  this.followZoom = false;
 			}
-		  //zoom is disabled for now. Delete the setCenter(point) function and uncomment the line below to enable automatic zoom
-			//leafletMap.setCenter(point, zoom);
-			leafletMap.setCenter(point);
+			else {
+				leafletMap.setCenter(point);
+			}
 			if(content.getComponentIndex(layout) != -1){
 				leafletMap.addStyleName("af_leaflet_map_edit_mode");
 				followBar = new AFFollowBar(this, names);
