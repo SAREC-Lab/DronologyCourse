@@ -7,6 +7,8 @@ import edu.nd.dronology.monitoring.util.BenchmarkLogger;
  * and Roslan Ismail. "The beta reputation system."
  * 
  * Currently supports the base reputation rating (Equation 5)
+ * 
+ * @author seanbayley
  */
 public class ReputationRating {
 	private String id;

@@ -4,9 +4,13 @@ import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.HashMap;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.IllegalArgumentException;
 import java.nio.file.Paths;
 
@@ -35,30 +39,19 @@ public class TrustManager {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(TrustManager.class);
 	private static volatile TrustManager INSTANCE = null;
 
-	private static final String PATH_TO_HISTORY = Paths
-			.get("src", "edu", "nd", "dronology", "monitoring", "trust", "history.json").toString();
 	private static final double FORGETTING_FACTOR = 0.9;
 
 	private Map<String, VehicleReputation> history;
 	private String pathToHistory;
 	private double forgettingFactor;
 
-	public TrustManager() {
-		this(PATH_TO_HISTORY, FORGETTING_FACTOR);
-	}
-
 	public TrustManager(String pathToHistory) {
 		this(pathToHistory, FORGETTING_FACTOR);
-	}
-
-	public TrustManager(double forgettingFactor) {
-		this(PATH_TO_HISTORY, forgettingFactor);
 	}
 
 	public TrustManager(String pathToHistory, double forgettingFactor) {
 		this.pathToHistory = pathToHistory;
 		this.forgettingFactor = forgettingFactor;
-		this.history = new HashMap<String, VehicleReputation>();
 		try {
 			Gson gson = new Gson();
 			JsonReader json = new JsonReader(new FileReader(pathToHistory));
@@ -67,7 +60,10 @@ public class TrustManager {
 
 		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
 			LOGGER.error(e.getMessage());
+			this.history = new HashMap<String, VehicleReputation>();
 		}
+		if (this.history == null)
+			this.history = new HashMap<String, VehicleReputation>();
 	}
 
 	/**
@@ -78,7 +74,14 @@ public class TrustManager {
 		if (INSTANCE == null) {
 			synchronized (TrustManager.class) {
 				if (INSTANCE == null) {
-					INSTANCE = new TrustManager();
+					String cwd = System.getProperty("user.dir");
+					cwd = cwd.replace("\\", "/");
+					String[] toks = cwd.split("/");
+					toks[toks.length - 1] = "edu.nd.dronology.monitoring";
+					String path = Stream.of(toks).collect(Collectors.joining(System.getProperty("file.separator")));
+					path = Paths.get(path, "src", "edu", "nd", "dronology", "monitoring", "trust", "history.json").toString();
+
+					INSTANCE = new TrustManager(path);
 				}
 			}
 		}
@@ -87,6 +90,20 @@ public class TrustManager {
 
 	public void initialize() {
 		DroneSafetyService.getInstance().addValidationListener(new InternalMonitoringEvalListener());
+	}
+	
+	public void shutDown() {
+		LOGGER.info("shutting down trust manager.");
+		try {
+			Gson gson = new Gson();
+			String json = gson.toJson(history);
+			FileWriter fw = new FileWriter(this.pathToHistory);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(json);
+			bw.close();
+		} catch (JsonIOException | JsonSyntaxException | IOException e) {
+			LOGGER.error(e.getMessage());
+		}
 	}
 
 	public void initializeUAV(String uavid) {
@@ -108,7 +125,6 @@ public class TrustManager {
 	public void constraintEvaluated(String vid, String assumptionid, double r, double s) throws IllegalArgumentException {
 		if (!history.containsKey(vid))
 			throw new IllegalArgumentException(String.format("vehicle %s not recognized", vid));
-		
 		history.get(vid).addFeedback(assumptionid, r, s);
 	}
 
@@ -120,18 +136,17 @@ public class TrustManager {
 	 * @return the reputation rating r (0 < r < 1)
 	 */
 	public double getReputationRating(String vid) {
-		// TODO: how do we want to combine reputation ratings from different
-		// assumptions?
-		
-		BenchmarkLogger.reportUAVTrust(vid, 0, 0);
-		return 0.0;
+		if (!history.containsKey(vid))
+			throw new IllegalArgumentException(String.format("vehicle %s not recognized", vid));
+		return history.get(vid).getReputation();
 	}
 
 	@Override
 	public String toString() {
-		return history.entrySet().stream()
-				.map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
-				.collect(Collectors.joining(System.getProperty("line.separator")));
+		return history.entrySet()
+					  .stream()
+					  .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
+					  .collect(Collectors.joining(System.getProperty("line.separator")));
 	}
 
 	private static class InternalMonitoringEvalListener extends RemoteObject implements IMonitoringValidationListener {
@@ -165,6 +180,12 @@ public class TrustManager {
 
 	public static void main(String[] args) {
 		TrustManager mger = TrustManager.getInstance();
+		mger.initializeUAV("UAV1");
+		mger.constraintEvaluated("UAV1", "A1", 2.0, 0.0);
+		mger.constraintEvaluated("UAV1", "A2", 0.0, 1.0);
+		mger.constraintEvaluated("UAV1", "A2", 2.0, 0.0);
+		System.out.println(mger.getReputationRating("UAV1"));
+		mger.shutDown();
 	}
 
 }

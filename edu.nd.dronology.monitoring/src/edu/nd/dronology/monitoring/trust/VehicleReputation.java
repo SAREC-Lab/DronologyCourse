@@ -5,9 +5,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import edu.nd.dronology.monitoring.util.BenchmarkLogger;
+
 /**
  * The reputation of a vehicle, defined by the weighted mean 
  * of the reputation of all assumptions
+ * 
  * @author seanbayley
  *
  */
@@ -26,14 +29,26 @@ public class VehicleReputation {
 		assumptions.get(assumptionid).addFeedback(r, s);
 	}
 	
-	public ReputationRating getReputationRating(String assumptionId) throws IllegalArgumentException {
-		if (!assumptions.containsKey(assumptionId))
-			throw new IllegalArgumentException(String.format("unrecognized assumptionId %s", assumptionId));
-		return assumptions.get(assumptionId);
-	}
+	/**
+	 * Get the reputation rating of the vehicle.
+	 * @return
+	 */
 	public double getReputation() {
-		// TODO: implement this (figure out where weights come from)
-		return 0.0;
+		long start = System.currentTimeMillis();
+		ReputationRating vehicleRep = new ReputationRating("");
+		assumptions.entrySet()
+			       .stream()
+			       .forEach(entry -> {
+			    	   String aId = entry.getKey();
+			    	   ReputationRating rating = entry.getValue();
+			    	   BenchmarkLogger.reportTrust(id, aId, rating.getReputationRating(), 0);
+			    	   vehicleRep.addFeedback(rating.getR(), rating.getS());
+			       });
+		double vehicleRating = vehicleRep.getReputationRating();
+		long duration = System.currentTimeMillis() - start;
+		BenchmarkLogger.reportUAVTrust(this.id, vehicleRating, duration);
+		return vehicleRating;
+		
 	}
 	/**
 	 * Get all assumption ids registered with this vehicle.
@@ -54,8 +69,8 @@ public class VehicleReputation {
 	@Override
 	public String toString() {
 		return assumptions.entrySet()
-			          .stream()
-			          .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
-			          .collect(Collectors.joining(", "));
+			          	  .stream()
+			          	  .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().toString()))
+			          	  .collect(Collectors.joining(", "));
 	}
 }

@@ -12,6 +12,7 @@ import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
 import edu.nd.dronology.monitoring.service.DroneSafetyService;
 import edu.nd.dronology.monitoring.service.DroneSafetyServiceRemoteFacade;
 import edu.nd.dronology.monitoring.service.IDroneSafetyRemoteService;
+import edu.nd.dronology.monitoring.trust.TrustManager;
 import edu.nd.dronology.monitoring.util.BenchmarkLogger;
 import edu.nd.dronology.monitoring.validation.SafetyCaseValidationManager;
 import edu.nd.dronology.monitoring.validation.SafetyCaseValidator;
@@ -32,6 +33,16 @@ public class DronologyServiceRunner {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DronologyServiceRunner.class);
 
 	public static void main(String[] args) {
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				TrustManager.getInstance().shutDown();
+
+			}
+
+		}));
+		
 		try {
 			RemoteService.getInstance().startService();
 			SupervisorService.getInstance().startService();
@@ -57,19 +68,9 @@ public class DronologyServiceRunner {
 
 			runtimeMode.registerCommandHandler(groundStation);
 
-			// BenchmarkLogger.init();
-			// groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
-			//groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
-
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					System.out.println("ASD");
-
-				}
-
-			}));
+			BenchmarkLogger.init();
+			groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
+			groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
 
 		} catch (DronologyServiceException | DroneException | FlightZoneException |
 
