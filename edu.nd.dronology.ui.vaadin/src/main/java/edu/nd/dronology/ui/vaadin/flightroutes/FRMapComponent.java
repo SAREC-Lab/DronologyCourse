@@ -487,7 +487,6 @@ public class FRMapComponent extends CustomComponent {
 					e.printStackTrace();
 				}
 				
-				
 				Waypoint toSend = new Waypoint(new LlaCoordinate(lat, lon, alt));
 				toSend.setApproachingspeed(approach);
 				froute.addWaypoint(toSend);
@@ -568,7 +567,7 @@ public class FRMapComponent extends CustomComponent {
 	public boolean getToDo() {
 		return toDo;
 	}
-	public void setRouteName(String name){
+	public void setRouteNameDescription(String input, boolean whichOne){
 		//sets the name of a selected route
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 		ByteArrayInputStream inStream;
@@ -583,12 +582,15 @@ public class FRMapComponent extends CustomComponent {
 
 			String id = selectedRoute.getId();
 			
-
 			byte[] information = service.requestFromServer(id);
 			inStream = new ByteArrayInputStream(information);
 			froute = routePersistor.loadItem(inStream);
 
-			froute.setName(name);
+			if(whichOne == true){
+				froute.setName(input);
+			}else{
+				froute.setDescription(input);
+			}
 			ByteArrayOutputStream outs = new ByteArrayOutputStream();
 			routePersistor.saveItem(froute, outs);
 			byte[] bytes = outs.toByteArray();
@@ -600,7 +602,40 @@ public class FRMapComponent extends CustomComponent {
 		} catch (PersistenceException e1) {
 			e1.printStackTrace();
 		}
-		//mainLayout.getControls().getInfoPanel().refreshRoutes();
+	}
+	
+	
+	public String getRouteDescription(){
+		//use selectedroute
+		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+		ByteArrayInputStream inStream;
+		IFlightRoute froute;
+
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+		
+		String description = "didnt get description"; 
+		//sends the information to dronology to be saved
+		try {
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+
+			String id = selectedRoute.getId();			
+			
+			byte[] information = service.requestFromServer(id);
+			inStream = new ByteArrayInputStream(information);
+			froute = routePersistor.loadItem(inStream);
+
+			description = froute.getDescription();
+			if(description == null){
+				description = "No Description";
+			}
+		} catch (DronologyServiceException | RemoteException e1) {
+			e1.printStackTrace();
+		} catch (PersistenceException e1) {
+			e1.printStackTrace();
+		}
+		return description;
 		
 	}
 }

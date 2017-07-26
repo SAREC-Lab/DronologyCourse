@@ -42,6 +42,9 @@ public class FRMetaInfo extends CustomComponent {
 	private Label nameOnly;
 	private boolean toDo;
 	private TextField textField = new TextField();
+	private TextField descriptionField = new TextField();
+	private String routeDescription;
+	boolean descriptionSet = false;
 	
 	public FRMetaInfo(String name, int numCoords, FRMapComponent map, boolean toDo){
 		//used if route is selected
@@ -93,16 +96,26 @@ public class FRMetaInfo extends CustomComponent {
 		
 		tableView.setValue(true);
 		
+		VerticalLayout labelDescription = new VerticalLayout();
+		routeDescription = map.getRouteDescription();
+	
+		Label description = new Label(routeDescription);
+		
+		HorizontalLayout descriptionLayout = new HorizontalLayout();
+		descriptionLayout.addComponent(description);
+		
+		labelDescription.addComponents(labels, descriptionLayout);
+		
 		buttons.addComponents(editButton, deleteButton);
 		checkboxes.addComponents(autoZooming, tableView);
 		controls.addComponents(buttons, checkboxes);
-		content.addComponents(labels, controls);
-		content.setComponentAlignment(labels, Alignment.MIDDLE_LEFT);
+		content.addComponents(labelDescription, controls);
+		content.setComponentAlignment(labelDescription, Alignment.TOP_LEFT);
 		content.setComponentAlignment(controls, Alignment.MIDDLE_RIGHT);
 
 		controls.addStyleName("route_meta_controls");
-		nameLabel.addStyleName("route_meta_name");
-		nameOnly.addStyleName("route_meta_name");
+		//nameLabel.addStyleName("route_meta_name");
+		//nameOnly.addStyleName("route_meta_name");
 		content.setWidth("1550px");
 		
 		editButton.addClickListener(e->{
@@ -112,8 +125,13 @@ public class FRMetaInfo extends CustomComponent {
 			map.deleteClick();
 		});
 		
-		//textField.setPropertyDataSource(nameLabel);
 		textField.setValue(name);
+		textField.setHeight("25px");
+		textField.setWidth("130px");
+		
+		descriptionField.setValue(routeDescription);
+		descriptionField.setHeight("25px");
+		descriptionField.setWidth("200px");
 
 		//double click
 		labels.addLayoutClickListener(new LayoutClickListener(){
@@ -125,7 +143,32 @@ public class FRMetaInfo extends CustomComponent {
 					if(event.isDoubleClick()){
 						content.removeAllComponents();
 						HorizontalLayout textLayout = new HorizontalLayout();
-						textLayout.addComponents(textField, nameLabel);
+						VerticalLayout textDescription = new VerticalLayout();
+						textDescription.addComponents(textField, descriptionLayout);
+						
+						textLayout.addComponents(textDescription, nameLabel);
+						content.addComponents(textLayout, controls);
+					}
+				}
+			}
+		});
+		
+		descriptionLayout.addLayoutClickListener(new LayoutClickListener(){
+			
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void layoutClick(LayoutClickEvent event){
+				if(event.getClickedComponent() == description){
+					if(event.isDoubleClick()){
+						
+						content.removeAllComponents();
+						HorizontalLayout textLayout = new HorizontalLayout();
+						VerticalLayout textDescription = new VerticalLayout();
+						labels.removeAllComponents();
+						labels.addComponents(nameOnly, nameLabel);
+						textDescription.addComponents(labels, descriptionField);
+						
+						textLayout.addComponents(textDescription);
 						content.addComponents(textLayout, controls);
 					}
 				}
@@ -134,21 +177,27 @@ public class FRMetaInfo extends CustomComponent {
 		
 		textField.addBlurListener(e->{
 			//occurs when you click away			
+			
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
 		
 			content.removeAllComponents();
 			labels.removeAllComponents();
+			//nameOnly.setValue(textField.getValue());
+			nameOnly = new Label("<b>" + textField.getValue() + "</b>", ContentMode.HTML);
 			labels.addComponents(nameOnly, nameLabel);
 			
-			content.addComponents(labels, controls);
+			labelDescription.removeAllComponents();
+			labelDescription.addComponents(labels, descriptionLayout);
+			
+			content.addComponents(labelDescription, controls);
 			controls.addStyleName("route_meta_controls");
-			nameLabel.addStyleName("route_meta_name");
-			nameOnly.addStyleName("route_meta_name");
+			//nameLabel.addStyleName("route_meta_name");
+			//nameOnly.addStyleName("route_meta_name");
 			
 			String routeName = textField.getValue();
 			
 			controls.addStyleName("route_meta_controls");
-			map.setRouteName(routeName);
+			map.setRouteNameDescription(routeName, true);
 			textField.setValue(routeName);
 			
 			//waits to refresh routes so dronology can save
@@ -158,6 +207,24 @@ public class FRMetaInfo extends CustomComponent {
 				e1.printStackTrace();
 			}
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
+		});
+		
+		descriptionField.addBlurListener(e->{
+			routeDescription = descriptionField.getValue();
+			
+			description.setValue(routeDescription);
+			content.removeAllComponents();
+			labels.removeAllComponents();
+			labels.addComponents(nameOnly, nameLabel);
+			labelDescription.addComponents(labels, descriptionLayout);
+			content.addComponents(labelDescription, controls);
+			controls.addStyleName("route_meta_controls");
+			descriptionField.setValue(routeDescription);
+		
+			map.setRouteNameDescription(routeDescription, false);
+			routeDescription = map.getRouteDescription();	
+			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
+			
 		});
 		
 		setCompositionRoot(content);
