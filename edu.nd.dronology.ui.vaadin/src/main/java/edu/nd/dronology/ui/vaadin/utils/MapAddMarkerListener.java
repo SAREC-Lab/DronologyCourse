@@ -30,7 +30,8 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	
 	@Override
 	public void onClick(LeafletClickEvent e) {
-		if (route.isEditable() && !route.isPolyline()) {
+		if (route.isEditable() && !route.isPolyline() && e.getPoint().getLat() >= -90 && e.getPoint().getLat() <= 90 &&
+				e.getPoint().getLon() >= -180 && e.getPoint().getLon() <= 180) {
 			processOnClick(e.getPoint(), -1);
 		}
 		else {
