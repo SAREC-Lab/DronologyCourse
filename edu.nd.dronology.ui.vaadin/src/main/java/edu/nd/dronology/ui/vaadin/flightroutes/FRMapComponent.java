@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LTileLayer;
@@ -425,8 +426,6 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public void saveClick(){
 		//called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct waypoints on the map
-		route.disableRouteEditing();
-		
 		exitEditMode();
 		
 		List<WayPoint> newWaypoints = route.getMapPoints();
@@ -505,8 +504,17 @@ public class FRMapComponent extends CustomComponent {
 		}
 		
 		//tests if points were added or deleted. If added, an identical ArrayList of waypoints is created (this is a workaround to remove the click-listeners)
+		
+		
+		String cap = "";
+		
+		
 		if(storedPoints.size() < route.getMapPoints().size()){
+			for (int i = 0; i < storedPoints.size(); i++) {
+				storedPoints.remove(i);
+			}
 			storedPoints.clear();
+			
 			for(int i = 0; i < route.getMapPoints().size(); i++){
 				String alt = route.getMapPoints().get(i).getAltitude();
 				String lon = route.getMapPoints().get(i).getLongitude();
@@ -531,6 +539,7 @@ public class FRMapComponent extends CustomComponent {
 			route.getMapPoints().clear();
 			//waypoints are re-loaded into mapPoints, but without click listeners
 			for (int i = 0; i < storedPoints.size(); i++) {
+				storedPoints.get(i).setId(UUID.randomUUID().toString());
 				route.getMapPoints().add(storedPoints.get(i));
 			}
 			
@@ -544,6 +553,14 @@ public class FRMapComponent extends CustomComponent {
 				WayPoint point = storedPoints.get(i);
 				route.addPinForWayPoint(point);
 			}
+			
+			
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
+				cap = cap + route.getMapPoints().get(i).getId() + "\n";
+			}
+			
+			Notification.show(cap);
+			
 			
 			route.drawLines(storedPoints, true, 0, false);
 		}
