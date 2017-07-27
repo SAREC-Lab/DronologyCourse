@@ -74,8 +74,8 @@ public class FRMetaInfo extends CustomComponent {
 		deleteButton = new Button("Delete");
 		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/editButtonFull.PNG"));
-		FileResource deleteIcon = new FileResource(new File(basepath+"/VAADIN/img/deleteButtonFull.PNG"));
+		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/editButtonFull.png"));
+		FileResource deleteIcon = new FileResource(new File(basepath+"/VAADIN/img/deleteButtonFull.png"));
 		
 		editButton.setIcon(editIcon);
 		deleteButton.setIcon(deleteIcon);
