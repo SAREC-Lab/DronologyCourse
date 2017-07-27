@@ -114,9 +114,7 @@ public class FRMetaInfo extends CustomComponent {
 		content.setComponentAlignment(controls, Alignment.MIDDLE_RIGHT);
 
 		controls.addStyleName("route_meta_controls");
-		//nameLabel.addStyleName("route_meta_name");
-		//nameOnly.addStyleName("route_meta_name");
-		content.setWidth("1550px");
+		labelDescription.addStyleName("route_meta_label_description");
 		
 		editButton.addClickListener(e->{
 			map.editButton();
@@ -126,12 +124,13 @@ public class FRMetaInfo extends CustomComponent {
 		});
 		
 		textField.setValue(name);
-		textField.setHeight("25px");
-		textField.setWidth("130px");
-		
 		descriptionField.setValue(routeDescription);
-		descriptionField.setHeight("25px");
-		descriptionField.setWidth("200px");
+		
+		textField.setStyleName("name_edit_field");
+		descriptionField.setStyleName("description_edit_field");
+		nameOnly.setStyleName("name_lable");
+		nameLabel.setStyleName("waypoint_num_lable");
+		description.setStyleName("description_lable");
 
 		//double click
 		labels.addLayoutClickListener(new LayoutClickListener(){
@@ -142,11 +141,12 @@ public class FRMetaInfo extends CustomComponent {
 				if(event.getClickedComponent() == nameOnly){
 					if(event.isDoubleClick()){
 						content.removeAllComponents();
-						HorizontalLayout textLayout = new HorizontalLayout();
-						VerticalLayout textDescription = new VerticalLayout();
-						textDescription.addComponents(textField, descriptionLayout);
+						VerticalLayout textLayout = new VerticalLayout();
+						textLayout.addStyleName("route_meta_label_description");
+						HorizontalLayout nameArea = new HorizontalLayout();
+						nameArea.addComponents(textField, nameLabel);
 						
-						textLayout.addComponents(textDescription, nameLabel);
+						textLayout.addComponents(nameArea, descriptionLayout);
 						content.addComponents(textLayout, controls);
 					}
 				}
@@ -162,13 +162,12 @@ public class FRMetaInfo extends CustomComponent {
 					if(event.isDoubleClick()){
 						
 						content.removeAllComponents();
-						HorizontalLayout textLayout = new HorizontalLayout();
-						VerticalLayout textDescription = new VerticalLayout();
+						VerticalLayout textLayout = new VerticalLayout();
+						textLayout.addStyleName("route_meta_label_description");
 						labels.removeAllComponents();
 						labels.addComponents(nameOnly, nameLabel);
-						textDescription.addComponents(labels, descriptionField);
+						textLayout.addComponents(labels, descriptionField);
 						
-						textLayout.addComponents(textDescription);
 						content.addComponents(textLayout, controls);
 					}
 				}
@@ -191,8 +190,6 @@ public class FRMetaInfo extends CustomComponent {
 			
 			content.addComponents(labelDescription, controls);
 			controls.addStyleName("route_meta_controls");
-			//nameLabel.addStyleName("route_meta_name");
-			//nameOnly.addStyleName("route_meta_name");
 			
 			String routeName = textField.getValue();
 			

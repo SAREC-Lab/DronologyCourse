@@ -262,9 +262,39 @@ $valo-menu-background-color: #eee;
 				font-size: 12px;
 			}
 		}
-		.v-slot-route_meta_name {
-			padding: 15px 0;
+		.v-slot-route_meta_label_description {
 			width: 80%;
+		}
+		.route_meta_label_description {
+			width: 100%;
+			
+			.v-spacing {
+				height: 0px;
+			}
+			.name_lable {
+				font-size: 16px;
+			}
+			.waypoint_num_lable {
+				padding-top:4px;
+				font-size: 12px;
+			}
+			.description_lable {
+				font-size: 14px;
+				margin-top: 2px;
+			}
+			.name_edit_field {
+				width: 100%;
+				height: 24px;
+				font-size: 16px;
+				padding: 0 6px;
+			}
+			.description_edit_field {
+				width: 80%;
+				height: 22px;
+				margin-top: 3px;
+				font-size: 14px;
+				padding: 0 6px;
+			}
 		}
 	}
 	.v-absolutelayout-wrapper-fr_edit_bar {
