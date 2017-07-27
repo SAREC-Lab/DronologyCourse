@@ -1,8 +1,6 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
-import java.awt.Frame;
 import java.awt.MouseInfo;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -16,18 +14,13 @@ import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LTileLayer;
-import org.vaadin.addon.leaflet.LeafletClickEvent;
-import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
 import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
-import com.vaadin.event.MouseEvents;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.ui.AbsoluteLayout;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
@@ -35,7 +28,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 
 import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.Waypoint;
@@ -54,6 +46,7 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
  * This is the map component for the Active Flights UI
  * 
  * @author Jinghui Cheng
+ * 				 Patrick Falvey
  */
 public class AFMapComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
@@ -109,7 +102,6 @@ public class AFMapComponent extends CustomComponent {
 					.getService(IFlightManagerRemoteService.class);
 			// currentFlights = flightRouteService.getFlightDetails().getCurrentFlights();
 		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		List<String> temp = new ArrayList<>();
@@ -150,21 +142,30 @@ public class AFMapComponent extends CustomComponent {
 	public LMap getMapInstance() {
 		return leafletMap;
 	}
-
+	
+  /**
+   * This function gets the flight routes from dronology core and draws them on the map. 
+   * 
+   * @param focused
+   * 					this is the drone that is focused in the AFInfoPanel. It's flight route will be orange
+   * @param checked
+   * 					this is a list of drones that have their checkbox checked in the AFInfoPanel. Their routes
+   * 					will be black.
+   */
 	@WaypointReplace
 	public void addActiveFlightRoutes(String focused, List<String> checked) {
 		try {
 			currentFlights = flightRouteService.getCurrentFlights();
-			for (FlightPlanInfo e : currentFlights) {
+			for (FlightPlanInfo e : currentFlights) { //goes through each route
 				List<Waypoint> coordinates = e.getWaypoints();
 				List<WayPoint> wayPoints = new ArrayList<>();
 				List<LMarker> wayPointMarker = new ArrayList<>();
 				int i = 0;
-				for (Waypoint coord : coordinates) {
+				for (Waypoint coord : coordinates) { //goes through all the coordinates in each route
 					Point point = new Point(coord.getCoordinate().getLatitude(), coord.getCoordinate().getLongitude());
 					WayPoint wayPoint = new WayPoint(point, nextReached(coordinates, i + 1));
 					wayPoints.add(wayPoint);
-					if (wayPointMarkers.size() != currentFlights.size()) {
+					if (wayPointMarkers.size() != currentFlights.size()) { //adds the waypoints to the map first
 						LMarker marker = new LMarker(point);
 						marker.setIcon(dotIcon);
 						marker.setIconSize(new Point(15, 15));
@@ -172,11 +173,11 @@ public class AFMapComponent extends CustomComponent {
 						wayPointMarker.add(marker);
 						leafletMap.addComponent(marker);
 						if (!follow)
-							this.setAverageCenter();
+							this.setAverageCenter(); //resets the map to show the new drone
 					}
 					i++;
 				}
-				List<LPolyline> polyLines = new ArrayList<>();
+				List<LPolyline> polyLines = new ArrayList<>(); //draws the lines and loads them into a list
 				if (e.getDroneId().equals(focused))
 					polyLines = utilities.drawLines(wayPoints, true, 2, true);
 				else {
@@ -190,26 +191,31 @@ public class AFMapComponent extends CustomComponent {
 					if (!drawn)
 						polyLines = utilities.drawLines(wayPoints, true, 0, true);
 				}
-				flightRoutes.add(polyLines);
+				flightRoutes.add(polyLines); //keep a list of all lines and markers
 				if (wayPointMarkers.size() != currentFlights.size())
 					wayPointMarkers.add(wayPointMarker);
 			}
-		} catch (RemoteException e) {
+		} catch (RemoteException e) { //reconnect to dronology if connection is lost
 			try {
 				Notification.show("Reconnecting...");
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 						.getService(IFlightManagerRemoteService.class);
 			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
+
 				Notification.show("Reconnecting...");
 			}
 			Notification.show("Reconnecting...");
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
+
 		}
 	}
-
+	/**
+	 * assists in the logic of updating flight routes
+	 * @param coordinates
+	 * @param i
+	 * @return
+	 */
+	@SuppressWarnings("static-method")
 	private boolean nextReached(List<Waypoint> coordinates, int i) {
 		if (coordinates.size() <= i) {
 			return false;
@@ -217,17 +223,26 @@ public class AFMapComponent extends CustomComponent {
 		Waypoint next = coordinates.get(i);
 		return next.isReached();
 	}
-
+	/**
+	 * updates the flight routes. Deletes old ones, adds new ones, and redraws the lines to
+	 * different colors as each waypoint is reached
+	 * 
+	 * @param focused
+   * 					this is the drone that is focused in the AFInfoPanel. It's flight route will be orange
+   * @param checked
+   * 					this is a list of drones that have their checkbox checked in the AFInfoPanel. Their routes
+   * 					will be black.
+	 */
 	public void updateActiveFlightRoutes(String focused, List<String> checked) {
 		try {
 			currentFlights = flightRouteService.getCurrentFlights();
 			if (currentFlights.size() != flightRoutes.size() || true) {
-				for (List<LPolyline> e : flightRoutes) {
+				for (List<LPolyline> e : flightRoutes) { //removes each set of lines from the map
 					utilities.removeAllLines(e);
 				}
-				boolean exists = true;
+				boolean exists = true; //determines if flight route is still active
 				for (List<LMarker> e : wayPointMarkers){
-					boolean individualExist = false;
+					boolean individualExist = false; //helper variable to determine if each flight route is still active
 					for (FlightPlanInfo q : currentFlights){
 						if (e.get(0).getPoint().getLat() == q.getWaypoints().get(0).getCoordinate().getLatitude() && 
 								e.get(0).getPoint().getLon() == q.getWaypoints().get(0).getCoordinate().getLongitude()){
@@ -237,7 +252,7 @@ public class AFMapComponent extends CustomComponent {
 					if (individualExist == false)
 						exists = false;
 				}
-				if (!exists || wayPointMarkers.size() != currentFlights.size()) {
+				if (!exists || wayPointMarkers.size() != currentFlights.size()) { //if flight doesn't exist, remove it's waypoint markers
 					for (List<LMarker> e : wayPointMarkers) {
 						utilities.removeAllMarkers(e);
 					}
@@ -250,25 +265,31 @@ public class AFMapComponent extends CustomComponent {
 			/*
 			 * if (wayPointMarkers.size() != flightRoutes.size()){ for (ArrayList<LMarker> e:wayPointMarkers){ utilities.removeAllMarkers(e); } wayPointMarkers.clear(); } flightRoutes.clear();
 			 */
-			this.addActiveFlightRoutes(focused, checked);
+			this.addActiveFlightRoutes(focused, checked); //redraw the flight routes
 			// }
 
-		} catch (RemoteException e) {
+		} catch (RemoteException e) { //reconnect to dronology
 			try {
 				Notification.show("Reconnecting...");
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 						.getService(IFlightManagerRemoteService.class);
 			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
 				Notification.show("Reconnecting...");
 			}
 			Notification.show("Reconnecting...");
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
 		}
 	}
-
+	/**
+	 * This function adds icons on the map that represent each drone's position.
+	 * 
+	 * @param focused
+   * 					this is the drone that is focused in the AFInfoPanel. It's flight route will be orange
+   * @param checked
+   * 					this is a list of drones that have their checkbox checked in the AFInfoPanel. Their routes
+   * 					will be black.
+	 */
+	@SuppressWarnings("deprecation")
 	public void addDroneMarkers(String focused, List<String> checked) {
 		try {
 			drones = service.getDrones();
@@ -278,12 +299,9 @@ public class AFMapComponent extends CustomComponent {
 				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 						.getService(IFlightManagerRemoteService.class);
 			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
 				Notification.show("Reconnecting...");
 			}
 			Notification.show("Reconnecting...");
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
 		}
 		for (Entry<String, DroneStatus> e : drones.entrySet()) {
 			LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
@@ -309,7 +327,16 @@ public class AFMapComponent extends CustomComponent {
 				this.setAverageCenter();
 		}
 	}
-
+	/**
+	 * This function updates the position of the drone icons on the map
+	 * 
+	 * @param focused
+   * 					this is the drone that is focused in the AFInfoPanel. It's flight route will be orange
+   * @param checked
+   * 					this is a list of drones that have their checkbox checked in the AFInfoPanel. Their routes
+   * 					will be black.
+	 */
+	@SuppressWarnings("deprecation")
 	public void updateDroneMarkers(String focused, List<String> checked) {
 		try {
 			drones = service.getDrones();
@@ -318,9 +345,9 @@ public class AFMapComponent extends CustomComponent {
 				for (LMarker marker : markers) {
 					boolean exists = false;
 					for (Entry<String, DroneStatus> e : drones.entrySet()) {
-						if (marker.getId().equals(e.getValue().getID())) {
+						if (marker.getId().equals(e.getValue().getID())) { //if the marker correlates to the drone
 							Point temp = new Point();
-							temp.setLat(e.getValue().getLatitude());
+							temp.setLat(e.getValue().getLatitude()); //update location
 							temp.setLon(e.getValue().getLongitude());
 							marker.setPoint(temp);
 							if (marker.getId().equals(focused))
@@ -339,7 +366,7 @@ public class AFMapComponent extends CustomComponent {
 							exists = true;
 						}
 					}
-					if (!exists) {
+					if (!exists) { //if the drone that is represented by the marker is no longer active or if the drone is new
 						remove.add(marker);
 						for (Entry<String, DroneStatus> e1 : drones.entrySet()) {
 							boolean old = false;
@@ -347,7 +374,7 @@ public class AFMapComponent extends CustomComponent {
 								if (e1.getValue().getID().equals(marker1.getId()))
 									old = true;
 							}
-							if (!old) {
+							if (!old) { //the drone does not have a marker represented by it
 								LMarker newMarker = new LMarker(e1.getValue().getLatitude(), e1.getValue().getLongitude());
 								newMarker.setId(e1.getValue().getID());
 								if (marker.getId().equals(focused))
@@ -381,7 +408,7 @@ public class AFMapComponent extends CustomComponent {
 							exists = true;
 					}
 					if (!exists) {
-						LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
+						LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude()); //create new marker for the drone
 						marker.setId(e.getValue().getID());
 						if (marker.getId().equals(focused))
 							marker.setIcon(droneIconFocused);
@@ -412,7 +439,7 @@ public class AFMapComponent extends CustomComponent {
 						if (e.getValue().getID().equals(marker.getId()))
 							exists = true;
 					}
-					if (!exists)
+					if (!exists) //remove marker that represents a deactivated drone
 						remove.add(marker);
 				}
 			}
@@ -425,24 +452,27 @@ public class AFMapComponent extends CustomComponent {
 				}
 				remove.clear();
 			}
-		} catch (RemoteException e) {
+		} catch (RemoteException e) { //reconnect to dronology
 			try {
 				Notification.show("Reconnecting...");
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 				flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 						.getService(IFlightManagerRemoteService.class);
 			} catch (RemoteException | DronologyServiceException e1) {
-				// TODO Auto-generated catch block
 				Notification.show("Reconnecting...");
 			}
 			Notification.show("Reconnecting...");
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
 		}
 	}
 
+	/**
+	 * This function sets the center and zoom of the map to include all drones and their flight routes.
+	 * It finds the average latitude and longitude first. It then finds the point farthest from the center
+	 * and bases the zoom level off of that point.
+	 */
+	@SuppressWarnings("deprecation")
 	public void setAverageCenter() {
-	   if (content.getComponentIndex(layout) == -1){
+	   if (content.getComponentIndex(layout) == -1){ //if coming out of follow mode
 			content.removeAllComponents();
 			leafletMap.removeStyleName("af_leaflet_map_edit_mode");
 			content.addComponent(layout);
@@ -454,7 +484,7 @@ public class AFMapComponent extends CustomComponent {
 			double avgLat = 0;
 			double avgLon = 0;
 			int numPoints = 0;
-			for (Entry<String, DroneStatus> e : drones.entrySet()) {
+			for (Entry<String, DroneStatus> e : drones.entrySet()) { //finding the average latitude and longitude of the drones and flight routes
 				avgLat += e.getValue().getLatitude();
 				avgLon += e.getValue().getLongitude();
 				numPoints++;
@@ -471,7 +501,7 @@ public class AFMapComponent extends CustomComponent {
 			avgLat /= (numPoints * 1.0);
 			avgLon /= (numPoints * 1.0);
 			double farthestLat = 0;
-			double farthestLon = 0;
+			double farthestLon = 0; //finding the farthest point from the center
 			for (Entry<String, DroneStatus> e : drones.entrySet()) {
 				if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat) {
 					farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
@@ -495,12 +525,11 @@ public class AFMapComponent extends CustomComponent {
 			double zoom;
 			if (farthestLat == 0 && farthestLon == 0) {
 				zoom = 14;
-			} else {
+			} else { //sets the zoom based on the calculation of degrees on the map per zoom level
 				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
 			}
 			leafletMap.setCenter(point, zoom);
 		} catch (RemoteException | DronologyServiceException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		if (drones.size() < 1) {
@@ -511,6 +540,10 @@ public class AFMapComponent extends CustomComponent {
 
 	}
 
+	/**
+	 * @return
+	 * 			follow is a boolean variable that is true when the map is following drones
+	 */
 	public boolean getFollow() {
 		return this.follow;
 	}
@@ -519,6 +552,11 @@ public class AFMapComponent extends CustomComponent {
 		this.follow = follow;
 	}
 	
+	/**
+	 * @return
+	 * 			followZoom determines whether the map should zoom in on the drones in follow mode. Only happens once initially
+	 * 			when the user clicks the button to follow the drones on the map.
+	 */
 	public boolean getFollowZoom(){
 		return this.followZoom;
 	}
@@ -527,10 +565,18 @@ public class AFMapComponent extends CustomComponent {
 		this.followZoom = followZoom;
 	}
 
+	/**
+	 * This function sets the center of the map as an average of the drones that it is following.
+	 * This will constantly change as each drone flies.
+	 * 
+	 * @param names
+	 * 					The list of drone names that the map should be following
+	 */
+	@SuppressWarnings("deprecation")
 	public void followDrones(List<String> names) {
 		if (names.size() < 1) {
 			this.follow = false;
-			if (content.getComponentIndex(layout) == -1){
+			if (content.getComponentIndex(layout) == -1){ //if not in follow mode
 				content.removeAllComponents();
 				leafletMap.removeStyleName("af_leaflet_map_edit_mode");
 				content.addComponent(layout);
@@ -538,7 +584,7 @@ public class AFMapComponent extends CustomComponent {
 			return;
 		}
 		if (this.follow == false){
-			if (content.getComponentIndex(layout) == -1){
+			if (content.getComponentIndex(layout) == -1){ //if not in follow mode
 				content.removeAllComponents();
 				leafletMap.removeStyleName("af_leaflet_map_edit_mode");
 				content.addComponent(layout);
@@ -548,7 +594,7 @@ public class AFMapComponent extends CustomComponent {
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			drones = service.getDrones();
-			double avgLat = 0;
+			double avgLat = 0; //finds the average latitude and longitude
 			double avgLon = 0;
 			int numPoints = 0;
 			for (Entry<String, DroneStatus> e : drones.entrySet()) {
@@ -562,7 +608,7 @@ public class AFMapComponent extends CustomComponent {
 			}
 			avgLat /= (numPoints * 1.0);
 			avgLon /= (numPoints * 1.0);
-			double farthestLat = 0;
+			double farthestLat = 0; //finds the farthest point from the center
 			double farthestLon = 0;
 			for (Entry<String, DroneStatus> e : drones.entrySet()) {
 				for (String name : names) {
@@ -577,7 +623,7 @@ public class AFMapComponent extends CustomComponent {
 				}
 			}
 			Point point = new Point(avgLat, avgLon);
-			if (this.followZoom){
+			if (this.followZoom){ //if the first time after the button click, set the zoom level to fit all drones
 				double zoom;
 				if (farthestLat == 0 && farthestLon == 0) { 
 					zoom = 17;
@@ -590,7 +636,7 @@ public class AFMapComponent extends CustomComponent {
 			else {
 				leafletMap.setCenter(point);
 			}
-			if(content.getComponentIndex(layout) != -1){
+			if(content.getComponentIndex(layout) != -1){ //change the map layout to display the follow bar.
 				leafletMap.addStyleName("af_leaflet_map_edit_mode");
 				followBar = new AFFollowBar(this, names);
 				followLayout.addStyleName("af_mapabsolute_layout");
@@ -607,19 +653,23 @@ public class AFMapComponent extends CustomComponent {
 				followBar.updateUAVList(names);
 			}
 		} catch (RemoteException | DronologyServiceException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
 
+	/**
+	 * this is a listener that displays an AFInfoBox in a popup over the drone that was just hovered over
+	 * @author Patrick Falvey
+	 *
+	 */
 	private class DroneMouseListener implements LeafletMouseOverListener {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
 			try {
 				drones = service.getDrones();
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -629,7 +679,7 @@ public class AFMapComponent extends CustomComponent {
 
 			VerticalLayout popupContent = (VerticalLayout)dronePopup.getContent().getPopupComponent();
 			popupContent.removeAllComponents();
-			for (Entry<String, DroneStatus> e : drones.entrySet()) {
+			for (Entry<String, DroneStatus> e : drones.entrySet()) { //change the popup content to display the right AFInfoBox
 				if (e.getValue().getID().equals(leafletMarker.getId())) {
 					AFInfoBox box = new AFInfoBox(false, e.getValue().getID(), e.getValue().getStatus(),
 							e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(),
@@ -639,7 +689,7 @@ public class AFMapComponent extends CustomComponent {
 					int numUAVs = panel.getNumUAVS();
 					for(int i = 1; i < numUAVs + 1; i++){
 						AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
-						if (panelBox.getName().equals(box.getName())){
+						if (panelBox.getName().equals(box.getName())){ //get the updated information from the AFInfoPanel
 							box.setIsChecked(panelBox.getIsChecked());
 							box.setHealthColor(panelBox.getHealthColor());
 							box.setHoverInPlace(panelBox.getHoverInPlace());
@@ -655,7 +705,7 @@ public class AFMapComponent extends CustomComponent {
 					box.getHoverSwitch().addValueChangeListener(click ->{
 						dronePopup.setPopupVisible(false);
 					});
-					box.getCheckBox().addValueChangeListener(click -> {
+					box.getCheckBox().addValueChangeListener(click -> { //if checkbox clicked in popup, it will change in AFInfoPanel
 						if (box.getCheckBox().getValue()){
 							for(int i = 1; i < numUAVs + 1; i++){
 								AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
@@ -676,7 +726,12 @@ public class AFMapComponent extends CustomComponent {
 					popupContent.addComponent(box);
 				}
 			}
-			
+			/*
+				find the location on the screen to display the popup.
+				Takes the absolute position of the mouse and converts that to the 
+				relative position of the mouse on the map. Uses the map dimensions and
+				the map position within the layout
+			*/
 			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
 			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.9;
 			
@@ -708,6 +763,13 @@ public class AFMapComponent extends CustomComponent {
 		}
 	}
 
+	/**
+	 * This listener displays a popup of information about a certain waypoint. Virtually the same 
+	 * listener used in the flight routes UI.
+	 * 
+	 * @author Patrick Falvey
+	 *
+	 */
 	private class WaypointMouseListener implements LeafletMouseOverListener {
 
 		@Override
@@ -718,7 +780,7 @@ public class AFMapComponent extends CustomComponent {
 			LMarker leafletMarker = (LMarker)event.getSource();
 
 			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
-			Iterator<Component> it = popupContent.iterator();
+			Iterator<Component> it = popupContent.iterator(); //iterates through the popup content and updates the waypoint information
 			while(it.hasNext()) {
 				Component c = it.next();
 				try {
@@ -758,7 +820,12 @@ public class AFMapComponent extends CustomComponent {
 					Notification.show("Reconnecting...");
 				}
 			}
-
+			/*
+				find the location on the screen to display the popup.
+				Takes the absolute position of the mouse and converts that to the 
+				relative position of the mouse on the map. Uses the map dimensions and
+				the map position within the layout
+			 */
 			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
 			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.9;
 			
@@ -790,6 +857,11 @@ public class AFMapComponent extends CustomComponent {
 		}		
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * 			returns the waypoint popup
+	 */
 	public PopupView createWayPointPopupView() {
 		VerticalLayout popupContent = new VerticalLayout();
 		popupContent.removeAllComponents();
@@ -820,6 +892,11 @@ public class AFMapComponent extends CustomComponent {
 		return popup;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * 			returns the drone popup
+	 */
 	public PopupView createDronePopupView() {
 		VerticalLayout popupContent = new VerticalLayout();
 		popupContent.removeAllComponents();
