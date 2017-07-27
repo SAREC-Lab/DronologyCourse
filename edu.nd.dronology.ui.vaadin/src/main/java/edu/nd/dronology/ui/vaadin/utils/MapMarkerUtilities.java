@@ -265,12 +265,6 @@ public class MapMarkerUtilities {
 		
 		if (isEditable) {
 			leafletMarker.addMouseOverListener(new MarkerMouseOverListener());
-    
-			/**
-			 * Drag End Listener is a listener that updates the path if a waypoint is moved.
-			 * The leafletMarker description is used to keep track of the previous point.
-			 * @author Patrick Falvey
-			 */
 			
 			leafletMarker.addDragEndListener(new MarkerDragEndListener());
 		}
@@ -292,7 +286,20 @@ public class MapMarkerUtilities {
 			}
 		}
 	}
-	
+	/**
+	 * 
+	 * @param mapPoints
+	 * @param drawOnMap
+	 * @param mode
+	 * 			determines the color of the line. 0 is gray. 1 is black. 2 is orange.
+	 * 			For flight routes, the mode should primarily be 1. For active flights,
+	 * 			it varies on if a drone is focused, checked, or neither.
+	 * @param fromActive
+	 * 			should be true if drawLines is being called from the active flights UI. This
+	 * 			determines if the first line segment should be green (which it shouldn't
+	 * 			be in the flight routes UI). 
+	 * @return
+	 */
 	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
 		List<LPolyline> polylines = new ArrayList<>();
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
