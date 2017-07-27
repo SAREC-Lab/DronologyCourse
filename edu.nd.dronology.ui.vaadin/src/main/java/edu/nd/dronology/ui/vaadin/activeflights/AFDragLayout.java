@@ -53,6 +53,7 @@ public class AFDragLayout extends VerticalLayout {
 	private IFlightRouteplanningRemoteService flightInfoService;
 	private BaseServiceProvider provider = MyUI.getProvider();
 	private String UAVid;
+	private int boxID = 88888; //arbitrary value so the ID does not overlap boxIDs from AFAssignRouteComponent
 
 	public AFDragLayout(String UAVid) {	
 		this.UAVid = UAVid;
@@ -97,6 +98,8 @@ public class AFDragLayout extends VerticalLayout {
 					
 					String length = String.valueOf(info.getLenght());
 					FRInfoBox box = new FRInfoBox(info.getName(), info.getId(), creationFormatted, modifiedFormatted, length);
+					box.setId(Integer.toString(this.boxID));
+					this.boxID++;
 					components.add(box);
 				}
 			}
