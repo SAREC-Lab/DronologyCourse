@@ -82,36 +82,41 @@ def mission_single_uav_sar(connection, v_type, v_id, bounds, point_last_seen=Non
     # FLY
     worker = core.goto_sequential(vehicle, waypoints, block=False)
 
-    # HANDLE INCOMING MESSAGES
-    while worker.isAlive():
-        if not connection.is_connected():
-            dronology_handshake_complete = False
+    try:
+        # HANDLE INCOMING MESSAGES
+        while worker.isAlive():
+            if not connection.is_connected():
+                dronology_handshake_complete = False
 
-        if not dronology_handshake_complete:
-            dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
+            if not dronology_handshake_complete:
+                dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
 
-        cmds = core.get_commands(v_id)
-        for cmd in cmds:
-            if isinstance(cmd, (SetMonitorFrequency,)):
-                # stop the timer, send message, reset interval, restart timer
-                send_monitor_message_timer.stop()
-                gen_monitor_message(vehicle)
-                send_monitor_message_timer.set_interval(cmd.get_monitor_frequency() / 1000)
-                send_monitor_message_timer.start()
+            cmds = core.get_commands(v_id)
+            for cmd in cmds:
+                if isinstance(cmd, (SetMonitorFrequency,)):
+                    # stop the timer, send message, reset interval, restart timer
+                    send_monitor_message_timer.stop()
+                    gen_monitor_message(vehicle)
+                    send_monitor_message_timer.set_interval(cmd.get_monitor_frequency() / 1000)
+                    send_monitor_message_timer.start()
+
+        worker.join()
+        core.return_to_launch(vehicle)
+        _LOG.info('Vehicle {} landed.'.format(v_id))
+        core.set_armed(vehicle, armed=False)
+        _LOG.info('Vehicle {} disarmed.'.format(v_id))
+    except KeyboardInterrupt:
+        vehicle.mode = dronekit.VehicleMode('Loiter')
 
     worker.join()
-    core.return_to_launch(vehicle)
-    _LOG.info('Vehicle {} landed.'.format(v_id))
-    core.set_armed(vehicle, armed=False)
-    _LOG.info('Vehicle {} disarmed.'.format(v_id))
     shutdown_cb()
 
 
 def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUNDS):
     _LOG.info('STARTING NEW MISSION.')
+    connection = core.Connection(host=host, port=port)
     try:
         # start a thread to monitor dronology connection
-        connection = core.Connection(host=host, port=port)
         connection.start()
         _LOG.info('Accepting connection on tcp:{}:{}'.format(host, port))
 
@@ -119,6 +124,7 @@ def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUN
         mission_single_uav_sar(connection, vehicle_type, vehicle_id, bounds, ardupath=ardupath)
         connection.stop()
     except KeyboardInterrupt:
+        connection.stop()
         exit(-1)
     _LOG.info('MISSION ENDED.')
 
