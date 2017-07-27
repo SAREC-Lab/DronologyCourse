@@ -189,11 +189,11 @@ public class FRInfoPanel extends CustomComponent {
 				controls.getLayout().editClick(infoBox);
 			});
 		}
-
+		/*
 		routeBox.getTrashButton().addClickListener(e->{
 			controls.getLayout().getMap().displayNoRoute();
 		});
-		
+		*/
 		buttons.addComponents(newRoute, popup);
 		buttons.addStyleName("fr_new_route_button_area");
 		totalLayout.addComponents(buttons, routes);

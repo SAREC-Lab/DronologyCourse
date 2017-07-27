@@ -109,4 +109,9 @@ public class FRDeleteRoute extends CustomComponent{
 				e.printStackTrace();
 			}
 	}
+	public void deleteAnyway(){
+		if(infoTobeDeleted != null){
+			deleteRoute(infoTobeDeleted);
+		}
+	}
 }

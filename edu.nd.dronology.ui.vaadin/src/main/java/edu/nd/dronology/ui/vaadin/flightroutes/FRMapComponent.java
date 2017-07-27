@@ -641,4 +641,10 @@ public class FRMapComponent extends CustomComponent {
 		return description;
 		
 	}
+	public FRDeleteRoute getDeleteBar(){
+		return delete;
+	}
+	public FlightRouteInfo getSelectedRoute(){
+		return selectedRoute;
+	}
 }
