@@ -107,21 +107,22 @@ public class TrustManager {
 	}
 
 	public void initializeUAV(String uavid) {
-		LOGGER.info("new uav initialized: " + uavid);
-		history.put(uavid, new VehicleReputation(uavid));
+		if (!history.containsKey(uavid)) {
+			LOGGER.info("new uav initialized: " + uavid);
+			history.put(uavid, new VehicleReputation(uavid));
+		}
+		else {
+			LOGGER.info(String.format("UAV %s (%f) re-entered the airspace", uavid, getReputationRating(uavid))); 
+		}
 	}
 
 	/**
 	 * Called by InternalMonitoringEvalListener when a constraint is evaluated
 	 * 
-	 * @param vid
-	 *            the vehicle id
-	 * @param assumptionid
-	 *            the assumption id
-	 * @param r
-	 * 			positive feedback
-	 * @param s
-	 * 			negative feedback  
+	 * @param vid: the vehicle id
+	 * @param assumptionid: the assumption id
+	 * @param r: positive feedback
+	 * @param s: negative feedback  
 	 * @throws IllegalArgumentException
 	 */
 	public void constraintEvaluated(String vid, String assumptionid, double r, double s) throws IllegalArgumentException {
@@ -133,8 +134,7 @@ public class TrustManager {
 	/**
 	 * Determine the reputation rating of a vehicle.
 	 * 
-	 * @param vid
-	 *            the vehicle id
+	 * @param vid the vehicle id
 	 * @return the reputation rating r (0 < r < 1)
 	 */
 	public double getReputationRating(String vid) {

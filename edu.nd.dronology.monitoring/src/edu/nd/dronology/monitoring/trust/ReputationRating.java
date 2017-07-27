@@ -11,12 +11,15 @@ import edu.nd.dronology.monitoring.util.BenchmarkLogger;
  * @author seanbayley
  */
 public class ReputationRating {
+	private static final int MIN_REQUIRED_FEEDBACK = 10;
 	private String id;
+	private int n;
 	private double r;
 	private double s;
 	
 	public ReputationRating(String id) {
 		this.id = id;
+		this.n = 0;
 		this.r = 0.0;
 		this.s = 0.0;
 	}
@@ -32,14 +35,13 @@ public class ReputationRating {
 	/**
 	 * Add feedback based on the result of some "interaction".
 	 * 
-	 * @param r 
-	 * 			positive feedback
-	 * @param s 
-	 * 			negative feedback
+	 * @param r: positive feedback
+	 * @param s: negative feedback
 	 */
 	public void addFeedback(double r, double s) {
-			this.r += r;
-			this.s += s;
+		this.n += 1;
+		this.r += r;
+		this.s += s;
 	}
 
 	/**
@@ -50,7 +52,13 @@ public class ReputationRating {
 	 * The rating is calculated using Equation 5. Ratings range from (0, 1).
 	 */
 	public double getReputationRating() {
-		return (r + 1) / (r + s + 2);
+		double rating;
+		if (n < MIN_REQUIRED_FEEDBACK) 
+			rating = 0.0;
+		else
+			rating = (r + 1) / (r + s + 2);
+		
+		return rating;
 	}
 
 	@Override
