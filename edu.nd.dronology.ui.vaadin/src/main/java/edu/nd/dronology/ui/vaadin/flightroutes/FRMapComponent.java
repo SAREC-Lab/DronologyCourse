@@ -17,7 +17,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -504,11 +503,6 @@ public class FRMapComponent extends CustomComponent {
 		}
 		
 		//tests if points were added or deleted. If added, an identical ArrayList of waypoints is created (this is a workaround to remove the click-listeners)
-		
-		
-		String cap = "";
-		
-		
 		if(storedPoints.size() < route.getMapPoints().size()){
 			for (int i = 0; i < storedPoints.size(); i++) {
 				storedPoints.remove(i);
@@ -553,14 +547,6 @@ public class FRMapComponent extends CustomComponent {
 				WayPoint point = storedPoints.get(i);
 				route.addPinForWayPoint(point);
 			}
-			
-			
-			for (int i = 0; i < route.getMapPoints().size(); i++) {
-				cap = cap + route.getMapPoints().get(i).getId() + "\n";
-			}
-			
-			Notification.show(cap);
-			
 			
 			route.drawLines(storedPoints, true, 0, false);
 		}
