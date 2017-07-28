@@ -46,7 +46,7 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
  * This is the map component for the Active Flights UI
  * 
  * @author Jinghui Cheng
- * 				 Patrick Falvey
+ * 				 
  */
 public class AFMapComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
