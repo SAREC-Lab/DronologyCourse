@@ -300,31 +300,29 @@ public class FRMainLayout extends CustomComponent {
 	public void drawRoute(){
 		//tests whether a route was added or not
 		isNew = true;
-		if(!(componentCount == controls.getInfoPanel().getRouteList().size())){
-			
-			map.enableEdit();
-			//to get rid of points and lines from previous routes
-			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-			map.getUtils().removeAllLines(map.getUtils().getPolylines());
-			map.getUtils().getMapPoints().clear();
-			
-			//displays the drone information in the info bar
-			drone = controls.getInfoPanel().getRoute();
-			int numCoords = drone.getWaypoints().size();
-			droneName = controls.getInfoPanel().getName();
-			map.displayByName(drone, droneName, numCoords, true, map.getToDo());
-			
-			Point pt = new Point(0, 0);
-			way = new WayPoint(pt, true);
-			
-			map.getTableDisplay().getGrid().setItems();
-			map.enableEdit();
 
-			//controls.getInfoPanel().refreshRoutes();
-			
-			flightInfo = controls.getInfoPanel().getFlight(index);
-			
-		}
+		map.enableEdit();
+		map.getUtils().enableRouteEditing();
+		//to get rid of points and lines from previous routes
+		map.getUtils().removeAllMarkers(map.getUtils().getPins());
+		map.getUtils().removeAllLines(map.getUtils().getPolylines());
+		map.getUtils().getMapPoints().clear();
+		
+		//displays the drone information in the info bar
+		drone = controls.getInfoPanel().getRoute();
+		int numCoords = drone.getWaypoints().size();
+		droneName = controls.getInfoPanel().getName();
+		map.displayByName(drone, droneName, numCoords, true, map.getToDo());
+		
+		Point pt = new Point(0, 0);
+		way = new WayPoint(pt, true);
+		
+		map.getTableDisplay().getGrid().setItems();
+		map.enableEdit();
+
+		//controls.getInfoPanel().refreshRoutes();
+		
+		flightInfo = controls.getInfoPanel().getFlight(index);
 	}
 	public void deleteRouteUpdate(){
 		VaadinSession session = getSession();
