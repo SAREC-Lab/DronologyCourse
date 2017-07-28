@@ -250,7 +250,7 @@ public class FRMainLayout extends CustomComponent {
 			map.getUtils().setMapPointsAltitude(waypoints);
 			map.getUtils().setMapPointsTransit(waypoints);
 		}
-	
+	/*
 		map.getMetaBar().getDeleteButton().addClickListener(eve->{
 			
 			if (map.getUtils().isEditable()) {
@@ -295,7 +295,7 @@ public class FRMainLayout extends CustomComponent {
 			}
 			
 		});
-
+*/
 	}
 	public void drawRoute(){
 		//tests whether a route was added or not
@@ -333,6 +333,41 @@ public class FRMainLayout extends CustomComponent {
 				//need to refresh route counter too
 			});
 		}
+	}
+	public void deleteInEdit(){
+			HorizontalLayout buttons = new HorizontalLayout();
+			Button yes = new Button("Yes");
+			Button no = new Button("No");
+			buttons.addComponents(yes, no);
+			
+			VerticalLayout windowContent = new VerticalLayout();
+			Label statement = new Label("You have unsaved changes on " + name + ".");
+			Label question = new Label ("Are you sure you want to discard all unsaved changes?");
+			
+			windowContent.addComponents(statement, question, buttons);
+			
+			Window warning;
+			warning = new Window(null, windowContent);
+			
+			warning.setModal(true);
+			warning.setClosable(false);
+			warning.setResizable(false);
+			
+			UI.getCurrent().addWindow(warning);
+			
+			yes.addClickListener(event -> {
+				map.getDeleteBar().deleteRoute(map.getSelectedRoute());
+				UI.getCurrent().removeWindow(warning);
+				map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
+				map.displayNoRoute();
+				map.exitEditMode();
+			});
+			
+			no.addClickListener(event -> {
+				UI.getCurrent().removeWindow(warning);
+				UI.getCurrent().removeWindow(warning);
+				controls.getInfoPanel().removeWindow();
+			});
 	}
 	public void editClick(FRInfoBox infoBox){
 		switchWindows(null, map, infoBox);

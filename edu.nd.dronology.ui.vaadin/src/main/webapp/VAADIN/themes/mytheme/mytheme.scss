@@ -323,9 +323,12 @@ $valo-menu-background-color: #eee;
 			width: calc(100% - 300px);
 		}
 	}
-	.fr_table_component {
+	.v-slot-fr_table_component{
 		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px) !important;
+	}
+	.fr_table_component {
 		width: 100% !important;
+		height: 100% !important;
 		.v-grid-column-resize-handle {
 			width: 0;
 		}
@@ -351,14 +354,16 @@ $valo-menu-background-color: #eee;
 			border: 0;
 		}
 	}
-	.fr_table_component_edit_mode {
+	.v-slot-fr_table_component_edit_mode {
 		border-width: 5px;
 		border-style: solid; 
 		border-color: $color-dark-4;
-		.v-grid-tablewrapper {
-			height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px - 10px) !important;
-			width: 100% !important;
-		}
+		height: calc(#{$screen-height} - #{$fr-map-height} - #{$fr-top-bar-height} - 12px - 10px) !important;
+	}
+	.fr_table_component_edit_mode {
+		width: 100% !important;
+		height: 100% !important;
+		
 		.v-grid-editor {
 			input.v-textfield {
 				font-size: 14px;

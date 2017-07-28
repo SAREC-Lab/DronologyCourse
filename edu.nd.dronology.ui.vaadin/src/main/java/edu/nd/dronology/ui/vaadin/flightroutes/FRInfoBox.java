@@ -93,19 +93,23 @@ public class FRInfoBox extends CustomComponent {
 		setCompositionRoot(allContent);
 
 		trashButton.addListener(e->{
-			UI.getCurrent().addWindow(delete.getWindow());
-			whichBox = this.getid();
-			for(int i = 0; i < panel.getRoutes().getComponentCount(); i++){
-				FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
-				if(local.getid().equals(whichBox)){
-					index = counter;
-				}else{
-					counter++;
+			if(panel.getControls().getLayout().getMap().getUtils().isEditable()){
+				panel.getControls().getLayout().deleteInEdit();
+			}else{
+				UI.getCurrent().addWindow(delete.getWindow());
+				whichBox = this.getid();
+				for(int i = 0; i < panel.getRoutes().getComponentCount(); i++){
+					FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
+					if(local.getid().equals(whichBox)){
+						index = counter;
+					}else{
+						counter++;
+					}
 				}
+				finfo = panel.getFlight(index);
+				delete.setRouteInfoTobeDeleted(finfo);
+				panel.refreshRoutes();	
 			}
-			finfo = panel.getFlight(index);
-			delete.setRouteInfoTobeDeleted(finfo);
-			panel.refreshRoutes();	
 		});
 		
 		delete.getYesButton().addClickListener(e->{
