@@ -68,6 +68,7 @@ public class FRMainLayout extends CustomComponent {
 				Button no = new Button("No");
 				buttons.addComponents(yes, no);
 				
+				//creates a window to warn the user about discarding unsaved changes
 				VerticalLayout windowContent = new VerticalLayout();
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
@@ -83,6 +84,7 @@ public class FRMainLayout extends CustomComponent {
 				
 				UI.getCurrent().addWindow(warning);
 				
+				//click listeners for buttons on window
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					switchWindows(e, map, null);
@@ -94,10 +96,11 @@ public class FRMainLayout extends CustomComponent {
 				});
 			}
 			else {
+				//if map is not in edit mode, then just switch to the other route
 				switchWindows(e, map, null);
 			}		
 		});
-		
+		//adds click listenr to new route button on info panel
 		controls.getInfoPanel().getNewRouteButton().addClickListener(e->{
 			if (map.getUtils().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
@@ -105,6 +108,7 @@ public class FRMainLayout extends CustomComponent {
 				Button no = new Button("No");
 				buttons.addComponents(yes, no);
 				
+				//creates a window to warn the user about discarding unsaved changes
 				VerticalLayout windowContent = new VerticalLayout();
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
@@ -120,6 +124,7 @@ public class FRMainLayout extends CustomComponent {
 				
 				UI.getCurrent().addWindow(warning);
 				
+				//click listeners for buttons on window
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					map.displayNoRoute();
@@ -133,24 +138,20 @@ public class FRMainLayout extends CustomComponent {
 			}
 		});
 		
-
-
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
-	
 	public FRControlsComponent getControls() {
 		return controls;
 	}
-
+	//gets the index of the selected infobox (or -1 for when no box is selected)
 	public int getIndex() {
 		return index;
 	}
-
 	public FRMapComponent getMap() {
 		return map;
 	}
-	
+	//displays the route that is clicked. Passes in the click event, map, and infobox that was clicked
 	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
 		isNew = false;
 		//gets box of route info and changes its style to show that it is selected
@@ -159,32 +160,34 @@ public class FRMainLayout extends CustomComponent {
 			child = e.getChildComponent();
 		}
 		else {
+			//checks the id's of the infoboxes to get the correct child if it was null
 			for (int i = 0; i < routeLayout.getComponentCount(); i++){
 				if (component.getid().equals(((FRInfoBox) routeLayout.getComponent(i)).getid())){
 					child = routeLayout.getComponent(i);
 				}
 			}
 		}
-		
 		if(routeLayout.getComponentIndex(child) != -1){
 			child.addStyleName("info_box_focus");
 		}
-		
-		//child.addStyleName("info_box_focus");
+
 		index = routeLayout.getComponentIndex(child);
 
 		//gets the flight info for that route
 		flightInfo = controls.getInfoPanel().getFlight(index);
 		
+		//creates an arraylist of infoboxes and adds click listeners to the 'yes' buttons on their respective delete bars
 		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
 		for(FRInfoBox box: list){
 			box.getDeleteBar().getYesButton().addClickListener(even->{
+				//if the 'yes' button is clicked, on route is displayed and the info panel is refreshed (route is deleted in FRDeleteRoute)
 				map.displayNoRoute();
 				map.exitEditMode();
 				controls.getInfoPanel().refreshRoutes();
 			});
 		}
 		
+		//creates a list of waypoints to store the waypoints of the relevant flight
 		List<Waypoint> flightWaypoints = new ArrayList<>();
 		if(routeLayout.getComponentIndex(child) != -1){
 			flightWaypoints = flightInfo.getWaypoints();
@@ -207,7 +210,7 @@ public class FRMainLayout extends CustomComponent {
 		
 		//iterates through the flight info and adds to internal waypoints list
 		for (Waypoint coor : flightWaypoints) {
-			
+			//NOTE: Waypoint and WayPoint are two different objects. Here I convert from one to the other, as WayPoint is what we need later
 			String altitude = String.valueOf(coor.getCoordinate().getAltitude());
 			String approachingSpeed = String.valueOf(coor.getApproachingspeed());
 			
@@ -227,6 +230,7 @@ public class FRMainLayout extends CustomComponent {
 		map.getUtils().drawLines(waypoints, true, 1, false);
 
 		numComponents = routeLayout.getComponentCount();
+		
 		// when one route is clicked, the others go back to default background color
 		for (int i = 0; i < numComponents; i++) {
 			if (i != index) {
@@ -236,6 +240,7 @@ public class FRMainLayout extends CustomComponent {
 
 		map.setRouteCenter(map.getToDo());
 		
+		//the next two code segments display the map and set the grid
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.displayByName(flightInfo, null, 0, false, map.getToDo());
 		}
@@ -247,9 +252,9 @@ public class FRMainLayout extends CustomComponent {
 		}
 	}
 	public void drawRoute(){
-		//tests whether a route was added or not
+		
 		isNew = true;
-
+		//puts the route in edit mode, removes previous data, and shows the current route
 		map.enableEdit();
 		map.getUtils().enableRouteEditing();
 		//to get rid of points and lines from previous routes
@@ -269,21 +274,23 @@ public class FRMainLayout extends CustomComponent {
 		flightInfo = controls.getInfoPanel().getFlight(index);
 	}
 	public void deleteRouteUpdate(){
+		//refreshes the routes in the info panel to reflect the data stored in dronology
 		VaadinSession session = getSession();
 		if(session != null){
-			UI.getCurrent().access(() -> {
-			
+			UI.getCurrent().access(() -> {	
 				controls.getInfoPanel().refreshRoutes();
 				//need to refresh route counter too
 			});
 		}
 	}
+	//handles what should happen when the user clicks on one of the delete buttons while still in edit mode
 	public void deleteInEdit(){
 			HorizontalLayout buttons = new HorizontalLayout();
 			Button yes = new Button("Yes");
 			Button no = new Button("No");
 			buttons.addComponents(yes, no);
 			
+			//creates a window to warn the user
 			VerticalLayout windowContent = new VerticalLayout();
 			Label statement = new Label("You have unsaved changes on " + name + ".");
 			Label question = new Label ("Are you sure you want to discard all unsaved changes?");
@@ -299,6 +306,7 @@ public class FRMainLayout extends CustomComponent {
 			
 			UI.getCurrent().addWindow(warning);
 			
+			//click listeners for yes and no button on window
 			yes.addClickListener(event -> {
 				map.getDeleteBar().deleteRoute(map.getSelectedRoute());
 				UI.getCurrent().removeWindow(warning);
@@ -313,10 +321,12 @@ public class FRMainLayout extends CustomComponent {
 				controls.getInfoPanel().removeWindow();
 			});
 	}
+	//describes what should happen when the user clicks on the edit button of a specific box (basically switches to that window and enables editing)
 	public void editClick(FRInfoBox infoBox){
 		switchWindows(null, map, infoBox);
 		map.enableEdit();
 	}
+	//enables map editing by calling function from MapComponent
 	public void enableMapEdit(){
 		map.enableEdit();
 	}
