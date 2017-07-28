@@ -100,6 +100,7 @@ public class FRMapComponent extends CustomComponent {
 		this.setRouteCenter(toDo);
 	}
 
+	@SuppressWarnings("static-method")
 	private Window createWayPointWindow() {
 		HorizontalLayout buttons = new HorizontalLayout();
 		Button saveButton = new Button("Save");
@@ -434,7 +435,6 @@ public class FRMapComponent extends CustomComponent {
 
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-		List routeList;
 
 		//sends the information to dronology to be saved
 		try {
@@ -442,11 +442,9 @@ public class FRMapComponent extends CustomComponent {
 					.getService(IFlightRouteplanningRemoteService.class);
 
 			String id;
-			String name;
 
 			// gets routes from dronology and requests their name/id
 			id = selectedRoute.getId();
-			name = selectedRoute.getName();
 
 			byte[] information = service.requestFromServer(id);
 			inStream = new ByteArrayInputStream(information);

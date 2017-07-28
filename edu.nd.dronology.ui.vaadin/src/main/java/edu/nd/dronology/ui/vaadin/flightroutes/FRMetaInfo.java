@@ -31,7 +31,6 @@ public class FRMetaInfo extends CustomComponent {
 
 	private static final long serialVersionUID = -2718986455485823804L;
 	private String routeName;
-	private String routeId; 
 	private int numWaypoints;
 	private CheckBox autoZooming;
 	private CheckBox tableView;
@@ -39,7 +38,6 @@ public class FRMetaInfo extends CustomComponent {
 	private Button deleteButton;
 	private Label nameLabel;
 	private Label nameOnly;
-	private boolean toDo;
 	private TextField textField = new TextField();
 	private TextField descriptionField = new TextField();
 	private String routeDescription;
@@ -86,7 +84,6 @@ public class FRMetaInfo extends CustomComponent {
 		zoomContent.setStyleName("fr_route_meta_info");
 		zoomContent.addStyleName("has_route");
 		
-		this.toDo = toDo;
 		autoZooming.setValue(toDo);
 		
 		tableView = new CheckBox("Table View");
@@ -251,9 +248,6 @@ public class FRMetaInfo extends CustomComponent {
 	
 	public void setName(String name){
 		routeName = name; 
-	}
-	public void setRouteId(String id){
-		routeId = id;
 	}
 	public void setNumWaypoints(int num){
 		if (nameLabel == null) {
