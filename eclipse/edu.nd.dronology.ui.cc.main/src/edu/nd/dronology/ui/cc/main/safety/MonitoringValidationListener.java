@@ -25,7 +25,7 @@ public class MonitoringValidationListener extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public void constraintEvaluated(String uavid, String assumptionid, String message, Result result)
+	public void constraintEvaluated(String uavid, String assumptionid,double weight, String message, Result result)
 			throws RemoteException {
 		safetyViewer.newEvaluationMessage(message);
 
