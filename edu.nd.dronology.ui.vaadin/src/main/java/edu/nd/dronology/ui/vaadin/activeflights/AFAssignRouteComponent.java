@@ -6,14 +6,8 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
 import org.vaadin.teemu.switchui.Switch;
 
-import com.vaadin.event.dd.DragAndDropEvent;
-import com.vaadin.event.dd.DropHandler;
-import com.vaadin.event.dd.acceptcriteria.AcceptAll;
-import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
@@ -21,10 +15,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.DragAndDropWrapper;
-import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
-import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
-import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
@@ -33,23 +23,19 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import edu.nd.dronology.core.flight.IFlightPlan;
-import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.services.core.info.FlightInfo;
-import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
-import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.activeflights.AFDragLayout.WrappedComponent;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
-import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoPanel;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
+ * This is the UI for assigning new routes to a UAV
  * 
  * @author Patrick Falvey
  *
@@ -85,9 +71,9 @@ public class AFAssignRouteComponent extends CustomComponent{
 	private FlightInfo flightRouteInfo = null;
 	private IFlightRouteplanningRemoteService flightInfoService;
 	
-	@SuppressWarnings("null")
 	public AFAssignRouteComponent(String name, String status, double batteryLife, String healthColor, double lat,
 			double lon, double alt, double speed){
+		//assign top bar content
 		this.addStyleName("af_assign_route");
 		topContent.addStyleName("af_assign_route_top_content");
 		sideContent.addStyleName("af_assign_route_middle_content");
@@ -182,6 +168,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 		sideButtons.setComponentAlignment(left, Alignment.MIDDLE_CENTER);
 		sideButtons.setComponentAlignment(right, Alignment.MIDDLE_CENTER);
 		
+		//when adding a route to be assigned
 		left.addClickListener( e-> {
 			if (frLayout.getIndex() != -1){
 				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
@@ -204,6 +191,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 				Notification.show("Please select route to assign.");
 		});
 		
+		//when removing a route from the assigned list
 		right.addClickListener( e -> {
 			if(index != -1){
 				removeRoute(this.index);
@@ -213,6 +201,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 				Notification.show("Please select assigned route to remove.");
 		});
 		
+		//when clicking on a route, focus the box and show the route on the map on the right
 		panelContent.getSortableLayout().getVerticalLayout().addLayoutClickListener( e -> {
 			WrappedComponent child = (WrappedComponent) e.getChildComponent();
 			Component childContent = child.getContent();
@@ -242,6 +231,11 @@ public class AFAssignRouteComponent extends CustomComponent{
 		
 	}
 	
+	@SuppressWarnings("null")
+	/**
+	 * 
+	 * @return in-order list of flight routes to be assigned to the UAV based on the order in the AFDragLayout
+	 */
 	public Collection<FlightRouteInfo> getRoutesToAssign(){
 		Collection<FlightRouteInfo> current = new ArrayList<>();
 		Collection<FlightRouteInfo> items = null;
@@ -250,7 +244,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 					.getService(IFlightRouteplanningRemoteService.class);
 			items = flightInfoService.getItems();
 		} catch (RemoteException | DronologyServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -266,6 +259,14 @@ public class AFAssignRouteComponent extends CustomComponent{
 		return current;
 	}
 	
+	/**
+	 * Adds a route to the AFDragLayout
+	 * @param name
+	 * @param ID
+	 * @param created
+	 * @param modified
+	 * @param length
+	 */
 	public void addRoute(String name, String ID, String created, String modified, String length) {
 		FRInfoBox box = new FRInfoBox(name, ID, created, modified, length);
 		box.setId(Integer.toString(this.boxID));
@@ -275,6 +276,10 @@ public class AFAssignRouteComponent extends CustomComponent{
 		sidePanel.setCaption(numRoutes + " Routes Assigned");
 	}
 	
+	/**
+	 * removes a route from the AFDragLayout
+	 * @param index
+	 */
 	public void removeRoute(int index){
 		panelContent.removeComponent(panelContent.getComponent(index));
 		numRoutes -= 1;
