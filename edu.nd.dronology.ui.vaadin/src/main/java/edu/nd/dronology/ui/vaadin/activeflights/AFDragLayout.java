@@ -64,11 +64,11 @@ public class AFDragLayout extends VerticalLayout {
 		addComponent(layout);
 	}
 
-	@SuppressWarnings("null")
 	/**
 	 * 
 	 * @return list of pending plans for the UAV
 	 */
+	@SuppressWarnings("null")
 	private List<Component> createComponents() {
 		FlightInfo flightRouteInfo = null;
 		Collection<FlightRouteInfo> items = null;
