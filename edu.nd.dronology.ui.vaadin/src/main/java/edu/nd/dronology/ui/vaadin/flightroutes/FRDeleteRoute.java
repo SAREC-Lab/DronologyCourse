@@ -17,6 +17,12 @@ import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
+/**
+ * This class defines the window that asks the user if they want to delete a specified route
+ * 
+ * @author James Holland
+ */
+
 public class FRDeleteRoute extends CustomComponent{
 
 	private static final long serialVersionUID = 6787319301316969492L;

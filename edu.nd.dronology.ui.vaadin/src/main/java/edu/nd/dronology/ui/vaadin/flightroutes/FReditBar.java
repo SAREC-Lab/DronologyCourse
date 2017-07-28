@@ -5,6 +5,12 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 
+/**
+ * This class defines the bar overlayed on the map that signals when a route is in edit mode
+ * 
+ * @author James Holland
+ */
+
 public class FReditBar extends CustomComponent{
 
 	private static final long serialVersionUID = 2389713576038720628L;
