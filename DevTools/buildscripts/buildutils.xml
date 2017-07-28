@@ -11,6 +11,7 @@
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/apache/commons-lang-2.5.jar" todir="${build.dir}/lib" />
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/apache/commons-io-2.4.jar"   todir="${build.dir}/lib" />
 		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/apache/commons-math3-3.6.1.jar"   todir="${build.dir}/lib" />
+		<copy file="{src.dir}/../../../edu.nd.dronology.libs/lib/apache/commons-collections4-4.1.jar"   todir="${build.dir}/lib" />
 
 		
 		
