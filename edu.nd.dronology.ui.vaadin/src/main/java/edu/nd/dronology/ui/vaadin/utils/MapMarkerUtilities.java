@@ -265,7 +265,6 @@ public class MapMarkerUtilities {
 		
 		if (isEditable) {
 			leafletMarker.addMouseOverListener(new MarkerMouseOverListener());
-			
 			leafletMarker.addDragEndListener(new MarkerDragEndListener());
 		}
 

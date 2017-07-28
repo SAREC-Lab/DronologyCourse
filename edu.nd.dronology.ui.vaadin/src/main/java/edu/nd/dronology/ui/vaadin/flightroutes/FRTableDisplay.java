@@ -73,7 +73,7 @@ public class FRTableDisplay {
 		});
 		
 		grid.setColumnOrder("order", "latitude", "longitude", "altitude", "transitSpeed");
-		addButtonColumn();
+		
 		grid.setColumnResizeMode(null);
 		grid.setSelectionMode(SelectionMode.NONE);
 	}
@@ -110,6 +110,7 @@ public class FRTableDisplay {
 		grid.setItems(points);
 		for (int i = 0; i < points.size(); i++) {
 			points.get(i).setOrder(i + 1);
+			points.get(i).setId(route.getMapPoints().get(i).getId());
 		}
 	}
 	public void addButtonColumn() {
@@ -135,9 +136,8 @@ public class FRTableDisplay {
 						deletePanel.setClosable(false);
 						deletePanel.setResizable(false);
 						
-						WayPoint w = clickEvent.getItem();
-						
 						yes.addClickListener(event -> {
+							WayPoint w = clickEvent.getItem();
 							route.removeAllLines(route.getPolylines());
 							
 							for (int i = 0; i < route.getMapPoints().size(); i++) {
@@ -155,7 +155,7 @@ public class FRTableDisplay {
 						
 							grid.setItems(this.route.getMapPoints());
 							grid.setItems(route.getMapPoints());
-							UI.getCurrent().removeWindow(deletePanel);				   	
+							UI.getCurrent().removeWindow(deletePanel);				
 						});
 							
 						no.addClickListener(event -> {
