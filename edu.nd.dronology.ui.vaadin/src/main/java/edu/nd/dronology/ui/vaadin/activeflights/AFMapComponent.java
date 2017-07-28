@@ -172,8 +172,6 @@ public class AFMapComponent extends CustomComponent {
 						marker.addMouseOverListener( new WaypointMouseListener());
 						wayPointMarker.add(marker);
 						leafletMap.addComponent(marker);
-						if (!follow)
-							this.setAverageCenter(); //resets the map to show the new drone
 					}
 					i++;
 				}
@@ -257,7 +255,7 @@ public class AFMapComponent extends CustomComponent {
 						utilities.removeAllMarkers(e);
 					}
 					wayPointMarkers.clear();
-					if (!follow)
+					if (!follow && flightRoutes.size() < currentFlights.size()) //only reset the center when a flight route is added
 						this.setAverageCenter();
 				}
 			}
@@ -703,7 +701,12 @@ public class AFMapComponent extends CustomComponent {
 						dronePopup.setPopupVisible(false);
 					});
 					box.getHoverSwitch().addValueChangeListener(click ->{
-						dronePopup.setPopupVisible(false);
+						for(int i = 1; i < numUAVs + 1; i++){
+							AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
+							if (panelBox.getName().equals(box.getName())){
+								panelBox.setHoverInPlace(box.getHoverInPlace());
+							}
+						}
 					});
 					box.getCheckBox().addValueChangeListener(click -> { //if checkbox clicked in popup, it will change in AFInfoPanel
 						if (box.getCheckBox().getValue()){
