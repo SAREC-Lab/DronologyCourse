@@ -46,7 +46,6 @@ public class FRMapComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 
 	private LMap leafletMap;
-
 	private MapMarkerUtilities route;
 	private FRTableDisplay tableDisplay = new FRTableDisplay();
 	private VerticalLayout content = new VerticalLayout();
@@ -71,7 +70,13 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("fr_leaflet_map");
 	
 		Window window = createWayPointWindow();
+		/* Creates a window that allows the user to input altitude and transit speed information about a newly created waypoint. 
+		 * Values are read in and used in MapMarkerUtilties. */
+		
 		PopupView popup = createWayPointPopupView();
+		/* Creates a popup view that shows information about a waypoint once a mouse over listener is activated corresponding to a waypoint.
+		 * Values are set in MapMarkerUtilities. */
+		
 		mapAndPopup.addComponent(popup);
 		route = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, window, popup, this);
 
@@ -96,12 +101,12 @@ public class FRMapComponent extends CustomComponent {
 		mainLayout = layout;
 		
 		this.toDo = toDo;
-		
 		this.setRouteCenter(toDo);
 	}
 
 	@SuppressWarnings("static-method")
 	private Window createWayPointWindow() {
+		// Window that allows the user to enter altitude and transit speed information.
 		HorizontalLayout buttons = new HorizontalLayout();
 		Button saveButton = new Button("Save");
 		Button cancelButton = new Button("Cancel");
@@ -126,7 +131,7 @@ public class FRMapComponent extends CustomComponent {
 	}
 
 	public PopupView createWayPointPopupView() {
-		//popup that displays on pin mouse-over. Contains button allowing for the waypoint to be deleted
+		// Popup that displays on pin mouse-over. Contains button allowing for the waypoint to be deleted.
 		VerticalLayout popupContent = new VerticalLayout();
 		popupContent.removeAllComponents();
 		
@@ -158,16 +163,25 @@ public class FRMapComponent extends CustomComponent {
 					route.getMapPoints().remove(route.getMapPoints().get(i));
 				}
 			}
+			// Finds and removes the waypoint of interest from the mapPoints ArrayList in MapMarkerUtilities using its Id.
 			
 			route.getMap().removeComponent(route.getLeafletMarker());
+			// Removes the marker from the map.
+			
 			route.removeAllLines(route.getPolylines());
 			route.drawLines(route.getMapPoints(), true, 1, false);
-			route.getGrid().setItems(route.getMapPoints());
-			onMapEdited(storedPoints);
+			// Redraws the polylines given the updated mapPoints.
 			
 			for (int i = 0; i < route.getMapPoints().size(); i++) {
-				route.getMapPoints().get(i).setOrder(i+1);
+				route.getMapPoints().get(i).setOrder(i + 1);
 			}
+			// Sets the order of the waypoints for display purposes.
+			
+			route.getGrid().setItems(route.getMapPoints());
+			// Update the grid to reflect the updated mapPoints.
+			
+			onMapEdited(storedPoints);
+			// Sets the number of waypoints and updates the displays the map in edit mode.
 		});
 		
 		toDelete.setId("toDelete");
@@ -181,12 +195,12 @@ public class FRMapComponent extends CustomComponent {
 	}
 	
 	public void display() {
-		//displays when no route is selected
+		// Displays when no route is selected.
 		content.addComponent(bar);
 		content.addComponents(mapAndPopup, tableDisplay.getGrid());
 	}
-	public void displayNoRoute(){
-		//displays with the map and table empty. Called when a route is deleted so that its waypoints are no longer displayed
+	public void displayNoRoute() {
+		// Displays with the map and table empty. Called when a route is deleted so that its waypoints are no longer displayed.
 		content.removeAllComponents();
 		content.addComponent(bar);
 		content.addComponents(mapAndPopup, tableDisplay.getGrid());
@@ -200,7 +214,7 @@ public class FRMapComponent extends CustomComponent {
 	
 	@WaypointReplace
 	public void displayByName(FlightRouteInfo info, String routeName, int numCoords, boolean whichName, boolean toDo) {
-		//displays with selected route info based on either the FlightRouteInfo object or the name and coordinate number passed in
+		// Displays with selected route info based on either the FlightRouteInfo object or the name and coordinate number passed in.
 		selectedRoute = info;
 		route.disableRouteEditing();
 
@@ -220,9 +234,8 @@ public class FRMapComponent extends CustomComponent {
 		editBar = new FReditBar(this);
 		CheckBox tableBox = selectedBar.getCheckBox();
 		
-		//to hide the table 
+		// Hides the table.
 		tableBox.addValueChangeListener(event -> {
-
 			if (tableBox.getValue()) {
 				displayTable();
 			} else {
@@ -241,12 +254,11 @@ public class FRMapComponent extends CustomComponent {
 		tableDisplay.setGrid(route.getMapPoints());	
 	}
 	
-	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName, boolean toDo){
-		//Displays the route determined by the FlightRouteInfo object and then re-enables edit mode
+	public void displayStillEdit(FlightRouteInfo info, String routeName, int numCoords, boolean whichName, boolean toDo) {
+		// Displays the route determined by the FlightRouteInfo object and then re-enables edit mode.
 		displayByName(info, routeName, numCoords, whichName, toDo);
 		
 		route.enableRouteEditing();
-		leafletMap.setEnabled(true);
 		editBar.addStyleName("bring_front");
 		layout.addComponent(editBar);
 
@@ -255,13 +267,13 @@ public class FRMapComponent extends CustomComponent {
 	}
 	
 	public void displayNoTable() {
-		//removes the grid and changes the style of the map accordingly
+		// Removes the grid and changes the style of the map accordingly.
 		content.removeComponent(tableDisplay.getGrid());
 		this.addStyleName("fr_map_component_no_table");
 	}
 
 	public void displayTable() {
-		//adds the grid
+		// Adds the grid to the UI.
 		content.addComponent(tableDisplay.getGrid());
 		this.removeStyleName("fr_map_component_no_table");
 	}
@@ -299,7 +311,7 @@ public class FRMapComponent extends CustomComponent {
 	}
 
 	public void enableEdit() {
-		//enables editing, adds the edit bar,  and calls the enableRouteEditing function from the MapMarkerUtilities class
+		// Enables editing, adds the edit bar, and calls the enableRouteEditing function from MapMarkerUtilities.
 		editBar.addStyleName("bring_front");
 		layout.addComponent(editBar);
 
@@ -309,7 +321,7 @@ public class FRMapComponent extends CustomComponent {
 		route.enableRouteEditing();
 	}
 	public void exitEditMode() {
-		//disables editing, removes the edit bar, and changes the component styles accordingly
+		// Disables editing, removes the edit bar, and changes the component styles accordingly.
 		route.disableRouteEditing();
 
 		layout.removeComponent(editBar);
@@ -317,9 +329,9 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("bring_back");
 		tableDisplay.getGrid().setStyleName("fr_table_component");
 	}
-	public void setRouteCenter(boolean toDo){
+	public void setRouteCenter(boolean toDo) {
 		if (toDo) {
-			//calculates the mean point and sets the route
+			// Calculates the mean point and sets the route.
 			double meanLat = 0;
 			double meanLon = 0;
 			int numberPoints;
@@ -330,7 +342,7 @@ public class FRMapComponent extends CustomComponent {
 			List<WayPoint> currentWayPoints = route.getMapPoints();
 			numberPoints = route.getMapPoints().size();
 			
-			for(WayPoint p: currentWayPoints){
+			for (WayPoint p: currentWayPoints) {
 					meanLat += Double.valueOf(p.getLatitude());
 					meanLon += Double.valueOf(p.getLongitude());
 			}
@@ -338,20 +350,20 @@ public class FRMapComponent extends CustomComponent {
 			meanLat /= (numberPoints * 1.0);
 			meanLon /= (numberPoints * 1.0);
 			
-			//finds farthest latitude and longitude from mean
-			for(WayPoint p: currentWayPoints){
-				if((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)){
+			// Finds farthest latitude and longitude from mean.
+			for (WayPoint p: currentWayPoints) {
+				if ((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)) {
 					farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
 				}
-				if((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)){
+				if ((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)) {
 					farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
 				}
 			}  
 			
 			Point centerPoint = new Point(meanLat, meanLon);
-			if(farthestLat == 0 && farthestLon == 0){
+			if (farthestLat == 0 && farthestLon == 0) {
 				zoom = 17;
-			}else{
+			} else {
 				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
 			}
 				
@@ -360,35 +372,35 @@ public class FRMapComponent extends CustomComponent {
 		if (selectedBar != null)
 			selectedBar.getAutoZooming().setValue(toDo);
 	}
-	public FRMetaInfo getMetaBar(){
+	public FRMetaInfo getMetaBar() {
 		return selectedBar;
 	}
-	public Button getEditButton(){
+	public Button getEditButton() {
 		return selectedBar.getEditButton();
 	}
-	public FRDeleteRoute getDeleteRouteWindow(){
+	public FRDeleteRoute getDeleteRouteWindow() {
 		return delete;
 	}
-	public void editButton(){
-		//called when the edit button is clicked. Stores the current contents of route.getMapPoints() in case the changes are reverted
+	public void editButton() {
+		// Called when the edit button is clicked. Stores the current contents of route.getMapPoints() in case the changes are reverted.
 		storedPoints.clear();
+
 		for (int i = 0; i < route.getMapPoints().size(); i++) {
 			storedPoints.add(route.getMapPoints().get(i));
 		}
 		
 		route.enableRouteEditing();
-		leafletMap.setEnabled(true);
 		editBar.addStyleName("bring_front");
 		layout.addComponent(editBar);
 
 		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
 	}
-	public void cancelClick(){
-		//called when the cancel button is clicked. Disables editing and reverts changes back to the contents of storedPoints
+	public void cancelClick() {
+		// Called when the cancel button is clicked. Disables editing and reverts changes back to the contents of storedPoints.
 				route.disableRouteEditing();
 				
-				if(storedPoints.size() != 0){
+				if (storedPoints.size() != 0) {
 					for (int i = 0; i < route.getMapPoints().size(); i++) {
 						route.getMapPoints().remove(i);
 					}
@@ -399,7 +411,6 @@ public class FRMapComponent extends CustomComponent {
 					}
 						
 					route.getTableDisplay().setGrid(route.getMapPoints());
-						
 					route.removeAllMarkers(route.getPins());
 					route.removeAllLines(route.getPolylines());
 						
@@ -409,7 +420,7 @@ public class FRMapComponent extends CustomComponent {
 					}
 						
 					route.drawLines(storedPoints, true, 0, false);
-				}else{
+				} else {
 					displayByName(selectedRoute, selectedRoute.getName(), selectedRoute.getWaypoints().size(), false, toDo);
 				}
 
@@ -422,13 +433,13 @@ public class FRMapComponent extends CustomComponent {
 			
 		}
 
-	public void deleteClick(){
-		//called when the delete button is clicked. It passes the correct FlightRouteInfo object to the FRDeleteRoute class
+	public void deleteClick() {
+		// Called when the delete button is clicked. It passes the correct FlightRouteInfo object to the FRDeleteRoute class.
 		delete.setRouteInfoTobeDeleted(selectedRoute);
 		UI.getCurrent().addWindow(delete.getWindow());
 	}
-	public void saveClick(){
-		//called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct waypoints on the map
+	public void saveClick() {
+		// Called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct waypoints on the map.
 		exitEditMode();
 		
 		List<WayPoint> newWaypoints = route.getMapPoints();
@@ -440,14 +451,14 @@ public class FRMapComponent extends CustomComponent {
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 
-		//sends the information to dronology to be saved
+		// Sends the information to dronology to be saved.
 		try {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 
 			String id;
 
-			// gets routes from dronology and requests their name/id
+			// Gets routes from dronology and requests their name/id.
 			id = selectedRoute.getId();
 
 			byte[] information = service.requestFromServer(id);
@@ -503,14 +514,14 @@ public class FRMapComponent extends CustomComponent {
 			e1.printStackTrace();
 		}
 		
-		//tests if points were added or deleted. If added, an identical ArrayList of waypoints is created (this is a workaround to remove the click-listeners)
-		if(storedPoints.size() < route.getMapPoints().size()){
+		// Tests if points were added or deleted. If added, an identical ArrayList of waypoints is created (this is a workaround to remove the click-listeners).
+		if(storedPoints.size() < route.getMapPoints().size()) {
 			for (int i = 0; i < storedPoints.size(); i++) {
 				storedPoints.remove(i);
 			}
 			storedPoints.clear();
 			
-			for(int i = 0; i < route.getMapPoints().size(); i++){
+			for (int i = 0; i < route.getMapPoints().size(); i++) {
 				String alt = route.getMapPoints().get(i).getAltitude();
 				String lon = route.getMapPoints().get(i).getLongitude();
 				String lat = route.getMapPoints().get(i).getLatitude();
@@ -532,13 +543,13 @@ public class FRMapComponent extends CustomComponent {
 				route.getMapPoints().remove(i);
 			}
 			route.getMapPoints().clear();
-			//waypoints are re-loaded into mapPoints, but without click listeners
+			// Waypoints are re-loaded into mapPoints, but without click listeners.
 			for (int i = 0; i < storedPoints.size(); i++) {
 				storedPoints.get(i).setId(UUID.randomUUID().toString());
 				route.getMapPoints().add(storedPoints.get(i));
 			}
 			
-			//then, the map has the points and lines redrawn
+			// Then, the map has the points and lines redrawn.
 			route.getGrid().setItems(route.getMapPoints());
 			
 			route.removeAllMarkers(route.getPins());
@@ -553,15 +564,15 @@ public class FRMapComponent extends CustomComponent {
 		}
 		route.disableRouteEditing();
 	}
-	public FRMainLayout getMainLayout(){
+	public FRMainLayout getMainLayout() {
 		return mainLayout;
 	}
 	public void onMapEdited(List<WayPoint> waypoints) {
+		// Displays in edit mode depending on whether or not the route is new.
 		bar.setNumWaypoints(waypoints.size());
 		if (mainLayout.isNew()) {
 			displayStillEdit(mainLayout.getDrone(), mainLayout.getDroneName(), route.getMapPoints().size(), true, toDo);
-		}
-		else {
+		} else {
 			displayStillEdit(mainLayout.getFlightInfo(), mainLayout.getFlightInfo().getName(), route.getMapPoints().size(), true, toDo);
 		}
 	}
@@ -571,15 +582,15 @@ public class FRMapComponent extends CustomComponent {
 	public boolean getToDo() {
 		return toDo;
 	}
-	public void setRouteNameDescription(String input, boolean whichOne){
-		//sets the name of a selected route
+	public void setRouteNameDescription(String input, boolean whichOne) {
+		// Sets the name of a selected route.
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 		ByteArrayInputStream inStream;
 		IFlightRoute froute;
 
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-		//sends the information to dronology to be saved
+		// Sends the information to dronology to be saved.
 		try {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
@@ -590,9 +601,9 @@ public class FRMapComponent extends CustomComponent {
 			inStream = new ByteArrayInputStream(information);
 			froute = routePersistor.loadItem(inStream);
 
-			if(whichOne == true){
+			if(whichOne == true) {
 				froute.setName(input);
-			}else{
+			} else {
 				froute.setDescription(input);
 			}
 			ByteArrayOutputStream outs = new ByteArrayOutputStream();
@@ -609,8 +620,8 @@ public class FRMapComponent extends CustomComponent {
 	}
 	
 	
-	public String getRouteDescription(){
-		//use selectedroute
+	public String getRouteDescription() {
+		// Use selectedroute.
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 		ByteArrayInputStream inStream;
 		IFlightRoute froute;
@@ -619,7 +630,7 @@ public class FRMapComponent extends CustomComponent {
 		BaseServiceProvider provider = MyUI.getProvider();
 		
 		String description = "didnt get description"; 
-		//sends the information to dronology to be saved
+		// Sends the information to dronology to be saved.
 		try {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
@@ -631,7 +642,7 @@ public class FRMapComponent extends CustomComponent {
 			froute = routePersistor.loadItem(inStream);
 
 			description = froute.getDescription();
-			if(description == null){
+			if(description == null) {
 				description = "No Description";
 			}
 		} catch (DronologyServiceException | RemoteException e1) {
@@ -642,10 +653,10 @@ public class FRMapComponent extends CustomComponent {
 		return description;
 		
 	}
-	public FRDeleteRoute getDeleteBar(){
+	public FRDeleteRoute getDeleteBar() {
 		return delete;
 	}
-	public FlightRouteInfo getSelectedRoute(){
+	public FlightRouteInfo getSelectedRoute() {
 		return selectedRoute;
 	}
 }
