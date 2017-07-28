@@ -15,6 +15,7 @@ public class UAVMonitoringMessage extends AbstractUAVMessage<Object> implements 
 		this.type = type;
 
 	}
+
 	
 
 	

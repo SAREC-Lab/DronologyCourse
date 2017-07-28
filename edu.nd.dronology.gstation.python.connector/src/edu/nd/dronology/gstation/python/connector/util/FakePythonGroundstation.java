@@ -48,7 +48,7 @@ public class FakePythonGroundstation {
 			File file = new File("sac"+File.separator+"sacjson.txt");
 			System.out.println(file.getAbsolutePath());
 			String sac = FileUtils.readFileToString(file);
-			handshake.setSafetyCase(sac);
+			handshake.addPropery("safetycase", sac);
 
 			String handshakeString = GSON.toJson(handshake);
 			Thread.sleep(10000);
