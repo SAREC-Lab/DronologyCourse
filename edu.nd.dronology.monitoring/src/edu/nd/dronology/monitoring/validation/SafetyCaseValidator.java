@@ -185,7 +185,8 @@ public class SafetyCaseValidator {
 			}
 			params.append(",");
 		}
-		return ass.getId() + "(" + params.substring(0, params.length() - 1) + ")";
+		params.append("null");
+		return ass.getId() + "(" + params.substring(0, params.length() ) + ")";
 	}
 
 	public static boolean isISACParam(String param) {

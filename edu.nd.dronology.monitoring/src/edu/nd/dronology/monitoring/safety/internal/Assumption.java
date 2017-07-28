@@ -126,7 +126,13 @@ public class Assumption implements ISACAssumption {
 
 		String functionString = expression.replace(FUNCTION_PREFIX, "function " + id);
 		functionString = functionString.replaceAll("#", "");
-		functionString = functionString.replace(":", "{return");
+		if (function.getParameters().size() > 0) {
+			functionString = functionString.replaceFirst("\\)", ",history)");
+		} else {
+			functionString = functionString.replaceFirst("\\)", "history)");
+		}
+
+		functionString = functionString.replace(":", "{  return");
 		StringBuilder sb = new StringBuilder(functionString);
 		sb.append("}");
 		function.setFunctionString(sb.toString());

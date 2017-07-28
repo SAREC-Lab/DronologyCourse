@@ -61,7 +61,7 @@ public class MonitoringFrequencyAdaptor implements Runnable {
 		ManagedDrone drone;
 		try {
 			drone = DroneFleetManager.getInstance().getRegisteredDrone(vid);
-			drone.sendCommand(new SetMonitoringFrequencyCommand(vid, Double.doubleToLongBits(frequency)));
+			drone.sendCommand(new SetMonitoringFrequencyCommand(vid, new Double(frequency).longValue()));
 		} catch (DroneException e) {
 			LOGGER.error(e);
 		}
@@ -69,7 +69,7 @@ public class MonitoringFrequencyAdaptor implements Runnable {
 	}
 
 	private double calculateFrequency(double currentReputation) {
-		return (currentReputation * 25) + 5;
+		return Math.floor(currentReputation * 25) + 5;
 	}
 
 }
