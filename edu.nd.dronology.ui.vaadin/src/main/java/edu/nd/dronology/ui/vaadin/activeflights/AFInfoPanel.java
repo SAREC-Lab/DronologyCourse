@@ -26,6 +26,7 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
+ * This is the side panel that contains the AFInfoBoxes with the UAV information
  * 
  * @author Patrick Falvey
  *
@@ -47,6 +48,7 @@ public class AFInfoPanel extends CustomComponent{
   private BaseServiceProvider provider = MyUI.getProvider();
 //private static final ILogger LOGGER = LoggerProvider.getLogger(AFInfoPanel.class);
 
+	@SuppressWarnings("deprecation")
 	public AFInfoPanel(){	
 		
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
@@ -59,7 +61,7 @@ public class AFInfoPanel extends CustomComponent{
 		
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
 		
-		emergency.getHome().addClickListener( e-> {
+		emergency.getHome().addClickListener( e-> {  //sends all UAVs (or all checked UAVs) to their homes
 			List<String> checked = this.getChecked();
 			String message = "";
 			boolean sendHome = true;
@@ -140,11 +142,11 @@ public class AFInfoPanel extends CustomComponent{
 			
 		});
 
-		content.addLayoutClickListener( e-> {
+		content.addLayoutClickListener( e-> { //determines if a box should be in focus
 			Component testChild = e.getChildComponent();
 			if (testChild.getClass() == AFInfoBox.class){
 				AFInfoBox child = (AFInfoBox) e.getChildComponent();
-				if(!child.getCheckClick()){
+				if(!child.getCheckClick()){ //if the box was clicked but not the checkbox
 					child.addStyleName("info_box_focus");
 					child.setIsChecked(true);
 					focused = child.getName();
@@ -213,7 +215,6 @@ public class AFInfoPanel extends CustomComponent{
 				addBox(false, e.getValue().getID(), e.getValue().getStatus(), e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(), e.getValue().getAltitude(), e.getValue().getVelocity(), false);
 			}
 		} catch (DronologyServiceException | RemoteException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	
@@ -227,6 +228,19 @@ public class AFInfoPanel extends CustomComponent{
 		return focused;
 	}
 	
+	/**
+	 * Adds a box to the panel
+	 * @param isChecked
+	 * @param name
+	 * @param status
+	 * @param batteryLife
+	 * @param healthColor
+	 * @param lat
+	 * @param lon
+	 * @param alt
+	 * @param speed
+	 * @param hoverInPlace
+	 */
 	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
 		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
 		content.addComponent(box);
@@ -242,7 +256,7 @@ public class AFInfoPanel extends CustomComponent{
 	}
 	
 	/**
-	 * 
+	 * Removes a box from the panel
 	 * @param name
 	 * 				the name/ID of the drone
 	 * @return
@@ -273,6 +287,10 @@ public class AFInfoPanel extends CustomComponent{
 		}
 	}
 	
+	/**
+	 * 
+	 * @return a list of all drones that have their checkbox checked
+	 */
 	public List<String> getChecked(){
 		List<String> names = new ArrayList<>();
 		for(int i = 1; i < numUAVs + 1; i++){
@@ -283,6 +301,10 @@ public class AFInfoPanel extends CustomComponent{
 		return names;
 	}
 	
+	/**
+	 * 
+	 * @return true if all the drones are checked
+	 */
 	private boolean getAllChecked(){
 		boolean checked = true;
 		for(int i = 1; i < numUAVs + 1; i++){
@@ -293,6 +315,10 @@ public class AFInfoPanel extends CustomComponent{
 		return checked;
 	}
 	
+	/**
+	 * 
+	 * @return true if all drones are not checked
+	 */
 	private boolean getAllNotChecked(){
 		boolean notChecked = true;
 		for(int i = 1; i < numUAVs + 1; i++){
@@ -303,6 +329,10 @@ public class AFInfoPanel extends CustomComponent{
 		return notChecked;
 	}
 	
+	/**
+	 * Expands or collapses all the boxes
+	 * @param visible
+	 */
 	public void setVisibility(boolean visible){
 		for(int i = 1; i < numUAVs + 1; i++){
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
@@ -310,6 +340,10 @@ public class AFInfoPanel extends CustomComponent{
 		}
 	}
 	
+	/**
+	 * 
+	 * @return true if all boxes are expanded
+	 */
 	private boolean getAllVisible(){
 		boolean visible = true;
 		for(int i = 1; i < numUAVs + 1; i++){
@@ -320,6 +354,10 @@ public class AFInfoPanel extends CustomComponent{
 		return visible;
 	}
 	
+	/**
+	 * 
+	 * @return true if all boxes are collapsed
+	 */
 	private boolean getAllNotVisible(){
 		boolean notVisible = true;
 		for(int i = 1; i < numUAVs + 1; i++){
@@ -345,6 +383,11 @@ public class AFInfoPanel extends CustomComponent{
 		return numUAVs;
 	}
 	
+	/**
+	 * gets updated information from dronology about the UAV's location information and status.
+	 * adds any new drones to the panel and removes any drones that were deactivated
+	 */
+	@SuppressWarnings("deprecation")
 	public void refreshDrones(){
 		//update select/deselect all button
 		if (this.getAllChecked() && selectButton.getCaption().equals("Select all") && numUAVs != 0){
@@ -407,14 +450,11 @@ public class AFInfoPanel extends CustomComponent{
 				Notification.show("Reconnecting...");
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			} catch (RemoteException | DronologyServiceException e) {
-				// TODO Auto-generated catch block
 				Notification.show("Reconnecting...");
 			}
 			Notification.show("Reconnecting...");
 			content.removeAllComponents();
 			numUAVs = 0;
-			// TODO Auto-generated catch block
-			//e1.printStackTrace();
 		}
 		/**
 		 * update current drones' status
@@ -439,14 +479,11 @@ public class AFInfoPanel extends CustomComponent{
 				Notification.show("Reconnecting...");
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			} catch (RemoteException | DronologyServiceException e) {
-				// TODO Auto-generated catch block
 				Notification.show("Reconnecting...");
 			}
 			Notification.show("Reconnecting...");
 			content.removeAllComponents();
 			numUAVs = 0;
-			// TODO Auto-generated catch block
-			//e1.printStackTrace();
 		}
 	}
 	
