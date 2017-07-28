@@ -13,7 +13,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -33,13 +32,10 @@ public class FRMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	private int index = -1;
 	private FRControlsComponent controls = new FRControlsComponent(this);
-	private WayPoint way;
 	private FRMapComponent map;
 	private VerticalLayout routeLayout;
-	private boolean isFirst = true;
 	private boolean isNew = false;
 	private boolean toDo = true;
-	private int componentCount;
 	private String name = "";
 	private FlightRouteInfo flightInfo;
 	private FlightRouteInfo drone;
@@ -60,7 +56,6 @@ public class FRMainLayout extends CustomComponent {
 		map.setZoomLevel(13);
 
 		routeLayout = controls.getInfoPanel().getRoutes();	
-		componentCount = controls.getInfoPanel().getRouteList().size();
 		
 		map.display();
 		name = controls.getInfoPanel().getName();
@@ -190,12 +185,12 @@ public class FRMainLayout extends CustomComponent {
 			});
 		}
 		
-		List<Waypoint> flightWaypoints = new ArrayList();
+		List<Waypoint> flightWaypoints = new ArrayList<>();
 		if(routeLayout.getComponentIndex(child) != -1){
 			flightWaypoints = flightInfo.getWaypoints();
 			name = flightInfo.getName();
 		}else{
-			flightWaypoints = new ArrayList();
+			flightWaypoints = new ArrayList<>();
 		}
 		
 		// removes old pins, polylines, and style when switching routes
@@ -268,13 +263,8 @@ public class FRMainLayout extends CustomComponent {
 		droneName = controls.getInfoPanel().getName();
 		map.displayByName(drone, droneName, numCoords, true, map.getToDo());
 		
-		Point pt = new Point(0, 0);
-		way = new WayPoint(pt, true);
-		
 		map.getTableDisplay().getGrid().setItems();
 		map.enableEdit();
-
-		//controls.getInfoPanel().refreshRoutes();
 		
 		flightInfo = controls.getInfoPanel().getFlight(index);
 	}

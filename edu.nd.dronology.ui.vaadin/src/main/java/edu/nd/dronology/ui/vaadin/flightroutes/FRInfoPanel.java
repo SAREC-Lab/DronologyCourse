@@ -9,11 +9,11 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
@@ -48,13 +48,12 @@ public class FRInfoPanel extends CustomComponent {
 	private VerticalLayout routes = new VerticalLayout();
 	private HorizontalLayout buttons = new HorizontalLayout();
 	private String routeInputName;
-	private IFlightRoute route;
 	private int index;
-	private ArrayList routeList;
+	private Collection<FlightRouteInfo> items;
+	private List<FlightRouteInfo> routeList;
 	private FlightRouteInfo flight;
 	private boolean isRouteSelected = false;
 	private Button drawButton;
-	private Collection<FlightRouteInfo> items;
 	private FlightRouteInfo drone;
 	private FRNewRoute display;
 	private TextField inputField;
@@ -100,7 +99,7 @@ public class FRInfoPanel extends CustomComponent {
 				byte[] information = service.requestFromServer(id);
 				inStream = new ByteArrayInputStream(information);
 				try {
-					route = routePersistor.loadItem(inStream);
+					routePersistor.loadItem(inStream);
 				} catch (PersistenceException e1) {
 					e1.printStackTrace();
 				}
@@ -184,8 +183,10 @@ public class FRInfoPanel extends CustomComponent {
 		});
 		
 		for(FRInfoBox infoBox: boxList){
-			infoBox.getEditButton().addClickListener(e->{
-				controls.getLayout().editClick(infoBox);
+			infoBox.getEditButton().addClickListener(e -> {
+				if(!controlComponent.getLayout().getMap().getUtils().isEditable()) {
+					controls.getLayout().editClick(infoBox);
+				}
 			});
 		}
 		/*
@@ -389,7 +390,7 @@ public FlightRouteInfo getRouteByName(String name){
 	public TextField getInputField(){
 		return inputField;
 	}
-	public ArrayList getRouteList(){
+	public List<FlightRouteInfo> getRouteList(){
 		return routeList;
 	}
 	public FRInfoBox getInfoBox(){

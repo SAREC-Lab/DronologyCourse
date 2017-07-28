@@ -2,6 +2,7 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
@@ -11,9 +12,11 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
  * 
@@ -106,13 +109,46 @@ public class FRInfoBox extends CustomComponent {
 			}
 		});
 		
-		delete.getYesButton().addClickListener(e->{
+		delete.getYesButton().addClickListener(e -> {
 			panel.refreshRoutes();
 		});
 		
-		editButton.addClickListener(e->{
-			panel.getControls().getLayout().enableMapEdit();
-			panel.getControls().getLayout().editClick(this);
+		editButton.addClickListener(e -> {
+			if (!panel.getControls().getLayout().getMap().getUtils().isEditable()) {
+				panel.getControls().getLayout().enableMapEdit();
+				panel.getControls().getLayout().editClick(this);
+			} else {
+				HorizontalLayout buttons = new HorizontalLayout();
+				Button yes = new Button("Yes");
+				Button no = new Button("No");
+				buttons.addComponents(yes, no);
+				
+				VerticalLayout windowContent = new VerticalLayout();
+				Label statement = new Label("You have unsaved changes on " + name + ".");
+				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
+				
+				windowContent.addComponents(statement, question, buttons);
+				
+				Window warning;
+				warning = new Window(null, windowContent);
+				
+				warning.setModal(true);
+				warning.setClosable(false);
+				warning.setResizable(false);
+				
+				UI.getCurrent().addWindow(warning);
+				
+				yes.addClickListener(event -> {
+					UI.getCurrent().removeWindow(warning);
+					panel.getControls().getLayout().getMap().displayNoRoute();
+					panel.getControls().getLayout().getMap().exitEditMode();
+				});
+				
+				no.addClickListener(event -> {
+					UI.getCurrent().removeWindow(warning);
+					panel.getControls().getInfoPanel().removeWindow();
+				});
+			}
 		});
 	}
 		

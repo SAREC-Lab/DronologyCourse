@@ -57,7 +57,6 @@ public class FRMapComponent extends CustomComponent {
 	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
 	private FRDeleteRoute delete = new FRDeleteRoute(this);
-	private ArrayList<String> names = new ArrayList<>();
 	private PopupView popup;
 	private FlightRouteInfo selectedRoute;
 	private FRMainLayout mainLayout;
@@ -435,7 +434,7 @@ public class FRMapComponent extends CustomComponent {
 
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-		ArrayList routeList;
+		List routeList;
 
 		//sends the information to dronology to be saved
 		try {
