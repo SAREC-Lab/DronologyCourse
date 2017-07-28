@@ -147,6 +147,7 @@ public class FRInfoBox extends CustomComponent {
 					panel.getControls().getInfoPanel().removeWindow();
 				});
 			}
+			panel.getControls().getLayout().getMap().editButton();
 		});
 	}
 		

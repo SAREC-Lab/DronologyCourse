@@ -386,38 +386,42 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public void cancelClick(){
 		//called when the cancel button is clicked. Disables editing and reverts changes back to the contents of storedPoints
-		route.disableRouteEditing();
-		
-		for (int i = 0; i < route.getMapPoints().size(); i++) {
-			route.getMapPoints().remove(i);
+				route.disableRouteEditing();
+				
+				if(storedPoints.size() != 0){
+					for (int i = 0; i < route.getMapPoints().size(); i++) {
+						route.getMapPoints().remove(i);
+					}
+					route.getMapPoints().clear();
+						
+					for (int i = 0; i < storedPoints.size(); i++) {
+						route.getMapPoints().add(storedPoints.get(i));
+					}
+						
+					route.getTableDisplay().setGrid(route.getMapPoints());
+						
+					route.removeAllMarkers(route.getPins());
+					route.removeAllLines(route.getPolylines());
+						
+					for (int i = 0; i < storedPoints.size(); i++) {
+						WayPoint point = storedPoints.get(i);
+						route.addPinForWayPoint(point);
+					}
+						
+					route.drawLines(storedPoints, true, 0, false);
+				}else{
+					displayByName(selectedRoute, selectedRoute.getName(), selectedRoute.getWaypoints().size(), false, toDo);
+				}
+
+				route.disableRouteEditing();
+				
+				layout.removeComponent(editBar);
+				leafletMap.addStyleName("bring_back");
+				leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
+				tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
+			
 		}
-		
-		route.getMapPoints().clear();
-		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			route.getMapPoints().add(storedPoints.get(i));
-		}
-		
-//		route.getGrid().setItems(route.getMapPoints());
-		route.getTableDisplay().setGrid(route.getMapPoints());
-		
-		route.removeAllMarkers(route.getPins());
-		route.removeAllLines(route.getPolylines());
-		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			WayPoint point = storedPoints.get(i);
-			route.addPinForWayPoint(point);
-		}
-		
-		route.drawLines(storedPoints, true, 0, false);
-		
-		route.disableRouteEditing();
-		
-		layout.removeComponent(editBar);
-		leafletMap.addStyleName("bring_back");
-		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
-		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-	}
+
 	public void deleteClick(){
 		//called when the delete button is clicked. It passes the correct FlightRouteInfo object to the FRDeleteRoute class
 		delete.setRouteInfoTobeDeleted(selectedRoute);
