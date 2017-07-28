@@ -24,20 +24,15 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.flight.IFlightPlan;
-import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.core.util.Waypoint;
-import edu.nd.dronology.services.core.info.FlightInfo;
-import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
-import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
+ * This is the box in the side panel that contains a UAV's information
  * 
  * @author Patrick Falvey
  *
@@ -114,10 +109,10 @@ public class AFInfoBox extends CustomComponent {
 		topContent.addStyleName("af_info_top_content");
 		middleContent.addStyleName("detailed_info_well");
 		bottomContent.addStyleName("af_info_bottom_content");
+		
 		/**
 		 * top layer components
 		 */
-
 		check.setValue(this.isChecked);
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource resource = new FileResource(new File(basepath + "/VAADIN/img/drone_icon.png"));
@@ -177,7 +172,7 @@ public class AFInfoBox extends CustomComponent {
 			this.returnHome(null);
 		});
 
-		assignNewRoute.addClickListener(assignEvent -> {
+		assignNewRoute.addClickListener(assignEvent -> {  //this opens the assign routes UI 
 			Window window = new Window("Assign New Route");
 			
 			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
@@ -224,12 +219,10 @@ public class AFInfoBox extends CustomComponent {
 					UI.getCurrent().removeWindow(confirm);
 				});
 
-				yes.addClickListener(subEvent -> {
-					FlightInfo flightRouteInfo = null;
+				yes.addClickListener(subEvent -> { //assign the flight routes to the UAV
 					IFlightManagerRemoteService service;
 					try {
-						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-						flightRouteInfo = service.getFlightInfo(this.name);					
+						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);					
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -238,7 +231,6 @@ public class AFInfoBox extends CustomComponent {
 				  	service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
 						service.cancelPendingFlights(this.name);
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				 
@@ -278,6 +270,7 @@ public class AFInfoBox extends CustomComponent {
 		mainContent.setSizeUndefined();
 		mainContent.setSpacing(false);
 
+		//this listener assists with whether a box is focused or only checked
 		topContent.addLayoutClickListener( e-> {
 			Component child = e.getChildComponent();
 			if (child != null && child.getClass() == CheckBox.class){
@@ -332,8 +325,8 @@ public class AFInfoBox extends CustomComponent {
 	public void setStatus(String status) {
 		this.status = status;
 		statusInfo2.setValue("Status: " + this.status);
-		/*if (this.status.equals("Hovering"))
-			this.hoverSwitch.setValue(true);
+		/*if (this.status.equals("Hovering"))     //string will need to change when function is implemented with dronology
+			this.hoverSwitch.setValue(true);        //this also may be unnecessary 
 		else
 			this.hoverSwitch.setValue(false);*/
 	}
@@ -353,6 +346,10 @@ public class AFInfoBox extends CustomComponent {
 		return this.batteryLife;
 	}
 
+	/**
+	 * 
+	 * @param healthColor must be green, yellow, or red
+	 */
 	public void setHealthColor(String healthColor) {
 		this.healthColor = healthColor;
 		health.setCaption(
@@ -411,8 +408,6 @@ public class AFInfoBox extends CustomComponent {
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
 		if (this.hoverInPlace) {
-			
-			
 			this.status = "Hovering";
 			statusInfo2.setValue("Status: ");
 		} else {
@@ -429,6 +424,10 @@ public class AFInfoBox extends CustomComponent {
 		return this.hoverSwitch;
 	}
 
+	/**
+	 * Expands and collapses the box
+	 * @param visible
+	 */
 	public void setBoxVisible(boolean visible) {
 		if (visible) {
 			this.visible = false;
@@ -501,12 +500,15 @@ public class AFInfoBox extends CustomComponent {
 	}
 	
 	@WaypointReplace
+	/**
+	 * Assigns a flight route to the drone
+	 * @param remoteItem
+	 */
 	private void activate(FlightRouteInfo remoteItem) {
 		IFlightManagerRemoteService service;
 		try {
 			service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
 			List<Waypoint> coordds = new ArrayList<>(remoteItem.getWaypoints());
-			// LlaCoordinate initPoint = coordds.remove(0);
 			service.planFlight(this.name, remoteItem.getName(), coordds);
 		} catch (Exception e) {
 			e.printStackTrace();
