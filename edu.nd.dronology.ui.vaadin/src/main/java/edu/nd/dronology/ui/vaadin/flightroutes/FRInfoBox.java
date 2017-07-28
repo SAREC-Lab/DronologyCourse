@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -31,9 +29,7 @@ public class FRInfoBox extends CustomComponent {
 	
 	private String name;
 	private String id;
-	private String created;
 	private String modified;
-	private String length;
 	private FRDeleteRoute delete = new FRDeleteRoute();
 	private Button trashButton;
 	private FlightRouteInfo finfo;
@@ -48,9 +44,7 @@ public class FRInfoBox extends CustomComponent {
 	
 		this.name = name;
 		this.id = id;
-		this.created = created;
 		this.modified = modified;
-		this.length = length;
 		
 		this.addStyleName("info_box");
 		this.addStyleName("fr_info_box");
@@ -127,9 +121,7 @@ public class FRInfoBox extends CustomComponent {
 		
 		this.name = name;
 		this.id = id;
-		this.created = created;
 		this.modified = modified;
-		this.length = length;
 		
 		this.addStyleName("info_box");
 		this.addStyleName("fr_info_box");
@@ -200,14 +192,6 @@ public class FRInfoBox extends CustomComponent {
 	
 	public void setModified(String modified){
 		this.modified = modified;
-	}
-	
-	public String getLength(String length){
-		return length;
-	}
-	
-	public void setLength(String length){
-		this.length = length;
 	}
 	public FRDeleteRoute getDeleteBar(){
 		return delete;

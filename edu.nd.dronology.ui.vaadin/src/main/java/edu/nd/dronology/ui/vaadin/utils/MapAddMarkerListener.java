@@ -57,7 +57,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			
 			altitude = altitudeField.getValue();
 			try {
-				float alt = Float.valueOf(altitude);
+				Float.valueOf(altitude);
 			} catch (NumberFormatException ex) {
 				caption = "Altitude must be a number.";
 				canSave = false;
@@ -70,7 +70,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			
 			transitSpeed = transitSpeedField.getValue();
 			try {
-				float tra = Float.valueOf(transitSpeed);
+				Float.valueOf(transitSpeed);
 			} catch (NumberFormatException ex) {
 				if (caption.isEmpty()) {
 					caption = "Transit speed must be a number.";

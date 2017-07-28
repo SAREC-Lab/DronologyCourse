@@ -6,8 +6,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -34,7 +32,6 @@ public class FRDeleteRoute extends CustomComponent{
 	private VerticalLayout totalLayout = new VerticalLayout();
 	private Window window = new Window();
 	private FlightRouteInfo infoTobeDeleted = null;
-	private FRMapComponent mapComp;
 	
 	public FRDeleteRoute(FRMapComponent mapComp){
 	
