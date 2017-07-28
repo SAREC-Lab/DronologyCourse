@@ -92,6 +92,8 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 		//limiter.acquire();
 		boolean moveStatus = simulator.move(2);
 		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());
+
+		// DroneCollectionStatus.getInstance().testStatus();
 		return moveStatus;
 	}
 

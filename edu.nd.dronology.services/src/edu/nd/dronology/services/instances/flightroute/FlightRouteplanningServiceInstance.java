@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -118,15 +120,27 @@ public class FlightRouteplanningServiceInstance extends AbstractFileTransmitServ
 
 		BasicFileAttributes attr = Files.readAttributes(Paths.get(file.toURI()), BasicFileAttributes.class);
 		if (atm.getWaypoints().size() > 1) {
-		//	info.setDistance(DistanceUtil.calculateTotalDistance(atm.getCoordinates().toArray(new LlaCoordinate[0])));
-			info.setDistance(0);
+			double distance = calculateDistance(atm.getWaypoints());
+			info.setDistance(distance);
 		} else {
 			info.setDistance(0);
 		}
 		info.setDateCreated(attr.creationTime().toMillis());
 		info.setDateModified(attr.lastModifiedTime().toMillis());
-    
+
 		return info;
+	}
+
+	private double calculateDistance(List<Waypoint> waypoints) {
+		LinkedList<Waypoint> ll = new LinkedList<>(waypoints);
+		Waypoint current = ll.remove(0);
+		double distance = 0;
+		while (!ll.isEmpty()) {
+			Waypoint next = ll.remove(0);
+			distance += Math.abs(current.getCoordinate().distance(next.getCoordinate()));
+			current = next;
+		}
+		return distance;
 	}
 
 	@Override

@@ -36,5 +36,9 @@ public class DronologyConstants {
 	public static final double HOME_ALTITUDE = 5;
 
 	public static final int MAX_IN_AIR = 10;
+	
+	
+
+	public static final int NR_MESSAGES_IN_QUEUE = 100;
 
 }
