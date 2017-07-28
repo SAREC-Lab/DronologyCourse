@@ -2,7 +2,6 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
@@ -16,7 +15,6 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
-import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 /**
  * 

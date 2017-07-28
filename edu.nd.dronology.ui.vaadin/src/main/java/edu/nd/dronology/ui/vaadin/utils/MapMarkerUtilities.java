@@ -298,7 +298,7 @@ public class MapMarkerUtilities {
 	 * 			should be true if drawLines is being called from the active flights UI. This
 	 * 			determines if the first line segment should be green (which it shouldn't
 	 * 			be in the flight routes UI). 
-	 * @return
+	 * @return list of polylines drawn on the map
 	 */
 	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
 		List<LPolyline> polylines = new ArrayList<>();

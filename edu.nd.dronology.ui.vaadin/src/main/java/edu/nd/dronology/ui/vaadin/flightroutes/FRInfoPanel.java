@@ -247,7 +247,7 @@ public class FRInfoPanel extends CustomComponent {
 			e.printStackTrace();
 		}
 		if(index != -1){
-			flight = (FlightRouteInfo) routeList.get(index);
+			flight = routeList.get(index);
 		}
 		
 		return flight;
