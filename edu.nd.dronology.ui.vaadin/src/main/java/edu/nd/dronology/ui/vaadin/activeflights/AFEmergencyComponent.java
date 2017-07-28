@@ -7,6 +7,7 @@ import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
 
 /**
+ * This is the set of emergency buttons in the AFInfoPanel
  * 
  * @author Patrick Falvey
  *
