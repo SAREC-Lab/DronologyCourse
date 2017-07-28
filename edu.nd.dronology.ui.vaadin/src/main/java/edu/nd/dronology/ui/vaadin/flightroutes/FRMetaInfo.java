@@ -24,6 +24,8 @@ import edu.nd.dronology.services.core.info.FlightRouteInfo;
 
 /**
  * 
+ * This is the info bar above the map that gives route information and contains the edit and delete buttons
+ * 
  * @author jhollan4
  *
  */

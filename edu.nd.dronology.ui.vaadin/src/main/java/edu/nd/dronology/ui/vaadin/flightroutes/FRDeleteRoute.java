@@ -6,8 +6,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -16,6 +14,12 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
+
+/**
+ * This class defines the window that asks the user if they want to delete a specified route
+ * 
+ * @author James Holland
+ */
 
 public class FRDeleteRoute extends CustomComponent{
 
@@ -28,7 +32,6 @@ public class FRDeleteRoute extends CustomComponent{
 	private VerticalLayout totalLayout = new VerticalLayout();
 	private Window window = new Window();
 	private FlightRouteInfo infoTobeDeleted = null;
-	private FRMapComponent mapComp;
 	
 	public FRDeleteRoute(FRMapComponent mapComp){
 	

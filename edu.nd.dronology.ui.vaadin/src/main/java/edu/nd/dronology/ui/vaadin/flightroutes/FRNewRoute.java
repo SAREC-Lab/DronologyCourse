@@ -7,6 +7,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
+/**
+ * This is the menu that allows the user to add a new route with a specified  name and description
+ * 
+ * @author James Holland
+ */
+
 public class FRNewRoute extends CustomComponent{
 	
 	private static final long serialVersionUID = 6262120678931967634L;
