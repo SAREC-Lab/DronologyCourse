@@ -1,6 +1,7 @@
+// FRInfoPanel.java
+
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
-import java.awt.MouseInfo;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
@@ -58,7 +59,7 @@ public class FRInfoPanel extends CustomComponent {
 	private FRNewRoute display;
 	private TextField inputField;
 	private FRInfoBox routeBox;
-	private ArrayList<FRInfoBox> boxList = new ArrayList();
+	private ArrayList<FRInfoBox> boxList = new ArrayList<>();
 	private FRControlsComponent controlComponent;
 	private Button newRoute;
 	private Window window;
@@ -80,7 +81,7 @@ public class FRInfoPanel extends CustomComponent {
 					.getService(IFlightRouteplanningRemoteService.class);
 
 			items = service.getItems();
-			routeList = new ArrayList(items);
+			routeList = new ArrayList<>(items);
 
 			String id;
 			String name;
@@ -138,8 +139,7 @@ public class FRInfoPanel extends CustomComponent {
 		inputField = display.getInputField();
 		descriptionField = display.getDescriptionField();
 		
-		drawButton.addClickListener(e -> {		
-		
+		drawButton.addClickListener(e -> {
 			routeInputName = inputField.getValue();
 			routeDescription = descriptionField.getValue();
 			
@@ -168,7 +168,6 @@ public class FRInfoPanel extends CustomComponent {
 		
 				controls.getLayout().drawRoute();
 				panel.setCaption(String.valueOf(routes.getComponentCount()) + " routes in database");
-				
 			}
 		});
 		
@@ -238,7 +237,7 @@ public class FRInfoPanel extends CustomComponent {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 			items = service.getItems();
-			routeList = new ArrayList(items);
+			routeList = new ArrayList<>(items);
 			
 			if(index == routeList.size()){
 				index--;
@@ -309,7 +308,7 @@ public class FRInfoPanel extends CustomComponent {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 			Collection<FlightRouteInfo> items = service.getItems();
-			routeList = new ArrayList(items);
+			routeList = new ArrayList<>(items);
 			
 			panel.setCaption(routeList.size() + " Routes in database");
 			
@@ -331,7 +330,6 @@ public class FRInfoPanel extends CustomComponent {
 		} catch (RemoteException | DronologyServiceException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	public int getRouteNumber(FlightRouteInfo info){
 		//given the route information, returns the index of the route
@@ -342,7 +340,7 @@ public class FRInfoPanel extends CustomComponent {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 			Collection<FlightRouteInfo> items = service.getItems();
-			routeList = new ArrayList(items);
+			routeList = new ArrayList<>(items);
 			
 			int counter = 0;
 			for (FlightRouteInfo e : items) {
@@ -365,7 +363,7 @@ public FlightRouteInfo getRouteByName(String name){
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 			Collection<FlightRouteInfo> items = service.getItems();
-			routeList = new ArrayList(items);			
+			routeList = new ArrayList<>(items);			
 			
 			for (FlightRouteInfo e : items) {
 				if(e.getName().equals(name)){
