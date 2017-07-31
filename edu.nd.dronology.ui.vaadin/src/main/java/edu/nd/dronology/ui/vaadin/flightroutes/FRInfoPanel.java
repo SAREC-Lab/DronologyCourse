@@ -1,5 +1,3 @@
-// FRInfoPanel.java
-
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +13,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -31,7 +28,6 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
- * 
  * This is the list of selectable flight routes
  * 
  * @author jhollan4
@@ -43,20 +39,20 @@ public class FRInfoPanel extends CustomComponent {
 	private static final long serialVersionUID = -2505608328159312876L;
 
 	private int numberRoutes;
-	private Panel panel = new Panel();
+	private Panel topPanel = new Panel();
 	private VerticalLayout totalLayout = new VerticalLayout();
-	private VerticalLayout routes = new VerticalLayout();
+	private VerticalLayout routeListLayout = new VerticalLayout();
 	private HorizontalLayout buttons = new HorizontalLayout();
 	private String routeInputName;
 	private int index;
-	private Collection<FlightRouteInfo> items;
+	private Collection<FlightRouteInfo> allFlights;
 	private List<FlightRouteInfo> routeList;
 	private FlightRouteInfo flight;
 	private boolean isRouteSelected = false;
 	private Button drawButton;
-	private FlightRouteInfo drone;
-	private FRNewRoute display;
-	private TextField inputField;
+	private FlightRouteInfo addedRoute;
+	private FRNewRoute newRouteDisplay;
+	private TextField nameField;
 	private FRInfoBox routeBox;
 	private ArrayList<FRInfoBox> boxList = new ArrayList<>();
 	private FRControlsComponent controlComponent;
@@ -64,13 +60,13 @@ public class FRInfoPanel extends CustomComponent {
 	private Window window;
 	private TextField descriptionField;
 	private String routeDescription;
-	
-	FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
-	ByteArrayInputStream inStream;
+	private FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
+	private ByteArrayInputStream inStream;
 	
 	public FRInfoPanel(FRControlsComponent controls) {
 		controlComponent = controls;
-				
+		
+		//gets service and provider from Dronology
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 
@@ -79,8 +75,9 @@ public class FRInfoPanel extends CustomComponent {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 
-			items = service.getItems();
-			routeList = new ArrayList<>(items);
+			//gets FlightRouteInfo objects and then creates arrayList of them
+			allFlights = service.getItems();
+			routeList = new ArrayList<>(allFlights);
 
 			String id;
 			String name;
@@ -88,14 +85,15 @@ public class FRInfoPanel extends CustomComponent {
 			String dateCreated;
 			String length;
 
-			// gets routes from dronology and requests their name/id
-			for (FlightRouteInfo e : items) {
+			// iterates through the FlightRouteInfo objects and gets the fields from each
+			for (FlightRouteInfo e : allFlights) {
 				id = e.getId();
 				name = e.getName();
 				dateModified = String.valueOf(e.getDateCreated());
 				dateCreated = String.valueOf(e.getDateModified());
 				length = String.valueOf(e.getLenght());
 				
+				//use byte stream to load from server
 				byte[] information = service.requestFromServer(id);
 				inStream = new ByteArrayInputStream(information);
 				try {
@@ -104,6 +102,7 @@ public class FRInfoPanel extends CustomComponent {
 					e1.printStackTrace();
 				}
 
+				//adds the correct infoBox to the infoPanel
 				addRoute(name, id, dateCreated, dateModified, length);
 				refreshRoutes();
 			}
@@ -113,75 +112,70 @@ public class FRInfoPanel extends CustomComponent {
 		}
 		
 		//top bar of panel
-		panel.setCaption(numberRoutes + " Routes in database");
-		panel.setContent(totalLayout);
-		panel.addStyleName("fr_info_panel");
-		panel.addStyleName("control_panel");
+		topPanel.setCaption(numberRoutes + " Routes in database");
+		topPanel.setContent(totalLayout);
+		topPanel.addStyleName("fr_info_panel");
+		topPanel.addStyleName("control_panel");
 
 		newRoute = new Button("+ Add a new route");
 		newRoute.addStyleName("fr_new_route_button");
 
-		VerticalLayout popupContent = new VerticalLayout();
+		//box to input new route info
+		newRouteDisplay = new FRNewRoute();
 
-		//popup box to input new route info
-		display = new FRNewRoute();
-		popupContent.addComponent(display);
-		PopupView popup = new PopupView(null, popupContent);
-		
 		window = new Window();
-		window.setContent(display);
+		window.setContent(newRouteDisplay);
 		window.setPosition(200, 80);
 		window.setResizable(false);
 		window.setClosable(false);
 		
-		drawButton = display.getDrawButton();
-		inputField = display.getInputField();
-		descriptionField = display.getDescriptionField();
+		//represents the buttons on the new route window
+		drawButton = newRouteDisplay.getDrawButton();
+		nameField = newRouteDisplay.getInputField();
+		descriptionField = newRouteDisplay.getDescriptionField();
 		
+		//click listener for when the user creates a new route
 		drawButton.addClickListener(e -> {
-			routeInputName = inputField.getValue();
+			routeInputName = nameField.getValue();
 			routeDescription = descriptionField.getValue();
 			
-			if(!routeInputName.isEmpty()){
-			
+			if(!routeInputName.isEmpty()){	
 				//sends route to dronology
-				drone = addRouteDronology(routeInputName, routeDescription);
+				addedRoute = addRouteDronology(routeInputName, routeDescription);
 				
 				//because dronology takes some time
 				try {
-					Thread.sleep(4000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
 				
-				refreshRoutes();
+				refreshRoutes();		
+	
+				//shows which route in the infoPanel is new and selected
+				index = getRouteNumber(addedRoute);
+				routeListLayout.getComponent(index).addStyleName("info_box_focus");	
 				
-				panel.setCaption(numberRoutes + " Routes in database");
-				
-				index = getRouteNumber(drone);
-				routes.getComponent(index).addStyleName("info_box_focus");	
-				
-				inputField.clear();
+				nameField.clear();
 				descriptionField.clear();
 				UI.getCurrent().removeWindow(window);
-		
 				controls.getLayout().drawRoute();
-				panel.setCaption(String.valueOf(routes.getComponentCount()) + " routes in database");
+				topPanel.setCaption(String.valueOf(routeListLayout.getComponentCount()) + " routes in database");
 			}
 		});
-		
+		//displays the route creation window
 		newRoute.addClickListener(e -> {
 			UI.getCurrent().addWindow(window);
 		});
-		
-		display.getCancelButton().addClickListener(e-> {
+		//removes route creation window on cancel
+		newRouteDisplay.getCancelButton().addClickListener(e-> {
 			UI.getCurrent().removeWindow(window);
 		});
-
-		routes.addLayoutClickListener(e -> {
+		//if the vertical layout is clicked, then a route is assumed to be selected
+		routeListLayout.addLayoutClickListener(e -> {
 			isRouteSelected = true;
 		});
-		
+		//iterates through the infoboxes and adds a click listener to each of the edit buttons
 		for(FRInfoBox infoBox: boxList){
 			infoBox.getEditButton().addClickListener(e -> {
 				if(!controlComponent.getLayout().getMap().getUtils().isEditable()) {
@@ -189,162 +183,123 @@ public class FRInfoPanel extends CustomComponent {
 				}
 			});
 		}
-		/*
-		routeBox.getTrashButton().addClickListener(e->{
-			controls.getLayout().getMap().displayNoRoute();
-		});
-		*/
-		buttons.addComponents(newRoute, popup);
+		buttons.addComponents(newRoute);
 		buttons.addStyleName("fr_new_route_button_area");
-		totalLayout.addComponents(buttons, routes);
+		totalLayout.addComponents(buttons, routeListLayout);
 		
-		setCompositionRoot(panel);
+		setCompositionRoot(topPanel);
 	}
-
-	public void addRoute() {
-		routeBox = new FRInfoBox(this);
-		routes.addComponent(routeBox);
-		boxList.add(routeBox);
-		numberRoutes += 1;
-	}
-
-	public void addRoute(String name, String ID, String created, String modified, String length) {
-		
-		routeBox = new FRInfoBox(name, ID, created, modified, length, this);
-		routes.addComponent(routeBox);
-		boxList.add(routeBox);
-		numberRoutes += 1;
-	}
-	public boolean removeBox(String name) {
-		for (int i = 0; i < numberRoutes; i++) {
-			FRInfoBox route = (FRInfoBox) routes.getComponent(i);
-			if (route.getName().equals(name)) {
-				routes.removeComponent(route);
-				return true;
-			}
+	//creates a new route in Dronology and returns the FlightRouteInfo object
+	public FlightRouteInfo addRouteDronology(String name, String description){
+			
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+		FlightRouteInfo routeInformation = null;
+			
+		try {
+				
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+				
+			//creates FlightRouteInfo object and gets its id
+			FlightRouteInfo newRoute = service.createItem();
+			String id = newRoute.getId();
+			IFlightRoute froute;
+				
+			//sets IFlightRoute information based on name and description
+			byte[] information = service.requestFromServer(id);
+			inStream = new ByteArrayInputStream(information);
+			froute = routePersistor.loadItem(inStream);
+			froute.setName(name);
+			froute.setDescription(description);
+				
+			//loads the information back to Dronology
+			ByteArrayOutputStream outs = new ByteArrayOutputStream();
+			routePersistor.saveItem(froute, outs);
+			byte[] bytes = outs.toByteArray();
+			service.transmitToServer(froute.getId(), bytes);	
+			routeInformation = newRoute;	
+				
+		} catch (RemoteException | DronologyServiceException | PersistenceException e) {
+			e.printStackTrace();
 		}
-		return false;
+		return routeInformation;
 	}
-	public VerticalLayout getRoutes() {
-		return routes;
+	//makes sure routes are updated by removing and re-adding routes
+	public void refreshRoutes(){
+		routeListLayout.removeAllComponents();
+			
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+			
+		try {
+				
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+					.getService(IFlightRouteplanningRemoteService.class);
+			Collection<FlightRouteInfo> allFlights = service.getItems();
+			routeList = new ArrayList<>(allFlights);
+				
+			topPanel.setCaption(routeList.size() + " Routes in database");
+				
+			//iterates through the routes, gets the fields of each, and creates an infobox
+			for (FlightRouteInfo e : allFlights) {
+				String id = e.getId();
+				String name = e.getName();
+				long creationTime = e.getDateCreated();
+				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
+				String creationFormatted = sdf.format(new Date(creationTime));
+					
+				long modifiedTime = e.getDateModified();
+				String modifiedFormatted = sdf.format(new Date(modifiedTime));
+					
+				String length = String.valueOf(e.getLenght());
+				addRoute(name, id, creationFormatted, modifiedFormatted, length);
+				numberRoutes--;
+			}
+				
+		} catch (RemoteException | DronologyServiceException e) {
+			e.printStackTrace();
+		}
 	}
+	//gets FlightRouteInfo from Dronology based on route index
 	public FlightRouteInfo getFlight(int index) {
 		//gets arrayList of different routes and returns the one specified by index
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-		
-		Collection<FlightRouteInfo> items;
+			
+		Collection<FlightRouteInfo> allFlights;
 		try {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
-			items = service.getItems();
-			routeList = new ArrayList<>(items);
-			
+			allFlights = service.getItems();
+			routeList = new ArrayList<>(allFlights);
+				
 			if(index == routeList.size()){
 				index--;
 			}
 		} catch (RemoteException | DronologyServiceException e) {
 			e.printStackTrace();
 		}
+			
 		if(index != -1){
 			flight = routeList.get(index);
 		}
-		
 		return flight;
 	}
-
-	public boolean getIsRouteSelected() {
-		return isRouteSelected;
-	}
-
-	public void setIsRouteSelected(boolean selected) {
-		isRouteSelected = selected;
-	}
-	public FlightRouteInfo addRouteDronology(String name, String description){
-		//sends a route to dronology to be saved, and returns the flight route info
-		
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-		FlightRouteInfo routeInformation = null;
-		
-		try {
-			
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-			
-			FlightRouteInfo newRoute = service.createItem();
-			String id = newRoute.getId();
-			IFlightRoute froute;
-				
-			byte[] information = service.requestFromServer(id);
-			inStream = new ByteArrayInputStream(information);
-			froute = routePersistor.loadItem(inStream);
-			froute.setName(name);
-			froute.setDescription(description);
-			
-			
-			ByteArrayOutputStream outs = new ByteArrayOutputStream();
-			routePersistor.saveItem(froute, outs);
-			byte[] bytes = outs.toByteArray();
-			service.transmitToServer(froute.getId(), bytes);	
-			routeInformation = newRoute;	
-			
-		} catch (RemoteException | DronologyServiceException | PersistenceException e) {
-			e.printStackTrace();
-		}
-		
-		return routeInformation;
-	}
-	public Button getDrawButton(){
-		return drawButton;
-	}
-	public void refreshRoutes(){
-		//makes sure routes are updated by removing and re-adding routes
-		routes.removeAllComponents();
-		
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-		
-		try {
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-			Collection<FlightRouteInfo> items = service.getItems();
-			routeList = new ArrayList<>(items);
-			
-			panel.setCaption(routeList.size() + " Routes in database");
-			
-			for (FlightRouteInfo e : items) {
-				String id = e.getId();
-				String name = e.getName();
-				long creationTime = e.getDateCreated();
-				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
-				String creationFormatted = sdf.format(new Date(creationTime));
-				
-				long modifiedTime = e.getDateModified();
-				String modifiedFormatted = sdf.format(new Date(modifiedTime));
-				
-				String length = String.valueOf(e.getLenght());
-				addRoute(name, id, creationFormatted, modifiedFormatted, length);
-				numberRoutes--;
-			}
-			
-		} catch (RemoteException | DronologyServiceException e) {
-			e.printStackTrace();
-		}
-	}
+	//gets the route number based on the FlightRouteInfo
 	public int getRouteNumber(FlightRouteInfo info){
-		//given the route information, returns the index of the route
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-		
-		try {
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-			Collection<FlightRouteInfo> items = service.getItems();
-			routeList = new ArrayList<>(items);
 			
+		try {
+			
+			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+						.getService(IFlightRouteplanningRemoteService.class);
+			Collection<FlightRouteInfo> allFlights = service.getItems();
+			routeList = new ArrayList<>(allFlights);
+				
 			int counter = 0;
-			for (FlightRouteInfo e : items) {
+			for (FlightRouteInfo e : allFlights) {
 				if(info.equals(e)){
 					return counter;		
 				}
@@ -355,68 +310,86 @@ public class FRInfoPanel extends CustomComponent {
 		}
 		return 0;
 	}
-public FlightRouteInfo getRouteByName(String name){
-		//given the name of the route, returns the route info
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-		
-		try {
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-			Collection<FlightRouteInfo> items = service.getItems();
-			routeList = new ArrayList<>(items);			
-			
-			for (FlightRouteInfo e : items) {
-				if(e.getName().equals(name)){
-					return e;			
-				}			
-			}
-			
-		} catch (RemoteException | DronologyServiceException e) {
-			e.printStackTrace();
-		}
-		FlightRouteInfo empty = null;
-		return empty;
+	//adds a generic infobox to the infopanel
+	public void addRoute() {
+		routeBox = new FRInfoBox(this);
+		routeListLayout.addComponent(routeBox);
+		boxList.add(routeBox);
+		numberRoutes += 1;
 	}
+	//adds a route to the infobox based on parameters
+	public void addRoute(String name, String ID, String created, String modified, String length) {
+		routeBox = new FRInfoBox(name, ID, created, modified, length, this);
+		routeListLayout.addComponent(routeBox);
+		boxList.add(routeBox);
+		numberRoutes += 1;
+	}
+	//gets the route layout
+	public VerticalLayout getRoutes() {
+		return routeListLayout;
+	}
+	//return whether or not a route is slected
+	public boolean getIsRouteSelected() {
+		return isRouteSelected;
+	}
+	//sets whether a route is selected
+	public void setIsRouteSelected(boolean selected) {
+		isRouteSelected = selected;
+	}
+	//gets button that creates route
+	public Button getDrawButton(){
+		return drawButton;
+	}
+	//gets the route that was added
 	public FlightRouteInfo getRoute(){
-		return drone;		
+		return addedRoute;		
 	}
+	//gets name of route that was created
 	public String getName(){
 		return routeInputName;
 	}
+	//gets the new route window
 	public FRNewRoute getDisplay(){
-		return display;
+		return newRouteDisplay;
 	}
-	public TextField getInputField(){
-		return inputField;
+	//gets the name field from the new route window
+	public TextField getNameField(){
+		return nameField;
 	}
+	//gets the list of FlightRouteInfo objects
 	public List<FlightRouteInfo> getRouteList(){
 		return routeList;
 	}
+	//gets the route box that was just added
 	public FRInfoBox getInfoBox(){
 		return routeBox;
 	}
+	//returns the infobox at a certain index
 	public FRInfoBox getInfoBoxIndex(int index){
-		
-		return (FRInfoBox) routes.getComponent(index);
+		return (FRInfoBox) routeListLayout.getComponent(index);
 	}
+	//gets the arraylist of info boxes
 	public ArrayList<FRInfoBox> getBoxList(){
 		return boxList;
 	}
+	//gets the controls component that was passed in through the constructor
 	public FRControlsComponent getControls(){
 		return controlComponent;
 	}
+	//gets the buttons on the top of the info panel
 	public HorizontalLayout getButtonLayout(){
 		return buttons;
 	}
+	//gets the entire info panel layout
 	public VerticalLayout getTotalLayout(){
 		return totalLayout;
 	}
+	//gets the button used to display the route creation window
 	public Button getNewRouteButton(){
 		return newRoute;
 	}
+	//removes the current window (used to remove route creation window)
 	public void removeWindow(){
 		UI.getCurrent().removeWindow(window);
 	}
-	
 }
