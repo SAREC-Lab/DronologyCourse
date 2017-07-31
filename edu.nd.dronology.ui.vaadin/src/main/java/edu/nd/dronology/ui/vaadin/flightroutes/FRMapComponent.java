@@ -474,7 +474,7 @@ public class FRMapComponent extends CustomComponent {
 		// Displays in edit mode depending on whether or not the route is new.
 		bar.setNumWaypoints(waypoints.size());
 		if (mainLayout.isNew()) {
-			displayStillEdit(mainLayout.getDrone(), mainLayout.getDroneName(), route.getMapPoints().size(), true, toDo);
+			displayStillEdit(mainLayout.getNewRoute(), mainLayout.getNewRouteName(), route.getMapPoints().size(), true, toDo);
 		} else {
 			displayStillEdit(mainLayout.getFlightInfo(), mainLayout.getFlightInfo().getName(), route.getMapPoints().size(), true, toDo);
 		}

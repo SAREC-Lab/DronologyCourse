@@ -38,8 +38,8 @@ public class FRMainLayout extends CustomComponent {
 	private boolean toDo = true;
 	private String name = "";
 	private FlightRouteInfo flightInfo;
-	private FlightRouteInfo drone;
-	private String droneName;
+	private FlightRouteInfo newRoute;
+	private String newRouteName;
 
 	@WaypointReplace
 	public FRMainLayout() {
@@ -100,7 +100,8 @@ public class FRMainLayout extends CustomComponent {
 				switchWindows(e, map, null);
 			}		
 		});
-		//adds click listenr to new route button on info panel
+	
+		//adds click listener to new route button on info panel
 		controls.getInfoPanel().getNewRouteButton().addClickListener(e->{
 			if (map.getUtils().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
@@ -141,16 +142,6 @@ public class FRMainLayout extends CustomComponent {
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
-	public FRControlsComponent getControls() {
-		return controls;
-	}
-	//gets the index of the selected infobox (or -1 for when no box is selected)
-	public int getIndex() {
-		return index;
-	}
-	public FRMapComponent getMap() {
-		return map;
-	}
 	//displays the route that is clicked. Passes in the click event, map, and infobox that was clicked
 	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
 		isNew = false;
@@ -167,6 +158,7 @@ public class FRMainLayout extends CustomComponent {
 				}
 			}
 		}
+		//-1 represent the area inbetween the infoboxes, or if the index was not set
 		if(routeLayout.getComponentIndex(child) != -1){
 			child.addStyleName("info_box_focus");
 		}
@@ -237,7 +229,7 @@ public class FRMainLayout extends CustomComponent {
 				routeLayout.getComponent(i).removeStyleName("info_box_focus");
 			}
 		}
-
+		//toDo sets whether or not to center and zoom levels should be reset when changing flight routes
 		map.setRouteCenter(map.getToDo());
 		
 		//the next two code segments display the map and set the grid
@@ -249,38 +241,6 @@ public class FRMainLayout extends CustomComponent {
 			map.getTableDisplay().setGrid(waypoints);
 			map.getUtils().setMapPointsAltitude(waypoints);
 			map.getUtils().setMapPointsTransit(waypoints);
-		}
-	}
-	public void drawRoute(){
-		
-		isNew = true;
-		//puts the route in edit mode, removes previous data, and shows the current route
-		map.enableEdit();
-		map.getUtils().enableRouteEditing();
-		//to get rid of points and lines from previous routes
-		map.getUtils().removeAllMarkers(map.getUtils().getPins());
-		map.getUtils().removeAllLines(map.getUtils().getPolylines());
-		map.getUtils().getMapPoints().clear();
-		
-		//displays the drone information in the info bar
-		drone = controls.getInfoPanel().getRoute();
-		int numCoords = drone.getWaypoints().size();
-		droneName = controls.getInfoPanel().getName();
-		map.displayByName(drone, droneName, numCoords, true, map.getToDo());
-		
-		map.getTableDisplay().getGrid().setItems();
-		map.enableEdit();
-		
-		flightInfo = controls.getInfoPanel().getFlight(index);
-	}
-	public void deleteRouteUpdate(){
-		//refreshes the routes in the info panel to reflect the data stored in dronology
-		VaadinSession session = getSession();
-		if(session != null){
-			UI.getCurrent().access(() -> {	
-				controls.getInfoPanel().refreshRoutes();
-				//need to refresh route counter too
-			});
 		}
 	}
 	//handles what should happen when the user clicks on one of the delete buttons while still in edit mode
@@ -317,9 +277,51 @@ public class FRMainLayout extends CustomComponent {
 			
 			no.addClickListener(event -> {
 				UI.getCurrent().removeWindow(warning);
-				UI.getCurrent().removeWindow(warning);
 				controls.getInfoPanel().removeWindow();
 			});
+	}
+	//called if a new route is made, and displays the route on the map and table while enabling edit mode
+	public void drawRoute(){
+		isNew = true;
+		//puts the route in edit mode, removes previous data, and shows the current route
+		map.enableEdit();
+		map.getUtils().enableRouteEditing();
+		//to get rid of points and lines from previous routes
+		map.getUtils().removeAllMarkers(map.getUtils().getPins());
+		map.getUtils().removeAllLines(map.getUtils().getPolylines());
+		map.getUtils().getMapPoints().clear();
+		
+		//displays the drone information in the info bar
+		newRoute = controls.getInfoPanel().getRoute();
+		int numCoords = newRoute.getWaypoints().size();
+		newRouteName = controls.getInfoPanel().getName();
+		map.displayByName(newRoute, newRouteName, numCoords, true, map.getToDo());
+		
+		map.getTableDisplay().getGrid().setItems();
+		map.enableEdit();
+		
+		flightInfo = controls.getInfoPanel().getFlight(index);
+	}
+	//when a route is deleted, this refreshes the routes in the info panel to reflect the data stored in dronology 
+	public void deleteRouteUpdate(){
+		VaadinSession session = getSession();
+		if(session != null){
+			UI.getCurrent().access(() -> {	
+				controls.getInfoPanel().refreshRoutes();
+			});
+		}
+	}
+	//gets the controls component that holds the infoPanel and mainLayout
+	public FRControlsComponent getControls() {
+		return controls;
+	}
+	//gets the index of the selected infobox (or -1 for when no box is selected)
+	public int getIndex() {
+		return index;
+	}
+	//gets the currently displayed map
+	public FRMapComponent getMap() {
+		return map;
 	}
 	//describes what should happen when the user clicks on the edit button of a specific box (basically switches to that window and enables editing)
 	public void editClick(FRInfoBox infoBox){
@@ -330,15 +332,19 @@ public class FRMainLayout extends CustomComponent {
 	public void enableMapEdit(){
 		map.enableEdit();
 	}
+	//gets the flight info of the selected route
 	public FlightRouteInfo getFlightInfo() {
 		return flightInfo;
 	}
-	public FlightRouteInfo getDrone() {
-		return drone;
+	//gets the FlightInfo of a new route
+	public FlightRouteInfo getNewRoute() {
+		return newRoute;
 	}
-	public String getDroneName() {
-		return droneName;
+	//gets the name of the new route
+	public String getNewRouteName() {
+		return newRouteName;
 	}
+	//signals if the selected infobox is representing a new route (false if not)
 	public boolean isNew() {
 		return isNew;
 	}
