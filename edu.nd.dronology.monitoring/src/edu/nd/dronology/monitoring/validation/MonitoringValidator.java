@@ -2,7 +2,6 @@ package edu.nd.dronology.monitoring.validation;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +15,13 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import edu.nd.dronology.core.exceptions.DroneException;
+import edu.nd.dronology.core.fleet.DroneFleetManager;
 import edu.nd.dronology.core.util.PreciseTimestamp;
+import edu.nd.dronology.core.vehicle.ManagedDrone;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
+import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.monitoring.monitoring.ValidationResultManager;
 import edu.nd.dronology.monitoring.safety.ISACAssumption;
 import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
@@ -27,7 +31,6 @@ import edu.nd.dronology.monitoring.validation.engine.EngineFactory;
 import edu.nd.dronology.monitoring.validation.engine.EvaluationEngineException;
 import edu.nd.dronology.monitoring.validation.engine.IEvaluationEngine;
 import edu.nd.dronology.util.NullUtil;
-import edu.nd.dronology.util.Pair;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -57,9 +60,14 @@ public class MonitoringValidator {
 
 	private void addUtilFunctions() {
 		try {
-			engine.createFunction("function getLast(key,param,hist){var len = hist[key].length; return hist[key][len-1][param];}");
+			engine.createFunction(
+					"function getLast(key,param,hist){var len = hist[key].length; return hist[key][len-1][param];}");
 			engine.createFunction(
 					"function diffToPrevious(key,param,history){ var hist = JSON.parse(history); var len = hist[key].length; return hist[key][len-1][param] - hist[key][len-2][param];}");
+
+			engine.createFunction("var uav_mode = 'in_air';");
+			engine.createFunction(
+					"function checkMode(toCheck){return new String(toCheck).valueOf() == new String(uav_mode).valueOf();}");
 
 		} catch (EvaluationEngineException e) {
 			LOGGER.error(e);
@@ -79,6 +87,8 @@ public class MonitoringValidator {
 
 	public void validate(UAVMonitoringMessage monitoringMesasge) {
 		NullUtil.checkNull(monitoringMesasge);
+		doPreEvaluation();
+		evaluateCustomFunctions(monitoringMesasge);
 		for (EvalFunction f : functions) {
 			try {
 				evaluate(f, monitoringMesasge);
@@ -88,6 +98,23 @@ public class MonitoringValidator {
 
 		}
 		storeMessageData(monitoringMesasge);
+	}
+
+	private void evaluateCustomFunctions(UAVMonitoringMessage monitoringMesasge) {
+		// TODO...
+	}
+
+	private void doPreEvaluation() {
+		ManagedDrone drone;
+		try {
+			drone = DroneFleetManager.getInstance().getRegisteredDrone(uavid);
+			String updateMode = "uav_mode ='" + drone.getFlightModeState().getStatus() + "'";
+			engine.createFunction(updateMode);
+
+		} catch (DroneException | EvaluationEngineException e) {
+			LOGGER.error(e);
+		}
+
 	}
 
 	private void storeMessageData(UAVMonitoringMessage monitoringMesasge) {
@@ -137,13 +164,20 @@ public class MonitoringValidator {
 			params.append(",");
 		}
 		params.append("'");
+		String paramString = params.toString();
 		params.append(GSON.toJson(monitoredData));
 		params.append("'");
 		String callString = f.getId() + "(" + params.substring(0, params.length()) + ")";
-		 LOGGER.info("Calling " + callString);
+		// LOGGER.info("Calling " + callString);
 		Boolean result;
 		try {
-			result = (Boolean) engine.evaluateFunction(callString);
+			Object returnvalue = engine.evaluateFunction(callString);
+			if (!(returnvalue instanceof Boolean)) {
+				result = null;
+				LOGGER.info(returnvalue.toString());
+			} else {
+				result = (Boolean) returnvalue;
+			}
 
 			Result res;
 			if (result == null) {
@@ -158,9 +192,9 @@ public class MonitoringValidator {
 			long endTimestamp = System.nanoTime();
 			BenchmarkLogger.reportMonitor(uavid, f.getId(), (endTimestamp - startTimestamp), result.toString());
 			if (!result.booleanValue()) {
-				LOGGER.warn("Evaluation failed: " + f.getFunctionString() + " with parameters " + callString);
+				LOGGER.warn("Evaluation failed: " + f.getFunctionString() + " with parameters " + paramString);
 			} else {
-				LOGGER.info("Evaluation passed: " + f.getFunctionString() + " with parameters " + callString);
+				LOGGER.info("Evaluation passed: " + f.getFunctionString() + " with parameters " + paramString);
 			}
 			ValidationResultManager.getInstance().forwardResult(uavid, validationResult);
 		} catch (EvaluationEngineException e) {
@@ -172,8 +206,25 @@ public class MonitoringValidator {
 	public void addFunction(EvalFunction function) throws EvaluationEngineException {
 		NullUtil.checkNull(function);
 		functions.add(function);
-		LOGGER.info("Creating function: " + function.getFunctionString());
+		// LOGGER.info("Creating function: " + function.getFunctionString());
 		Object createFunction = engine.evaluateFunction(function.getFunctionString());
+
+	}
+
+	public void process(UAVStateMessage message) {
+		long ts = message.getTimestamp().getTimestamp();
+		synchronized (monitoredData) {
+
+			for (Entry<String, Object> s : message.getProperties()) {
+
+				Queue<MonitoredEvent> list = monitoredData.get(s.getKey());
+				if (list == null) {
+					list = new CircularFifoQueue<MonitoredEvent>(MAX_STORE);
+					monitoredData.put(s.getKey(), list);
+				}
+				list.add(MonitoredEvent.create(ts, s.getValue()));
+			}
+		}
 
 	}
 

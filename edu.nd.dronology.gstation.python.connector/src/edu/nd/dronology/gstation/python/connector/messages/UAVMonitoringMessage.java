@@ -11,10 +11,7 @@ public class UAVMonitoringMessage extends AbstractUAVMessage<Object> implements 
 		super(messagetype, uavid);
 	}
 
-	public void setType(String type) {
-		this.type = type;
-
-	}
+	
 
 	
 

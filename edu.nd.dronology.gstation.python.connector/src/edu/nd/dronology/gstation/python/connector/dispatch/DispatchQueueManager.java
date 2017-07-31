@@ -16,6 +16,7 @@ import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
@@ -49,12 +50,11 @@ public class DispatchQueueManager {
 
 	private static final boolean USE_MONITORING = true;
 
-
 	Map<String, BlockingQueue<UAVStateMessage>> queueMap = new ConcurrentHashMap<>();
 	List<AbstractStatusDispatchThread> dispatchThreads = new ArrayList<>();
 
 	private BlockingQueue<IDroneCommand> outgoingCommandQueue = new LinkedBlockingDeque<>(100);
-	private BlockingQueue<UAVMonitoringMessage> monitoringQueue = new LinkedBlockingDeque<>(100);
+	private BlockingQueue<AbstractUAVMessage> monitoringQueue = new LinkedBlockingDeque<>(100);
 	private List<IMonitoringMessageHandler> handlers = new ArrayList<>();
 
 	private final String groundstationid;
@@ -86,6 +86,19 @@ public class DispatchQueueManager {
 				LOGGER.hwFatal("Buffer overflow! '" + id + "'");
 			}
 		}
+		forwardToValidator(status);
+	}
+
+	private void forwardToValidator(UAVStateMessage status) {
+		if (!USE_MONITORING) {
+			return;
+		}
+		boolean success = false;
+		success = monitoringQueue.offer(status);
+		if (!success) {
+			LOGGER.warn("MonitoringQueue is Full!");
+		}
+
 	}
 
 	// private void registerNewDrone(String id, UAVStateMessage status) {
@@ -136,7 +149,7 @@ public class DispatchQueueManager {
 		}
 	}
 
-	private void createMonitoringDispatchThread(BlockingQueue<UAVMonitoringMessage> queue) {
+	private void createMonitoringDispatchThread(BlockingQueue<AbstractUAVMessage> queue) {
 		MonitoringDispatchThread thread = new MonitoringDispatchThread(queue, handlers);
 		dispatchThreads.add(thread);
 		LOGGER.hwInfo("New Monitoring Dispatch-Thread created");

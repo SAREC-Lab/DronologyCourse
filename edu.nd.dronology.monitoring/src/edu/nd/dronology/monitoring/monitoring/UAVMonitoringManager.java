@@ -10,7 +10,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import edu.nd.dronology.monitoring.validation.MonitoringValidator;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
@@ -21,7 +23,7 @@ public class UAVMonitoringManager implements IMonitoringMessageHandler {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(UAVMonitoringManager.class);
 
 	private static volatile UAVMonitoringManager INSTANCE;
-	private static final BlockingQueue<UAVMonitoringMessage> queue = new ArrayBlockingQueue<>(500);
+	private static final BlockingQueue<AbstractUAVMessage> queue = new ArrayBlockingQueue<>(500);
 
 	private static final int NUM_THREADS = 5;
 
@@ -53,7 +55,7 @@ public class UAVMonitoringManager implements IMonitoringMessageHandler {
 	}
 
 	@Override
-	public void notify(UAVMonitoringMessage message) {
+	public void notifyMonitoringMessage(UAVMonitoringMessage message) {
 		boolean taken = queue.offer(message);
 		if (!taken) {
 			LOGGER.error("Monitoring queue full!");
@@ -73,6 +75,15 @@ public class UAVMonitoringManager implements IMonitoringMessageHandler {
 
 	public Collection<MonitoringValidator> getValidators() {
 		return Collections.unmodifiableCollection(validators.values());
+		
+	}
+
+	@Override
+	public void notifyStatusMessage(UAVStateMessage message) {
+		boolean taken = queue.offer(message);
+		if (!taken) {
+			LOGGER.error("Monitoring queue full!");
+		}
 		
 	}
 

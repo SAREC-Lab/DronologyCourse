@@ -6,17 +6,19 @@ import java.util.concurrent.Callable;
 
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class MonitoringDispatchThread extends  AbstractStatusDispatchThread<UAVMonitoringMessage> implements Callable {
+public class MonitoringDispatchThread extends AbstractStatusDispatchThread<AbstractUAVMessage> implements Callable {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(MonitoringDispatchThread.class);
 
 	private IUAVPropertyUpdateNotifier listener;
 	private List<IMonitoringMessageHandler> handlers;
 
-	public MonitoringDispatchThread(final BlockingQueue<UAVMonitoringMessage> queue,
+	public MonitoringDispatchThread(final BlockingQueue<AbstractUAVMessage> queue,
 			List<IMonitoringMessageHandler> handlers) {
 		super(queue);
 		this.handlers = handlers;
@@ -27,10 +29,17 @@ public class MonitoringDispatchThread extends  AbstractStatusDispatchThread<UAVM
 		while (cont.get()) {
 
 			try {
-				UAVMonitoringMessage message = queue.take();
+				AbstractUAVMessage message = queue.take();
 
 				for (IMonitoringMessageHandler handler : handlers) {
-					handler.notify(message);
+					if (message instanceof UAVMonitoringMessage) {
+						handler.notifyMonitoringMessage((UAVMonitoringMessage) message);
+					} else if (message instanceof UAVStateMessage) {
+						handler.notifyStatusMessage((UAVStateMessage) message);
+					} else {
+						LOGGER.error("Unhandled message type: '" + message.getClass() + "'");
+					}
+
 				}
 
 			} catch (Exception e) {
@@ -41,7 +50,5 @@ public class MonitoringDispatchThread extends  AbstractStatusDispatchThread<UAVM
 		LOGGER.info("Dispatcher shutdown!");
 		return null;
 	}
-
-
 
 }
