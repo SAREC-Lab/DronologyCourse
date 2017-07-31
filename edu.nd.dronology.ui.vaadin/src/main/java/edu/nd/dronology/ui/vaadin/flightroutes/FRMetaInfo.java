@@ -36,7 +36,7 @@ public class FRMetaInfo extends CustomComponent {
 	private CheckBox tableView;
 	private Button editButton;
 	private Button deleteButton;
-	private Label nameLabel;
+	private Label waypointLabel;
 	private Label nameOnly;
 	private TextField textField = new TextField();
 	private TextField descriptionField = new TextField();
@@ -45,12 +45,14 @@ public class FRMetaInfo extends CustomComponent {
 	
 	public FRMetaInfo(String name, int numCoords, FRMapComponent map, boolean toDo){
 		//used if route is selected
-		HorizontalLayout content = new HorizontalLayout();
+		HorizontalLayout allContent = new HorizontalLayout();
 		HorizontalLayout zoomContent = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		HorizontalLayout checkboxes = new HorizontalLayout();
-		VerticalLayout controls = new VerticalLayout();
-		
+		VerticalLayout rightSide = new VerticalLayout();
+		HorizontalLayout labels = new HorizontalLayout();
+		VerticalLayout leftSide = new VerticalLayout();
+		HorizontalLayout descriptionHolder = new HorizontalLayout();
 		
 		routeName = name;
 		numWaypoints = numCoords;
@@ -58,14 +60,13 @@ public class FRMetaInfo extends CustomComponent {
 		nameOnly = new Label("<b>" + routeName + "</b>", ContentMode.HTML);
 		
 		if(numWaypoints == 1){
-			nameLabel = new Label(" (" +  numWaypoints +  " waypoint)", ContentMode.HTML);
+			waypointLabel = new Label(" (" +  numWaypoints +  " waypoint)", ContentMode.HTML);
 		}
 		else{
-			nameLabel = new Label(" (" +  numWaypoints +  " waypoints)", ContentMode.HTML);
+			waypointLabel = new Label(" (" +  numWaypoints +  " waypoints)", ContentMode.HTML);
 		}
 		
-		HorizontalLayout labels = new HorizontalLayout();
-		labels.addComponents(nameOnly, nameLabel);
+		labels.addComponents(nameOnly, waypointLabel);
 		
 		editButton = new Button("Edit");
 		deleteButton = new Button("Delete");
@@ -83,35 +84,40 @@ public class FRMetaInfo extends CustomComponent {
 		autoZooming = new CheckBox("Zoom to Route");
 		zoomContent.setStyleName("fr_route_meta_info");
 		zoomContent.addStyleName("has_route");
-		
 		autoZooming.setValue(toDo);
 		
 		tableView = new CheckBox("Table View");
-		content.setStyleName("fr_route_meta_info");
-		content.addStyleName("has_route");
+		allContent.setStyleName("fr_route_meta_info");
+		allContent.addStyleName("has_route");
 		
 		tableView.setValue(true);
 		
-		VerticalLayout labelDescription = new VerticalLayout();
 		routeDescription = map.getRouteDescription();
-	
 		Label description = new Label(routeDescription);
-		
-		HorizontalLayout descriptionLayout = new HorizontalLayout();
-		descriptionLayout.addComponent(description);
-		
-		labelDescription.addComponents(labels, descriptionLayout);
+		descriptionHolder.addComponent(description);	
+		leftSide.addComponents(labels, descriptionHolder);
 		
 		buttons.addComponents(editButton, deleteButton);
 		checkboxes.addComponents(autoZooming, tableView);
-		controls.addComponents(buttons, checkboxes);
-		content.addComponents(labelDescription, controls);
-		content.setComponentAlignment(labelDescription, Alignment.TOP_LEFT);
-		content.setComponentAlignment(controls, Alignment.MIDDLE_RIGHT);
-
-		controls.addStyleName("route_meta_controls");
-		labelDescription.addStyleName("route_meta_label_description");
+		rightSide.addComponents(buttons, checkboxes);
+		allContent.addComponents(leftSide, rightSide);
 		
+		allContent.setComponentAlignment(leftSide, Alignment.TOP_LEFT);
+		allContent.setComponentAlignment(rightSide, Alignment.MIDDLE_RIGHT);
+
+		rightSide.addStyleName("route_meta_controls");
+		leftSide.addStyleName("route_meta_label_description");
+		
+		textField.setValue(name);
+		descriptionField.setValue(routeDescription);
+		
+		textField.setStyleName("name_edit_field");
+		descriptionField.setStyleName("description_edit_field");
+		nameOnly.setStyleName("name_lable");
+		waypointLabel.setStyleName("waypoint_num_lable");
+		description.setStyleName("description_lable");
+		
+		//click listeners for the edit and delete buttons
 		editButton.addClickListener(e->{
 			map.editButton();
 		});
@@ -123,77 +129,60 @@ public class FRMetaInfo extends CustomComponent {
 			}
 		});
 		
-		textField.setValue(name);
-		descriptionField.setValue(routeDescription);
-		
-		textField.setStyleName("name_edit_field");
-		descriptionField.setStyleName("description_edit_field");
-		nameOnly.setStyleName("name_lable");
-		nameLabel.setStyleName("waypoint_num_lable");
-		description.setStyleName("description_lable");
-
-		//double click
+		//double click allows user to edit label by turning it into a textbox
 		labels.addLayoutClickListener(new LayoutClickListener(){
-	
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void layoutClick(LayoutClickEvent event){
 				if(event.getClickedComponent() == nameOnly){
 					if(event.isDoubleClick()){
-						content.removeAllComponents();
+						//change layout to accomodate textfield
+						allContent.removeAllComponents();
 						VerticalLayout textLayout = new VerticalLayout();
 						textLayout.addStyleName("route_meta_label_description");
 						HorizontalLayout nameArea = new HorizontalLayout();
-						nameArea.addComponents(textField, nameLabel);
 						
-						textLayout.addComponents(nameArea, descriptionLayout);
-						content.addComponents(textLayout, controls);
+						nameArea.addComponents(textField, waypointLabel);
+						textLayout.addComponents(nameArea, descriptionHolder);
+						allContent.addComponents(textLayout, rightSide);
 					}
 				}
 			}
 		});
-		
-		descriptionLayout.addLayoutClickListener(new LayoutClickListener(){
-			
+		//double click allows user to edit description by turning it into a textbox
+		descriptionHolder.addLayoutClickListener(new LayoutClickListener(){
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void layoutClick(LayoutClickEvent event){
 				if(event.getClickedComponent() == description){
-					if(event.isDoubleClick()){
-						
-						content.removeAllComponents();
+					if(event.isDoubleClick()){	
+						//change layout to accomodate textfield
+						allContent.removeAllComponents();
 						VerticalLayout textLayout = new VerticalLayout();
 						textLayout.addStyleName("route_meta_label_description");
 						labels.removeAllComponents();
-						labels.addComponents(nameOnly, nameLabel);
-						textLayout.addComponents(labels, descriptionField);
-						
-						content.addComponents(textLayout, controls);
+						labels.addComponents(nameOnly, waypointLabel);
+						textLayout.addComponents(labels, descriptionField);		
+						allContent.addComponents(textLayout, rightSide);
 					}
 				}
 			}
 		});
-		
-		textField.addBlurListener(e->{
-			//occurs when you click away			
-			
+		//textfield turns back into correct label once the user clicks away
+		textField.addBlurListener(e->{			
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
-		
-			content.removeAllComponents();
+			allContent.removeAllComponents();
 			labels.removeAllComponents();
-			//nameOnly.setValue(textField.getValue());
+	
 			nameOnly = new Label("<b>" + textField.getValue() + "</b>", ContentMode.HTML);
-			labels.addComponents(nameOnly, nameLabel);
+			labels.addComponents(nameOnly, waypointLabel);
+			leftSide.removeAllComponents();
+			leftSide.addComponents(labels, descriptionHolder);
 			
-			labelDescription.removeAllComponents();
-			labelDescription.addComponents(labels, descriptionLayout);
-			
-			content.addComponents(labelDescription, controls);
-			controls.addStyleName("route_meta_controls");
+			allContent.addComponents(leftSide, rightSide);
+			rightSide.addStyleName("route_meta_controls");
 			
 			String routeName = textField.getValue();
-			
-			controls.addStyleName("route_meta_controls");
 			map.setRouteNameDescription(routeName, true);
 			textField.setValue(routeName);
 			
@@ -203,37 +192,31 @@ public class FRMetaInfo extends CustomComponent {
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
+			
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
 		});
-		
+		//once the user clicks away from the description field, correct label is shown
 		descriptionField.addBlurListener(e->{
 			routeDescription = descriptionField.getValue();
-			
 			description.setValue(routeDescription);
-			content.removeAllComponents();
+			allContent.removeAllComponents();
 			labels.removeAllComponents();
-			labels.addComponents(nameOnly, nameLabel);
-			labelDescription.addComponents(labels, descriptionLayout);
-			content.addComponents(labelDescription, controls);
-			controls.addStyleName("route_meta_controls");
+			labels.addComponents(nameOnly, waypointLabel);
+			leftSide.addComponents(labels, descriptionHolder);
+			allContent.addComponents(leftSide, rightSide);
+			rightSide.addStyleName("route_meta_controls");
 			descriptionField.setValue(routeDescription);
 		
 			map.setRouteNameDescription(routeDescription, false);
 			routeDescription = map.getRouteDescription();	
-			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
-			
+			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();	
 		});
 		
-		setCompositionRoot(content);
-				
-		
-	}
-	public FRMetaInfo(FlightRouteInfo info, FRMapComponent map, boolean toDo){
-		this(info.getName(), info.getWaypoints().size(), map, toDo);	
-	}	
+		setCompositionRoot(allContent);
 	
+	}	
+	//constructor when no route is selected
 	public FRMetaInfo(){
-		//used if no route selected
 		HorizontalLayout information = new HorizontalLayout();
 		routeName = "No Route Selected";
 		Label nameLabel = new Label(routeName);
@@ -245,23 +228,27 @@ public class FRMetaInfo extends CustomComponent {
 		information.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
 		setCompositionRoot(information);
 	}
-	
-	public void setName(String name){
-		routeName = name; 
+	//constructor is equivalent to the previous one except that it takes a FlightRouteInfo object as a parameter
+	public FRMetaInfo(FlightRouteInfo info, FRMapComponent map, boolean toDo){
+		this(info.getName(), info.getWaypoints().size(), map, toDo);	
 	}
+	//ensures that the correct description of waypoints is shown
 	public void setNumWaypoints(int num){
-		if (nameLabel == null) {
-			nameLabel = new Label();
+		if (waypointLabel == null) {
+			waypointLabel = new Label();
 		}
 		numWaypoints = num;
 		if(numWaypoints == 1){
-			nameLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoint)");
-			nameLabel.setContentMode(ContentMode.HTML);
+			waypointLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoint)");
+			waypointLabel.setContentMode(ContentMode.HTML);
 		}
 		else{
-			nameLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoints)");
-			nameLabel.setContentMode(ContentMode.HTML);
+			waypointLabel.setValue("<b>" + routeName + "</b>" + " (" +  numWaypoints +  " waypoints)");
+			waypointLabel.setContentMode(ContentMode.HTML);
 		}
+	}
+	public void setName(String name){
+		routeName = name; 
 	}
 	public CheckBox getAutoZooming(){
 		return autoZooming;
@@ -275,5 +262,4 @@ public class FRMetaInfo extends CustomComponent {
 	public Button getDeleteButton(){
 		return deleteButton;
 	}
-	
 }
