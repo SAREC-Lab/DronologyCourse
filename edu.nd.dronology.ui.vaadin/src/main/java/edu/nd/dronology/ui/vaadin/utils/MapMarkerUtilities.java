@@ -34,26 +34,33 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRMapComponent;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 
 /**
- * This is the class that contains all logic for plotting flight routes.
+ * This is the class that contains all logic for plotting flight routes. It contains logic for listeners related to waypoints and polylines, addition of
+ * waypoints, updating waypoints, updating pins on the map, entering and exiting edit mode, setting altitude and transit speed from input values, and
+ * related functions.
  * 
  * @author Michelle Galbavy
  */
 
 public class MapMarkerUtilities {
 	private class MarkerMouseOverListener implements LeafletMouseOverListener {
+		// Sets the values for the popup views shown when hovering the mouse over a waypoint. Window created in the FRMapComponent class.
 
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
 			popup.setVisible(false);
 			popup.setPopupVisible(false);
-			leafletMarker = (LMarker)event.getSource();
+			// Closes popup while the values are being changed.
 			
-	    	for (int i = 0; i < mapPoints.size(); i++) {
-	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
-	    			w = mapPoints.get(i);
-	    		}
-	    	}
-	    	selectedWayPointId = w.getId();
+			leafletMarker = (LMarker)event.getSource();
+			// Determines which marker the mouse was hovering over.
+			
+    	for (int i = 0; i < mapPoints.size(); i++) {
+    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
+    			w = mapPoints.get(i);
+    		}
+    	}
+    	selectedWayPointId = w.getId();
+    	// Retrieves the waypoint based on its id.
 
 			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
 			Iterator<Component> it = popupContent.iterator();
@@ -84,6 +91,7 @@ public class MapMarkerUtilities {
 					}
 				}
 			}
+			// Sets the strings in the popup view from the values of the waypoint of interest.
 			
 			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
 			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.55;
@@ -124,28 +132,33 @@ public class MapMarkerUtilities {
 			x = (int) MouseInfo.getPointerInfo().getLocation().getX();
 			y = (int) MouseInfo.getPointerInfo().getLocation().getY();
 			position.setCSSString("top:" + String.valueOf(adjustedYLocation) + "px;left:" + String.valueOf(adjustedXLocation) + "px;");
+			// Math related to finding the proper positioning of the popup view given any screen dimensions/resolutions.
 			
 			layout.setPosition(popup, position);
 
 			popup.setVisible(true);
 			popup.setPopupVisible(true);
+			// Put the popup view on the screen once all of its new parameters are set.
 		}
 	}
-	
 	private class MarkerMouseOutListener implements LeafletMouseOutListener {
+		/* Closes the popup view created in the mouse over listener above if the mouse leaves the waypoint unless it leaves in the bottom right hand quadrant.
+		 * This is because the popup view is supposed to show up in the bottom right hand quadrant, and the "Remove Waypoint" button needs to be accessible when
+		 * the map is in edit mode. */
 
 		@Override
 		public void onMouseOut(LeafletMouseOutEvent event) {
 			if (isEditable && (int) MouseInfo.getPointerInfo().getLocation().getX() >= x + popup.getWidth() &&
 					(int) MouseInfo.getPointerInfo().getLocation().getY() >= y + popup.getHeight()) {
+				// Check for the bottom right hand quadrant. There is no code within this if statement because nothing should happen unless it is false.
 			}
 			else {
 				popup.setPopupVisible(false);
 			}	
 		}
 	}
-	
 	private class MarkerDragEndListener implements DragEndListener {
+		// Allows the pins to be dragged around, and updates their information in the table and in the popup views.
 		
 		@Override
 		public void dragEnd(DragEndEvent event) {
@@ -162,20 +175,22 @@ public class MapMarkerUtilities {
 	    	grid.setItems(mapPoints);
 		}
 	}
-	
 	private class PolylineClickListener implements LeafletClickListener {
+		// Adds a pin in the middle of a polyline when that polyline is clicked.
 
 		@Override
 		public void onClick(LeafletClickEvent event) {
 			if (isEditable) {
+				// Ensures the map is editable before doing anything. This way, polyline listeners are never deleted.
 				isPolyline = true;
 				LPolyline polyline = (LPolyline)event.getSource();
-			List<LPolyline> polylines = getPolylines();
+				List<LPolyline> polylines = getPolylines();
+				
 				for (int j = 0; j < polylines.size(); j++) {
 					if (polylines.get(j).getId().equals(polyline.getId())) {
-						int index = j+1;
+						int index = j + 1;
 						mapAddMarkerListener.processOnClick(event.getPoint(), index);
-						break;
+						// Opens the window to enter altitude and transit speed for the newly added waypoint.
 					}
 				}
 			}
@@ -210,16 +225,16 @@ public class MapMarkerUtilities {
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
-	
 	public MapMarkerUtilities(LMap map){
 		this.map = map;
 	}
-
 	public WayPoint addNewPin(Point point, int index) {
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
+		// Creates a waypoint at the given point that has not been reached yet, and assigns it a random id.
 		
 		addPinForWayPoint(p);
+		// Adds a pin to the map for the waypoint of interest.
 		
 		if (index == -1) {
 			mapPoints.add(p);
@@ -231,22 +246,28 @@ public class MapMarkerUtilities {
 		for (int i = 0; i < mapPoints.size(); i++) {
 			mapPoints.get(i).setOrder(i + 1);
 		}
+		// Resets the order of all of the waypoints in case one of them is added in the middle of a polyline.
 		
 		removeAllLines(getPolylines());
 		drawLines(mapPoints, true, 1, false);
 		grid.setItems(mapPoints);
+		// Redraws lines and resets the points in the grid to match the new points on the map.
 		
 		return p;
 	}
-	
 	public WayPoint addNewPinRemoveOld(Point point, boolean first) {
+		// Called in a loop in the FRMainLayout class, this function clears mapPoints the first time, then adds all of the pins back from Dronology.
+		
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
 		addPinForWayPoint(p);
+		// Adds the new pin.
 		
-		if(first){
+		if (first) {
 			mapPoints.clear();
 		}
+		// Clears mapPoints the first time.
+		
 		mapPoints.add(p);
 		removeAllLines(getPolylines());
 		drawLines(mapPoints, false, 1, false);
@@ -255,22 +276,23 @@ public class MapMarkerUtilities {
 		for (int i = 0; i < mapPoints.size(); i++) {
 			mapPoints.get(i).setOrder(i + 1);
 		}
+		// Redraws and resets the map to reflect the new changes.
 		
 		return p;
 	}
-	
 	public void addPinForWayPoint(WayPoint wayPoint) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
 		leafletMarker.setId(wayPoint.getId());
+		// Creates a new marker to show the position of the input waypoint.
 		
 		if (isEditable) {
 			leafletMarker.addMouseOverListener(new MarkerMouseOverListener());
 			leafletMarker.addDragEndListener(new MarkerDragEndListener());
 		}
+		// Adds listeners to markers if the map is editable.
 
 		map.addComponent(leafletMarker);
 	}
-	
 	public void updatePinForWayPoint(WayPoint wayPoint) {
 		Iterator<Component> itr = map.iterator();
 		while(itr.hasNext()) {
@@ -280,6 +302,7 @@ public class MapMarkerUtilities {
 				if (marker.getId().equals(wayPoint.getId())) {
 					marker.getPoint().setLat(Double.valueOf(wayPoint.getLatitude()));
 					marker.getPoint().setLon(Double.valueOf(wayPoint.getLongitude()));
+					// Updates latitude and longitude values of a waypoint.
 					break;
 				}
 			}
@@ -300,11 +323,13 @@ public class MapMarkerUtilities {
 	 * @return list of polylines drawn on the map
 	 */
 	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
+		// Draws polylines based on a list of waypoints, then outputs the newly formed arraylist of polylines.
 		List<LPolyline> polylines = new ArrayList<>();
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
 			WayPoint current =	mapPoints.get(i);
 			LPolyline polyline = new LPolyline(current.toPoint(), mapPoints.get(i + 1).toPoint());
 			polyline.setId(UUID.randomUUID().toString());
+			
 			polyline.setWeight(current.isReached() ? 1 : 2);
 			if (mode == 0) //normal
 				polyline.setColor("#444");
@@ -316,10 +341,12 @@ public class MapMarkerUtilities {
 				polyline.setDashArray("5 10");
 				polyline.setColor("#249b09");
 			}
-			else if(i>0 && mapPoints.get(i - 1).isReached()){
+			// Sets style based on the status of the polyline.
+			
+			else if (i > 0 && mapPoints.get(i - 1).isReached()) {
 				polyline.setColor("#249b09");
 			}
-			else if (i == 0 && fromActive){
+			else if (i == 0 && fromActive) {
 				polyline.setColor("#249b09");
 			}
 			if (drawOnMap)
@@ -330,14 +357,13 @@ public class MapMarkerUtilities {
 		}
 		return polylines;
 	}
-	
 	public void removeAllLines(List<LPolyline> polylines) {
+		// Removes all lines from the map and the polylines arraylist.
 		for (int i = polylines.size() - 1; i >= 0; i--) {
 			map.removeComponent(polylines.get(i));
 		}
 		polylines.clear();
 	}
-
 	public void enableRouteEditing () {
 		map.setEnabled(true);
 		isEditable = true;
@@ -348,24 +374,29 @@ public class MapMarkerUtilities {
 			pins.get(i).addMouseOverListener(new MarkerMouseOverListener());
 			pins.get(i).addMouseOutListener(new MarkerMouseOutListener());
 		}
+		// Adds listeners to all of the pins.
 
-	List<LPolyline> polylines = getPolylines();
+		List<LPolyline> polylines = getPolylines();
 		
 		for (int i = 0; i < polylines.size(); i++) {
 			registeredListeners.add(polylines.get(i).
 					addListener(LeafletClickEvent.class, new PolylineClickListener(), LeafletClickListener.METHOD));
 		}
+		// Adds listeners to all of the polylines.
 		
 		registeredListeners.add(map.addClickListener(mapAddMarkerListener));
+		// Adds a click listener to the map.
+		
 		tableDisplay.makeEditable(this);
 	}
-	
 	public void disableRouteEditing () {
 		isEditable = false;
 		for (int i = 0; i < registeredListeners.size(); i++) {
 			registeredListeners.get(i).remove();
 		}
 		registeredListeners.clear();
+		// Deletes all listeners in the arraylist of registered listeners.
+		
 		tableDisplay.makeUneditable(this);
 		
 		List<LMarker> storedPins = getPins();
@@ -375,31 +406,34 @@ public class MapMarkerUtilities {
 			LMarker newPin = new LMarker(pins.get(i).getPoint().getLat(), pins.get(i).getPoint().getLon());
 			storedPins.add(newPin);
 		}
-
+		// Makes a new arraylist of pins as a way to remove drag listeners. 
+		
 		for (int i = 0; i < storedPins.size(); i++) {
 			storedPins.get(i).addMouseOverListener(new MarkerMouseOverListener());
 			storedPins.get(i).addMouseOutListener(new MarkerMouseOutListener());
 		}
+		// Adds mouse over and mouse out listeners back to the pins, as those listeners should be there both in and out of edit mode.
 	}
-	
-	public boolean isEditable () {
-		return isEditable;
-	}
-	
 	public void removeAllMarkers(List<LMarker> markers) {
 		for (int i = markers.size() - 1; i >= 0; i--) {
 			map.removeComponent(markers.get(i));
 		}
 	}
-
+	public void clearMapPoints(){
+		mapPoints.clear();
+	}
+	public void clearMapPointsIndex(int index){
+		mapPoints.subList(index, mapPoints.size()).clear();
+	}
+	public boolean isEditable () {
+		return isEditable;
+	}
 	public List<WayPoint> getMapPoints() {
 		return mapPoints;
 	}
-	
 	public Grid<WayPoint> getGrid() {
 		return grid;
 	}
-	
 	public List<LPolyline> getPolylines() {
 		List<LPolyline> polylines = new ArrayList<>();
 		Iterator<Component> it = map.iterator();
@@ -410,7 +444,6 @@ public class MapMarkerUtilities {
 		}
 		return polylines;
 	}
-	
 	public List<LMarker> getPins() {
 		List<LMarker> pins = new ArrayList<>();
 		Iterator<Component> it = map.iterator();
@@ -421,23 +454,14 @@ public class MapMarkerUtilities {
 		}
 		return pins;
 	}
-	
 	public LMap getMap() {
 		return map;
-	}
-	
-	public void clearMapPoints(){
-		mapPoints.clear();
-	}
-	public void clearMapPointsIndex(int index){
-		mapPoints.subList(index, mapPoints.size()).clear();
 	}
 	public void setAllItems(ArrayList<WayPoint> dronologyPoints){
 		grid.setItems(dronologyPoints);
 	}
 	public void setMapPoints(List<WayPoint> waypoints){
 		mapPoints = waypoints;
-		
 	}
 	public void setMapPointsAltitude(List<WayPoint> wayPoints){
 		for(int i = 0; i < wayPoints.size(); i++){
