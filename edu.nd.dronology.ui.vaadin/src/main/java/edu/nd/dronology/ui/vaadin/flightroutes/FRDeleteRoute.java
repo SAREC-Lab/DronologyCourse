@@ -43,6 +43,7 @@ public class FRDeleteRoute extends CustomComponent{
 		window.setClosable(false);
 		window.setPosition(800, 200);
 		
+		//click listeners for yes and no buttons on window
 		noButton.addClickListener(e->{
 			window.close();
 		});
@@ -55,17 +56,15 @@ public class FRDeleteRoute extends CustomComponent{
 				infoTobeDeleted = null;
 			}
 			
-			mapComp.displayNoRoute();
-			
+			mapComp.displayNoRoute();	
 			mapComp.getMainLayout().deleteRouteUpdate();
 		});
 		
 	}
+	//used when the delete button in one of the infoboxes is clicked
 	public FRDeleteRoute(){
 		buttonLayout.addComponents(yesButton, noButton);
 		totalLayout.addComponents(question, buttonLayout);
-		
-		//setCompositionRoot(totalLayout);
 		
 		window.setContent(totalLayout);
 		window.setResizable(false);
@@ -85,6 +84,30 @@ public class FRDeleteRoute extends CustomComponent{
 			
 		});	
 	}
+	//deletes a route from Dronology based on the FlightRouteInfo
+	public void deleteRoute(FlightRouteInfo routeinfo){
+		IFlightRouteplanningRemoteService service;
+		BaseServiceProvider provider = MyUI.getProvider();
+	
+			try {
+				
+				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
+						.getService(IFlightRouteplanningRemoteService.class);
+				service.deleteItem(routeinfo.getId());
+			} catch (RemoteException | DronologyServiceException e) {
+				e.printStackTrace();
+			}
+	}
+	//deletes the currently selected route
+		public void deleteAnyway(){
+			if(infoTobeDeleted != null){
+				deleteRoute(infoTobeDeleted);
+			}
+		}
+	//allows for FlightRouteInfo to be passed in from other files and deleted
+	public void setRouteInfoTobeDeleted (FlightRouteInfo infoTobeDeleted) {
+		this.infoTobeDeleted = infoTobeDeleted;
+	}
 	public Button getYesButton(){
 		return yesButton;
 	}
@@ -93,28 +116,5 @@ public class FRDeleteRoute extends CustomComponent{
 	}
 	public Window getWindow() {
 		return window;
-	}
-	
-	public void setRouteInfoTobeDeleted (FlightRouteInfo infoTobeDeleted) {
-		this.infoTobeDeleted = infoTobeDeleted;
-	}
-
-	public void deleteRoute(FlightRouteInfo routeinfo){
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-	
-			try {
-				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-						.getService(IFlightRouteplanningRemoteService.class);
-				//String id = routeinfo.getId();
-				service.deleteItem(routeinfo.getId());
-			} catch (RemoteException | DronologyServiceException e) {
-				e.printStackTrace();
-			}
-	}
-	public void deleteAnyway(){
-		if(infoTobeDeleted != null){
-			deleteRoute(infoTobeDeleted);
-		}
 	}
 }

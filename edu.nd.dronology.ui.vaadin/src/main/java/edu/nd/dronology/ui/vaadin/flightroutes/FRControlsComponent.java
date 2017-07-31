@@ -17,7 +17,6 @@ public class FRControlsComponent extends CustomComponent {
 		addStyleName("controls_component");
 		setCompositionRoot(information);
 		main = layout;
-		
 	}
 	public FRInfoPanel getInfoPanel(){
 		return information;

@@ -269,6 +269,7 @@ public class FRInfoPanel extends CustomComponent {
 			
 		Collection<FlightRouteInfo> allFlights;
 		try {
+			
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 			allFlights = service.getItems();

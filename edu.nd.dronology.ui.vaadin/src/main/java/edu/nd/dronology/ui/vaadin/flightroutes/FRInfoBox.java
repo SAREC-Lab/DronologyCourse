@@ -31,13 +31,16 @@ public class FRInfoBox extends CustomComponent {
 	private String name;
 	private String id;
 	private String modified;
-	private FRDeleteRoute delete = new FRDeleteRoute();
+	private FRDeleteRoute deleteRoute = new FRDeleteRoute();
 	private Button trashButton;
 	private FlightRouteInfo finfo;
 	private int index = 0;
 	private Button editButton;
-	int counter;
-	String whichBox;
+	private int counter;
+	private String whichBox;
+	private VerticalLayout routeDescription;
+	private HorizontalLayout titleBar;
+	private VerticalLayout allContent;
 	
 	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	
@@ -50,11 +53,11 @@ public class FRInfoBox extends CustomComponent {
 		this.addStyleName("info_box");
 		this.addStyleName("fr_info_box");
 
-		VerticalLayout routeDescription = new VerticalLayout();
+		routeDescription = new VerticalLayout();
 		routeDescription.addStyleName("detailed_info_well");
 		
-		HorizontalLayout titleBar = new HorizontalLayout();
-		VerticalLayout allContent = new VerticalLayout();
+		titleBar = new HorizontalLayout();
+		allContent = new VerticalLayout();
 		
 		//create name id label
 		Label nameidLabel = new Label(name);
@@ -87,12 +90,14 @@ public class FRInfoBox extends CustomComponent {
 		
 		setCompositionRoot(allContent);
 
+		//adds listener to the delete button the route box 
 		trashButton.addListener(e->{
 			if(panel.getControls().getLayout().getMap().getUtils().isEditable()){
 				panel.getControls().getLayout().deleteInEdit();
 			}else{
-				UI.getCurrent().addWindow(delete.getWindow());
+				UI.getCurrent().addWindow(deleteRoute.getWindow());
 				whichBox = this.getid();
+				//uses the id of the specific infobox to find the index of the route that should be deleted
 				for(int i = 0; i < panel.getRoutes().getComponentCount(); i++){
 					FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
 					if(local.getid().equals(whichBox)){
@@ -102,15 +107,15 @@ public class FRInfoBox extends CustomComponent {
 					}
 				}
 				finfo = panel.getFlight(index);
-				delete.setRouteInfoTobeDeleted(finfo);
+				deleteRoute.setRouteInfoTobeDeleted(finfo);
 				panel.refreshRoutes();	
 			}
 		});
-		
-		delete.getYesButton().addClickListener(e -> {
+		//refreshes routes immediately after the "yes" on window is clicked 
+		deleteRoute.getYesButton().addClickListener(e -> {
 			panel.refreshRoutes();
 		});
-		
+		//a click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes
 		editButton.addClickListener(e -> {
 			if (!panel.getControls().getLayout().getMap().getUtils().isEditable()) {
 				panel.getControls().getLayout().enableMapEdit();
@@ -141,7 +146,6 @@ public class FRInfoBox extends CustomComponent {
 					panel.getControls().getLayout().getMap().displayNoRoute();
 					panel.getControls().getLayout().getMap().exitEditMode();
 				});
-				
 				no.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					panel.getControls().getInfoPanel().removeWindow();
@@ -150,8 +154,7 @@ public class FRInfoBox extends CustomComponent {
 			panel.getControls().getLayout().getMap().editButton();
 		});
 	}
-		
-	
+	//infobox constructor called from activeflights
 	public FRInfoBox(String name, String id, String created, String modified, String length){
 		
 		this.name = name;
@@ -198,57 +201,37 @@ public class FRInfoBox extends CustomComponent {
 		
 		setCompositionRoot(allContent);
 	}
-	
-	
 	//default if no parameters are passed
 	public FRInfoBox(FRInfoPanel panel){	
 		this("NAME", "id", "Jun 3, 2017, 9:24 AM", "Jun 8, 2017, 11:04 AM", "2.1 miles", panel);
 	}
-	
+	//sets the name shown on the infobox
 	public String getName(){
 		return name;
 	}
-	
 	public void setName(String name){
 		this.name = name;
 	}
-	
 	public String getid(){
 		return id;
 	}
-	
 	public void setid(String id){
 		this.id = id;
 	}
-	
 	public String getModified(){
 		return modified;
 	}
-	
 	public void setModified(String modified){
 		this.modified = modified;
 	}
 	public FRDeleteRoute getDeleteBar(){
-		return delete;
+		return deleteRoute;
 	}
 	public Button getTrashButton(){
 		return trashButton;
 	}
 	public Button getEditButton(){
 		return editButton;
-	}
-	public int getIndex(FRInfoPanel panel){
-		String whichBox = this.getId();
-		ArrayList<FRInfoBox> listBoxes = panel.getBoxList();
-		int counter = 0;
-		index = 0; 
-		for(FRInfoBox box: listBoxes){
-			if(box.getId() != null && whichBox.equals(box.getId())){
-				index = counter;
-			}
-			counter++;
-		}
-		return index;
 	}
 }
 
