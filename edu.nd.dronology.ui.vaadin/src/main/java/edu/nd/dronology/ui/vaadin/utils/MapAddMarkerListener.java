@@ -15,6 +15,14 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+/**
+ * This is the class that contains all logic for the map click listener. It contains code for adding a waypoint and popping up a window for the user to
+ * input the altitude and transit speed for the newly created waypoint. It also contains code for deleting a waypoint if the user decides they do not want
+ * to add a waypoint after all. Lastly, it contains a helper function, which returns a component given its id.
+ * 
+ * @author Michelle Galbavy
+ */
+
 public class MapAddMarkerListener implements LeafletClickListener {
 
 	private String altitude = "";
@@ -27,18 +35,19 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		this.route = route;
 		this.window = window;
 	}
-	
 	@Override
 	public void onClick(LeafletClickEvent e) {
 		if (route.isEditable() && !route.isPolyline() && e.getPoint().getLat() >= -90 && e.getPoint().getLat() <= 90 &&
 				e.getPoint().getLon() >= -180 && e.getPoint().getLon() <= 180) {
+			// Adds a pin if the user clicks on the map in a valid place while the map is editable.
 			processOnClick(e.getPoint(), -1);
 		}
 		else {
 			route.setIsPolyline(false);
+			/* If the user clicked on a polyline, isPolyline in the MapMarkerUtilities class is set to false, as the PolylineClickListener will correctly add
+			 * the waypoint to the map. */
 		}
 	}
-	
 	public void processOnClick(Point p, int index) {
 		currentWayPoint = route.addNewPin(p, index);
 		
@@ -104,6 +113,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	    	else {
 	    		Notification.show(caption);
 	    	}
+	    	// Checks to make sure the input altitude and transit speed are valid floats. If they are not, an error is output in the form of a Notification.
 		});
 		
 		cancelButton.addClickListener(event -> {
@@ -112,10 +122,10 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			route.drawLines(route.getMapPoints(), true, 0, false);
 		});
 	}
-
 	public void removeCurrentWayPoint() {
 		for (int i = 0; i < route.getMapPoints().size(); i++) {
 			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
+				// Removes the point from mapPoints, updates the grid, then redraws all of the lines.
 				route.getMapPoints().remove(route.getMapPoints().get(i));
 				route.getGrid().setItems(route.getMapPoints());
 				route.removeAllLines(route.getPolylines());
@@ -124,15 +134,17 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		}
 		for (int i = 0; i < route.getPins().size(); i++) {
 			if (route.getPins().get(i).getId().equals(currentWayPoint.getId())) {
+				// Removes the pin from the map.
 				route.getMap().removeComponent(route.getPins().get(i));
 			}
 		}
 		for(int i = 0; i < route.getPolylines().size(); i++){
 			route.getMap().addComponent(route.getPolylines().get(i));
+			// Adds lines back to the polyline arraylist.
 		}
 	}
-
 	private Component getComponentByCaption(HasComponents component, String caption) {
+		// Takes in a component and a caption. The component is returned based on the caption input.
 		Iterator<Component> it = component.iterator();
 		while (it.hasNext()) {
 			Component l = it.next();
