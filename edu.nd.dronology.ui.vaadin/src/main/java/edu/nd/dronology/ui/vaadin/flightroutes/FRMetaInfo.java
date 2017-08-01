@@ -30,8 +30,6 @@ import edu.nd.dronology.services.core.info.FlightRouteInfo;
 public class FRMetaInfo extends CustomComponent {
 
 	private static final long serialVersionUID = -2718986455485823804L;
-	private String routeName;
-	private int numWaypoints;
 	private CheckBox autoZooming;
 	private CheckBox tableView;
 	private Button editButton;
@@ -41,7 +39,9 @@ public class FRMetaInfo extends CustomComponent {
 	private TextField textField = new TextField();
 	private TextField descriptionField = new TextField();
 	private String routeDescription;
+	private String routeName;
 	boolean descriptionSet = false;
+	private int numWaypoints;
 	
 	public FRMetaInfo(String name, int numCoords, FRMapComponent map, boolean toDo){
 		//used if route is selected
@@ -49,10 +49,10 @@ public class FRMetaInfo extends CustomComponent {
 		HorizontalLayout zoomContent = new HorizontalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
 		HorizontalLayout checkboxes = new HorizontalLayout();
-		VerticalLayout rightSide = new VerticalLayout();
-		HorizontalLayout labels = new HorizontalLayout();
-		VerticalLayout leftSide = new VerticalLayout();
 		HorizontalLayout descriptionHolder = new HorizontalLayout();
+		HorizontalLayout labels = new HorizontalLayout();
+		VerticalLayout rightSide = new VerticalLayout();
+		VerticalLayout leftSide = new VerticalLayout();
 		
 		routeName = name;
 		numWaypoints = numCoords;
@@ -77,7 +77,6 @@ public class FRMetaInfo extends CustomComponent {
 		
 		editButton.setIcon(editIcon);
 		deleteButton.setIcon(deleteIcon);
-		
 		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
@@ -89,14 +88,13 @@ public class FRMetaInfo extends CustomComponent {
 		tableView = new CheckBox("Table View");
 		allContent.setStyleName("fr_route_meta_info");
 		allContent.addStyleName("has_route");
-		
 		tableView.setValue(true);
 		
 		routeDescription = map.getRouteDescription();
 		Label description = new Label(routeDescription);
 		descriptionHolder.addComponent(description);	
-		leftSide.addComponents(labels, descriptionHolder);
 		
+		leftSide.addComponents(labels, descriptionHolder);
 		buttons.addComponents(editButton, deleteButton);
 		checkboxes.addComponents(autoZooming, tableView);
 		rightSide.addComponents(buttons, checkboxes);
@@ -180,8 +178,8 @@ public class FRMetaInfo extends CustomComponent {
 			leftSide.addComponents(labels, descriptionHolder);
 			
 			allContent.addComponents(leftSide, rightSide);
-			rightSide.addStyleName("route_meta_controls");
 			
+			rightSide.addStyleName("route_meta_controls");
 			String routeName = textField.getValue();
 			map.setRouteNameDescription(routeName, true);
 			textField.setValue(routeName);
@@ -199,21 +197,22 @@ public class FRMetaInfo extends CustomComponent {
 		descriptionField.addBlurListener(e->{
 			routeDescription = descriptionField.getValue();
 			description.setValue(routeDescription);
+			
 			allContent.removeAllComponents();
 			labels.removeAllComponents();
 			labels.addComponents(nameOnly, waypointLabel);
 			leftSide.addComponents(labels, descriptionHolder);
 			allContent.addComponents(leftSide, rightSide);
+			
 			rightSide.addStyleName("route_meta_controls");
 			descriptionField.setValue(routeDescription);
-		
 			map.setRouteNameDescription(routeDescription, false);
 			routeDescription = map.getRouteDescription();	
+			
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();	
 		});
 		
 		setCompositionRoot(allContent);
-	
 	}	
 	//constructor when no route is selected
 	public FRMetaInfo(){

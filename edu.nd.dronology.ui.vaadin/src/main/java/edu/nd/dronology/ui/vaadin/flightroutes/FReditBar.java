@@ -45,5 +45,4 @@ public class FReditBar extends CustomComponent{
 	public Button getSaveButton(){
 		return saveButton;
 	}
-	
 }

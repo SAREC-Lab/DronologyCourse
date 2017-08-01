@@ -30,16 +30,17 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 public class FRMainLayout extends CustomComponent {	
 	private static final long serialVersionUID = 1L;
-	private int index = -1;
+	
 	private FRControlsComponent controls = new FRControlsComponent(this);
 	private FRMapComponent map;
 	private VerticalLayout routeLayout;
 	private boolean isNew = false;
 	private boolean toDo = true;
 	private String name = "";
+	private String newRouteName;
 	private FlightRouteInfo flightInfo;
 	private FlightRouteInfo newRoute;
-	private String newRouteName;
+	private int index = -1;
 
 	@WaypointReplace
 	public FRMainLayout() {
@@ -74,10 +75,8 @@ public class FRMainLayout extends CustomComponent {
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
 				
 				windowContent.addComponents(statement, question, buttons);
-				
 				Window warning;
 				warning = new Window(null, windowContent);
-				
 				warning.setModal(true);
 				warning.setClosable(false);
 				warning.setResizable(false);
@@ -90,7 +89,6 @@ public class FRMainLayout extends CustomComponent {
 					switchWindows(e, map, null);
 					map.exitEditMode();
 				});
-				
 				no.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 				});
@@ -100,9 +98,9 @@ public class FRMainLayout extends CustomComponent {
 				switchWindows(e, map, null);
 			}		
 		});
-	
 		//adds click listener to new route button on info panel
 		controls.getInfoPanel().getNewRouteButton().addClickListener(e->{
+			//only prompts user if map is in edit mode
 			if (map.getUtils().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
 				Button yes = new Button("Yes");
@@ -115,10 +113,8 @@ public class FRMainLayout extends CustomComponent {
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
 				
 				windowContent.addComponents(statement, question, buttons);
-				
 				Window warning;
 				warning = new Window(null, windowContent);
-				
 				warning.setModal(true);
 				warning.setClosable(false);
 				warning.setResizable(false);
@@ -131,7 +127,6 @@ public class FRMainLayout extends CustomComponent {
 					map.displayNoRoute();
 					map.exitEditMode();
 				});
-				
 				no.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					controls.getInfoPanel().removeWindow();
@@ -172,14 +167,14 @@ public class FRMainLayout extends CustomComponent {
 		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
 		for(FRInfoBox box: list){
 			box.getDeleteBar().getYesButton().addClickListener(even->{
-				//if the 'yes' button is clicked, on route is displayed and the info panel is refreshed (route is deleted in FRDeleteRoute)
+				//if the 'yes' button is clicked, no route is displayed and the info panel is refreshed (route is deleted in FRDeleteRoute)
 				map.displayNoRoute();
 				map.exitEditMode();
 				controls.getInfoPanel().refreshRoutes();
 			});
 		}
 		
-		//creates a list of waypoints to store the waypoints of the relevant flight
+		//stores list of waypoints of relevant flight
 		List<Waypoint> flightWaypoints = new ArrayList<>();
 		if(routeLayout.getComponentIndex(child) != -1){
 			flightWaypoints = flightInfo.getWaypoints();
@@ -197,7 +192,7 @@ public class FRMainLayout extends CustomComponent {
 		int numComponents;
 		boolean first = true;
 
-		List<WayPoint> waypoints = new ArrayList<>();
+		List<WayPoint> wayPoints = new ArrayList<>();
 		Point pt = new Point();
 		
 		//iterates through the flight info and adds to internal waypoints list
@@ -214,12 +209,12 @@ public class FRMainLayout extends CustomComponent {
 			way.setTransitSpeed(approachingSpeed);
 			map.getUtils().addNewPinRemoveOld(pt, first);
 			
-			waypoints.add(way);
+			wayPoints.add(way);
 			first = false;
 		}
 
 		//adds the lines to the map
-		map.getUtils().drawLines(waypoints, true, 1, false);
+		map.getUtils().drawLines(wayPoints, true, 1, false);
 
 		numComponents = routeLayout.getComponentCount();
 		
@@ -232,15 +227,15 @@ public class FRMainLayout extends CustomComponent {
 		//toDo sets whether or not to center and zoom levels should be reset when changing flight routes
 		map.setRouteCenter(map.getToDo());
 		
-		//the next two code segments display the map and set the grid
+		//displays map
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.displayByName(flightInfo, null, 0, false, map.getToDo());
 		}
-		
+		//sets grid
 		if(routeLayout.getComponentIndex(child) != -1){
-			map.getTableDisplay().setGrid(waypoints);
-			map.getUtils().setMapPointsAltitude(waypoints);
-			map.getUtils().setMapPointsTransit(waypoints);
+			map.getTableDisplay().setGrid(wayPoints);
+			map.getUtils().setMapPointsAltitude(wayPoints);
+			map.getUtils().setMapPointsTransit(wayPoints);
 		}
 	}
 	//handles what should happen when the user clicks on one of the delete buttons while still in edit mode
@@ -256,10 +251,8 @@ public class FRMainLayout extends CustomComponent {
 			Label question = new Label ("Are you sure you want to discard all unsaved changes?");
 			
 			windowContent.addComponents(statement, question, buttons);
-			
 			Window warning;
 			warning = new Window(null, windowContent);
-			
 			warning.setModal(true);
 			warning.setClosable(false);
 			warning.setResizable(false);
@@ -274,7 +267,6 @@ public class FRMainLayout extends CustomComponent {
 				map.displayNoRoute();
 				map.exitEditMode();
 			});
-			
 			no.addClickListener(event -> {
 				UI.getCurrent().removeWindow(warning);
 				controls.getInfoPanel().removeWindow();
@@ -283,9 +275,9 @@ public class FRMainLayout extends CustomComponent {
 	//called if a new route is made, and displays the route on the map and table while enabling edit mode
 	public void drawRoute(){
 		isNew = true;
-		//puts the route in edit mode, removes previous data, and shows the current route
 		map.enableEdit();
 		map.getUtils().enableRouteEditing();
+	
 		//to get rid of points and lines from previous routes
 		map.getUtils().removeAllMarkers(map.getUtils().getPins());
 		map.getUtils().removeAllLines(map.getUtils().getPolylines());
@@ -295,14 +287,14 @@ public class FRMainLayout extends CustomComponent {
 		newRoute = controls.getInfoPanel().getRoute();
 		int numCoords = newRoute.getWaypoints().size();
 		newRouteName = controls.getInfoPanel().getName();
-		map.displayByName(newRoute, newRouteName, numCoords, true, map.getToDo());
 		
+		map.displayByName(newRoute, newRouteName, numCoords, true, map.getToDo());
 		map.getTableDisplay().getGrid().setItems();
 		map.enableEdit();
 		
 		flightInfo = controls.getInfoPanel().getFlight(index);
 	}
-	//when a route is deleted, this refreshes the routes in the info panel to reflect the data stored in dronology 
+	//when a route is deleted, this refreshes the routes in the info panel to reflect the data stored in Dronology 
 	public void deleteRouteUpdate(){
 		VaadinSession session = getSession();
 		if(session != null){
@@ -336,7 +328,7 @@ public class FRMainLayout extends CustomComponent {
 	public FlightRouteInfo getFlightInfo() {
 		return flightInfo;
 	}
-	//gets the FlightInfo of a new route
+	//gets the flight info of a new route
 	public FlightRouteInfo getNewRoute() {
 		return newRoute;
 	}

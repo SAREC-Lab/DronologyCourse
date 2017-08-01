@@ -17,8 +17,8 @@ public class FRNewRoute extends CustomComponent{
 	
 	private static final long serialVersionUID = 6262120678931967634L;
 	
-	private HorizontalLayout buttonLayout = new HorizontalLayout();
 	private VerticalLayout totalLayout = new VerticalLayout();
+	private HorizontalLayout buttonLayout = new HorizontalLayout();
 	private Label directions = new Label("Please enter a route name");
 	private Label description = new Label("Route Description");
 	private TextField descriptionField = new TextField();
@@ -29,7 +29,7 @@ public class FRNewRoute extends CustomComponent{
 	public FRNewRoute(){
 		//arranges layout of new route window
 		buttonLayout.addComponents(drawButton, cancelButton);
-		totalLayout.addComponents(directions, inputField,description, descriptionField, buttonLayout);
+		totalLayout.addComponents(directions, inputField, description, descriptionField, buttonLayout);
 		
 		setCompositionRoot(totalLayout);
 	}

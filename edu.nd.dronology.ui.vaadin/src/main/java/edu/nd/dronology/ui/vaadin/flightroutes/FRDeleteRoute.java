@@ -25,11 +25,11 @@ public class FRDeleteRoute extends CustomComponent{
 
 	private static final long serialVersionUID = 6787319301316969492L;
 
+	private VerticalLayout totalLayout = new VerticalLayout();
+	private HorizontalLayout buttonLayout = new HorizontalLayout();
 	private Button yesButton = new Button("Yes");
 	private Button noButton = new Button("No");
 	private Label question = new Label("Are you sure you want to delete this route?");
-	private HorizontalLayout buttonLayout = new HorizontalLayout();
-	private VerticalLayout totalLayout = new VerticalLayout();
 	private Window window = new Window();
 	private FlightRouteInfo infoTobeDeleted = null;
 	
@@ -51,17 +51,16 @@ public class FRDeleteRoute extends CustomComponent{
 			window.close();
 			mapComp.exitEditMode();
 			
+			//only delete if the route to be deleted has been set
 			if (infoTobeDeleted != null) {
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
 			}
-			
 			mapComp.displayNoRoute();	
 			mapComp.getMainLayout().deleteRouteUpdate();
 		});
-		
 	}
-	//used when the delete button in one of the infoboxes is clicked
+	//used when the delete button in one of the infoboxes is clicked, as there is no mapComponent object to be passed (route to be deleted is set in FRMapComponent)
 	public FRDeleteRoute(){
 		buttonLayout.addComponents(yesButton, noButton);
 		totalLayout.addComponents(question, buttonLayout);
@@ -74,23 +73,20 @@ public class FRDeleteRoute extends CustomComponent{
 		noButton.addClickListener(e->{
 			window.close();
 		});
-		
 		yesButton.addClickListener(e->{
 			window.close();
 			if (infoTobeDeleted != null) {	
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
-			}
-			
+			}	
 		});	
 	}
 	//deletes a route from Dronology based on the FlightRouteInfo
 	public void deleteRoute(FlightRouteInfo routeinfo){
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
-	
+			
 			try {
-				
 				service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 						.getService(IFlightRouteplanningRemoteService.class);
 				service.deleteItem(routeinfo.getId());
@@ -99,12 +95,12 @@ public class FRDeleteRoute extends CustomComponent{
 			}
 	}
 	//deletes the currently selected route
-		public void deleteAnyway(){
-			if(infoTobeDeleted != null){
-				deleteRoute(infoTobeDeleted);
-			}
+	public void deleteAnyway(){
+		if(infoTobeDeleted != null){
+			deleteRoute(infoTobeDeleted);
 		}
-	//allows for FlightRouteInfo to be passed in from other files and deleted
+	}
+	//allows for FlightRouteInfo to be passed in from other files and deleted (FlightRouteInfo object may not be available from where click listener is defined)
 	public void setRouteInfoTobeDeleted (FlightRouteInfo infoTobeDeleted) {
 		this.infoTobeDeleted = infoTobeDeleted;
 	}

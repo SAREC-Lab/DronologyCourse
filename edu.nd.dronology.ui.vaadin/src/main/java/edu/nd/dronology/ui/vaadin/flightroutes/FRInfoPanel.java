@@ -38,19 +38,20 @@ public class FRInfoPanel extends CustomComponent {
 
 	private static final long serialVersionUID = -2505608328159312876L;
 
-	private int numberRoutes;
-	private Panel topPanel = new Panel();
 	private VerticalLayout totalLayout = new VerticalLayout();
 	private VerticalLayout routeListLayout = new VerticalLayout();
 	private HorizontalLayout buttons = new HorizontalLayout();
-	private String routeInputName;
+	private int numberRoutes;
 	private int index;
+	private Panel topPanel = new Panel();
+	private String routeInputName;
 	private Collection<FlightRouteInfo> allFlights;
 	private List<FlightRouteInfo> routeList;
 	private FlightRouteInfo flight;
+	private FlightRouteInfo addedRoute;
 	private boolean isRouteSelected = false;
 	private Button drawButton;
-	private FlightRouteInfo addedRoute;
+	private Button cancelButton;
 	private FRNewRoute newRouteDisplay;
 	private TextField nameField;
 	private FRInfoBox routeBox;
@@ -75,7 +76,7 @@ public class FRInfoPanel extends CustomComponent {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
 
-			//gets FlightRouteInfo objects and then creates arrayList of them
+			//gets and creates an ArrayList of FlightRouteInfo items
 			allFlights = service.getItems();
 			routeList = new ArrayList<>(allFlights);
 
@@ -122,16 +123,16 @@ public class FRInfoPanel extends CustomComponent {
 
 		//box to input new route info
 		newRouteDisplay = new FRNewRoute();
-
 		window = new Window();
 		window.setContent(newRouteDisplay);
 		window.setPosition(200, 80);
 		window.setResizable(false);
 		window.setClosable(false);
 		
-		//represents the buttons on the new route window
+		//gets the buttons on the new route window
 		drawButton = newRouteDisplay.getDrawButton();
 		nameField = newRouteDisplay.getInputField();
+		cancelButton = newRouteDisplay.getCancelButton();
 		descriptionField = newRouteDisplay.getDescriptionField();
 		
 		//click listener for when the user creates a new route
@@ -152,7 +153,7 @@ public class FRInfoPanel extends CustomComponent {
 				
 				refreshRoutes();		
 	
-				//shows which route in the infoPanel is new and selected
+				//shows the newly created route as selected
 				index = getRouteNumber(addedRoute);
 				routeListLayout.getComponent(index).addStyleName("info_box_focus");	
 				
@@ -168,7 +169,7 @@ public class FRInfoPanel extends CustomComponent {
 			UI.getCurrent().addWindow(window);
 		});
 		//removes route creation window on cancel
-		newRouteDisplay.getCancelButton().addClickListener(e-> {
+		cancelButton.addClickListener(e-> {
 			UI.getCurrent().removeWindow(window);
 		});
 		//if the vertical layout is clicked, then a route is assumed to be selected
@@ -185,6 +186,7 @@ public class FRInfoPanel extends CustomComponent {
 		}
 		buttons.addComponents(newRoute);
 		buttons.addStyleName("fr_new_route_button_area");
+		
 		totalLayout.addComponents(buttons, routeListLayout);
 		
 		setCompositionRoot(topPanel);
@@ -263,7 +265,6 @@ public class FRInfoPanel extends CustomComponent {
 	}
 	//gets FlightRouteInfo from Dronology based on route index
 	public FlightRouteInfo getFlight(int index) {
-		//gets arrayList of different routes and returns the one specified by index
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 			
@@ -281,7 +282,7 @@ public class FRInfoPanel extends CustomComponent {
 		} catch (RemoteException | DronologyServiceException e) {
 			e.printStackTrace();
 		}
-			
+		//makes sure an infobox was clicked rather than inbetween the boxes	
 		if(index != -1){
 			flight = routeList.get(index);
 		}
@@ -365,7 +366,7 @@ public class FRInfoPanel extends CustomComponent {
 	public FRInfoBox getInfoBox(){
 		return routeBox;
 	}
-	//returns the infobox at a certain index
+	//gets the infobox at a certain index
 	public FRInfoBox getInfoBoxIndex(int index){
 		return (FRInfoBox) routeListLayout.getComponent(index);
 	}
