@@ -299,29 +299,10 @@ public class MapMarkerUtilities {
 			leafletMarker.addDragEndListener(new MarkerDragEndListener());
 		}
 		// Adds listeners to markers if the map is editable.
-	
-		
-		/*
-		if(mapPoints.size() == 0){
-			String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-			FileResource greenIcon = new FileResource(new File(basepath+"/VAADIN/img/green-icon-with-shadow.png"));
-			leafletMarker.setIcon(greenIcon);
-			leafletMarker.setIconSize(new Point(41, 41));
-			leafletMarker.setIconAnchor(new Point(13, 41));
-		}else{
-			String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-			FileResource greenIcon = new FileResource(new File(basepath+"/VAADIN/img/red-icon-with-shadow.png"));
-			leafletMarker.setIcon(greenIcon);
-			leafletMarker.setIconSize(new Point(41, 41));
-			leafletMarker.setIconAnchor(new Point(13, 41));
-		}
-		*/
-		
+
 		map.addComponent(leafletMarker);
 		
-		updatePinColors();
-		
-		
+		updatePinColors();		
 	}
 	public void updatePinColors(){
 		
@@ -332,13 +313,13 @@ public class MapMarkerUtilities {
 		
 		List<LMarker> storedPins = getPins();
 		
+		//re-adds the tiles
 		LTileLayer tiles = mapComponent.getTiles();
 		map.removeAllComponents();
 		map.addComponent(tiles);
 		
+		//resets the colors so that the first and last are green and red respectively - all others are blue
 		for(int i = 0; i < storedPins.size(); i++){
-			
-			
 			if(i == 0){
 				storedPins.get(i).setIcon(greenIcon);
 				storedPins.get(i).setIconSize(new Point(41, 41));
@@ -349,16 +330,12 @@ public class MapMarkerUtilities {
 				storedPins.get(i).setIconSize(new Point(41, 41));
 				storedPins.get(i).setIconAnchor(new Point(13, 41));
 			}else{
-				
 				storedPins.get(i).setIcon(blueIcon);
 				storedPins.get(i).setIconSize(new Point(41, 41));
 				storedPins.get(i).setIconAnchor(new Point(13, 41));
 			}
-			
 			map.addComponent(storedPins.get(i));
 		}
-		
-		
 	}
 	public void updatePinForWayPoint(WayPoint wayPoint) {
 		Iterator<Component> itr = map.iterator();
