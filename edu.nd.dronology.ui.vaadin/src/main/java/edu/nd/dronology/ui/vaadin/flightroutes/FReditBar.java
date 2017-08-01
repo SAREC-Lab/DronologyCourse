@@ -15,12 +15,11 @@ public class FReditBar extends CustomComponent{
 
 	private static final long serialVersionUID = 2389713576038720628L;
 	
-	HorizontalLayout totalLayout = new HorizontalLayout();
-	Button cancelButton = new Button("Cancel");
-	Button saveButton = new Button("Save");
-	
-	Label textLabel = new Label("Editing Route");
-	Label smallText = new Label("Left click to add a new waypoint. Drag waypoints to move.");
+	private HorizontalLayout totalLayout = new HorizontalLayout();
+	private Button cancelButton = new Button("Cancel");
+	private Button saveButton = new Button("Save");	
+	private Label textLabel = new Label("Editing Route");
+	private Label smallText = new Label("Left click to add a new waypoint. Drag waypoints to move.");
 	
 	public FReditBar(FRMapComponent map) {
 		setStyleName("fr_edit_bar");

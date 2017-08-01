@@ -62,6 +62,7 @@ public class FRMapComponent extends CustomComponent {
 	private FlightRouteInfo selectedRoute;
 	private FRMainLayout mainLayout;
 	private boolean toDo = true;
+	private LTileLayer tiles;
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName, FRMainLayout layout, boolean toDo) {
 		this.setWidth("100%");
@@ -86,7 +87,7 @@ public class FRMapComponent extends CustomComponent {
 		mapAndPopup.addComponent(leafletMap);
 		tableDisplay.setRoute(route);
 
-		LTileLayer tiles = new LTileLayer();
+		tiles = new LTileLayer();
 		tiles.setUrl(tileDataURL);
 
 		LTileLayer satelliteTiles = new LTileLayer();
@@ -166,6 +167,7 @@ public class FRMapComponent extends CustomComponent {
 			// Removes the marker from the map.
 			
 			route.removeAllLines(route.getPolylines());
+			route.updatePinColors();
 			route.drawLines(route.getMapPoints(), true, 1, false);
 			// Redraws the polylines given the updated mapPoints.
 			
@@ -638,6 +640,9 @@ public class FRMapComponent extends CustomComponent {
 	}
 	public void setZoomLevel(double zoomLevel) {
 		leafletMap.setZoomLevel(zoomLevel);
+	}
+	public LTileLayer getTiles(){
+		return tiles;
 	}
 
 }

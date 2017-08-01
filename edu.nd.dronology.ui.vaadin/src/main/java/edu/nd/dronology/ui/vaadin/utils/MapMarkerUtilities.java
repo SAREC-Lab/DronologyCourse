@@ -1,6 +1,7 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
 import java.awt.MouseInfo;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LMarker.DragEndEvent;
 import org.vaadin.addon.leaflet.LMarker.DragEndListener;
 import org.vaadin.addon.leaflet.LPolyline;
+import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.LeafletMouseOutEvent;
@@ -19,12 +21,17 @@ import org.vaadin.addon.leaflet.LeafletMouseOverEvent;
 import org.vaadin.addon.leaflet.LeafletMouseOverListener;
 import org.vaadin.addon.leaflet.shared.Point;
 
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.Resource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Registration;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -213,6 +220,8 @@ public class MapMarkerUtilities {
 	private String selectedWayPointId = "";
 	private LMarker leafletMarker;
 	private FRMapComponent mapComponent;
+	int counter = 0;
+	private Resource icon;
 	
 	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window window, PopupView popup, FRMapComponent mapComponent) {
 		this.map = map;
@@ -290,8 +299,66 @@ public class MapMarkerUtilities {
 			leafletMarker.addDragEndListener(new MarkerDragEndListener());
 		}
 		// Adds listeners to markers if the map is editable.
-
+	
+		
+		/*
+		if(mapPoints.size() == 0){
+			String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+			FileResource greenIcon = new FileResource(new File(basepath+"/VAADIN/img/green-icon-with-shadow.png"));
+			leafletMarker.setIcon(greenIcon);
+			leafletMarker.setIconSize(new Point(41, 41));
+			leafletMarker.setIconAnchor(new Point(13, 41));
+		}else{
+			String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+			FileResource greenIcon = new FileResource(new File(basepath+"/VAADIN/img/red-icon-with-shadow.png"));
+			leafletMarker.setIcon(greenIcon);
+			leafletMarker.setIconSize(new Point(41, 41));
+			leafletMarker.setIconAnchor(new Point(13, 41));
+		}
+		*/
+		
 		map.addComponent(leafletMarker);
+		
+		updatePinColors();
+		
+		
+	}
+	public void updatePinColors(){
+		
+		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+		FileResource greenIcon = new FileResource(new File(basepath+"/VAADIN/img/green-icon-with-shadow.png"));
+		FileResource redIcon = new FileResource(new File(basepath+"/VAADIN/img/red-icon-with-shadow.png"));
+		FileResource blueIcon = new FileResource(new File(basepath+"/VAADIN/img/blue-icon-with-shadow.png"));
+		
+		List<LMarker> storedPins = getPins();
+		
+		LTileLayer tiles = mapComponent.getTiles();
+		map.removeAllComponents();
+		map.addComponent(tiles);
+		
+		for(int i = 0; i < storedPins.size(); i++){
+			
+			
+			if(i == 0){
+				storedPins.get(i).setIcon(greenIcon);
+				storedPins.get(i).setIconSize(new Point(41, 41));
+				storedPins.get(i).setIconAnchor(new Point(13, 41));
+			}
+			else if(i == storedPins.size() - 1){
+				storedPins.get(i).setIcon(redIcon);
+				storedPins.get(i).setIconSize(new Point(41, 41));
+				storedPins.get(i).setIconAnchor(new Point(13, 41));
+			}else{
+				
+				storedPins.get(i).setIcon(blueIcon);
+				storedPins.get(i).setIconSize(new Point(41, 41));
+				storedPins.get(i).setIconAnchor(new Point(13, 41));
+			}
+			
+			map.addComponent(storedPins.get(i));
+		}
+		
+		
 	}
 	public void updatePinForWayPoint(WayPoint wayPoint) {
 		Iterator<Component> itr = map.iterator();
