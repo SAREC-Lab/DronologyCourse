@@ -221,7 +221,6 @@ public class MapMarkerUtilities {
 	private LMarker leafletMarker;
 	private FRMapComponent mapComponent;
 	int counter = 0;
-	private Resource icon;
 	
 	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window window, PopupView popup, FRMapComponent mapComponent) {
 		this.map = map;

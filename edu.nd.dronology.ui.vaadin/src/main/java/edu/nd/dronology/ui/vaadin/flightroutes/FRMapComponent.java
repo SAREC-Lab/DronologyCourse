@@ -471,6 +471,9 @@ public class FRMapComponent extends CustomComponent {
 			route.drawLines(storedPoints, true, 0, false);
 		}
 		route.disableRouteEditing();
+		for (int i = 0; i < route.getMapPoints().size(); i++) {
+			route.getMapPoints().get(i).setOrder(i+1);
+		}
 	}
 	public void onMapEdited(List<WayPoint> waypoints) {
 		// Displays in edit mode depending on whether or not the route is new.
