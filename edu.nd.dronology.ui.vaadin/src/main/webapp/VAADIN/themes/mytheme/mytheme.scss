@@ -68,19 +68,19 @@ $valo-menu-background-color: #eee;
 	.v-nativebutton:focus {
 		outline: none;
 	}
-	.button_warning {
+	.btn-warning {
 		color: $color-light-5;
 		background-color: $color-warning-main;
 		border-color: $color-warning-main-border;
 		border-width: 1px;
 	}
-	.button_warning:focus,
-	.button_warning.focus {
+	.btn-warning:focus,
+	.btn-warning.focus {
 		color: $color-light-5;
 		background-color: $color-warning-main;
 		border-color: $color-warning-main-border;
 	}
-	.button_warning:hover {
+	.btn-warning:hover {
 		color: $color-light-5;
 		background-color: $color-warning-hover;
 		border-color: $color-warning-hover-border;
@@ -120,6 +120,35 @@ $valo-menu-background-color: #eee;
 		color: $color-light-5;
 		background-color: $color-okay-hover;
 		border-color: $color-okay-hover-border;
+	}
+	.confirm_window {
+		padding: 10px;
+		font-size: 14px;
+		.confirm_button_area {
+			float: right;
+			padding-top: 10px;
+		}
+		.v-button {
+			min-width: 90px;
+			height: 30px;
+			text-align: center;
+		}
+		.v-textfield {
+			height: 30px;
+		}
+	
+		.v-margin-top {
+			padding-top:0px !important;
+		}
+		.v-margin-right {
+			padding-right:0px !important;
+		}
+		.v-margin-bottom {
+			padding-bottom:0px !important;
+		}
+		.v-margin-left {
+			padding-left:0px !important;
+		}
 	}
 	
 	.main_layout {
@@ -295,6 +324,29 @@ $valo-menu-background-color: #eee;
 				font-size: 14px;
 				padding: 0 6px;
 			}
+		}
+	}
+	.fr_add_route_layout {
+		.v-textfield {
+			width: 100%;
+			font-size: 14px;
+			padding: 6px 10px;
+			height: 30px;
+		}
+		.v-textarea {
+			width: 100%;
+			font-size: 14px;
+			padding: 6px 10px;
+		}
+	}
+	.fr_waypoint_popup {
+		font-size: 14px;
+		line-height: 16px;
+		.v-button {
+			margin-top: 10px;
+			font-size: 14px;
+			height: 30px;
+			width: 100%;
 		}
 	}
 	.v-absolutelayout-wrapper-fr_edit_bar {

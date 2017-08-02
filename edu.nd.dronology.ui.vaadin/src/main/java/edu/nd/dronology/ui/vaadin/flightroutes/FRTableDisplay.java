@@ -120,6 +120,10 @@ public class FRTableDisplay {
 						Button no = new Button("No");
 						deletePanel.setContent(deletePanelContent);
 						
+						deletePanel.addStyleName("confirm_window");
+						buttons.addStyleName("confirm_button_area");
+						yes.addStyleName("btn-danger");
+						
 						deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
 						deletePanel.setWidth("425px");
 						

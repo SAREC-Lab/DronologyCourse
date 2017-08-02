@@ -124,7 +124,11 @@ public class FRMapComponent extends CustomComponent {
 
 		Window window;
 		window = new Window(null, windowContent);
-
+		
+		window.addStyleName("confirm_window");
+		buttons.addStyleName("confirm_button_area");
+		saveButton.addStyleName("btn-okay");
+		
 		window.setModal(true);
 		window.setClosable(false);
 		window.setResizable(false);
@@ -187,6 +191,7 @@ public class FRMapComponent extends CustomComponent {
 		popupContent.addComponent(toDelete);
 		
 		popup.addStyleName("bring_front");
+		popupContent.addStyleName("fr_waypoint_popup");
 		popup.setVisible(false);
 		popup.setPopupVisible(false);
 		

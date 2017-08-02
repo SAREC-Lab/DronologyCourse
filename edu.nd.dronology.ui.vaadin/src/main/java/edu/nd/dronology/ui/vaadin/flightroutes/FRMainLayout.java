@@ -81,6 +81,10 @@ public class FRMainLayout extends CustomComponent {
 				warning.setClosable(false);
 				warning.setResizable(false);
 				
+				warning.addStyleName("confirm_window");
+				buttons.addStyleName("confirm_button_area");
+				yes.addStyleName("btn-danger");
+				
 				UI.getCurrent().addWindow(warning);
 				
 				//click listeners for buttons on window
@@ -118,6 +122,10 @@ public class FRMainLayout extends CustomComponent {
 				warning.setModal(true);
 				warning.setClosable(false);
 				warning.setResizable(false);
+				
+				warning.addStyleName("confirm_window");
+				buttons.addStyleName("confirm_button_area");
+				yes.addStyleName("btn-danger");
 				
 				UI.getCurrent().addWindow(warning);
 				
@@ -256,6 +264,10 @@ public class FRMainLayout extends CustomComponent {
 			warning.setModal(true);
 			warning.setClosable(false);
 			warning.setResizable(false);
+			
+			warning.addStyleName("confirm_window");
+			buttons.addStyleName("confirm_button_area");
+			yes.addStyleName("btn-danger");
 			
 			UI.getCurrent().addWindow(warning);
 			

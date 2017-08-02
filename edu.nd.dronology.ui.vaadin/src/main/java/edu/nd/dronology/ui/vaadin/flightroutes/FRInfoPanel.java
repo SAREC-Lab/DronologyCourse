@@ -13,6 +13,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -59,7 +60,7 @@ public class FRInfoPanel extends CustomComponent {
 	private FRControlsComponent controlComponent;
 	private Button newRoute;
 	private Window window;
-	private TextField descriptionField;
+	private TextArea descriptionField;
 	private String routeDescription;
 	private FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 	private ByteArrayInputStream inStream;
@@ -124,6 +125,9 @@ public class FRInfoPanel extends CustomComponent {
 		//box to input new route info
 		newRouteDisplay = new FRNewRoute();
 		window = new Window();
+		
+		window.addStyleName("confirm_window");
+		
 		window.setContent(newRouteDisplay);
 		window.setPosition(200, 80);
 		window.setResizable(false);

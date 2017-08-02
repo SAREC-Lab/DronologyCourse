@@ -38,6 +38,10 @@ public class FRDeleteRoute extends CustomComponent{
 		buttonLayout.addComponents(yesButton, noButton);
 		totalLayout.addComponents(question, buttonLayout);
 		
+		window.addStyleName("confirm_window");
+		buttonLayout.addStyleName("confirm_button_area");
+		yesButton.addStyleName("btn-danger");
+		
 		window.setContent(totalLayout);
 		window.setResizable(false);
 		window.setClosable(false);
@@ -64,6 +68,10 @@ public class FRDeleteRoute extends CustomComponent{
 	public FRDeleteRoute(){
 		buttonLayout.addComponents(yesButton, noButton);
 		totalLayout.addComponents(question, buttonLayout);
+		
+		window.addStyleName("confirm_window");
+		buttonLayout.addStyleName("confirm_button_area");
+		yesButton.addStyleName("btn-danger");
 		
 		window.setContent(totalLayout);
 		window.setResizable(false);

@@ -25,9 +25,9 @@ public class AFEmergencyComponent extends CustomComponent{
 		Label caption = new Label("Emergency Operations");
     
     hover.setCaptionAsHtml(true);
-    hover.addStyleName("button_warning");
+    hover.addStyleName("btn-warning");
     home.setCaptionAsHtml(true);
-    home.addStyleName("button_warning");
+    home.addStyleName("btn-warning");
     
     buttons.addComponents(hover, home);
     layout.addComponents(caption, buttons);
