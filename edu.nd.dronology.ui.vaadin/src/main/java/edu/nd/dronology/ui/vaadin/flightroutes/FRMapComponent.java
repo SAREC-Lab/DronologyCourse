@@ -114,6 +114,7 @@ public class FRMapComponent extends CustomComponent {
 		Button cancelButton = new Button("Cancel");
 		buttons.addComponents(saveButton, cancelButton);
 
+		//creates vertical layout and then uses it to instantiate window
 		VerticalLayout windowContent = new VerticalLayout();
 		TextField altitudeField = new TextField("Altitude: ");
 		TextField transitSpeedField = new TextField("Transit Speed: ");
@@ -150,6 +151,7 @@ public class FRMapComponent extends CustomComponent {
 		
 		popupContent.addComponents(latitudeLabel, longitudeLabel, altitudeLabel, transitSpeedLabel);
 	
+		//uses popupContent vertical layout to instantiate popup	
 		popup = new PopupView(null, popupContent);
 		
 		Button toDelete = new Button("Remove Waypoint");
@@ -622,7 +624,7 @@ public class FRMapComponent extends CustomComponent {
 	public LMap getMapInstance() {
 		return leafletMap;
 	}
-	public MapMarkerUtilities getUtils() {
+	public MapMarkerUtilities getUtilities() {
 		return utilities;
 	}
 	public FRTableDisplay getTableDisplay() {
