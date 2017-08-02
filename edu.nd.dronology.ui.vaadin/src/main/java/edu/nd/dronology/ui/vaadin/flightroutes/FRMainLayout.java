@@ -63,7 +63,7 @@ public class FRMainLayout extends CustomComponent {
 		
 		// adds click listener to route list
 		routeLayout.addLayoutClickListener(e -> {
-			if (map.getUtils().isEditable()) {
+			if (map.getUtilities().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
 				Button yes = new Button("Yes");
 				Button no = new Button("No");
@@ -101,7 +101,7 @@ public class FRMainLayout extends CustomComponent {
 		//adds click listener to new route button on info panel
 		controls.getInfoPanel().getNewRouteButton().addClickListener(e->{
 			//only prompts user if map is in edit mode
-			if (map.getUtils().isEditable()) {
+			if (map.getUtilities().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
 				Button yes = new Button("Yes");
 				Button no = new Button("No");
@@ -185,8 +185,8 @@ public class FRMainLayout extends CustomComponent {
 		
 		// removes old pins, polylines, and style when switching routes
 		if(routeLayout.getComponentIndex(child) != -1){
-			map.getUtils().removeAllMarkers(map.getUtils().getPins());
-			map.getUtils().removeAllLines(map.getUtils().getPolylines());
+			map.getUtilities().removeAllMarkers(map.getUtilities().getPins());
+			map.getUtilities().removeAllLines(map.getUtilities().getPolylines());
 		}
 
 		int numComponents;
@@ -207,14 +207,14 @@ public class FRMainLayout extends CustomComponent {
 			WayPoint way = new WayPoint(pt, false);
 			way.setAltitude(altitude);
 			way.setTransitSpeed(approachingSpeed);
-			map.getUtils().addNewPinRemoveOld(pt, first);
+			map.getUtilities().addNewPinRemoveOld(pt, first);
 			
 			wayPoints.add(way);
 			first = false;
 		}
 
 		//adds the lines to the map
-		map.getUtils().drawLines(wayPoints, true, 1, false);
+		map.getUtilities().drawLines(wayPoints, true, 1, false);
 
 		numComponents = routeLayout.getComponentCount();
 		
@@ -234,8 +234,8 @@ public class FRMainLayout extends CustomComponent {
 		//sets grid
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.getTableDisplay().setGrid(wayPoints);
-			map.getUtils().setMapPointsAltitude(wayPoints);
-			map.getUtils().setMapPointsTransit(wayPoints);
+			map.getUtilities().setMapPointsAltitude(wayPoints);
+			map.getUtilities().setMapPointsTransit(wayPoints);
 		}
 	}
 	//handles what should happen when the user clicks on one of the delete buttons while still in edit mode
@@ -276,12 +276,12 @@ public class FRMainLayout extends CustomComponent {
 	public void drawRoute(){
 		isNew = true;
 		map.enableEdit();
-		map.getUtils().enableRouteEditing();
+		map.getUtilities().enableRouteEditing();
 	
 		//to get rid of points and lines from previous routes
-		map.getUtils().removeAllMarkers(map.getUtils().getPins());
-		map.getUtils().removeAllLines(map.getUtils().getPolylines());
-		map.getUtils().getMapPoints().clear();
+		map.getUtilities().removeAllMarkers(map.getUtilities().getPins());
+		map.getUtilities().removeAllLines(map.getUtilities().getPolylines());
+		map.getUtilities().getMapPoints().clear();
 		
 		//displays the drone information in the info bar
 		newRoute = controls.getInfoPanel().getRoute();

@@ -89,7 +89,7 @@ public class FRInfoBox extends CustomComponent {
 
 		//adds listener to the delete button on the route box 
 		trashButton.addListener(e->{
-			if(panel.getControls().getLayout().getMap().getUtils().isEditable()){  //checks if the route is in edit mode
+			if(panel.getControls().getLayout().getMap().getUtilities().isEditable()){  //checks if the route is in edit mode
 				panel.getControls().getLayout().deleteInEdit();
 			}else{
 				UI.getCurrent().addWindow(deleteRoute.getWindow());
@@ -114,7 +114,7 @@ public class FRInfoBox extends CustomComponent {
 		});
 		//a click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes
 		editButton.addClickListener(e -> {
-			if (!panel.getControls().getLayout().getMap().getUtils().isEditable()) {
+			if (!panel.getControls().getLayout().getMap().getUtilities().isEditable()) {
 				panel.getControls().getLayout().enableMapEdit();
 				panel.getControls().getLayout().editClick(this);
 			} else {
