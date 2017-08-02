@@ -29,6 +29,7 @@ import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -210,18 +211,16 @@ public class MapMarkerUtilities {
 	private PopupView popup;
 	private FRMapComponent mapComponent;
 	private MapAddMarkerListener mapAddMarkerListener;
-	
-	
 	private Grid<WayPoint> grid;
 	private List<WayPoint> mapPoints = new ArrayList<>();
-	private List<Registration> registeredListeners = new ArrayList<>();
+	private WayPoint w = null;
+	private LMarker leafletMarker;
+	private String selectedWayPointId = "";
 	private boolean isEditable = false;
 	private boolean isPolyline = false;
 	private int x = 0;
 	private int y = 0;
-	private WayPoint w = null;
-	private String selectedWayPointId = "";
-	private LMarker leafletMarker;
+	private List<Registration> registeredListeners = new ArrayList<>();
 	
 	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, PopupView popup, FRMapComponent mapComponent, Window window) {
 		this.layout = layout;
@@ -241,22 +240,22 @@ public class MapMarkerUtilities {
 	public WayPoint addNewPin(Point point, int index) {
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
-		// Creates a waypoint at the given point that has not been reached yet, and assigns it a random id.
+		// Creates a waypoint at the given point, and assigns it a random id.
 		
 		//if a marker is added in the middle of a route, then the colors will not be updated, as the first and last markers are the same
-		if(index < mapPoints.size() && index != -1){
+		if (index <= mapPoints.size() && index != -1) {
 			//-1 signals that a waypoint was added to the end
+			Notification.show(String.valueOf(mapPoints.size()) + " " + String.valueOf(index));
 			addPinForWayPoint(p, false);
-			
 		} else {
 			addPinForWayPoint(p, true);
+			Notification.show("first " + String.valueOf(mapPoints.size()));
 		}
 		// Adds a pin to the map for the waypoint of interest.
 		
 		if (index == -1) {
 			mapPoints.add(p);
-		} 
-		else {
+		} else {
 			mapPoints.add(index, p);
 		}
 		
@@ -308,7 +307,7 @@ public class MapMarkerUtilities {
 		
 		//only updates marker colors if directed
 		if(updateColors){
-			updatePinColors();	
+			updatePinColors();
 		}
 	}
 	public void updatePinColors(){
