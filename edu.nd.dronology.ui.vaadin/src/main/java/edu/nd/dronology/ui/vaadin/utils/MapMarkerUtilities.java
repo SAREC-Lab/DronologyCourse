@@ -38,8 +38,8 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRMapComponent;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 
 /**
- * This is the class that contains all logic for plotting flight routes. It contains logic for listeners related to waypoints and polylines, addition of
- * waypoints, updating waypoints, updating pins on the map, entering and exiting edit mode, setting altitude and transit speed from input values, and
+ * This is the class that contains all logic for plotting flight routes. It contains logic for all listeners assigned to waypoints and polylines, the addition
+ * of waypoints, updating waypoints, updating pins on the map, entering and exiting edit mode, setting altitude and transit speed from input values, and
  * related functions.
  * 
  * @author Michelle Galbavy
@@ -64,29 +64,30 @@ public class MapMarkerUtilities {
     		}
     	}
     	selectedWayPointId = w.getId();
-    	// Retrieves the waypoint based on its id.
+    	// Retrieves the id of the waypoint of interest.
 
 			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
 			Iterator<Component> it = popupContent.iterator();
 			while(it.hasNext()) {
 				Component c = it.next();
-				if (c.getId()!=null && c.getId().equals("latitude")) {
+				if (c.getId() != null && c.getId().equals("latitude")) {
 					Label l = (Label)c;
 					l.setValue("Latitude: " + w.getLatitude());
 				}
-				if (c.getId()!=null && c.getId().equals("longitude")) {
+				if (c.getId() != null && c.getId().equals("longitude")) {
 					Label l = (Label)c;
 					l.setValue("Longitude: " + w.getLongitude());
 				}
-				if (c.getId()!=null && c.getId().equals("altitude")) {
+				if (c.getId() != null && c.getId().equals("altitude")) {
 					Label l = (Label)c;
 					l.setValue("Altitude: "  + w.getAltitude());
 				}
-				if (c.getId()!=null && c.getId().equals("transitSpeed")) {
+				if (c.getId() != null && c.getId().equals("transitSpeed")) {
 					Label l = (Label)c;
 					l.setValue("Transit Speed: " + w.getTransitSpeed());
 				}
-				if (c.getId()!=null && c.getId().equals("toDelete")) {
+				// Sets the strings in the popup view from the values of the waypoint of interest.
+				if (c.getId() != null && c.getId().equals("toDelete")) {
 					if (isEditable) {
 						c.setVisible(true);
 					}
@@ -94,9 +95,10 @@ public class MapMarkerUtilities {
 						c.setVisible(false);
 					}
 				}
+				// Sets whether or not the column of buttons is visible based on whether or not the map is editable.
 			}
-			// Sets the strings in the popup view from the values of the waypoint of interest.
 			
+			// Math related to positioning the popup view follows.
 			double mapWidth = UI.getCurrent().getPage().getBrowserWindowWidth() - 366.0;
 			double mapHeight = UI.getCurrent().getPage().getBrowserWindowHeight() * 0.55;
 			
@@ -139,44 +141,44 @@ public class MapMarkerUtilities {
 			// Math related to finding the proper positioning of the popup view given any screen dimensions/resolutions.
 			
 			layout.setPosition(popup, position);
+			// Applies the position to the popup view.
 
 			popup.setVisible(true);
 			popup.setPopupVisible(true);
-			// Put the popup view on the screen once all of its new parameters are set.
+			// Puts the popup view on the screen once all of its new parameters are set.
 		}
 	}
 	private class MarkerMouseOutListener implements LeafletMouseOutListener {
-		/* Closes the popup view created in the mouse over listener above if the mouse leaves the waypoint unless it leaves in the bottom right hand quadrant.
-		 * This is because the popup view is supposed to show up in the bottom right hand quadrant, and the "Remove Waypoint" button needs to be accessible when
-		 * the map is in edit mode. */
+		/* Closes the popup view created in the mouse over listener above if the mouse leaves the waypoint unless it leaves in the bottom right hand quadrant when
+		 * the map is in edit mode. This is because the popup view is supposed to show up in the bottom right hand quadrant, and the "Remove Waypoint" button needs
+		 * to be accessible when the map is in edit mode. 
+		 */
 
 		@Override
 		public void onMouseOut(LeafletMouseOutEvent event) {
-			if (isEditable && (int) MouseInfo.getPointerInfo().getLocation().getX() >= x + popup.getWidth() &&
-					(int) MouseInfo.getPointerInfo().getLocation().getY() >= y + popup.getHeight()) {
-				// Check for the bottom right hand quadrant. There is no code within this if statement because nothing should happen unless it is false.
-			}
-			else {
+			if (!(isEditable && (int) MouseInfo.getPointerInfo().getLocation().getX() >= x + popup.getWidth() &&
+					(int) MouseInfo.getPointerInfo().getLocation().getY() >= y + popup.getHeight())) {
 				popup.setPopupVisible(false);
-			}	
+			}
 		}
 	}
 	private class MarkerDragEndListener implements DragEndListener {
-		// Allows the pins to be dragged around, and updates their information in the table and in the popup views.
+		/* Allows a pin to be dragged around. Once the pin is "dropped", its information is updated in both the grid and its corresponding popup views. 
+		 * Note: Once this listener is added to a pin, it can always be dragged around. However, the following code is only run once the pin is
+		 * "dropped" - hence drag end - and this listener is added to it. 
+		 */
 		
 		@Override
 		public void dragEnd(DragEndEvent event) {
 			LMarker leafletMarker = (LMarker)event.getSource();
-	    	int index = -1;
-	    	for (int i = 0; i < mapPoints.size(); i++) {
-	    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
-	  				index = i;
-	    	}
-	    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
-	    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
-	    	removeAllLines(getPolylines());
-	    	drawLines(mapPoints, true, 1, false);
-	    	grid.setItems(mapPoints);
+    	int index = -1;
+    	for (int i = 0; i < mapPoints.size(); i++) {
+    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
+  				index = i;
+    	}
+    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
+    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
+    	refreshMapAndGrid();
 		}
 	}
 	private class PolylineClickListener implements LeafletClickListener {
@@ -522,6 +524,11 @@ public class MapMarkerUtilities {
 		for(int i = 0; i < wayPoints.size(); i++){
 			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
 		}
+	}
+	public void refreshMapAndGrid() {
+  	removeAllLines(getPolylines());
+  	drawLines(mapPoints, true, 1, false);
+  	grid.setItems(mapPoints);
 	}
 	public String getSelectedWayPointId() {
 		return selectedWayPointId;
