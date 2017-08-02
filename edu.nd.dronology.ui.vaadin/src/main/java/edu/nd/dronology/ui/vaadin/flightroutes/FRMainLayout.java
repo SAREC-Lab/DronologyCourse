@@ -225,11 +225,11 @@ public class FRMainLayout extends CustomComponent {
 			}
 		}
 		//toDo sets whether or not to center and zoom levels should be reset when changing flight routes
-		map.setRouteCenter(map.getToDo());
+		map.setRouteCenter(map.getZoomRoute());
 		
 		//displays map
 		if(routeLayout.getComponentIndex(child) != -1){
-			map.displayByName(flightInfo, null, 0, false, map.getToDo());
+			map.displayByName(flightInfo, null, 0, false, map.getZoomRoute());
 		}
 		//sets grid
 		if(routeLayout.getComponentIndex(child) != -1){
@@ -288,7 +288,7 @@ public class FRMainLayout extends CustomComponent {
 		int numCoords = newRoute.getWaypoints().size();
 		newRouteName = controls.getInfoPanel().getName();
 		
-		map.displayByName(newRoute, newRouteName, numCoords, true, map.getToDo());
+		map.displayByName(newRoute, newRouteName, numCoords, true, map.getZoomRoute());
 		map.getTableDisplay().getGrid().setItems();
 		map.enableEdit();
 		
