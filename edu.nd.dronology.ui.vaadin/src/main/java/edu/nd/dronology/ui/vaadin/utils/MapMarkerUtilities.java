@@ -47,7 +47,7 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
 
 public class MapMarkerUtilities {
 	private class MarkerMouseOverListener implements LeafletMouseOverListener {
-		// Sets the values for the popup views shown when hovering the mouse over a waypoint. Window created in the FRMapComponent class.
+		// Sets the values for the popup views shown when hovering the mouse over a waypoint. Window is created in the FRMapComponent class.
 
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
@@ -187,7 +187,8 @@ public class MapMarkerUtilities {
 		@Override
 		public void onClick(LeafletClickEvent event) {
 			if (isEditable) {
-				// Ensures the map is editable before doing anything. This way, polyline listeners are never deleted.
+				// Ensures the map is editable before doing anything. This way, polyline listeners never have to be deleted.
+				
 				isPolyline = true;
 				LPolyline polyline = (LPolyline)event.getSource();
 				List<LPolyline> polylines = getPolylines();
@@ -203,32 +204,34 @@ public class MapMarkerUtilities {
 		}
 	}
 	
+	private AbsoluteLayout layout;
 	private LMap map;
 	private FRTableDisplay tableDisplay;
+	private PopupView popup;
+	private FRMapComponent mapComponent;
+	private MapAddMarkerListener mapAddMarkerListener;
+	
+	
 	private Grid<WayPoint> grid;
 	private List<WayPoint> mapPoints = new ArrayList<>();
 	private List<Registration> registeredListeners = new ArrayList<>();
 	private boolean isEditable = false;
 	private boolean isPolyline = false;
-	private AbsoluteLayout layout;
-	private MapAddMarkerListener mapAddMarkerListener;
-	private PopupView popup;
 	private int x = 0;
 	private int y = 0;
 	private WayPoint w = null;
 	private String selectedWayPointId = "";
 	private LMarker leafletMarker;
-	private FRMapComponent mapComponent;
-	int counter = 0;
 	
-	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, Window window, PopupView popup, FRMapComponent mapComponent) {
+	public MapMarkerUtilities(AbsoluteLayout layout, LMap map, FRTableDisplay tableDisplay, PopupView popup, FRMapComponent mapComponent, Window window) {
+		this.layout = layout;
 		this.map = map;
 		this.tableDisplay = tableDisplay;
-		this.grid = tableDisplay.getGrid();
-		this.layout = layout;
-		this.mapAddMarkerListener = new MapAddMarkerListener(this, window);
 		this.popup = popup;
 		this.mapComponent = mapComponent;
+		this.mapAddMarkerListener = new MapAddMarkerListener(this, window);
+		
+		this.grid = tableDisplay.getGrid();
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
@@ -245,7 +248,7 @@ public class MapMarkerUtilities {
 			//-1 signals that a waypoint was added to the end
 			addPinForWayPoint(p, false);
 			
-		}else{
+		} else {
 			addPinForWayPoint(p, true);
 		}
 		// Adds a pin to the map for the waypoint of interest.
@@ -262,9 +265,7 @@ public class MapMarkerUtilities {
 		}
 		// Resets the order of all of the waypoints in case one of them is added in the middle of a polyline.
 		
-		removeAllLines(getPolylines());
-		drawLines(mapPoints, true, 1, false);
-		grid.setItems(mapPoints);
+		refreshMapAndGrid();
 		// Redraws lines and resets the points in the grid to match the new points on the map.
 		
 		return p;
@@ -283,9 +284,7 @@ public class MapMarkerUtilities {
 		// Clears mapPoints the first time.
 		
 		mapPoints.add(p);
-		removeAllLines(getPolylines());
-		drawLines(mapPoints, false, 1, false);
-		grid.setItems(mapPoints);
+		refreshMapAndGrid();
 		
 		for (int i = 0; i < mapPoints.size(); i++) {
 			mapPoints.get(i).setOrder(i + 1);

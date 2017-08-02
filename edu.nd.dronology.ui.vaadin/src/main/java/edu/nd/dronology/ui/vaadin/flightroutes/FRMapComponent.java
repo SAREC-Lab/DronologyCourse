@@ -81,7 +81,7 @@ public class FRMapComponent extends CustomComponent {
 		 * Values are set in the MapMarkerUtilities class. */
 		
 		mapAndPopup.addComponent(popup);
-		utilities = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, window, popup, this);
+		utilities = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, popup, this, window);
 
 		mapAndPopup.addStyleName("fr_mapabsolute_layout");
 		mapAndPopup.addComponent(leafletMap);
