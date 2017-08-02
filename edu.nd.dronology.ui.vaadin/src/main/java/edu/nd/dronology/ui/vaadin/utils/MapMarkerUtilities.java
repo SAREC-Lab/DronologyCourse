@@ -242,7 +242,14 @@ public class MapMarkerUtilities {
 		p.setId(UUID.randomUUID().toString());
 		// Creates a waypoint at the given point that has not been reached yet, and assigns it a random id.
 		
-		addPinForWayPoint(p);
+		//if a marker is added in the middle of a route, then the colors will not be updated, as the first and last markers are the same
+		if(index < mapPoints.size() && index != -1){
+			//-1 signals that a waypoint was added to the end
+			addPinForWayPoint(p, false);
+			
+		}else{
+			addPinForWayPoint(p, true);
+		}
 		// Adds a pin to the map for the waypoint of interest.
 		
 		if (index == -1) {
@@ -269,7 +276,7 @@ public class MapMarkerUtilities {
 		
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
-		addPinForWayPoint(p);
+		addPinForWayPoint(p, true);
 		// Adds the new pin.
 		
 		if (first) {
@@ -289,7 +296,7 @@ public class MapMarkerUtilities {
 		
 		return p;
 	}
-	public void addPinForWayPoint(WayPoint wayPoint) {
+	public void addPinForWayPoint(WayPoint wayPoint, boolean updateColors) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
 		leafletMarker.setId(wayPoint.getId());
 		// Creates a new marker to show the position of the input waypoint.
@@ -302,7 +309,10 @@ public class MapMarkerUtilities {
 
 		map.addComponent(leafletMarker);
 		
-		updatePinColors();		
+		//only updates marker colors if directed
+		if(updateColors){
+			updatePinColors();	
+		}
 	}
 	public void updatePinColors(){
 		

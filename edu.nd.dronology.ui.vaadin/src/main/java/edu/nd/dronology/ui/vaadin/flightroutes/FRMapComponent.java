@@ -325,7 +325,7 @@ public class FRMapComponent extends CustomComponent {
 				
 			for (int i = 0; i < storedPoints.size(); i++) {
 				WayPoint point = storedPoints.get(i);
-				route.addPinForWayPoint(point);
+				route.addPinForWayPoint(point, true);
 			}
 				
 			route.drawLines(storedPoints, true, 0, false);
@@ -465,7 +465,7 @@ public class FRMapComponent extends CustomComponent {
 			
 			for (int i = 0; i < storedPoints.size(); i++) {
 				WayPoint point = storedPoints.get(i);
-				route.addPinForWayPoint(point);
+				route.addPinForWayPoint(point, true);
 			}
 			
 			route.drawLines(storedPoints, true, 0, false);
