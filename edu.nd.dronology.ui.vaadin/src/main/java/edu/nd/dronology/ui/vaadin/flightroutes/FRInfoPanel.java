@@ -183,7 +183,7 @@ public class FRInfoPanel extends CustomComponent {
 		//iterates through the infoboxes and adds a click listener to each of the edit buttons
 		for(FRInfoBox infoBox: boxList){
 			infoBox.getEditButton().addClickListener(e -> {
-				if(!controlComponent.getLayout().getMap().getUtils().isEditable()) {
+				if(!controlComponent.getLayout().getMap().getUtilities().isEditable()) {
 					controls.getLayout().editClick(infoBox);
 				}
 			});

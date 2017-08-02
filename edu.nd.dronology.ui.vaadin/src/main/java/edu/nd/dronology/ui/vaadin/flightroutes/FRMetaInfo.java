@@ -120,7 +120,7 @@ public class FRMetaInfo extends CustomComponent {
 			map.editButton();
 		});
 		deleteButton.addClickListener(e->{
-			if (map.getUtils().isEditable()) {
+			if (map.getUtilities().isEditable()) {
 				map.getMainLayout().deleteInEdit();
 			}else{
 				map.deleteClick();

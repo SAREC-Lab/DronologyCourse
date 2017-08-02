@@ -27,7 +27,7 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 
 public class FRTableDisplay {
 	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
-	private MapMarkerUtilities route;
+	private MapMarkerUtilities utilities;
 	private boolean hasDeleteColumn;
 	private TextField latitude = new TextField();
 	private TextField longitude = new TextField();
@@ -93,8 +93,8 @@ public class FRTableDisplay {
 		grid.getEditor().addSaveListener(event -> {
 			mapMarkers.updatePinForWayPoint(event.getBean());
 			grid.getEditor().cancel();
-			route.removeAllLines(route.getPolylines());
-			grid.setItems(route.getMapPoints());
+			utilities.removeAllLines(utilities.getPolylines());
+			grid.setItems(utilities.getMapPoints());
 			grid.getEditor().cancel();
 		});
 		addButtonColumn();
@@ -111,7 +111,7 @@ public class FRTableDisplay {
 			hasDeleteColumn = true;
 			grid.addColumn(event -> "Delete",
 				new ButtonRenderer<WayPoint> (clickEvent -> {
-					if (route.isEditable()) {
+					if (utilities.isEditable()) {
 						// This check ensures that a column of Delete buttons should logically be added to the grid.
 						Window deletePanel = new Window(" ");
 						VerticalLayout deletePanelContent = new VerticalLayout();
@@ -136,23 +136,23 @@ public class FRTableDisplay {
 						
 						yes.addClickListener(event -> {
 							WayPoint w = clickEvent.getItem();
-							route.removeAllLines(route.getPolylines());
+							utilities.removeAllLines(utilities.getPolylines());
 							
-							for (int i = 0; i < route.getMapPoints().size(); i++) {
-								if (route.getMapPoints().get(i).getId().equals(w.getId())) {
-									route.getMapPoints().remove(route.getMapPoints().get(i));
-									route.getMap().removeComponent(route.getPins().get(i));
+							for (int i = 0; i < utilities.getMapPoints().size(); i++) {
+								if (utilities.getMapPoints().get(i).getId().equals(w.getId())) {
+									utilities.getMapPoints().remove(utilities.getMapPoints().get(i));
+									utilities.getMap().removeComponent(utilities.getPins().get(i));
 								}
 							}
 							
-							route.drawLines(route.getMapPoints(), true, 1, false);
+							utilities.drawLines(utilities.getMapPoints(), true, 1, false);
 	
-							for (int i = 0; i < this.route.getMapPoints().size(); i++) {
-								this.route.getMapPoints().get(i).setOrder(i + 1);
+							for (int i = 0; i < this.utilities.getMapPoints().size(); i++) {
+								this.utilities.getMapPoints().get(i).setOrder(i + 1);
 							}
 						
-							grid.setItems(this.route.getMapPoints());
-							grid.setItems(route.getMapPoints());
+							grid.setItems(this.utilities.getMapPoints());
+							grid.setItems(utilities.getMapPoints());
 							UI.getCurrent().removeWindow(deletePanel);				
 						});
 							
@@ -187,10 +187,10 @@ public class FRTableDisplay {
 		grid.setItems(points);
 		for (int i = 0; i < points.size(); i++) {
 			points.get(i).setOrder(i + 1);
-			points.get(i).setId(route.getMapPoints().get(i).getId());
+			points.get(i).setId(utilities.getMapPoints().get(i).getId());
 		}
 	}
-	public void setRoute(MapMarkerUtilities route) {
-		this.route = route;
+	public void setUtilities(MapMarkerUtilities utilities) {
+		this.utilities = utilities;
 	}
 }
