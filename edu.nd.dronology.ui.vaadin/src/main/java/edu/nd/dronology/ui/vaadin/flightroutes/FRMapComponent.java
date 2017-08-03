@@ -54,7 +54,7 @@ public class FRMapComponent extends CustomComponent {
 	private MapMarkerUtilities utilities;
 	private FRTableDisplay tableDisplay = new FRTableDisplay();
 	private FRMetaInfo bar = new FRMetaInfo();
-	private FReditBar editBar = new FReditBar(this);
+	private FREditBar editBar = new FREditBar(this);
 	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
 	private FRDeleteRoute delete = new FRDeleteRoute(this);
@@ -235,7 +235,7 @@ public class FRMapComponent extends CustomComponent {
 			this.zoomRoute = getMetaInfo().getAutoZooming().getValue();
 		});
 		
-		editBar = new FReditBar(this);
+		editBar = new FREditBar(this);
 		CheckBox tableBox = selectedBar.getCheckBox();
 		
 		// Hides the table.

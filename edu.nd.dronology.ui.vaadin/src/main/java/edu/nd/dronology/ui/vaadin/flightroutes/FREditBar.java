@@ -11,7 +11,7 @@ import com.vaadin.ui.Label;
  * @author James Holland
  */
 
-public class FReditBar extends CustomComponent{
+public class FREditBar extends CustomComponent{
 
 	private static final long serialVersionUID = 2389713576038720628L;
 	
@@ -21,7 +21,7 @@ public class FReditBar extends CustomComponent{
 	private Label textLabel = new Label("Editing Route");
 	private Label smallText = new Label("Left click to add a new waypoint. Drag waypoints to move.");
 	
-	public FReditBar(FRMapComponent map) {
+	public FREditBar(FRMapComponent map) {
 		setStyleName("fr_edit_bar");
 		textLabel.setStyleName("large_text");
 		smallText.setStyleName("small_text");
