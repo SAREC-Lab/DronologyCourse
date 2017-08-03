@@ -235,6 +235,7 @@ public class MapMarkerUtilities {
 	public MapMarkerUtilities(LMap map){
 		this.map = map;
 	}
+	//adds a new pin at a specified point and at a certain index in the list of waypoints (index is relevant when adding a waypoint between two other waypoints)
 	public WayPoint addNewPin(Point point, int index) {
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
@@ -268,7 +269,7 @@ public class MapMarkerUtilities {
 		return p;
 	}
 	public WayPoint addNewPinRemoveOld(Point point, boolean first) {
-		// Called in a loop in the FRMainLayout class, this function clears mapPoints the first time, then adds all of the pins back from Dronology.
+		// Called in a loop in the FRMainLayout class, this function clears mapPoints if is the first point added, then adds all of the pins back from Dronology.
 		
 		WayPoint p = new WayPoint(point, false);
 		p.setId(UUID.randomUUID().toString());
@@ -290,6 +291,7 @@ public class MapMarkerUtilities {
 		
 		return p;
 	}
+	//adds a pin in a location designated by the wayPoints. Also takes an argument determining whether or not to update marker colors when called
 	public void addPinForWayPoint(WayPoint wayPoint, boolean updateColors) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
 		leafletMarker.setId(wayPoint.getId());
@@ -308,8 +310,8 @@ public class MapMarkerUtilities {
 			updatePinColors();
 		}
 	}
+	//retrieves the pins of different colors, removes the pins currently on the map, and re-adds them as the correctly colored markers
 	public void updatePinColors(){
-		
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource greenIcon = new FileResource(new File(basepath+"/VAADIN/img/green-icon-with-shadow.png"));
 		FileResource redIcon = new FileResource(new File(basepath+"/VAADIN/img/red-icon-with-shadow.png"));
@@ -341,6 +343,7 @@ public class MapMarkerUtilities {
 			map.addComponent(storedPins.get(i));
 		}
 	}
+	//updates the lat and lon of a waypoint to the wayPoint passed in as an argument 
 	public void updatePinForWayPoint(WayPoint wayPoint) {
 		Iterator<Component> itr = map.iterator();
 		while(itr.hasNext()) {
@@ -416,6 +419,7 @@ public class MapMarkerUtilities {
 		}
 		polylines.clear();
 	}
+	//enables route editing. This include adding of the the listeners to the markers and polyline while making the table editable and the map responsive
 	public void enableRouteEditing () {
 		map.setEnabled(true);
 		isEditable = true;
@@ -441,6 +445,7 @@ public class MapMarkerUtilities {
 		
 		tableDisplay.makeEditable(this);
 	}
+	//disables route editing by removing the click listeners and making the table uneditable, 
 	public void disableRouteEditing () {
 		isEditable = false;
 		for (int i = 0; i < registeredListeners.size(); i++) {
@@ -466,26 +471,33 @@ public class MapMarkerUtilities {
 		}
 		// Adds mouse over and mouse out listeners back to the pins, as those listeners should be there both in and out of edit mode.
 	}
+	//removes all of the markers from the map
 	public void removeAllMarkers(List<LMarker> markers) {
 		for (int i = markers.size() - 1; i >= 0; i--) {
 			map.removeComponent(markers.get(i));
 		}
 	}
+	//clears all of the waypoints from the mapPoints list
 	public void clearMapPoints(){
 		mapPoints.clear();
 	}
+	//clears the waypoints from mapPoints starting at a certain index (but does not delete waypoints at lower indices)
 	public void clearMapPointsIndex(int index){
 		mapPoints.subList(index, mapPoints.size()).clear();
 	}
+	//returns whether or not edit mode has been enabled
 	public boolean isEditable () {
 		return isEditable;
 	}
+	//returns the mapPoints list
 	public List<WayPoint> getMapPoints() {
 		return mapPoints;
 	}
+	//returns the grid that is in the table
 	public Grid<WayPoint> getGrid() {
 		return grid;
 	}
+	//gets all of the polylines that are on the map
 	public List<LPolyline> getPolylines() {
 		List<LPolyline> polylines = new ArrayList<>();
 		Iterator<Component> it = map.iterator();
@@ -497,6 +509,7 @@ public class MapMarkerUtilities {
 		}
 		return polylines;
 	}
+	//gets all of the pins that are on the map
 	public List<LMarker> getPins() {
 		List<LMarker> pins = new ArrayList<>();
 		Iterator<Component> it = map.iterator();
@@ -507,51 +520,65 @@ public class MapMarkerUtilities {
 		}
 		return pins;
 	}
+	//returns the map
 	public LMap getMap() {
 		return map;
 	}
+	//sets an arraylist of waypoints so that the grid displays them correctly
 	public void setAllItems(ArrayList<WayPoint> dronologyPoints){
 		grid.setItems(dronologyPoints);
 	}
+	//takes a list of waypoints and sets it as the stored mapPoints
 	public void setMapPoints(List<WayPoint> waypoints){
 		mapPoints = waypoints;
 	}
+	//takes a list of waypoints and sets the altitude so that they match the altitude of the waypoint in the parameter at the same index
 	public void setMapPointsAltitude(List<WayPoint> wayPoints){
 		for(int i = 0; i < wayPoints.size(); i++){
 			mapPoints.get(i).setAltitude(wayPoints.get(i).getAltitude());
 		}
 	}
+	//takes a list of waypoints and sets the transit speed so that they match the altitude of the waypoint in the parameter at the same index
 	public void setMapPointsTransit(List<WayPoint> wayPoints){
 		for(int i = 0; i < wayPoints.size(); i++){
 			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
 		}
 	}
+	//refreshes the map and grid by removing lines, redrawing them, and then setting the map again
 	public void refreshMapAndGrid() {
-  	removeAllLines(getPolylines());
-  	drawLines(mapPoints, true, 1, false);
-  	grid.setItems(mapPoints);
+		removeAllLines(getPolylines());
+		drawLines(mapPoints, true, 1, false);
+		grid.setItems(mapPoints);
 	}
+	//gets the id of the selected waypoint (defined elsewhere)
 	public String getSelectedWayPointId() {
 		return selectedWayPointId;
 	}
+	//gets the LMarker that was just added
 	public LMarker getLeafletMarker() {
 		return leafletMarker;
 	}
+	//gets the registered listeners on the markers (type is List<Registration>)
 	public List<Registration> getRegisteredListeners() {
 		return registeredListeners;
 	}
+	//sets the list of current registered listeners
 	public void setRegisteredListeners(List<Registration> registeredListeners) {
 		this.registeredListeners = registeredListeners;
 	}
+	//returns the mapComponent (use if the functions in FRMapComponent are needed)
 	public FRMapComponent getMapComponent() {
 		return mapComponent;
 	}
+	//returns whether or not the item that was clicked is a polyline ("isPolyline" is set when an object is clicked)
 	public boolean isPolyline() {
 		return isPolyline;
 	}
+	//used to manually set whether the object clicked is a polyline 
 	public void setIsPolyline(boolean isPolyline) {
 		this.isPolyline = isPolyline;
 	}
+	//returns the table display
 	public FRTableDisplay getTableDisplay() {
 		return tableDisplay;
 	}
