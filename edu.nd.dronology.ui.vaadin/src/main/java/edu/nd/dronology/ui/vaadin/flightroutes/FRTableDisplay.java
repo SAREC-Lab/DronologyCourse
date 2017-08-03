@@ -153,7 +153,8 @@ public class FRTableDisplay {
 						
 							grid.setItems(this.utilities.getMapPoints());
 							grid.setItems(utilities.getMapPoints());
-							UI.getCurrent().removeWindow(deletePanel);				
+							UI.getCurrent().removeWindow(deletePanel);
+							utilities.updatePinColors();
 						});
 							
 						no.addClickListener(event -> {

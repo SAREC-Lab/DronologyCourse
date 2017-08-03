@@ -334,20 +334,18 @@ public class FRMapComponent extends CustomComponent {
 				WayPoint point = storedPoints.get(i);
 				utilities.addPinForWayPoint(point, true);
 			}
-				
+			
+			utilities.updatePinColors();
 			utilities.drawLines(storedPoints, true, 0, false);
+			
 		} else {
 			displayByName(selectedRoute, selectedRoute.getName(), selectedRoute.getWaypoints().size(), false, zoomRoute);
 		}
-
-		utilities.disableRouteEditing();
 		
 		layout.removeComponent(editBar);
 		leafletMap.addStyleName("bring_back");
 		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-		
-		utilities.updatePinColors();
 	}
 	public void deleteClick() {
 		// Called when the delete button is clicked. It passes the correct FlightRouteInfo object to the FRDeleteRoute class.

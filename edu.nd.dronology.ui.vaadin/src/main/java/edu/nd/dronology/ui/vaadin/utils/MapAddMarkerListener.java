@@ -123,6 +123,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			removeCurrentWayPoint();
 			UI.getCurrent().removeWindow(window);
 			List<LPolyline> lines = route.drawLines(route.getMapPoints(), true, 0, false);
+			route.updatePinColors();
 		});
 	}
 	public void removeCurrentWayPoint() {

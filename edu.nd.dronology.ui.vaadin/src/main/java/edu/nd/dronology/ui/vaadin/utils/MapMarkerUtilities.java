@@ -318,11 +318,11 @@ public class MapMarkerUtilities {
 		
 		List<LMarker> storedPins = getPins();
 		
-		//re-adds the tiles
-		LTileLayer tiles = mapComponent.getTiles();
-		map.removeAllComponents();
-		map.addComponent(tiles);
-		
+		List<LMarker> points = getPins();
+		for (int i = 0; i < points.size(); i++) {
+			map.removeComponent(points.get(i));
+		}
+
 		//resets the colors so that the first and last are green and red respectively - all others are blue
 		for(int i = 0; i < storedPins.size(); i++){
 			if(i == 0){
