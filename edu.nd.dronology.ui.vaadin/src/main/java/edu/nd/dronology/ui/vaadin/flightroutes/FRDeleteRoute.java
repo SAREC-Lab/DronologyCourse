@@ -22,15 +22,14 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
  */
 
 public class FRDeleteRoute extends CustomComponent{
-
 	private static final long serialVersionUID = 6787319301316969492L;
 
-	private VerticalLayout totalLayout = new VerticalLayout();
 	private HorizontalLayout buttonLayout = new HorizontalLayout();
+	private VerticalLayout totalLayout = new VerticalLayout();
+	private Window window = new Window();
+	private Label question = new Label("Are you sure you want to delete this route?");
 	private Button yesButton = new Button("Yes");
 	private Button noButton = new Button("No");
-	private Label question = new Label("Are you sure you want to delete this route?");
-	private Window window = new Window();
 	private FlightRouteInfo infoTobeDeleted = null;
 	
 	public FRDeleteRoute(FRMapComponent mapComp){
@@ -47,15 +46,12 @@ public class FRDeleteRoute extends CustomComponent{
 		window.setClosable(false);
 		window.setPosition(800, 200);
 		
-		//click listeners for yes and no buttons on window
-		noButton.addClickListener(e->{
-			window.close();
-		});
-		yesButton.addClickListener(e->{
+		// Click listeners for yes and no buttons on window.
+		yesButton.addClickListener(e -> {
 			window.close();
 			mapComp.exitEditMode();
 			
-			//only delete if the route to be deleted has been set
+			// Only delete if the route to be deleted has been set.
 			if (infoTobeDeleted != null) {
 				deleteRoute(infoTobeDeleted);
 				infoTobeDeleted = null;
@@ -63,8 +59,12 @@ public class FRDeleteRoute extends CustomComponent{
 			mapComp.displayNoRoute();	
 			mapComp.getMainLayout().deleteRouteUpdate();
 		});
+		
+		noButton.addClickListener(e -> {
+			window.close();
+		});
 	}
-	//used when the delete button in one of the infoboxes is clicked, as there is no mapComponent object to be passed (route to be deleted is set in FRMapComponent)
+	// Used when the delete button in one of the infoboxes is clicked, as there is no mapComponent object to be passed (route to be deleted is set in FRMapComponent).
 	public FRDeleteRoute(){
 		buttonLayout.addComponents(yesButton, noButton);
 		totalLayout.addComponents(question, buttonLayout);
@@ -78,10 +78,11 @@ public class FRDeleteRoute extends CustomComponent{
 		window.setClosable(false);
 		window.setPosition(800, 200);
 		
-		noButton.addClickListener(e->{
+		noButton.addClickListener(e -> {
 			window.close();
 		});
-		yesButton.addClickListener(e->{
+		
+		yesButton.addClickListener(e -> {
 			window.close();
 			if (infoTobeDeleted != null) {	
 				deleteRoute(infoTobeDeleted);
@@ -89,8 +90,8 @@ public class FRDeleteRoute extends CustomComponent{
 			}	
 		});	
 	}
-	//deletes a route from Dronology based on the FlightRouteInfo
-	public void deleteRoute(FlightRouteInfo routeinfo){
+	// Deletes a route from Dronology based on the FlightRouteInfo.
+	public void deleteRoute(FlightRouteInfo routeinfo) {
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 			
@@ -102,21 +103,23 @@ public class FRDeleteRoute extends CustomComponent{
 				e.printStackTrace();
 			}
 	}
-	//deletes the currently selected route
-	public void deleteAnyway(){
-		if(infoTobeDeleted != null){
+	// Deletes the currently selected route.
+	public void deleteAnyway() {
+		if(infoTobeDeleted != null) {
 			deleteRoute(infoTobeDeleted);
 		}
 	}
-	//allows for FlightRouteInfo to be passed in from other files and deleted (FlightRouteInfo object may not be available from where click listener is defined)
+	// Allows for FlightRouteInfo to be passed in from other files and deleted (FlightRouteInfo object may not be available from where click listener is defined).
 	public void setRouteInfoTobeDeleted (FlightRouteInfo infoTobeDeleted) {
 		this.infoTobeDeleted = infoTobeDeleted;
 	}
-	public Button getYesButton(){
+	public Button getYesButton() {
 		return yesButton;
+		// Returns the yes button so a click listener can be added to it based on the route with which it is associated.
 	}
-	public Button getNoButton(){
+	public Button getNoButton() {
 		return noButton;
+		// Returns the no button so a click listener can be added to it based on the route with which it is associated.
 	}
 	public Window getWindow() {
 		return window;
