@@ -1,8 +1,11 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
 import java.awt.MouseInfo;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
@@ -99,27 +102,27 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				canSave = false;
 			}
 			
-	    	if (canSave) {
-	    		UI.getCurrent().removeWindow(window);
-	    		for (int i = 0; i < route.getMapPoints().size(); i++) {
-	    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
-	    				route.getMapPoints().get(i).setAltitude(altitude);
-	    				route.getMapPoints().get(i).setTransitSpeed(transitSpeed);
-	    				route.getGrid().setItems(route.getMapPoints());
-	    			}
-	    		}
-	    		route.getMapComponent().onMapEdited(route.getMapPoints());
-	    	}
-	    	else {
-	    		Notification.show(caption);
-	    	}
-	    	// Checks to make sure the input altitude and transit speed are valid floats. If they are not, an error is output in the form of a Notification.
+    	if (canSave) {
+    		UI.getCurrent().removeWindow(window);
+    		for (int i = 0; i < route.getMapPoints().size(); i++) {
+    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
+    				route.getMapPoints().get(i).setAltitude(altitude);
+    				route.getMapPoints().get(i).setTransitSpeed(transitSpeed);
+    				route.getGrid().setItems(route.getMapPoints());
+    			}
+    		}
+    		route.getMapComponent().onMapEdited(route.getMapPoints());
+    	}
+    	else {
+    		Notification.show(caption);
+    	}
+    	// Checks to make sure the input altitude and transit speed are valid floats. If they are not, an error is output in the form of a Notification.
 		});
 		
 		cancelButton.addClickListener(event -> {
 			removeCurrentWayPoint();
 			UI.getCurrent().removeWindow(window);
-			route.drawLines(route.getMapPoints(), true, 0, false);
+			List<LPolyline> lines = route.drawLines(route.getMapPoints(), true, 0, false);
 		});
 	}
 	public void removeCurrentWayPoint() {

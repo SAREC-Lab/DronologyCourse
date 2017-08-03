@@ -29,7 +29,6 @@ import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -243,14 +242,14 @@ public class MapMarkerUtilities {
 		// Creates a waypoint at the given point, and assigns it a random id.
 		
 		//if a marker is added in the middle of a route, then the colors will not be updated, as the first and last markers are the same
-		if (index <= mapPoints.size() && index != -1) {
+		
+		if (index < mapPoints.size() && index != -1) {
 			//-1 signals that a waypoint was added to the end
-			Notification.show(String.valueOf(mapPoints.size()) + " " + String.valueOf(index));
 			addPinForWayPoint(p, false);
 		} else {
 			addPinForWayPoint(p, true);
-			Notification.show("first " + String.valueOf(mapPoints.size()));
 		}
+		
 		// Adds a pin to the map for the waypoint of interest.
 		
 		if (index == -1) {
@@ -374,6 +373,10 @@ public class MapMarkerUtilities {
 	 */
 	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
 		// Draws polylines based on a list of waypoints, then outputs the newly formed arraylist of polylines.
+		List<LPolyline> currentLines = getPolylines();
+		for (int i = 0; i < currentLines.size(); i++) {
+			map.removeComponent(currentLines.get(i));
+		}
 		List<LPolyline> polylines = new ArrayList<>();
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
 			WayPoint current =	mapPoints.get(i);
@@ -425,7 +428,7 @@ public class MapMarkerUtilities {
 			pins.get(i).addMouseOutListener(new MarkerMouseOutListener());
 		}
 		// Adds listeners to all of the pins.
-
+		
 		List<LPolyline> polylines = getPolylines();
 		
 		for (int i = 0; i < polylines.size(); i++) {
@@ -489,8 +492,9 @@ public class MapMarkerUtilities {
 		Iterator<Component> it = map.iterator();
 		while(it.hasNext()) {
 			Component c = it.next();
-			if (c.getClass() == LPolyline.class)
+			if (c.getClass() == LPolyline.class) {
 				polylines.add((LPolyline)c);
+			}
 		}
 		return polylines;
 	}
