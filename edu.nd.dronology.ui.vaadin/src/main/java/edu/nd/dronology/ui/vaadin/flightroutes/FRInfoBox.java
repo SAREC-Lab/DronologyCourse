@@ -140,7 +140,7 @@ public class FRInfoBox extends CustomComponent {
 				yes.addStyleName("btn-danger");
 				
 				UI.getCurrent().addWindow(warning);
-				
+				//click listeners for the buttons on the window asking the user about discarding unsaved changes
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					panel.getControls().getLayout().getMap().displayNoRoute();
@@ -203,30 +203,39 @@ public class FRInfoBox extends CustomComponent {
 	public FRInfoBox(FRInfoPanel panel){	
 		this("NAME", "id", "Jun 3, 2017, 9:24 AM", "Jun 8, 2017, 11:04 AM", "2.1 miles", panel);
 	}
+	//gets the name of the route
 	public String getName(){
 		return name;
 	}
+	//sets the name of the route
 	public void setName(String name){
 		this.name = name;
 	}
+	//gets the route id
 	public String getid(){
 		return id;
 	}
+	//set the route id
 	public void setid(String id){
 		this.id = id;
 	}
+	//gets the modified time and date
 	public String getModified(){
 		return modified;
 	}
+	//sets the modified time and date
 	public void setModified(String modified){
 		this.modified = modified;
 	}
+	//gets the window that asks the user if they want to delete the route or not
 	public FRDeleteRoute getDeleteBar(){
 		return deleteRoute;
 	}
+	//gets the delete button on the edit box
 	public Button getTrashButton(){
 		return trashButton;
 	}
+	//gets teh edit button on the info box
 	public Button getEditButton(){
 		return editButton;
 	}
