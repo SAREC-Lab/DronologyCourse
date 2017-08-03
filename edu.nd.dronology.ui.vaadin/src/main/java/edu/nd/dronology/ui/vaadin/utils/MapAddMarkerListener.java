@@ -1,11 +1,8 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
 import java.awt.MouseInfo;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-import org.vaadin.addon.leaflet.LPolyline;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.shared.Point;
@@ -122,7 +119,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		cancelButton.addClickListener(event -> {
 			removeCurrentWayPoint();
 			UI.getCurrent().removeWindow(window);
-			List<LPolyline> lines = route.drawLines(route.getMapPoints(), true, 0, false);
+			route.drawLines(route.getMapPoints(), true, 0, false);
 			route.updatePinColors();
 		});
 	}

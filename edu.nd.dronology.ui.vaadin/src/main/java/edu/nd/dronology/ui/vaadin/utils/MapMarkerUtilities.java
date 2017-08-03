@@ -12,7 +12,6 @@ import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LMarker.DragEndEvent;
 import org.vaadin.addon.leaflet.LMarker.DragEndListener;
 import org.vaadin.addon.leaflet.LPolyline;
-import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 import org.vaadin.addon.leaflet.LeafletClickListener;
 import org.vaadin.addon.leaflet.LeafletMouseOutEvent;
