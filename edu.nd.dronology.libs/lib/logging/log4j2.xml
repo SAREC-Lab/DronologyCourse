@@ -2,9 +2,9 @@
 <configuration name="citeomat" packages="net.mv.logging">
 	<properties>
 
-		<property name="net.mv.filepath">logs\dronology.log</property>
+		<property name="net.mv.filepath">logs/dronology.log</property>
 		<property name="net.mv.filename">dronology</property>
-		<property name="net.mv.filepathHW">logs\dronology-hw.log</property>
+		<property name="net.mv.filepathHW">logs/dronology-hw.log</property>
 		<property name="net.mv.filenameHW">dronology-hw</property>
 		<property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5.8p] %-20M |%-5C:%L | %msg%n</property>
 

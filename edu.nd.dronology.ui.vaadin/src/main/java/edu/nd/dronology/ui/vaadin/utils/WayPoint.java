@@ -18,8 +18,8 @@ public class WayPoint {
 	private int order = 0;
 	
 	public WayPoint (Point point, boolean isreached) {
-		longitude = Double.toString(point.getLon());
-		latitude = Double.toString(point.getLat());
+		longitude = CoordinateUtilities.toSignedDegreesFormat(point.getLon());
+		latitude = CoordinateUtilities.toSignedDegreesFormat(point.getLat());
 		this.isreached = isreached;
 	}
 	
@@ -50,7 +50,7 @@ public class WayPoint {
 	}
 	
 	public void setLongitude(String longitude) {
-		this.longitude = longitude;
+		this.longitude = CoordinateUtilities.toSignedDegreesFormat(longitude);
 	}
 	
 	public String getLatitude() {
@@ -58,7 +58,7 @@ public class WayPoint {
 	}
 	
 	public void setLatitude(String latitude) {
-		this.latitude = latitude;
+		this.latitude = CoordinateUtilities.toSignedDegreesFormat(latitude);
 	}
 	
 	public String getAltitude() {

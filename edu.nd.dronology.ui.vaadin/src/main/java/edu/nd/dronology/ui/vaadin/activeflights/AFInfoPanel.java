@@ -92,10 +92,13 @@ public class AFInfoPanel extends CustomComponent{
 				message = "Are you sure to send all UAVs to their homes?";
 			}
 			Window confirm = new Window("Confirm");
+			confirm.addStyleName("confirm_window");
 			VerticalLayout subContent = new VerticalLayout();
 			HorizontalLayout subButtons = new HorizontalLayout();
+			subButtons.addStyleName("confirm_button_area");
 			Label label = new Label(message);
 			Button yes = new Button("Yes");
+			yes.addStyleName("btn-danger");
 			Button no = new Button("No");
 			
 			yes.addClickListener(subEvent -> {
@@ -136,6 +139,7 @@ public class AFInfoPanel extends CustomComponent{
 			subContent.addComponents(label, subButtons);
 			confirm.setContent(subContent);
 			confirm.setModal(true);
+			confirm.setResizable(false);
 			confirm.center();
 			if (sendHome)
 				UI.getCurrent().addWindow(confirm);
