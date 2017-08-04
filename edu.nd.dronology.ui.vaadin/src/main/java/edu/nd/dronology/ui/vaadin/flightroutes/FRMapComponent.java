@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.vaadin.addon.leaflet.LMap;
+import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
@@ -17,6 +18,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -36,6 +38,8 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
+import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities.MarkerMouseOutListener;
+import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities.MarkerMouseOverListener;
 
 /**
  * This is the map component for the Flight Routes UI. It has the code for creating waypoint windows and popup views, the functions related to
@@ -316,7 +320,7 @@ public class FRMapComponent extends CustomComponent {
 	public void cancelClick() {
 		utilities.disableRouteEditing();
 		
-		if (storedPoints.size() != 0) {
+//		if (/*storedPoints.size() != 0*/true) {
 			for (int i = 0; i < utilities.getMapPoints().size(); i++) {
 				utilities.getMapPoints().remove(i);
 			}
@@ -330,7 +334,7 @@ public class FRMapComponent extends CustomComponent {
 			utilities.getTableDisplay().setGrid(utilities.getMapPoints());
 			utilities.removeAllMarkers(utilities.getPins());
 			utilities.removeAllLines(utilities.getPolylines());
-				
+			
 			for (int i = 0; i < storedPoints.size(); i++) {
 				WayPoint point = storedPoints.get(i);
 				utilities.addPinForWayPoint(point, true);
@@ -338,11 +342,10 @@ public class FRMapComponent extends CustomComponent {
 			
 			utilities.updatePinColors();
 			utilities.drawLines(storedPoints, true, 0, false);
-			
-		} else {
-			displayByName(selectedRoute, selectedRoute.getName(), selectedRoute.getWaypoints().size(), false, zoomRoute);
-		}
-		
+//		} else {
+//			displayByName(selectedRoute, selectedRoute.getName(), 0, false, zoomRoute);
+//		}
+//		
 		layout.removeComponent(editBar);
 		leafletMap.addStyleName("bring_back");
 		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
@@ -431,53 +434,68 @@ public class FRMapComponent extends CustomComponent {
 		}
 		
 		// Tests if points were added or deleted. If added, an identical ArrayList of waypoints is created (this is a workaround to remove the click-listeners).
-		if(storedPoints.size() < utilities.getMapPoints().size()) {
-			for (int i = 0; i < storedPoints.size(); i++) {
-				storedPoints.remove(i);
-			}
-			storedPoints.clear();
-			
-			for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-				String alt = utilities.getMapPoints().get(i).getAltitude();
-				String lon = utilities.getMapPoints().get(i).getLongitude();
-				String lat = utilities.getMapPoints().get(i).getLatitude();
-				String trans = utilities.getMapPoints().get(i).getTransitSpeed();
-				
-				Point pt = new Point();
-				
-				pt.setLat(Double.valueOf(lat));
-				pt.setLon(Double.valueOf(lon));
-				
-				WayPoint way = new WayPoint(pt, false);
-				way.setAltitude(alt);
-				way.setTransitSpeed(trans);
-				
-				storedPoints.add(way);
-			}
-			
-			for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-				utilities.getMapPoints().remove(i);
-			}
-			utilities.getMapPoints().clear();
-			// Waypoints are re-loaded into mapPoints, but without click listeners.
-			for (int i = 0; i < storedPoints.size(); i++) {
-				storedPoints.get(i).setId(UUID.randomUUID().toString());
-				utilities.getMapPoints().add(storedPoints.get(i));
-			}
-			
-			// Then, the map has the points and lines redrawn.
-			utilities.getGrid().setItems(utilities.getMapPoints());
-			
-			utilities.removeAllMarkers(utilities.getPins());
-			utilities.removeAllLines(utilities.getPolylines());
-			
-			for (int i = 0; i < storedPoints.size(); i++) {
-				WayPoint point = storedPoints.get(i);
-				utilities.addPinForWayPoint(point, true);
-			}
-			
-			utilities.drawLines(storedPoints, true, 0, false);
+
+		for (int i = 0; i < storedPoints.size(); i++) {
+			storedPoints.remove(i);
 		}
+		storedPoints.clear();
+		
+		for (int i = 0; i < utilities.getMapPoints().size(); i++) {
+			String alt = utilities.getMapPoints().get(i).getAltitude();
+			String lon = utilities.getMapPoints().get(i).getLongitude();
+			String lat = utilities.getMapPoints().get(i).getLatitude();
+			String trans = utilities.getMapPoints().get(i).getTransitSpeed();
+			
+			Point pt = new Point();
+			
+			pt.setLat(Double.valueOf(lat));
+			pt.setLon(Double.valueOf(lon));
+			
+			WayPoint way = new WayPoint(pt, false);
+			way.setAltitude(alt);
+			way.setTransitSpeed(trans);
+			
+			storedPoints.add(way);
+		}
+		
+		for (int i = 0; i < utilities.getMapPoints().size(); i++) {
+			utilities.getMapPoints().remove(i);
+		}
+		utilities.getMapPoints().clear();
+		// Waypoints are re-loaded into mapPoints, but without click listeners.
+		for (int i = 0; i < storedPoints.size(); i++) {
+			storedPoints.get(i).setId(UUID.randomUUID().toString());
+			utilities.getMapPoints().add(storedPoints.get(i));
+		}
+		
+		// Then, the map has the points and lines redrawn.
+		utilities.getGrid().setItems(utilities.getMapPoints());
+		
+		utilities.removeAllMarkers(utilities.getPins());
+		utilities.removeAllLines(utilities.getPolylines());
+		
+		for (int i = 0; i < storedPoints.size(); i++) {
+			WayPoint point = storedPoints.get(i);
+			utilities.addPinForWayPoint(point, true);
+		}
+		
+		utilities.drawLines(storedPoints, true, 0, false);
+
+		List<LMarker> oldPins = utilities.getPins();
+		List<LMarker> newPins = new ArrayList<>();
+		
+		for (int i = 0; i < oldPins.size(); i++) {
+			LMarker newPin = new LMarker(oldPins.get(i).getPoint());
+			utilities.addPinListeners(newPin);
+			newPins.add(newPin);
+		}
+		
+		utilities.getPins().clear();
+		
+		for (int i = 0; i < newPins.size(); i++) {
+			utilities.getPins().add(newPins.get(i));
+		}
+
 		utilities.disableRouteEditing();
 		for (int i = 0; i < utilities.getMapPoints().size(); i++) {
 			utilities.getMapPoints().get(i).setOrder(i+1);

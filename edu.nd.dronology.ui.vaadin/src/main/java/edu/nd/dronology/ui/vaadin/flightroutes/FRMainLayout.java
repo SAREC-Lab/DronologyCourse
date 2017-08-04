@@ -191,6 +191,10 @@ public class FRMainLayout extends CustomComponent {
 			flightWaypoints = new ArrayList<>();
 		}
 		
+		if (flightWaypoints.size() == 0) {
+			map.getUtilities().clearMapPoints();
+		}
+		
 		// removes old pins, polylines, and style when switching routes
 		if(routeLayout.getComponentIndex(child) != -1){
 			map.getUtilities().removeAllMarkers(map.getUtilities().getPins());

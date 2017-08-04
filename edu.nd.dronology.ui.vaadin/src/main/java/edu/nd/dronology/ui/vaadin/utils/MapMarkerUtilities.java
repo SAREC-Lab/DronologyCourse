@@ -28,6 +28,7 @@ import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -45,7 +46,7 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRTableDisplay;
  */
 
 public class MapMarkerUtilities {
-	private class MarkerMouseOverListener implements LeafletMouseOverListener {
+	public class MarkerMouseOverListener implements LeafletMouseOverListener {
 		// Sets the values for the popup views shown when hovering the mouse over a waypoint. Window is created in the FRMapComponent class.
 
 		@Override
@@ -147,7 +148,7 @@ public class MapMarkerUtilities {
 			// Puts the popup view on the screen once all of its new parameters are set.
 		}
 	}
-	private class MarkerMouseOutListener implements LeafletMouseOutListener {
+	public class MarkerMouseOutListener implements LeafletMouseOutListener {
 		/* Closes the popup view created in the mouse over listener above if the mouse leaves the waypoint unless it leaves in the bottom right hand quadrant when
 		 * the map is in edit mode. This is because the popup view is supposed to show up in the bottom right hand quadrant, and the "Remove Waypoint" button needs
 		 * to be accessible when the map is in edit mode. 
@@ -484,6 +485,10 @@ public class MapMarkerUtilities {
 	//clears the waypoints from mapPoints starting at a certain index (but does not delete waypoints at lower indices)
 	public void clearMapPointsIndex(int index){
 		mapPoints.subList(index, mapPoints.size()).clear();
+	}
+	public void addPinListeners(LMarker pin) {
+		pin.addMouseOverListener(new MarkerMouseOverListener());
+		pin.addMouseOutListener(new MarkerMouseOutListener());
 	}
 	//returns whether or not edit mode has been enabled
 	public boolean isEditable () {
