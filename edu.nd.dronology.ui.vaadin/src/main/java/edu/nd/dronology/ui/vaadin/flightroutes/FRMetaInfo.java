@@ -52,7 +52,7 @@ public class FRMetaInfo extends CustomComponent {
 		} else {
 			waypointLabel = new Label(" (" +  numWaypoints +  " waypoints)", ContentMode.HTML);
 		}
-		
+		//the two labels are initialized separately so that they can be changed independently later
 		HorizontalLayout labels = new HorizontalLayout();
 		labels.addComponents(nameOnly, waypointLabel);
 
@@ -82,6 +82,7 @@ public class FRMetaInfo extends CustomComponent {
 		allContent.addStyleName("has_route");
 		tableView.setValue(true);
 		
+		//a layout is used to hold the description label so that a LayoutClickListener can be added later
 		HorizontalLayout descriptionHolder = new HorizontalLayout();
 		routeDescription = map.getRouteDescription();
 		Label description = new Label(routeDescription);
@@ -99,6 +100,7 @@ public class FRMetaInfo extends CustomComponent {
 		VerticalLayout rightSide = new VerticalLayout();
 		rightSide.addComponents(buttons, checkboxes);
 		
+		//"leftSide" includes the labels and description, while "rightSide" includes the buttons and checkboxes
 		allContent.addComponents(leftSide, rightSide);
 		allContent.setComponentAlignment(leftSide, Alignment.TOP_LEFT);
 		allContent.setComponentAlignment(rightSide, Alignment.MIDDLE_RIGHT);
@@ -171,6 +173,7 @@ public class FRMetaInfo extends CustomComponent {
 		});
 		// Textfield turns back into the correct label once the user clicks away.
 		textField.addBlurListener(e -> {			
+			//removes and re-adds components so that they are in correct layout
 			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
 			allContent.removeAllComponents();
 			labels.removeAllComponents();
@@ -182,6 +185,7 @@ public class FRMetaInfo extends CustomComponent {
 			
 			allContent.addComponents(leftSide, rightSide);
 			
+			//gets the value from the textbox and saves it to Dronology
 			rightSide.addStyleName("route_meta_controls");
 			String routeName = textField.getValue();
 			map.setRouteNameDescription(routeName, true);
@@ -198,6 +202,7 @@ public class FRMetaInfo extends CustomComponent {
 		});
 		// Once the user clicks away from the description field, the correct label is shown.
 		descriptionField.addBlurListener(e -> {
+			//removes and re-adds components so that they are in correct layout
 			routeDescription = descriptionField.getValue();
 			description.setValue(routeDescription);
 			
@@ -207,6 +212,7 @@ public class FRMetaInfo extends CustomComponent {
 			leftSide.addComponents(labels, descriptionHolder);
 			allContent.addComponents(leftSide, rightSide);
 			
+			//gets the value from the textbox and saves it to Dronology
 			rightSide.addStyleName("route_meta_controls");
 			descriptionField.setValue(routeDescription);
 			map.setRouteNameDescription(routeDescription, false);
