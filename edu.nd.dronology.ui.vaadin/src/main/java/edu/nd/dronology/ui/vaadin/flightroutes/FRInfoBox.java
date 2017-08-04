@@ -93,11 +93,11 @@ public class FRInfoBox extends CustomComponent {
 				panel.getControls().getLayout().deleteInEdit();
 			}else{
 				UI.getCurrent().addWindow(deleteRoute.getWindow());
-				whichBox = this.getid();
+				whichBox = this.getId();
 				//uses the id of the specific infobox and the route list from the infopanel to find the index of the route that should be deleted 
 				for(int i = 0; i < panel.getRoutes().getComponentCount(); i++){
 					FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
-					if(local.getid().equals(whichBox)){
+					if(local.getId().equals(whichBox)){
 						index = counter;
 					}else{
 						counter++;
@@ -212,7 +212,8 @@ public class FRInfoBox extends CustomComponent {
 		this.name = name;
 	}
 	//gets the route id
-	public String getid(){
+	@Override
+	public String getId(){
 		return id;
 	}
 	//set the route id

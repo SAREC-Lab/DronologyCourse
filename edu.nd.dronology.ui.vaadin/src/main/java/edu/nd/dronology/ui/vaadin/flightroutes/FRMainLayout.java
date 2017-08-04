@@ -156,7 +156,7 @@ public class FRMainLayout extends CustomComponent {
 		else {
 			//checks the id's of the infoboxes to get the correct child if it was null
 			for (int i = 0; i < routeLayout.getComponentCount(); i++){
-				if (component.getid().equals(((FRInfoBox) routeLayout.getComponent(i)).getid())){
+				if (component.getId().equals(((FRInfoBox) routeLayout.getComponent(i)).getId())){
 					child = routeLayout.getComponent(i);
 				}
 			}
