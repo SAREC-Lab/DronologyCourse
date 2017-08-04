@@ -18,7 +18,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -38,8 +37,6 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
-import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities.MarkerMouseOutListener;
-import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities.MarkerMouseOverListener;
 
 /**
  * This is the map component for the Flight Routes UI. It has the code for creating waypoint windows and popup views, the functions related to
