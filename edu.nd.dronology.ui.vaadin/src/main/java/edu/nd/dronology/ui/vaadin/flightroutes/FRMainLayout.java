@@ -23,7 +23,7 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
- * This is the main layout for the Flight Routes UI
+ * This is the main layout for the Flight Routes UI.
  * 
  * @author Jinghui Cheng
  */
@@ -61,7 +61,7 @@ public class FRMainLayout extends CustomComponent {
 		map.display();
 		name = controls.getInfoPanel().getName();
 		
-		// adds click listener to route list
+		// Adds click listener to route list.
 		routeLayout.addLayoutClickListener(e -> {
 			if (map.getUtilities().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
@@ -69,7 +69,7 @@ public class FRMainLayout extends CustomComponent {
 				Button no = new Button("No");
 				buttons.addComponents(yes, no);
 				
-				//creates a window to warn the user about discarding unsaved changes
+				// Creates a window to warn the user about discarding unsaved changes.
 				VerticalLayout windowContent = new VerticalLayout();
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
@@ -87,7 +87,7 @@ public class FRMainLayout extends CustomComponent {
 				
 				UI.getCurrent().addWindow(warning);
 				
-				//click listeners for buttons on window
+				// Click listeners for buttons on window.
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					switchWindows(e, map, null);
@@ -96,22 +96,21 @@ public class FRMainLayout extends CustomComponent {
 				no.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 				});
-			}
-			else {
-				//if map is not in edit mode, then just switch to the other route
+			} else {
+				// If map is not in edit mode, then just switch to the other route.
 				switchWindows(e, map, null);
 			}		
 		});
-		//adds click listener to new route button on info panel
-		controls.getInfoPanel().getNewRouteButton().addClickListener(e->{
-			//only prompts user if map is in edit mode
+		// Adds click listener to new route button on info panel.
+		controls.getInfoPanel().getNewRouteButton().addClickListener(e -> {
+			// Only prompts user if map is in edit mode.
 			if (map.getUtilities().isEditable()) {
 				HorizontalLayout buttons = new HorizontalLayout();
 				Button yes = new Button("Yes");
 				Button no = new Button("No");
 				buttons.addComponents(yes, no);
 				
-				//creates a window to warn the user about discarding unsaved changes
+				// Creates a window to warn the user about discarding unsaved changes.
 				VerticalLayout windowContent = new VerticalLayout();
 				Label statement = new Label("You have unsaved changes on " + name + ".");
 				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
@@ -129,7 +128,7 @@ public class FRMainLayout extends CustomComponent {
 				
 				UI.getCurrent().addWindow(warning);
 				
-				//click listeners for buttons on window
+				// Click listeners for buttons on window.
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					map.displayNoRoute();
@@ -145,49 +144,49 @@ public class FRMainLayout extends CustomComponent {
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
-	//displays the route that is clicked. Passes in the click event, map, and infobox that was clicked
+	// Displays the route that is clicked. Passes in the click event, map, and infobox that was clicked.
 	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
 		isNew = false;
-		//gets box of route info and changes its style to show that it is selected
-		Component child = component; //to initialize the variable
-		if (e != null){
+		// Gets box of route info and changes its style to show that it is selected.
+		Component child = component;
+		// To initialize the variable.
+		if (e != null) {
 			child = e.getChildComponent();
-		}
-		else {
-			//checks the id's of the infoboxes to get the correct child if it was null
-			for (int i = 0; i < routeLayout.getComponentCount(); i++){
-				if (component.getId().equals(((FRInfoBox) routeLayout.getComponent(i)).getId())){
+		} else {
+			// Checks the id's of the infoboxes to get the correct child if it was null.
+			for (int i = 0; i < routeLayout.getComponentCount(); i++) {
+				if (component.getId().equals(((FRInfoBox) routeLayout.getComponent(i)).getId())) {
 					child = routeLayout.getComponent(i);
 				}
 			}
 		}
-		//-1 represent the area inbetween the infoboxes, or if the index was not set
-		if(routeLayout.getComponentIndex(child) != -1){
+		// -1 represent the area inbetween the infoboxes, or if the index was not set.
+		if (routeLayout.getComponentIndex(child) != -1) {
 			child.addStyleName("info_box_focus");
 		}
 
 		index = routeLayout.getComponentIndex(child);
 
-		//gets the flight info for that route
+		// Gets the flight info for that route.
 		flightInfo = controls.getInfoPanel().getFlight(index);
 		
-		//creates an arraylist of infoboxes and adds click listeners to the 'yes' buttons on their respective delete bars
+		// Creates an arraylist of infoboxes and adds click listeners to the 'yes' buttons on their respective delete bars.
 		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
 		for(FRInfoBox box: list){
 			box.getDeleteBar().getYesButton().addClickListener(even->{
-				//if the 'yes' button is clicked, no route is displayed and the info panel is refreshed (route is deleted in FRDeleteRoute)
+				// If the 'yes' button is clicked, no route is displayed and the info panel is refreshed (route is deleted in FRDeleteRoute).
 				map.displayNoRoute();
 				map.exitEditMode();
 				controls.getInfoPanel().refreshRoutes();
 			});
 		}
 		
-		//stores list of waypoints of relevant flight
+		// Stores list of waypoints of relevant flight.
 		List<Waypoint> flightWaypoints = new ArrayList<>();
-		if(routeLayout.getComponentIndex(child) != -1){
+		if (routeLayout.getComponentIndex(child) != -1) {
 			flightWaypoints = flightInfo.getWaypoints();
 			name = flightInfo.getName();
-		}else{
+		} else {
 			flightWaypoints = new ArrayList<>();
 		}
 		
@@ -195,8 +194,8 @@ public class FRMainLayout extends CustomComponent {
 			map.getUtilities().clearMapPoints();
 		}
 		
-		// removes old pins, polylines, and style when switching routes
-		if(routeLayout.getComponentIndex(child) != -1){
+		// Removes old pins, polylines, and style when switching routes.
+		if (routeLayout.getComponentIndex(child) != -1) {
 			map.getUtilities().removeAllMarkers(map.getUtilities().getPins());
 			map.getUtilities().removeAllLines(map.getUtilities().getPolylines());
 		}
@@ -207,9 +206,9 @@ public class FRMainLayout extends CustomComponent {
 		List<WayPoint> wayPoints = new ArrayList<>();
 		Point pt = new Point();
 		
-		//iterates through the flight info and adds to internal waypoints list
+		// Iterates through the flight info and adds to internal waypoints list.
 		for (Waypoint coor : flightWaypoints) {
-			//NOTE: Waypoint and WayPoint are two different objects. Here I convert from one to the other, as WayPoint is what we need later
+			// *** NOTE: Waypoint and WayPoint are two different objects. Here I convert from one to the other, as WayPoint is what we need later. ***
 			String altitude = String.valueOf(coor.getCoordinate().getAltitude());
 			String approachingSpeed = String.valueOf(coor.getApproachingspeed());
 			
@@ -225,39 +224,39 @@ public class FRMainLayout extends CustomComponent {
 			first = false;
 		}
 
-		//adds the lines to the map
+		// Adds the lines to the map.
 		map.getUtilities().drawLines(wayPoints, true, 1, false);
 
 		numComponents = routeLayout.getComponentCount();
 		
-		// when one route is clicked, the others go back to default background color
+		// When one route is clicked, the others go back to default background color.
 		for (int i = 0; i < numComponents; i++) {
 			if (i != index) {
 				routeLayout.getComponent(i).removeStyleName("info_box_focus");
 			}
 		}
-		//toDo sets whether or not to center and zoom levels should be reset when changing flight routes
+		// toDo sets whether or not to center and zoom levels should be reset when changing flight routes.
 		map.setRouteCenter(map.getZoomRoute());
 		
-		//displays map
-		if(routeLayout.getComponentIndex(child) != -1){
+		// Displays map.
+		if (routeLayout.getComponentIndex(child) != -1) {
 			map.displayByName(flightInfo, null, 0, false, map.getZoomRoute());
 		}
-		//sets grid
-		if(routeLayout.getComponentIndex(child) != -1){
+		// Sets grid.
+		if (routeLayout.getComponentIndex(child) != -1) {
 			map.getTableDisplay().setGrid(wayPoints);
 			map.getUtilities().setMapPointsAltitude(wayPoints);
 			map.getUtilities().setMapPointsTransit(wayPoints);
 		}
 	}
-	//handles what should happen when the user clicks on one of the delete buttons while still in edit mode
-	public void deleteInEdit(){
+	// Handles what should happen when the user clicks on one of the delete buttons while still in edit mode.
+	public void deleteInEdit() {
 			HorizontalLayout buttons = new HorizontalLayout();
 			Button yes = new Button("Yes");
 			Button no = new Button("No");
 			buttons.addComponents(yes, no);
 			
-			//creates a window to warn the user
+			// Creates a window to warn the user.
 			VerticalLayout windowContent = new VerticalLayout();
 			Label statement = new Label("You have unsaved changes on " + name + ".");
 			Label question = new Label ("Are you sure you want to discard all unsaved changes?");
@@ -275,7 +274,7 @@ public class FRMainLayout extends CustomComponent {
 			
 			UI.getCurrent().addWindow(warning);
 			
-			//click listeners for yes and no button on window
+			// Click listeners for yes and no button on window.
 			yes.addClickListener(event -> {
 				map.getDeleteBar().deleteRoute(map.getSelectedRoute());
 				UI.getCurrent().removeWindow(warning);
@@ -288,18 +287,18 @@ public class FRMainLayout extends CustomComponent {
 				controls.getInfoPanel().removeWindow();
 			});
 	}
-	//called if a new route is made, and displays the route on the map and table while enabling edit mode
-	public void drawRoute(){
+	// Called if a new route is made, and displays the route on the map and table while enabling edit mode.
+	public void drawRoute() {
 		isNew = true;
 		map.enableEdit();
 		map.getUtilities().enableRouteEditing();
 	
-		//to get rid of points and lines from previous routes
+		// To get rid of points and lines from previous routes.
 		map.getUtilities().removeAllMarkers(map.getUtilities().getPins());
 		map.getUtilities().removeAllLines(map.getUtilities().getPolylines());
 		map.getUtilities().getMapPoints().clear();
 		
-		//displays the drone information in the info bar
+		// Displays the drone information in the info bar.
 		newRoute = controls.getInfoPanel().getRoute();
 		int numCoords = newRoute.getWaypoints().size();
 		newRouteName = controls.getInfoPanel().getName();
@@ -310,49 +309,49 @@ public class FRMainLayout extends CustomComponent {
 		
 		flightInfo = controls.getInfoPanel().getFlight(index);
 	}
-	//when a route is deleted, this refreshes the routes in the info panel to reflect the data stored in Dronology 
-	public void deleteRouteUpdate(){
+	// When a route is deleted, this refreshes the routes in the info panel to reflect the data stored in Dronology.
+	public void deleteRouteUpdate() {
 		VaadinSession session = getSession();
-		if(session != null){
+		if (session != null) {
 			UI.getCurrent().access(() -> {	
 				controls.getInfoPanel().refreshRoutes();
 			});
 		}
 	}
-	//gets the controls component that holds the infoPanel and mainLayout
+	// Gets the controls component that holds the infoPanel and mainLayout.
 	public FRControlsComponent getControls() {
 		return controls;
 	}
-	//gets the index of the selected infobox (or -1 for when no box is selected)
+	// Gets the index of the selected infobox (or -1 for when no box is selected).
 	public int getIndex() {
 		return index;
 	}
-	//gets the currently displayed map
+	// Gets the currently displayed map.
 	public FRMapComponent getMap() {
 		return map;
 	}
-	//describes what should happen when the user clicks on the edit button of a specific box (basically switches to that window and enables editing)
-	public void editClick(FRInfoBox infoBox){
+	// Describes what should happen when the user clicks on the edit button of a specific box (basically switches to that window and enables editing).
+	public void editClick(FRInfoBox infoBox) {
 		switchWindows(null, map, infoBox);
 		map.enableEdit();
 	}
-	//enables map editing by calling function from MapComponent
+	// Enables map editing by calling a function from MapComponent.
 	public void enableMapEdit(){
 		map.enableEdit();
 	}
-	//gets the flight info of the selected route
+	// Gets the flight info of the selected route.
 	public FlightRouteInfo getFlightInfo() {
 		return flightInfo;
 	}
-	//gets the flight info of a new route
+	// Gets the flight info of a new route.
 	public FlightRouteInfo getNewRoute() {
 		return newRoute;
 	}
-	//gets the name of the new route
+	// Gets the name of the new route.
 	public String getNewRouteName() {
 		return newRouteName;
 	}
-	//signals if the selected infobox is representing a new route (false if not)
+	// Signals if the selected infobox is representing a new route (false if not).
 	public boolean isNew() {
 		return isNew;
 	}

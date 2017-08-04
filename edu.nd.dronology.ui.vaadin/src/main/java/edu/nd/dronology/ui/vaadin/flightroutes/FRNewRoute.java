@@ -9,7 +9,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 /**
- * This is the menu that allows the user to add a new route with a specified  name and description
+ * This is the menu that allows the user to add a new route with a specified  name and description.
  * 
  * @author James Holland
  */
@@ -27,8 +27,8 @@ public class FRNewRoute extends CustomComponent{
 	private Button cancelButton = new Button("Cancel");
 	private Button drawButton = new Button("Draw Route");
 	
-	public FRNewRoute(){
-		//arranges layout of new route window
+	public FRNewRoute() {
+		// Arranges layout of new route window.
 		buttonLayout.addComponents(cancelButton, drawButton);
 		totalLayout.addComponents(directions, inputField, description, descriptionField, buttonLayout);
 		
@@ -38,16 +38,16 @@ public class FRNewRoute extends CustomComponent{
 		
 		setCompositionRoot(totalLayout);
 	}
-	public Button getDrawButton(){
+	public Button getDrawButton() {
 		return drawButton;
 	}
-	public TextField getInputField(){
+	public TextField getInputField() {
 		return inputField;
 	}
-	public Button getCancelButton(){
+	public Button getCancelButton() {
 		return cancelButton;
 	}
-	public TextArea getDescriptionField(){
+	public TextArea getDescriptionField() {
 		return descriptionField;
 	}
 }

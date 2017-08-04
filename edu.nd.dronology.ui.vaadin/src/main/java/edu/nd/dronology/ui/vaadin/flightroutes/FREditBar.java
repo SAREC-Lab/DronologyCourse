@@ -6,7 +6,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 
 /**
- * This class defines the bar overlaid on the map that signals when a route is in edit mode
+ * This class defines the bar overlaid on the map that signals when a route is in edit mode.
  * 
  * @author James Holland
  */
@@ -31,18 +31,18 @@ public class FREditBar extends CustomComponent{
 		totalLayout.addComponents(textLabel, smallText, cancelButton, saveButton);
 		setCompositionRoot(totalLayout);
 		
-		//click listeners for the cancel and saves buttons on edit bar - function are defined in FRMapComponent
-		cancelButton.addClickListener(e->{
+		// Click listeners for the cancel and saves buttons on edit bar - function are defined in FRMapComponent.
+		cancelButton.addClickListener(e -> {
 			map.cancelClick();
 		});
-		saveButton.addClickListener(e->{
+		saveButton.addClickListener(e -> {
 			map.saveClick();
 		});
 	}
-	public Button getCancelButton(){
+	public Button getCancelButton() {
 		return cancelButton;
 	}
-	public Button getSaveButton(){
+	public Button getSaveButton() {
 		return saveButton;
 	}
 }

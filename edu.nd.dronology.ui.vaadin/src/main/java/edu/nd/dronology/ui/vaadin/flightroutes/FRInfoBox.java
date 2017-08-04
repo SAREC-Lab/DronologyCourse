@@ -17,9 +17,9 @@ import edu.nd.dronology.services.core.info.FlightRouteInfo;
 
 /**
  * 
- * This layout gives information about each of the flight routes along with options to edit or delete
+ * This layout gives information about each of the flight routes along with options to edit or delete.
  * 
- * @author jhollan4
+ * @author James Holland
  *
  */
 
@@ -57,18 +57,18 @@ public class FRInfoBox extends CustomComponent {
 		allContent = new VerticalLayout();
 		routeDescription.addStyleName("detailed_info_well");
 	
-		//create name id label
+		// Create name id label.
 		nameIdLabel = new Label(name);
 		nameIdLabel.addStyleName("info_box_name");
 			
-		//this section creates 3 different labels and adds styles to format them appropriately
+		// Creates 3 different labels and adds styles to format them appropriately.
 		Label createdLabel = new Label("Created:  " + created);
 		Label modifiedLabel = new Label("Last Modified:  " + modified);
 		Label lengthLabel = new Label("Total Length: " + length);
 		
 		routeDescription.addComponents(createdLabel, modifiedLabel, lengthLabel);
 		
-		//imports images for buttons
+		// Imports images for buttons.
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/edit.png"));
 		FileResource trashIcon = new FileResource(new File(basepath+"/VAADIN/img/trashcan.png"));
 		
@@ -82,37 +82,38 @@ public class FRInfoBox extends CustomComponent {
 		
 		titleBar.addComponents(nameIdLabel, trashButton, editButton);
 		
-		//adds all content together and aligns the buttons on the right
+		// Adds all content together and aligns the buttons on the right.
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
 
-		//adds listener to the delete button on the route box 
+		// Adds listener to the delete button on the route box /
 		trashButton.addListener(e->{
-			if(panel.getControls().getLayout().getMap().getUtilities().isEditable()){  //checks if the route is in edit mode
+			if (panel.getControls().getLayout().getMap().getUtilities().isEditable()) {
+				// Checks if the route is in edit mode.
 				panel.getControls().getLayout().deleteInEdit();
-			}else{
+			} else {
 				UI.getCurrent().addWindow(deleteRoute.getWindow());
 				whichBox = this.getId();
-				//uses the id of the specific infobox and the route list from the infopanel to find the index of the route that should be deleted 
-				for(int i = 0; i < panel.getRoutes().getComponentCount(); i++){
+				// Uses the id of the specific infobox and the route list from the infopanel to find the index of the route that should be deleted.
+				for (int i = 0; i < panel.getRoutes().getComponentCount(); i++) {
 					FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
-					if(local.getId().equals(whichBox)){
+					if (local.getId().equals(whichBox)) {
 						index = counter;
-					}else{
+					} else {
 						counter++;
 					}
 				}
-				//gets the FlightRouteInfo at that index and sets it to be deleted
+				// Gets the FlightRouteInfo at that index and sets it to be deleted.
 				finfo = panel.getFlight(index);
 				deleteRoute.setRouteInfoTobeDeleted(finfo);
 			}
 		});
-		//refreshes routes immediately after the "yes" on window is clicked 
+		// Refreshes routes immediately after the "yes" on window is clicked.
 		deleteRoute.getYesButton().addClickListener(e -> {
 			panel.refreshRoutes();
 		});
-		//a click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes
+		// A click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes.
 		editButton.addClickListener(e -> {
 			if (!panel.getControls().getLayout().getMap().getUtilities().isEditable()) {
 				panel.getControls().getLayout().enableMapEdit();
@@ -140,7 +141,7 @@ public class FRInfoBox extends CustomComponent {
 				yes.addStyleName("btn-danger");
 				
 				UI.getCurrent().addWindow(warning);
-				//click listeners for the buttons on the window asking the user about discarding unsaved changes
+				// Click listeners for the buttons on the window asking the user about discarding unsaved changes.
 				yes.addClickListener(event -> {
 					UI.getCurrent().removeWindow(warning);
 					panel.getControls().getLayout().getMap().displayNoRoute();
@@ -153,9 +154,8 @@ public class FRInfoBox extends CustomComponent {
 			panel.getControls().getLayout().getMap().editButton();
 		});
 	}
-	//this infobox constructor is called from activeflights
-	public FRInfoBox(String name, String id, String created, String modified, String length){
-		
+	// This infobox constructor is called from activeflights.
+	public FRInfoBox(String name, String id, String created, String modified, String length) {
 		this.name = name;
 		this.id = id;
 		this.modified = modified;
@@ -169,18 +169,18 @@ public class FRInfoBox extends CustomComponent {
 		HorizontalLayout titleBar = new HorizontalLayout();
 		VerticalLayout allContent = new VerticalLayout();
 		
-		//create name id label
+		// Create name id label.
 		Label nameIdLabel = new Label(name);
 		nameIdLabel.addStyleName("info_box_name");
 			
-		//this next section creates 3 different labels and adds styles to format them appropriately
+		// Creates 3 different labels and adds styles to format them appropriately.
 		Label createdLabel = new Label("Created:  " + created);
 		Label modifiedLabel = new Label("Last Modified:  " + modified);
 		Label lengthLabel = new Label("Total Length: " + length);
 		
 		routeDescription.addComponents(createdLabel, modifiedLabel, lengthLabel);
 		
-		//imports images for buttons
+		// Imports images for buttons.
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/edit.png"));
 		FileResource trashIcon = new FileResource(new File(basepath+"/VAADIN/img/trashcan.png"));
 		
@@ -194,50 +194,50 @@ public class FRInfoBox extends CustomComponent {
 		
 		titleBar.addComponents(nameIdLabel, trashButton, editButton);
 		
-		//adds all content together and aligns the buttons on the right
+		// Adds all content together and aligns the buttons on the right.
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
 	}
-	//default if no parameters are passed
-	public FRInfoBox(FRInfoPanel panel){	
+	// Default if no parameters are passed.
+	public FRInfoBox(FRInfoPanel panel) {	
 		this("NAME", "id", "Jun 3, 2017, 9:24 AM", "Jun 8, 2017, 11:04 AM", "2.1 miles", panel);
 	}
-	//gets the name of the route
-	public String getName(){
+	// Gets the name of the route.
+	public String getName() {
 		return name;
 	}
-	//sets the name of the route
-	public void setName(String name){
+	// Sets the name of the route.
+	public void setName(String name) {
 		this.name = name;
 	}
-	//gets the route id
+	// Gets the route id.
 	@Override
-	public String getId(){
+	public String getId() {
 		return id;
 	}
-	//set the route id
-	public void setid(String id){
+	// Sets the route id.
+	public void setid(String id) {
 		this.id = id;
 	}
-	//gets the modified time and date
-	public String getModified(){
+	// Gets the modified time and date.
+	public String getModified() {
 		return modified;
 	}
-	//sets the modified time and date
-	public void setModified(String modified){
+	// Sets the modified time and date.
+	public void setModified(String modified) {
 		this.modified = modified;
 	}
-	//gets the window that asks the user if they want to delete the route or not
-	public FRDeleteRoute getDeleteBar(){
+	// Gets the window that asks the user if they want to delete the route or not.
+	public FRDeleteRoute getDeleteBar() {
 		return deleteRoute;
 	}
-	//gets the delete button on the edit box
-	public Button getTrashButton(){
+	// Gets the delete button on the edit box.
+	public Button getTrashButton() {
 		return trashButton;
 	}
-	//gets teh edit button on the info box
-	public Button getEditButton(){
+	// Gets the edit button on the info box.
+	public Button getEditButton() {
 		return editButton;
 	}
 }

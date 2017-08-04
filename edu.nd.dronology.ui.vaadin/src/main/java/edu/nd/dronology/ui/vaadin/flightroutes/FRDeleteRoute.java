@@ -16,7 +16,7 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
- * This class defines the window that asks the user if they want to delete a specified route
+ * This class defines the window that asks the user if they want to delete a specified route.
  * 
  * @author James Holland
  */
@@ -77,11 +77,7 @@ public class FRDeleteRoute extends CustomComponent{
 		window.setResizable(false);
 		window.setClosable(false);
 		window.setPosition(800, 200);
-		
-		noButton.addClickListener(e -> {
-			window.close();
-		});
-		
+
 		yesButton.addClickListener(e -> {
 			window.close();
 			if (infoTobeDeleted != null) {	
@@ -89,6 +85,10 @@ public class FRDeleteRoute extends CustomComponent{
 				infoTobeDeleted = null;
 			}	
 		});	
+		
+		noButton.addClickListener(e -> {
+			window.close();
+		});
 	}
 	// Deletes a route from Dronology based on the FlightRouteInfo.
 	public void deleteRoute(FlightRouteInfo routeinfo) {
@@ -123,5 +123,6 @@ public class FRDeleteRoute extends CustomComponent{
 	}
 	public Window getWindow() {
 		return window;
+		// Returns the window so it can be added to/deleted from the current UI.
 	}
 }

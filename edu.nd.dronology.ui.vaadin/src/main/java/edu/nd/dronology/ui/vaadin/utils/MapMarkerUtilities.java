@@ -232,7 +232,7 @@ public class MapMarkerUtilities {
 		grid.getColumn("latitude").setCaption("Latitude");
 		grid.getColumn("longitude").setCaption("Longitude");
 	}
-	public MapMarkerUtilities(LMap map){
+	public MapMarkerUtilities(LMap map) {
 		this.map = map;
 	}
 	//adds a new pin at a specified point and at a certain index in the list of waypoints (index is relevant when adding a waypoint between two other waypoints)
@@ -325,17 +325,17 @@ public class MapMarkerUtilities {
 		}
 
 		//resets the colors so that the first and last are green and red respectively - all others are blue
-		for(int i = 0; i < storedPins.size(); i++){
-			if(i == 0){
+		for (int i = 0; i < storedPins.size(); i++) {
+			if (i == 0) {
 				storedPins.get(i).setIcon(greenIcon);
 				storedPins.get(i).setIconSize(new Point(41, 41));
 				storedPins.get(i).setIconAnchor(new Point(13, 41));
 			}
-			else if(i == storedPins.size() - 1){
+			else if (i == storedPins.size() - 1) {
 				storedPins.get(i).setIcon(redIcon);
 				storedPins.get(i).setIconSize(new Point(41, 41));
 				storedPins.get(i).setIconAnchor(new Point(13, 41));
-			}else{
+			} else {
 				storedPins.get(i).setIcon(blueIcon);
 				storedPins.get(i).setIconSize(new Point(41, 41));
 				storedPins.get(i).setIconAnchor(new Point(13, 41));
@@ -343,10 +343,10 @@ public class MapMarkerUtilities {
 			map.addComponent(storedPins.get(i));
 		}
 	}
-	//updates the lat and lon of a waypoint to the wayPoint passed in as an argument 
+	// Updates the latitude and longitude of a waypoint to the wayPoint passed in as an argument.
 	public void updatePinForWayPoint(WayPoint wayPoint) {
 		Iterator<Component> itr = map.iterator();
-		while(itr.hasNext()) {
+		while (itr.hasNext()) {
 			Object o = itr.next();
 			if (o.getClass() == LMarker.class) {
 				LMarker marker = (LMarker)o;
@@ -386,11 +386,14 @@ public class MapMarkerUtilities {
 			polyline.setId(UUID.randomUUID().toString());
 			
 			polyline.setWeight(current.isReached() ? 1 : 2);
-			if (mode == 0) //normal
+			if (mode == 0)
+				// Normal.
 				polyline.setColor("#444");
-			if (mode == 1) //selected
+			if (mode == 1)
+				// Selected.
 				polyline.setColor("#000");
-			if (mode == 2) //focused
+			if (mode == 2)
+				// Focused.
 				polyline.setColor("#d87703");
 			if (current.isReached()) {
 				polyline.setDashArray("5 10");
@@ -419,7 +422,7 @@ public class MapMarkerUtilities {
 		}
 		polylines.clear();
 	}
-	//enables route editing. This include adding of the the listeners to the markers and polyline while making the table editable and the map responsive
+	// Enables route editing. This include adding of the the listeners to the markers and polyline while making the table editable and the map responsive.
 	public void enableRouteEditing () {
 		map.setEnabled(true);
 		isEditable = true;
@@ -445,7 +448,7 @@ public class MapMarkerUtilities {
 		
 		tableDisplay.makeEditable(this);
 	}
-	//disables route editing by removing the click listeners and making the table uneditable, 
+	// Disables route editing by removing the click listeners and making the table uneditable.
 	public void disableRouteEditing () {
 		isEditable = false;
 		for (int i = 0; i < registeredListeners.size(); i++) {
@@ -481,27 +484,27 @@ public class MapMarkerUtilities {
 	public void clearMapPoints(){
 		mapPoints.clear();
 	}
-	//clears the waypoints from mapPoints starting at a certain index (but does not delete waypoints at lower indices)
-	public void clearMapPointsIndex(int index){
+	// Clears the waypoints from mapPoints starting at a certain index (but does not delete waypoints at lower indices).
+	public void clearMapPointsIndex(int index) {
 		mapPoints.subList(index, mapPoints.size()).clear();
 	}
 	public void addPinListeners(LMarker pin) {
 		pin.addMouseOverListener(new MarkerMouseOverListener());
 		pin.addMouseOutListener(new MarkerMouseOutListener());
 	}
-	//returns whether or not edit mode has been enabled
-	public boolean isEditable () {
+	// Returns whether or not edit mode has been enabled.
+	public boolean isEditable() {
 		return isEditable;
 	}
-	//returns the mapPoints list
+	// Returns the mapPoints list.
 	public List<WayPoint> getMapPoints() {
 		return mapPoints;
 	}
-	//returns the grid that is in the table
+	// Returns the grid that is in the table.
 	public Grid<WayPoint> getGrid() {
 		return grid;
 	}
-	//gets all of the polylines that are on the map
+	// Gets all of the polylines that are on the map.
 	public List<LPolyline> getPolylines() {
 		List<LPolyline> polylines = new ArrayList<>();
 		Iterator<Component> it = map.iterator();
@@ -513,7 +516,7 @@ public class MapMarkerUtilities {
 		}
 		return polylines;
 	}
-	//gets all of the pins that are on the map
+	// Gets all of the pins that are on the map.
 	public List<LMarker> getPins() {
 		List<LMarker> pins = new ArrayList<>();
 		Iterator<Component> it = map.iterator();
@@ -524,65 +527,65 @@ public class MapMarkerUtilities {
 		}
 		return pins;
 	}
-	//returns the map
+	// Returns the map.
 	public LMap getMap() {
 		return map;
 	}
-	//sets an arraylist of waypoints so that the grid displays them correctly
-	public void setAllItems(ArrayList<WayPoint> dronologyPoints){
+	// Sets an arraylist of waypoints so that the grid displays them correctly.
+	public void setAllItems(ArrayList<WayPoint> dronologyPoints) {
 		grid.setItems(dronologyPoints);
 	}
-	//takes a list of waypoints and sets it as the stored mapPoints
-	public void setMapPoints(List<WayPoint> waypoints){
+	// Takes a list of waypoints and sets it as the stored mapPoints.
+	public void setMapPoints(List<WayPoint> waypoints) {
 		mapPoints = waypoints;
 	}
-	//takes a list of waypoints and sets the altitude so that they match the altitude of the waypoint in the parameter at the same index
-	public void setMapPointsAltitude(List<WayPoint> wayPoints){
-		for(int i = 0; i < wayPoints.size(); i++){
+	// Takes a list of waypoints and sets the altitude so that they match the altitude of the waypoint in the parameter at the same index.
+	public void setMapPointsAltitude(List<WayPoint> wayPoints) {
+		for (int i = 0; i < wayPoints.size(); i++) {
 			mapPoints.get(i).setAltitude(wayPoints.get(i).getAltitude());
 		}
 	}
-	//takes a list of waypoints and sets the transit speed so that they match the altitude of the waypoint in the parameter at the same index
-	public void setMapPointsTransit(List<WayPoint> wayPoints){
-		for(int i = 0; i < wayPoints.size(); i++){
+	// Takes a list of waypoints and sets the transit speed so that they match the altitude of the waypoint in the parameter at the same index.
+	public void setMapPointsTransit(List<WayPoint> wayPoints) {
+		for (int i = 0; i < wayPoints.size(); i++) {
 			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
 		}
 	}
-	//refreshes the map and grid by removing lines, redrawing them, and then setting the map again
+	// Refreshes the map and grid by removing lines, redrawing them, and then setting the map again.
 	public void refreshMapAndGrid() {
 		removeAllLines(getPolylines());
 		drawLines(mapPoints, true, 1, false);
 		grid.setItems(mapPoints);
 	}
-	//gets the id of the selected waypoint (defined elsewhere)
+	// Gets the id of the selected waypoint (defined elsewhere).
 	public String getSelectedWayPointId() {
 		return selectedWayPointId;
 	}
-	//gets the LMarker that was just added
+	// Gets the LMarker that was just added.
 	public LMarker getLeafletMarker() {
 		return leafletMarker;
 	}
-	//gets the registered listeners on the markers (type is List<Registration>)
+	// Gets the registered listeners on the markers (type is List<Registration>).
 	public List<Registration> getRegisteredListeners() {
 		return registeredListeners;
 	}
-	//sets the list of current registered listeners
+	// Sets the list of current registered listeners.
 	public void setRegisteredListeners(List<Registration> registeredListeners) {
 		this.registeredListeners = registeredListeners;
 	}
-	//returns the mapComponent (use if the functions in FRMapComponent are needed)
+	// Returns the mapComponent (use if the functions in FRMapComponent are needed).
 	public FRMapComponent getMapComponent() {
 		return mapComponent;
 	}
-	//returns whether or not the item that was clicked is a polyline ("isPolyline" is set when an object is clicked)
+	// Returns whether or not the item that was clicked is a polyline ("isPolyline" is set when an object is clicked).
 	public boolean isPolyline() {
 		return isPolyline;
 	}
-	//used to manually set whether the object clicked is a polyline 
+	// Used to manually set whether the object clicked is a polyline.
 	public void setIsPolyline(boolean isPolyline) {
 		this.isPolyline = isPolyline;
 	}
-	//returns the table display
+	// Returns the table display.
 	public FRTableDisplay getTableDisplay() {
 		return tableDisplay;
 	}

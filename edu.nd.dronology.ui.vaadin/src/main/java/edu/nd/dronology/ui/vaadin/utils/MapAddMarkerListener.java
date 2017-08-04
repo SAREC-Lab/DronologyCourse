@@ -41,8 +41,7 @@ public class MapAddMarkerListener implements LeafletClickListener {
 				e.getPoint().getLon() >= -180 && e.getPoint().getLon() <= 180) {
 			// Adds a pin if the user clicks on the map in a valid place while the map is editable.
 			processOnClick(e.getPoint(), -1);
-		}
-		else {
+		} else {
 			route.setIsPolyline(false);
 			/* If the user clicked on a polyline, isPolyline in the MapMarkerUtilities class is set to false, as the PolylineClickListener will correctly add
 			 * the waypoint to the map. */
