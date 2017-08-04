@@ -294,6 +294,7 @@ public class MapMarkerUtilities {
 	//adds a pin in a location designated by the wayPoints. Also takes an argument determining whether or not to update marker colors when called
 	public void addPinForWayPoint(WayPoint wayPoint, boolean updateColors) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
+		addPinListeners(leafletMarker);
 		leafletMarker.setId(wayPoint.getId());
 		// Creates a new marker to show the position of the input waypoint.
 		
