@@ -52,16 +52,32 @@ public class FakePythonGroundstation {
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
 
+			LlaCoordinate cord1 = new LlaCoordinate(41.519200, -86.239127, 0);
+			LlaCoordinate cord2 = new LlaCoordinate(41.519400, -86.239527, 0);
+			LlaCoordinate cord3 = new LlaCoordinate(41.519600, -86.239927, 0);
+
 			UAVHandshakeMessage handshake = new UAVHandshakeMessage("Drone1", "Drone1");
-			handshake.setHome(new LlaCoordinate(1, 2, 3));
+			handshake.setHome(cord1);
 			handshake.setType(UAVHandshakeMessage.MESSAGE_TYPE);
 			File file = new File("sac" + File.separator + "sacjson.txt");
 			System.out.println(file.getAbsolutePath());
 			String sac = FileUtils.readFileToString(file);
 			handshake.addPropery("safetycase", sac);
 
+			UAVHandshakeMessage handshake2 = new UAVHandshakeMessage("Drone2", "Drone2");
+			handshake2.setHome(cord2);
+			handshake2.setType(UAVHandshakeMessage.MESSAGE_TYPE);
+			handshake2.addPropery("safetycase", sac);
+
+			UAVHandshakeMessage handshake3 = new UAVHandshakeMessage("Drone3", "Drone3");
+			handshake3.setHome(cord3);
+			handshake3.setType(UAVHandshakeMessage.MESSAGE_TYPE);
+			handshake3.addPropery("safetycase", sac);
+
 			String handshakeString = GSON.toJson(handshake);
-			Thread.sleep(10000);
+			String handshakeString2 = GSON.toJson(handshake2);
+			String handshakeString3 = GSON.toJson(handshake3);
+			Thread.sleep(3000);
 			OutputStream os = socket.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os);
 			BufferedWriter bw = new BufferedWriter(osw);
@@ -69,9 +85,22 @@ public class FakePythonGroundstation {
 			bw.write("\n");
 			System.out.println("Message sent to the client is " + handshakeString);
 			bw.flush();
-			br.readLine();
+
+			Thread.sleep(1000);
+			bw.write(handshakeString2);
 			bw.write("\n");
+			System.out.println("Message sent to the client is " + handshakeString2);
 			bw.flush();
+
+			Thread.sleep(1000);
+			bw.write(handshakeString3);
+			bw.write("\n");
+			System.out.println("Message sent to the client is " + handshakeString3);
+			bw.flush();
+
+			// br.readLine();
+			// bw.write("\n");
+			// bw.flush();
 
 			Thread.sleep(500);
 			int run = 0;
@@ -80,7 +109,8 @@ public class FakePythonGroundstation {
 				if (run % 5 == 0) {
 					toSend = sendMonitoringMessage();
 				} else {
-					toSend = sendStatusMessage();
+					// toSend = sendStatusMessage();
+					toSend = sendMonitoringMessage();
 				}
 
 				// if flying mission mlevel > 20%
@@ -131,11 +161,11 @@ public class FakePythonGroundstation {
 		// mm.setuavid("DRONE1");
 
 		mm.addPropery("longitude", "23");
-		mm.addPropery("velocity", "50");
+		mm.addPropery("velocity", "80");
 		mm.addPropery("altitude", "50");
-		mm.addPropery("battery_remaining_percentage", rand.nextInt(10) + 11);
+		mm.addPropery("battery_remaining_percentage", rand.nextInt(10) + 1);
 		mm.addPropery("gps_bias", "1");
-		mm.addPropery("max_velocity", "60");
+		// mm.addPropery("max_velocity", "60");
 		String toSend = GSON.toJson(mm);
 		return toSend;
 	}

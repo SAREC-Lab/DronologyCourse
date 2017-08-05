@@ -1,5 +1,7 @@
 package edu.nd.dronology.ui.cc.main.monitoring;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -22,7 +24,11 @@ public class DroneSetupContentProvider implements ITreeContentProvider {
 					.getRemoteManager().getService(IDroneSetupRemoteService.class);
 
 			Map<String, DroneStatus> drones = service.getDrones();
-			return drones.values().toArray();
+			
+			ArrayList drns = new ArrayList<>(drones.values());
+			Collections.sort(drns, new DroneComparator());
+			//System.out.println(drns.size());
+			return drns.toArray();
 
 		} catch (Exception e) {
 			LOGGER.error(e);

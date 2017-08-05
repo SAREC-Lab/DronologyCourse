@@ -42,6 +42,7 @@ public class VehicleReputation {
 			ReputationRating rating = entry.getValue();
 			BenchmarkLogger.reportTrust(id, aId, rating.getReputationRating(), 0);
 			vehicleRep.addFeedback(rating.getR(), rating.getS());
+			vehicleRep.setN(vehicleRep.getN() + rating.getN());
 		});
 		double vehicleRating = vehicleRep.getReputationRating();
 		long duration = System.nanoTime() - start;

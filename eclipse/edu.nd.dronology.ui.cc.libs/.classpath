@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/apache/commons-math3-3.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dronology/nd.edu.dronology.monitoring.jar" sourcepath="/edu.nd.dronology.monitoring/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/nebula/org.eclipse.nebula.visualization.xygraph_1.0.0.201502221352.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/nebula/org.eclipse.nebula.widgets.pshelf_1.0.0.201403032113.jar"/>

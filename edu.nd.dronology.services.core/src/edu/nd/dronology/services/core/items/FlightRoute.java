@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.DronologyConstants;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 
 public class FlightRoute implements IFlightRoute {
@@ -17,6 +16,7 @@ public class FlightRoute implements IFlightRoute {
 	private String category = "Default";
 	private LinkedList<Waypoint> waypoints;
 	private double takeoffaltitude = DronologyConstants.TAKE_OFF_ALTITUDE;
+	private String description;
 
 	public double setTakeoffAltitude() {
 		return takeoffaltitude;
@@ -46,13 +46,12 @@ public class FlightRoute implements IFlightRoute {
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return description;
 	}
 
 	@Override
 	public void setDescription(String description) {
-		// TODO Auto-generated method stub
+		this.description = description;
 
 	}
 

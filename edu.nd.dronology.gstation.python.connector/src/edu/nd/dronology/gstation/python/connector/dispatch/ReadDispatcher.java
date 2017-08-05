@@ -57,7 +57,9 @@ public class ReadDispatcher implements Runnable {
 					// object....
 					try {
 						AbstractUAVMessage msg = UAVMessageFactory.create(line);
-						processMessage(msg);
+						if (msg != null) {
+							processMessage(msg);
+						}
 						if (msg == null) {
 							LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
 						}
@@ -73,7 +75,8 @@ public class ReadDispatcher implements Runnable {
 
 					} catch (Exception ex) {
 						ex.printStackTrace();
-						LOGGER.hwFatal("Error when parsing incomming message '" + line + "' " + ex.getMessage());
+						LOGGER.hwFatal(
+								"Error when parsing incomming message: " + ex.getMessage() + " -- '" + line + "' ");
 					}
 
 				} else {
@@ -116,10 +119,11 @@ public class ReadDispatcher implements Runnable {
 
 	private void processMessage(AbstractUAVMessage<?> message) {
 		if (message instanceof UAVStateMessage) {
-			// LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "]
-			// "+FormatUtil.formatTimestamp(message.getTimestamp(),
-			// FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
-			// + " - " + message.toString());
+			// LOGGER.info("State Message received");
+			// LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "]"
+			// + FormatUtil.formatTimestamp(message.getTimestamp(),
+			// FormatUtil.FORMAT_YEAR_FIRST_MILLIS) + " - "
+			// + message.toString());
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
 		} else if (message instanceof UAVHandshakeMessage) {
@@ -128,6 +132,7 @@ public class ReadDispatcher implements Runnable {
 			dispatchQueueManager.postDoneHandshakeMessage(message.getUavid(), (UAVHandshakeMessage) message);
 
 		} else if (message instanceof UAVMonitoringMessage) {
+			// LOGGER.info("Monitoring Message received");
 			dispatchQueueManager.postMonitoringMessage((UAVMonitoringMessage) message);
 		}
 	}
