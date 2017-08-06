@@ -77,182 +77,221 @@ def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
     return dronekit.Command(*cmd_args)
 
 
-def connect_vehicle(vehicle_type, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, speed=1, rate=10,
-                    home=(41.732955, -86.180886, 0, 0), baud=115200):
-    """
-    Connect to a SITL vehicle or a real vehicle.
+class VehicleControl(object):
+    @staticmethod
+    def connect_vehicle(**kwargs):
+        raise NotImplementedError
 
-    :param vehicle_type:
-    :param vehicle_id:
-    :param ip:
-    :param instance:
-    :param ardupath:
-    :param speed:
-    :param rate:
-    :param home:
-    :param baud:
-    :return:
-    """
-    def _sitl_shutdown_cb(m_vehicle, m_sitl):
-        m_vehicle.close()
-        m_sitl.stop()
+    @staticmethod
+    def set_armed(vehicle, **kwargs):
+        raise NotImplementedError
 
-    vehicle = None
-    shutdown_cb = lambda: 0
+    @staticmethod
+    def takeoff(vehicle, **kwargs):
+        raise NotImplementedError
 
-    if vehicle_type == DRONE_TYPE_SITL_PHYS:
-        vehicle = dronekit.connect(ip, wait_ready=True, baud=baud)
-        shutdown_cb = lambda: vehicle.close()
-    elif vehicle_type == DRONE_TYPE_SITL_VRTL:
-        sitl_args = [
-            '-S',
-            '-I{}'.format(instance),
-            '--model', '+',
-            '--home', ','.join(map(str, home)),
-            '--speedup', str(speed),
-            '--rate', str(rate),
-            '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
-        ]
-        sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
-        sitl.launch(sitl_args, await_ready=True, verbose=True)
-        tcp, ip, port = sitl.connection_string().split(':')
-        port = str(int(port) + instance * 10)
-        conn_string = ':'.join([tcp, ip, port])
-        _LOG.info('SITL instance {} launched on: {}'.format(instance ,conn_string))
-        vehicle = dronekit.connect(conn_string, wait_ready=True, baud=baud)
-        _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
-        shutdown_cb = lambda: _sitl_shutdown_cb(vehicle, sitl)
-    else:
-        _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
+    @staticmethod
+    def set_mode(vehicle, **kwargs):
+        raise NotImplementedError
 
-    if vehicle is not None:
-        if vehicle_id is None:
-            vehicle_id = int(vehicle.parameters['SYSID_THISMAV'])
-        vehicle.parameters['SYSID_THISMAV'] = vehicle_id
+    @staticmethod
+    def goto_lla(vehicle, **kwargs):
+        raise NotImplementedError
 
-    return vehicle, shutdown_cb
+    @staticmethod
+    def is_lla_reached(vehicle, **kwargs):
+        raise NotImplementedError
+
+    @staticmethod
+    def goto_lla_sequential(vehicle, **kwargs):
+        raise NotImplementedError
 
 
-def set_armed(vehicle, armed=True):
-    """
+class ArduPilot(VehicleControl):
+    @staticmethod
+    def connect_vehicle(vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, speed=1, rate=10,
+                        home=(41.732955, -86.180886, 0, 0), baud=115200):
+        """
+        Connect to a SITL vehicle or a real vehicle.
 
-    :param vehicle:
-    :param armed:
-    :return:
-    """
-    if vehicle.armed != armed:
-        if armed:
-            while not vehicle.is_armable:
+        :param vehicle_type:
+        :param vehicle_id:
+        :param ip:
+        :param instance:
+        :param ardupath:
+        :param speed:
+        :param rate:
+        :param home:
+        :param baud:
+        :return:
+        """
+        def _sitl_shutdown_cb(m_vehicle, m_sitl):
+            m_vehicle.close()
+            m_sitl.stop()
+
+        vehicle = None
+        shutdown_cb = lambda: 0
+
+        if vehicle_type == DRONE_TYPE_SITL_PHYS:
+            vehicle = dronekit.connect(ip, wait_ready=True, baud=baud)
+            shutdown_cb = lambda: vehicle.close()
+        elif vehicle_type == DRONE_TYPE_SITL_VRTL:
+            sitl_args = [
+                '-S',
+                '-I{}'.format(instance),
+                '--model', '+',
+                '--home', ','.join(map(str, home)),
+                '--speedup', str(speed),
+                '--rate', str(rate),
+                '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
+            ]
+            sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
+            sitl.launch(sitl_args, await_ready=True, verbose=True)
+            tcp, ip, port = sitl.connection_string().split(':')
+            port = str(int(port) + instance * 10)
+            conn_string = ':'.join([tcp, ip, port])
+            _LOG.info('SITL instance {} launched on: {}'.format(instance ,conn_string))
+            vehicle = dronekit.connect(conn_string, wait_ready=True, baud=baud)
+            _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
+            shutdown_cb = lambda: _sitl_shutdown_cb(vehicle, sitl)
+        else:
+            _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
+
+        if vehicle is not None:
+            if vehicle_id is None:
+                vehicle_id = int(vehicle.parameters['SYSID_THISMAV'])
+            vehicle.parameters['SYSID_THISMAV'] = vehicle_id
+
+        return vehicle, shutdown_cb
+
+    @staticmethod
+    def set_armed(vehicle, armed=True):
+        """
+
+        :param vehicle:
+        :param armed:
+        :return:
+        """
+        if vehicle.armed != armed:
+            if armed:
+                while not vehicle.is_armable:
+                    time.sleep(1)
+
+            vehicle.armed = armed
+
+            while vehicle.armed != armed:
                 time.sleep(1)
 
-        vehicle.armed = armed
+    @staticmethod
+    def takeoff(vehicle, alt=10):
+        """
 
-        while vehicle.armed != armed:
+        :param vehicle:
+        :param alt:
+        :return:
+        """
+        cur_alt = 0
+        vehicle.simple_takeoff(alt=alt)
+
+        while abs(alt - cur_alt) > 3:
+            cur_alt = vehicle.location.global_frame.alt
             time.sleep(1)
 
+    @staticmethod
+    def land(vehicle):
+        """
 
-def takeoff(vehicle, alt):
-    """
+        :param vehicle:
+        :return:
+        """
+        vehicle.mode = dronekit.VehicleMode("LAND")
 
-    :param vehicle:
-    :param alt:
-    :return:
-    """
-    cur_alt = 0
-    vehicle.simple_takeoff(alt=alt)
+        while vehicle.location.global_frame.alt:
+            time.sleep(2)
 
-    while abs(alt - cur_alt) > 3:
-        cur_alt = vehicle.location.global_frame.alt
-        time.sleep(1)
+    @staticmethod
+    def set_mode(vehicle, mode):
+        if mode == 'LAND':
+            ArduPilot.land(vehicle)
+        else:
+            _LOG.warn('unsupported mode ({})'.format(mode))
 
+    @staticmethod
+    def goto_lla_and_wait(vehicle, lat, lon, alt, groundspeed=None):
+        ArduPilot.goto_lla(vehicle, lat, lon, alt, groundspeed=groundspeed)
 
-def land(vehicle):
-    """
+        while not ArduPilot.is_lla_reached(vehicle, lat, lon, alt):
+            time.sleep(2)
 
-    :param vehicle:
-    :return:
-    """
-    vehicle.mode = dronekit.VehicleMode("LAND")
+    @staticmethod
+    def goto_lla(vehicle, lat, lon, alt, groundspeed=None):
+        """
 
-    while vehicle.location.global_frame.alt:
-        time.sleep(2)
+        :param vehicle:
+        :param lat:
+        :param lon:
+        :param alt:
+        :param groundspeed:
+        :return:
+        """
+        vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), groundspeed=groundspeed)
 
+    @staticmethod
+    def is_lla_reached(vehicle, lat, lon, alt, threshold=1):
+        """
 
-def return_to_launch(vehicle):
-    vehicle.mode = dronekit.VehicleMode("RTL")
+        :param vehicle:
+        :param lat:
+        :param lon:
+        :param alt:
+        :param threshold:
+        :return:
+        """
+        return ArduPilot.vehicle_to_lla(vehicle).distance(mathutil.Lla(lat, lon, alt)) <= threshold
 
-    while vehicle.location.global_frame.alt:
-        time.sleep(2)
+    @staticmethod
+    def _goto_sequential(vehicle, waypoints):
+        """
 
+        :param vehicle:
+        :param waypoints:
+        :return:
+        """
+        is_complete = False
+        waypoints = list(waypoints)
+        cur_wp = waypoints.pop(0)
+        ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
 
-def goto_lla(vehicle, lat, lon, alt, groundspeed=None):
-    """
+        while not is_complete and vehicle.mode.name == 'GUIDED':
+            if ArduPilot.is_lla_reached(vehicle, *cur_wp.get_lla()):
+                _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
+                if waypoints:
+                    cur_wp = waypoints.pop(0)
+                    ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
+                else:
+                    is_complete = True
 
-    :param vehicle:
-    :param lat:
-    :param lon:
-    :param alt:
-    :param groundspeed:
-    :return:
-    """
-    vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), groundspeed=groundspeed)
+    @staticmethod
+    def goto_lla_sequential(vehicle, waypoints, block=False):
+        """
+        Execute a series of "goto commands":
+            (lat, lon, alt, groundspeed)
+        :param vehicle:
+        :param waypoints:
+        :param block:
+        :return:
+        """
+        if block:
+            ArduPilot._goto_sequential(vehicle, waypoints)
+        else:
+            worker = threading.Thread(target=ArduPilot._goto_sequential, args=[vehicle, waypoints])
+            worker.start()
+            return worker
 
-
-def is_lla_reached(vehicle, lat, lon, alt, threshold=1):
-    """
-
-    :param vehicle:
-    :param lat:
-    :param lon:
-    :param alt:
-    :param threshold:
-    :return:
-    """
-    return vehicle_to_lla(vehicle).distance(mathutil.Lla(lat, lon, alt)) <= threshold
-
-
-def _goto_sequential(vehicle, waypoints):
-    """
-
-    :param vehicle:
-    :param waypoints:
-    :return:
-    """
-    is_complete = False
-    waypoints = list(waypoints)
-    cur_wp = waypoints.pop(0)
-    goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
-
-    while not is_complete and vehicle.mode.name == 'GUIDED':
-        if is_lla_reached(vehicle, *cur_wp.get_lla()):
-            _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
-            if waypoints:
-                cur_wp = waypoints.pop(0)
-                goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
-            else:
-                is_complete = True
-
-
-def goto_sequential(vehicle, waypoints, block=False):
-    """
-    Execute a series of "goto commands":
-        (lat, lon, alt, groundspeed)
-    :param vehicle:
-    :param waypoints:
-    :param block:
-    :return:
-    """
-    if block:
-        _goto_sequential(vehicle, waypoints)
-    else:
-        worker = threading.Thread(target=_goto_sequential, args=[vehicle, waypoints])
-        worker.start()
-        return worker
-
-
-def vehicle_to_lla(vehicle):
-    lla = vehicle.location.global_frame
-    return mathutil.Lla(lla.lat, lla.lon, lla.alt)
+    @staticmethod
+    def vehicle_to_lla(vehicle):
+        lla = vehicle.location.global_frame
+        return mathutil.Lla(lla.lat, lla.lon, lla.alt)
 
 
 class Connection:
