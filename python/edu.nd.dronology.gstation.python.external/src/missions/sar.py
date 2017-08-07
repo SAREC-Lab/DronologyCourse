@@ -130,9 +130,8 @@ class SingleUAVSAR(Mission):
         :param home: internal SITL parameter (see documentation)
         :param control:
         """
-        threading.Thread(target=SingleUAVSAR._start,
-                         args=[connection, v_type, v_id, bounds, point_last_seen, altitude, groundspeed,
-                               ip, instance, ardupath, baud, speed, rate, home, control]).start()
+        SingleUAVSAR._start(connection, v_type, v_id, bounds, point_last_seen, altitude, groundspeed,
+                            ip, instance, ardupath, baud, speed, rate, home, control)
 
     @staticmethod
     def _start(connection, v_type, v_id, bounds, pls, alt, gs, ip, inst, ardu, baud, speed, rate, home, control):

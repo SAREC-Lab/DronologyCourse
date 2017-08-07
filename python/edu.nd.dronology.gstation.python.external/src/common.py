@@ -37,7 +37,7 @@ class Waypoint:
 
 
 class DronologyMessage(object):
-    def __init__(self, m_type, uav_id, data):
+    def __init__(self, m_type, uav_id, data, **kwargs):
         self.m_type = m_type
         self.uav_id = uav_id
         self.data = data
@@ -55,18 +55,25 @@ class DronologyMessage(object):
 
 
 class DronologyHandshakeMessage(DronologyMessage):
-    def __init__(self, uav_id, data):
+    def __init__(self, uav_id, data, p2sac='../resources/sac.json'):
         super(DronologyHandshakeMessage, self).__init__('handshake', uav_id, data)
+        self.p2sac = p2sac
 
     @classmethod
-    def from_vehicle(cls, vehicle, v_id):
+    def from_vehicle(cls, vehicle, v_id, p2sac='../resources/sac.json'):
         battery = {
             'voltage': vehicle.battery.voltage,
             'current': vehicle.battery.current,
             'level'	: vehicle.battery.level,
         }
+
+        with open(p2sac) as f:
+            sac = json.load(f)
+
         lla = vehicle.location.global_frame
-        data = {'batterystatus': battery, 'location': {'x': lla.lat, 'y': lla.lon, 'z': lla.alt}}
+        data = {'batterystatus': battery,
+                'home': {'x': lla.lat, 'y': lla.lon, 'z': lla.alt},
+                'safetycase': sac}
         return cls(v_id, data)
 
 

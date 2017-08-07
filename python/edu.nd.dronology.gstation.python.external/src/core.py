@@ -352,9 +352,8 @@ class Connection:
                     self._socket.settimeout(self._accept_timeout)
                     self._socket.bind((self._host, self._port))
                     self._socket.listen(0)
-                    conn = None
-                    while conn is None and self.get_status() == Connection._WAITING:
-                        _LOG.debug('Waiting for Dronology connection.')
+                    while self.get_status() == Connection._WAITING:
+                        _LOG.info('Waiting for Dronology connection.')
                         try:
                             conn, addr = self._socket.accept()
                             self._conn = conn
@@ -363,9 +362,9 @@ class Connection:
                             _LOG.info('Established Dronology connection.')
                             time.sleep(1.0)
                         except socket.timeout:
-                            _LOG.debug('No connection attempted')
+                            _LOG.info('No connection attempted')
                 except socket.error as e:
-                    _LOG.debug('Socket error ({})'.format(e))
+                    _LOG.info('Socket error ({})'.format(e))
                     if e.errno == socket.errno.EADDRINUSE:
                         time.sleep(3.0)
             else:

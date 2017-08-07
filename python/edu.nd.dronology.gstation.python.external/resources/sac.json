@@ -1,0 +1,220 @@
+{
+  "id": "SAC1",
+  "assumptions": [
+    {
+      "id": "A_1_1_1",
+      "content": "Bias smaller than min sep distance",
+      "expression": "$L(#E_bias,#I_min_separation_distance ) : (#E_bias < #I_min_separation_distance * 0.25)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 100.0,
+      "params": {},
+      "mapping": {
+        "#E_bias": "gps_bias"
+      }
+    },
+    {
+      "id": "A_1_1_2",
+      "content": "abcd",
+      "expression": "$L() : (diffToPrevious(bias,ts) < 10)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 100.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_3",
+      "content": "abcd",
+      "expression": "$L() : (diffToPrevious(location,ts) <  2)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 100.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_4",
+      "content": "abcd",
+      "expression": "$L() : (#E_battery_remaining <  10)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {},
+      "mapping": {
+        "#E_battery_remaining": "battery_remaining_percentage"
+      }
+    },
+    {
+      "id": "A_1_1_5",
+      "content": "abcd",
+      "expression": "$L(#E_current_speed ,#E_max_speed) : (#E_current_speed  <  #E_max_speed)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_max_speed": 45
+      },
+      "mapping": {
+        "#E_current_speed": "velocity"
+      }
+    },
+    {
+      "id": "A_1_1_6",
+      "content": "abcd",
+      "expression": "$L(#I_min_altitude, #E_current_alt,#I_max_altitude) : (#I_min_altitude <  #E_current_alt < #I_max_altitude &&  (!(checkMode('landing') || checkMode('takeoff'))",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {},
+      "mapping": {
+        "#E_current_alt": "altitude"
+      }
+    },
+    {
+      "id": "A_1_1_7",
+      "content": "abcd",
+      "expression": "$L(#E_wingspan,#I_max_wingspan) : (#E_wingspan < #I_max_wingspan)",
+      "is-monitorable": false,
+      "is-static": true,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_wingspan": "1.2"
+      },
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_8",
+      "content": "abcd",
+      "expression": "$L(#E_maxSpeed,#I_max_allowed_speed) : ( #E_maxSpeed < #I_max_allowed_speed)",
+      "is-monitorable": false,
+      "is-static": true,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_maxSpeed": "45"
+      },
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_9",
+      "content": "abcd",
+      "expression": "$L(#I_min_allowed_altitude,#E_max_altitude,#I_max_allowed_altitude) : ( #I_min_allowed_altitude < #E_max_altitude < #I_max_allowed_altitude)",
+      "is-monitorable": false,
+      "is-static": true,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_max_altitude": "75"
+      },
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_10",
+      "content": "abcd",
+      "expression": "$L(#E_weight,#I_max_allowed_weight) : ( #E_weight < #I_max_allowed_weight)",
+      "is-monitorable": false,
+      "is-static": true,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_weight": "1.2"
+      },
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_11",
+      "content": "abcd",
+      "expression": "$L(#E_current_payload,#E_max_allowed_payload) : ( #E_current_payload < #E_max_allowed_payload)",
+      "is-monitorable": false,
+      "is-static": true,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_current_payload": "0",
+        "#E_max_allowed_payload": "1.2"
+      },
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_12",
+      "content": "abcd",
+      "expression": "$L(#E_max_allowed_payload,#I_max_allowed_payload) : ( #E_max_allowed_payload < #I_max_allowed_payload)",
+      "is-monitorable": false,
+      "is-static": true,
+      "is-plugable": true,
+      "weight": 40.0,
+      "params": {
+        "#E_max_allowed_payload": "1.2"
+      },
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_13",
+      "content": "uav's must be able to loiter -> provide documentation",
+      "is-monitorable": false,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 0.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_14",
+      "content": "safe landing",
+      "is-monitorable": false,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 0.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_15",
+      "content": "Have sufficient battery at all time to reach the rally point (built in battery monitoring and distance calculation to safe rally point...)",
+      "is-monitorable": false,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 0.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_16",
+      "content": "ability to avoid no fly zone",
+      "is-monitorable": false,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 0.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_17",
+      "content": "ability to receive and respond to speed limit commands (or be aware of speed limits)",
+      "is-monitorable": false,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 0.0,
+      "params": {},
+      "mapping": {}
+    },
+    {
+      "id": "A_1_1_18",
+      "content": "ability to react to communication loss... -> safety ass. case (stay safe....)",
+      "is-monitorable": false,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 0.0,
+      "params": {},
+      "mapping": {}
+    }
+  ]
+}
