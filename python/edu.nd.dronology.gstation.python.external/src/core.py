@@ -368,10 +368,11 @@ class Connection:
                     if e.errno == socket.errno.EADDRINUSE:
                         time.sleep(3.0)
             else:
+                _LOG.info('Waiting for messages...')
                 try:
                     # msg = ''
                     msg = self._conn.recv(2048)
-                    _LOG.debug('Message received: {}'.format(msg))
+                    _LOG.info('Message received: {}'.format(msg))
                     if os.linesep in msg:
                         toks = msg.split(os.linesep)
                         msg_end = toks[0]
@@ -385,7 +386,6 @@ class Connection:
                             cmd = CommandFactory.get_command(msg_)
                             if isinstance(cmd, (SetMonitorFrequency,)):
                                 put_command(cmd.get_target(), cmd)
-                        # TODO: put the commands in the cmd dict
 
                         msg = toks[-1]
                         self._msg_buffer = ''

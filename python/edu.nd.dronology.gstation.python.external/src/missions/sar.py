@@ -148,12 +148,12 @@ class SingleUAVSAR(Mission):
         # SET UP TIMERS
         def gen_state_message(m_vehicle):
             msg = DronologyStateMessage.from_vehicle(m_vehicle, v_id)
-            _LOG.debug(str(msg))
+            _LOG.info(str(msg))
             connection.send(str(msg))
 
         def gen_monitor_message(m_vehicle):
             msg = DronologyMonitorMessage.from_vehicle(m_vehicle, v_id)
-            _LOG.debug(str(msg))
+            _LOG.info(str(msg))
             connection.send(str(msg))
 
         # ARM & READY
@@ -210,7 +210,7 @@ class SingleUAVSAR(Mission):
             control.set_armed(vehicle, armed=False)
             _LOG.info('Vehicle {} disarmed.'.format(v_id))
         except KeyboardInterrupt:
-            vehicle.mode = dronekit.VehicleMode('LTR')
+            vehicle.mode = dronekit.VehicleMode('LOITER')
 
         worker.join()
         shutdown_cb()
