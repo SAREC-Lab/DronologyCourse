@@ -135,26 +135,27 @@ class SingleUAVSAR(Mission):
 
     @staticmethod
     def _start(connection, v_type, v_id, bounds, pls, alt, gs, ip, inst, ardu, baud, speed, rate, home, control):
+        v_id = '{}_{}'.format(v_type, v_id)
         vehicle, shutdown_cb = control.connect_vehicle(v_type, vehicle_id=v_id, ip=ip,
                                                        instance=inst, ardupath=ardu, speed=speed,
                                                        rate=rate, home=home, baud=baud)
-
-        # SET UP CALLBACKS
-        # @vehicle.on_attribute('mode')
-        # def mode_listener(_, name, value):
-        #     # should stop doing whatever we are doing if mode changes
-        #     pass
+        handshake_lock = threading.Lock()
+        handshake_complete = False
 
         # SET UP TIMERS
         def gen_state_message(m_vehicle):
-            msg = DronologyStateMessage.from_vehicle(m_vehicle, v_id)
-            _LOG.info(str(msg))
-            connection.send(str(msg))
+            with handshake_lock:
+                if handshake_complete:
+                    msg = StateMessage.from_vehicle(m_vehicle, v_id)
+                    _LOG.info(str(msg))
+                    connection.send(str(msg))
 
         def gen_monitor_message(m_vehicle):
-            msg = DronologyMonitorMessage.from_vehicle(m_vehicle, v_id)
-            _LOG.info(str(msg))
-            connection.send(str(msg))
+            with handshake_lock:
+                if handshake_complete:
+                    msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
+                    _LOG.info(str(msg))
+                    connection.send(str(msg))
 
         # ARM & READY
         control.set_armed(vehicle, armed=True)
@@ -169,10 +170,6 @@ class SingleUAVSAR(Mission):
         waypoints = []
         for lat, lon, _ in path:
             waypoints.append(Waypoint(lat, lon, alt, groundpseed=gs))
-
-        # SEND HANDSHAKE
-        dronology_handshake_complete = connection.send(str(DronologyHandshakeMessage.from_vehicle(vehicle,
-                                                                                                  v_id)))
 
         # START MESSAGE TIMERS
         send_state_message_timer = util.RepeatedTimer(1.0, gen_state_message, vehicle)
@@ -189,15 +186,19 @@ class SingleUAVSAR(Mission):
             # HANDLE INCOMING MESSAGES
             while worker.isAlive():
                 if not connection.is_connected():
-                    dronology_handshake_complete = False
+                    with handshake_lock:
+                        handshake_complete = False
 
-                if not dronology_handshake_complete:
-                    dronology_handshake_complete = connection.send(
-                        str(DronologyHandshakeMessage.from_vehicle(vehicle, v_id)))
+                with handshake_lock:
+                    if not handshake_complete:
+                        handshake_complete = connection.send(
+                            str(HandshakeMessage.from_vehicle(vehicle, v_id)))
 
                 cmds = core.get_commands(v_id)
                 for cmd in cmds:
                     if isinstance(cmd, (SetMonitorFrequency,)):
+                        # acknowledge
+                        connection.send(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id()))
                         # stop the timer, send message, reset interval, restart timer
                         send_monitor_message_timer.stop()
                         gen_monitor_message(vehicle)

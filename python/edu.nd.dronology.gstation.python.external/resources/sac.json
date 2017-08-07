@@ -11,7 +11,7 @@
       "weight": 100.0,
       "params": {},
       "mapping": {
-        "#E_bias": "gps_bias"
+        "#E_bias": "eph"
       }
     },
     {
@@ -23,7 +23,9 @@
       "is-plugable": true,
       "weight": 100.0,
       "params": {},
-      "mapping": {}
+      "mapping": {
+
+      }
     },
     {
       "id": "A_1_1_3",
@@ -46,7 +48,7 @@
       "weight": 40.0,
       "params": {},
       "mapping": {
-        "#E_battery_remaining": "battery_remaining_percentage"
+        "#E_battery_remaining": "level"
       }
     },
     {
@@ -61,7 +63,7 @@
         "#E_max_speed": 45
       },
       "mapping": {
-        "#E_current_speed": "velocity"
+        "#E_current_speed": "groundspeed"
       }
     },
     {
@@ -74,7 +76,7 @@
       "weight": 40.0,
       "params": {},
       "mapping": {
-        "#E_current_alt": "altitude"
+        "#E_current_alt": "alt"
       }
     },
     {

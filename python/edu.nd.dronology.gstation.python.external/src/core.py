@@ -132,7 +132,7 @@ class ArduPilot(VehicleControl):
         vehicle = None
         shutdown_cb = lambda: 0
 
-        if vehicle_type == DRONE_TYPE_SITL_PHYS:
+        if vehicle_type == DRONE_TYPE_PHYS:
             vehicle = dronekit.connect(ip, wait_ready=True, baud=baud)
             shutdown_cb = lambda: vehicle.close()
         elif vehicle_type == DRONE_TYPE_SITL_VRTL:
@@ -156,11 +156,6 @@ class ArduPilot(VehicleControl):
             shutdown_cb = lambda: _sitl_shutdown_cb(vehicle, sitl)
         else:
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
-
-        if vehicle is not None:
-            if vehicle_id is None:
-                vehicle_id = int(vehicle.parameters['SYSID_THISMAV'])
-            vehicle.parameters['SYSID_THISMAV'] = vehicle_id
 
         return vehicle, shutdown_cb
 
@@ -299,6 +294,15 @@ class Connection:
     _CONNECTED = 2
     _DEAD = -1
 
+    def __init__(self, conn):
+        self.conn = conn
+
+
+class Host:
+    _WAITING = 1
+    _CONNECTED = 2
+    _DEAD = -1
+
     def __init__(self, host='127.0.0.1', port=1234, accept_timeout=5.0):
         self._host = host
         self._port = port
@@ -306,7 +310,7 @@ class Connection:
         self._socket = None
         self._conn = None
         self._conn_lock = threading.Lock()
-        self._status = Connection._WAITING
+        self._status = Host._WAITING
         self._status_lock = threading.Lock()
         self._msg_buffer = ''
 
@@ -319,18 +323,18 @@ class Connection:
             self._status = status
 
     def is_connected(self):
-        return self.get_status() == Connection._CONNECTED
+        return self.get_status() == Host._CONNECTED
 
     def start(self):
         threading.Thread(target=self._work).start()
 
     def stop(self):
-        self.set_status(Connection._DEAD)
+        self.set_status(Host._DEAD)
 
     def send(self, msg):
         success = False
-        if self._conn is not None:
-            with self._conn_lock:
+        with self._conn_lock:
+            if self._status == Host._CONNECTED:
                 try:
                     self._conn.send(msg)
                     self._conn.send(os.linesep)
@@ -344,31 +348,30 @@ class Connection:
         cont = True
         while cont:
             status = self.get_status()
-            if status == Connection._DEAD:
+            if status == Host._DEAD:
                 cont = False
-            elif status == Connection._WAITING:
+                _LOG.info('shutting down connection...')
+            elif status == Host._WAITING:
                 try:
                     self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     self._socket.settimeout(self._accept_timeout)
                     self._socket.bind((self._host, self._port))
                     self._socket.listen(0)
-                    while self.get_status() == Connection._WAITING:
+                    while self.get_status() == Host._WAITING:
                         _LOG.info('Waiting for Dronology connection.')
                         try:
                             conn, addr = self._socket.accept()
                             self._conn = conn
-                            self._conn.settimeout(0.5)
-                            self.set_status(Connection._CONNECTED)
+                            self._conn.settimeout(5.0)
+                            self.set_status(Host._CONNECTED)
                             _LOG.info('Established Dronology connection.')
                             time.sleep(1.0)
                         except socket.timeout:
                             _LOG.info('No connection attempted')
                 except socket.error as e:
                     _LOG.info('Socket error ({})'.format(e))
-                    if e.errno == socket.errno.EADDRINUSE:
-                        time.sleep(3.0)
+                    time.sleep(5.0)
             else:
-                _LOG.info('Waiting for messages...')
                 try:
                     # msg = ''
                     msg = self._conn.recv(2048)
@@ -394,9 +397,14 @@ class Connection:
                     pass
                 except socket.error as e:
                     _LOG.warn('connection interrupted! ({})'.format(e))
+                    self._conn.shutdown(socket.SHUT_RD)
                     self._conn.close()
                     self._conn = None
-                    time.sleep(1)
+                    self._socket.shutdown(socket.SHUT_RDWR)
                     self._socket.close()
-                    self.set_status(Connection._WAITING)
-
+                    self._socket = None
+                    self.set_status(Host._WAITING)
+                    time.sleep(20.0)
+        if self._conn is not None:
+            self._conn.shutdown(socket.SHUT_RD)
+            self._conn.close()
