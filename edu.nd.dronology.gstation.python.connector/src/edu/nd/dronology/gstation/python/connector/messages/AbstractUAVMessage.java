@@ -3,6 +3,8 @@ package edu.nd.dronology.gstation.python.connector.messages;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import edu.nd.dronology.core.util.PreciseTimestamp;
 
@@ -59,5 +61,10 @@ public class AbstractUAVMessage<T> implements Serializable {
 		return data.get(key);
 
 	}
+	
+	public Set<Entry<String, T>> getProperties() {
+		return data.entrySet();
+	}
+	
 
 }

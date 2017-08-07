@@ -5,7 +5,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,12 +13,13 @@ import com.google.common.util.concurrent.RateLimiter;
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.flight.FlightDirectorFactory;
 import edu.nd.dronology.core.flight.IFlightDirector;
 import edu.nd.dronology.core.util.LlaCoordinate;
-import edu.nd.dronology.core.util.Waypoint;
-import edu.nd.dronology.core.vehicle.ManagedDrone.HaltTimerTask;
+import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
+import edu.nd.dronology.core.vehicle.commands.SetMonitoringFrequencyCommand;
 import edu.nd.dronology.util.NamedThreadFactory;
 import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
@@ -57,7 +57,7 @@ public class ManagedDrone extends Observable implements Runnable {
 
 	@Discuss(discuss = "should this be configurable?")
 	private static final int NORMAL_SLEEP = 1;
-	private int currentSleep = NORMAL_SLEEP;
+//	private int currentSleep = NORMAL_SLEEP;
 
 	@Discuss(discuss = "why not final? - new flight director for each flight??")
 	private IFlightDirector flightDirector = null; // Each drone can be assigned
@@ -65,8 +65,7 @@ public class ManagedDrone extends Observable implements Runnable {
 	private double targetAltitude = 0;
 
 	private final Lock lock = new ReentrantLock();
-	private final Condition continueCycle = lock.newCondition();
-
+	
 	private Timer haltTimer = new Timer();
 	private HaltTimerTask currentHaltTimer;
 
@@ -203,7 +202,7 @@ public class ManagedDrone extends Observable implements Runnable {
 				// Drone has been temporarily halted. Reset to normal mode once
 				// sleep is completed.
 				LIMITER.acquire();
-				setSleep(NORMAL_SLEEP);
+				//setSleep(NORMAL_SLEEP);
 				// try {
 				// continueCycle.await();
 				// } catch (InterruptedException e) {
@@ -224,7 +223,7 @@ public class ManagedDrone extends Observable implements Runnable {
 					// Move the drone. Returns FALSE if it cannot move because
 					// it
 					// has reached destination
-					if (!drone.move(10)) {
+					if (!drone.move(0.1)) {
 						LOGGER.missionInfo(
 								drone.getDroneName() + " - Waypoint reached - " + targetCoordinates.toString());
 						flightDirector.clearCurrentWayPoint();
@@ -276,16 +275,16 @@ public class ManagedDrone extends Observable implements Runnable {
 		}
 	}
 
-	private void setSleep(int sleepInms) {
-		if (currentSleep == sleepInms) {
-			return;
-		}
-		currentSleep = sleepInms;
-		double permits = 1 / new Double(currentSleep);
-		// double permits = (1 / currentSleep) * 1000d;
-		LIMITER.setRate(permits);
-		LOGGER.info("Permits set to " + permits);
-	}
+//	private void setSleep(int sleepInms) {
+//		if (currentSleep == sleepInms) {
+//			return;
+//		}
+//		currentSleep = sleepInms;
+//		double permits = 1 / new Double(currentSleep);
+//		// double permits = (1 / currentSleep) * 1000d;
+//		LIMITER.setRate(permits);
+//		LOGGER.info("Permits set to " + permits);
+//	}
 
 	// Check for end of flight. Land if conditions are satisfied
 	private boolean checkForEndOfFlight() {
@@ -459,6 +458,11 @@ public class ManagedDrone extends Observable implements Runnable {
 			}
 		}
 
+	}
+
+	public void sendCommand(AbstractDroneCommand command) throws DroneException {
+		drone.sendCommand(command);
+		
 	}
 
 }

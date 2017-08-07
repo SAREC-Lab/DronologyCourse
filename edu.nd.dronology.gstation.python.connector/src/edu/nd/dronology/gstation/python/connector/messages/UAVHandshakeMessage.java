@@ -10,8 +10,7 @@ public class UAVHandshakeMessage extends AbstractUAVMessage<Object> implements S
 	private static final long serialVersionUID = 1502042637906425729L;
 	public static final String MESSAGE_TYPE = "handshake";
 	public static final String HOME = "home";
-
-	private String safetyCase;
+	public static final String SAFETY_CASE = "safetycase";
 
 	public UAVHandshakeMessage(String messagetype, String uavid) {
 		super(messagetype, uavid);
@@ -32,11 +31,7 @@ public class UAVHandshakeMessage extends AbstractUAVMessage<Object> implements S
 	}
 
 	public String getSafetyCase() {
-		return safetyCase;
-	}
-
-	public void setSafetyCase(String safetyCase) {
-		this.safetyCase = safetyCase;
+		return data.get(SAFETY_CASE).toString();
 	}
 
 	public void setHome(LlaCoordinate coordinate) {

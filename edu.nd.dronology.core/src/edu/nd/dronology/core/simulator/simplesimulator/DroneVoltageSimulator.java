@@ -14,7 +14,7 @@ public class DroneVoltageSimulator {
    
 	private long checkPointTime;
 	
-	protected DroneVoltageSimulator(){
+	public DroneVoltageSimulator(){
 		voltage = 15.0;
 		checkPointTime = 0;
 	}

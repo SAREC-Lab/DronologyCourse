@@ -3,6 +3,7 @@ package edu.nd.dronology.ui.cc.main.dialogs;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -115,6 +116,9 @@ public class PlanMissionDialog extends Dialog {
 					.getInstance().getRemoteManager().getService(IFlightRouteplanningRemoteService.class);
 
 			routeList = new ArrayList(routeService.getItems());
+			
+			Collections.sort(routeList, new RouteListNameComparator());
+			
 
 			IDroneSetupRemoteService setupService = (IDroneSetupRemoteService) BaseServiceProvider.getInstance()
 					.getRemoteManager().getService(IDroneSetupRemoteService.class);

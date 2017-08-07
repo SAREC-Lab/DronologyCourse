@@ -23,7 +23,6 @@ public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 	 * @return The singleton instance.
 	 */
 	public static SafetyCaseValidationManager getInstance() {
-
 		if (INSTANCE == null) {
 			synchronized (SafetyCaseValidationManager.class) {
 				if (INSTANCE == null) {

@@ -34,7 +34,11 @@ public class SafetyCaseGeneration {
 		ass4.setStatic(false);
 		ass4.setMonitorable(true);
 		ass4.setExpression(
-				"$L(#E_batterypower, #E_maxbatterypower ) : ( #E_batterypower >= #E_maxbatterypower * 0.1  )");
+				"$L() : ( diffToPrevious('NR_SATELITES','timestamp',history) <5  )");
+		
+		//ass4.setExpression(
+		//		"$L(#E_batterypower, #E_maxbatterypower ) : ( #E_batterypower >= #E_maxbatterypower * 0.1  )");
+		
 		sac.addAssumption(ass4);
 
 		// InfrastructureSafetyCase sac = new InfrastructureSafetyCase();

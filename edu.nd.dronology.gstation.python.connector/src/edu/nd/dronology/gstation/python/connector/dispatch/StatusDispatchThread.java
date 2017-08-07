@@ -30,6 +30,7 @@ public class StatusDispatchThread extends AbstractStatusDispatchThread<UAVStateM
 				UAVStateMessage state = queue.take();
 				listener.updateCoordinates(state.getLocation());
 				listener.updateVelocity(state.getGroundspeed());
+				listener.updateBatteryLevel(state.getBatterystatus().getBatteryVoltage());
 			} catch (Exception e) {
 				LOGGER.error(e);
 			}

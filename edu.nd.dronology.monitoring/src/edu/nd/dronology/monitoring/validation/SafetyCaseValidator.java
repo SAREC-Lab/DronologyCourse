@@ -12,6 +12,7 @@ import edu.nd.dronology.monitoring.safety.IExternalSafetyCase;
 import edu.nd.dronology.monitoring.safety.ISACAssumption;
 import edu.nd.dronology.monitoring.safety.internal.InfrastructureSafetyCase;
 import edu.nd.dronology.monitoring.safety.misc.SafetyCaseGeneration;
+import edu.nd.dronology.monitoring.util.BenchmarkLogger;
 import edu.nd.dronology.monitoring.validation.ValidationResult.Result;
 import edu.nd.dronology.monitoring.validation.engine.EngineFactory;
 import edu.nd.dronology.monitoring.validation.engine.EvaluationEngineException;
@@ -63,12 +64,12 @@ public class SafetyCaseValidator {
 
 			try {
 				evaluateMonitorable(ass, monitoringValidator);
-				entry = new ValidationEntry(ass.getId(), Result.MONITORING_PROPERTY_PASSED);
+				entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.MONITORING_PROPERTY_PASSED);
 				validationResult.addValidationEntry(entry);
 
 			} catch (EvaluationException e) {
 				LOGGER.error("Error when evaluating safety case " + e.getMessage());
-				entry = new ValidationEntry(ass.getId(), Result.MONITORING_PROPERTY_FAILED);
+				entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.MONITORING_PROPERTY_FAILED);
 				validationResult.addValidationEntry(entry);
 				valid = false;
 			}
@@ -112,6 +113,7 @@ public class SafetyCaseValidator {
 	private void validateStaticEntries(ValidationResult validationResult) {
 		List<ISACAssumption> staticassumptions = INSTANCE_SAFETY_CASE.getStaticEvaluateableAssumptions();
 		boolean passed = true;
+		long startTimestamp = System.nanoTime();
 		for (ISACAssumption ass : staticassumptions) {
 			Boolean result;
 			ValidationEntry entry;
@@ -119,24 +121,26 @@ public class SafetyCaseValidator {
 				result = evaluate(ass);
 
 				if (result == null) {
-					entry = new ValidationEntry(ass.getId(), Result.ERROR);
+					entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.ERROR);
 					LOGGER.error("Error when evaluating assumption '" + ass.getId() + "' " + ass.getExpression());
 					passed = false;
 				} else if (result.booleanValue()) {
-					entry = new ValidationEntry(ass.getId(), Result.STATIC_CHECK_PASSED);
+					entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.STATIC_CHECK_PASSED);
 				} else {
-					entry = new ValidationEntry(ass.getId(), Result.STATIC_CHECK_FAILED);
+					entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.STATIC_CHECK_FAILED);
 					LOGGER.warn("Assumption '" + ass.getId() + "' " + ass.getExpression() + " evaluated to false");
 					passed = false;
 				}
 			} catch (EvaluationException e) {
 				LOGGER.error("Error when evaluating safety case " + e.getMessage());
-				entry = new ValidationEntry(ass.getId(), Result.ERROR);
+				entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.ERROR);
 				passed = false;
 			}
 			validationResult.addValidationEntry(entry);
 
 		}
+		long endTimestamp = System.nanoTime();
+		BenchmarkLogger.reportStatic(safetyCase.getUAVId(), (endTimestamp - startTimestamp), Boolean.toString(passed));
 		if (passed) {
 			LOGGER.info("Validation of static constraints passed!");
 		} else {
@@ -181,7 +185,8 @@ public class SafetyCaseValidator {
 			}
 			params.append(",");
 		}
-		return ass.getId() + "(" + params.substring(0, params.length() - 1) + ")";
+		params.append("null");
+		return ass.getId() + "(" + params.substring(0, params.length() ) + ")";
 	}
 
 	public static boolean isISACParam(String param) {
