@@ -28,7 +28,7 @@ import net.mv.logging.LoggerProvider;
 public class DronologyServiceRunner {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DronologyServiceRunner.class);
-	private static final boolean USE_SAFETY_CASES = false;
+	private static final boolean USE_SAFETY_CASES = true;
 
 	public static void main(String[] args) {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -56,7 +56,7 @@ public class DronologyServiceRunner {
 
 			// MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("HERB",
 			// "192.168.102", 1234);
-			MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("LOCAL", "localhost", 1234);
+			MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("LAB1", "localhost", 1234);
 			// MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("HUEY",
 			// "huey.cse.nd.edu", 1234);
 

@@ -31,7 +31,14 @@ public class ReputationRating {
 	public double getS() {
 		return s;
 	}
-
+	
+	public int getN() {
+		return n;
+	}
+	
+	public void setN(int n) {
+		this.n = n;
+	}
 	/**
 	 * Add feedback based on the result of some "interaction".
 	 * 

@@ -2,11 +2,11 @@
 <configuration name="citeomat" packages="net.mv.logging">
 	<properties>
 
-		<property name="net.mv.filepath">logs\dronology.log</property>
+		<property name="net.mv.filepath">logs/dronology.log</property>
 		<property name="net.mv.filename">dronology</property>
-		<property name="net.mv.filepathHW">logs\dronology-hw.log</property>
+		<property name="net.mv.filepathHW">logs/dronology-hw.log</property>
 		<property name="net.mv.filenameHW">dronology-hw</property>
-		<property name="net.mv.filepathMission">logs\dronology-mission.log</property>
+		<property name="net.mv.filepathMission">logs/dronology-mission.log</property>
 		<property name="net.mv.filenameMission">dronology-missions</property>
 		<property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5.8p] %-20M
 			|%-5C:%L | %msg%n</property>
@@ -20,7 +20,7 @@
 
 
 		<RollingFile name="RollingFile" fileName="${net.mv.filepath}"
-			filePattern="logs\${net.mv.filename}-%i.log">
+			filePattern="logs/${net.mv.filename}-%i.log">
 			<PatternLayout>
 				<pattern>${pattern}</pattern>
 				<!-- <pattern>"%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - 
@@ -42,17 +42,25 @@
 		</RollingFile>
 
 
-		<File name="hwfile" fileName="${net.mv.filepathHW}" append="true">
+		<RollingFile  name="hwfile" fileName="${net.mv.filepathHW}" filePattern="${net.mv.filepathHW}-%i.log"
+			append="true">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-		</File>
+
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100 MB" /> <!-- Or every 100 MB -->
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+
+		</RollingFile>
 
 		<File name="missionfile" fileName="${net.mv.filepathMission}"
 			append="true">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 
 			<Filters>
-				  <MarkerFilter marker="MISSION" onMatch="ACCEPT" onMismatch="DENY"/>
-		
+				<MarkerFilter marker="MISSION" onMatch="ACCEPT"
+					onMismatch="DENY" />
+
 			</Filters>
 
 		</File>

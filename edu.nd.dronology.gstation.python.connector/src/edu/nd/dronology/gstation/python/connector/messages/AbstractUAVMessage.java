@@ -66,5 +66,10 @@ public class AbstractUAVMessage<T> implements Serializable {
 		return data.entrySet();
 	}
 	
+	public void setType(String type) {
+		this.type = type;
+
+	}
+	
 
 }

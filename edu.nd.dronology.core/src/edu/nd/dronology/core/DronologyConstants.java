@@ -6,7 +6,7 @@ public class DronologyConstants {
 	 * The maximum number of individual uav threads - i.e., the maximum number of
 	 * uavs handled by dronology.
 	 */
-	public static final int MAX_DRONE_THREADS = 50;
+	public static final int MAX_DRONE_THREADS = 150;
 
 	/**
 	 * The speed with which the drone returns to its home location once the 'return
@@ -19,7 +19,7 @@ public class DronologyConstants {
 	 * The safety zone of the uav in m which is used for determining whether a uav
 	 * is allowed to take off.
 	 */
-	public static final double SAFETY_ZONE = 5;
+	public static final double SAFETY_ZONE = 0;
 
 	/**
 	 * The takeoff altitude of the uav (vertical distance in m before going to the
@@ -35,10 +35,14 @@ public class DronologyConstants {
 
 	public static final double HOME_ALTITUDE = 5;
 
-	public static final int MAX_IN_AIR = 10;
+	public static final int MAX_IN_AIR = 100;
 	
 	
 
-	public static final int NR_MESSAGES_IN_QUEUE = 100;
-
+	public static final int NR_MESSAGES_IN_QUEUE = 250;
+	
+	
+	public static final boolean USE_MONITORING = true;
+	
+	public static final boolean USE_SAFETY_CHECKS = true;
 }

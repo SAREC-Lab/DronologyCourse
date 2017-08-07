@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sun.media.jfxmedia.logging.Logger;
 
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
 import edu.nd.dronology.monitoring.safety.internal.UAVSaeftyCase;
@@ -38,7 +39,7 @@ public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 	}
 
 	@Override
-	public boolean validate(String uavid, String safetyCase) {
+	public synchronized boolean validate(String uavid, String safetyCase) {
 		TrustManager.getInstance().initializeUAV(uavid);
 		UAVSaeftyCase sac = GSON.fromJson(safetyCase, UAVSaeftyCase.class);
 		sac.setUAVId(uavid);
