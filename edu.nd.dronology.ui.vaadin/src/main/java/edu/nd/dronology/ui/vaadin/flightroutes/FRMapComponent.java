@@ -20,7 +20,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -58,7 +57,6 @@ public class FRMapComponent extends CustomComponent {
 	private FREditBar editBar = new FREditBar(this);
 	private FRMetaInfo selectedBar;
 	private List<WayPoint> storedPoints = new ArrayList<>();
-	private FRDeleteRoute delete = new FRDeleteRoute(this);
 	private PopupView popup;
 	private FlightRouteInfo selectedRoute;
 	private boolean zoomRoute = true;
@@ -163,32 +161,7 @@ public class FRMapComponent extends CustomComponent {
 		Button toDelete = new Button("Remove Waypoint");
 		toDelete.addClickListener(event -> {
 			popup.setPopupVisible(false);
-			
-			for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-				if (utilities.getMapPoints().get(i).getId().equals(utilities.getSelectedWayPointId())) {
-					utilities.getMapPoints().remove(utilities.getMapPoints().get(i));
-				}
-			}
-			// Finds and removes the waypoint of interest from the mapPoints ArrayList in MapMarkerUtilities using its id.
-			
-			utilities.getMap().removeComponent(utilities.getLeafletMarker());
-			// Removes the marker from the map.
-			
-			utilities.removeAllLines(utilities.getPolylines());
-			utilities.updatePinColors();
-			utilities.drawLines(utilities.getMapPoints(), true, 1, false);
-			// Redraws the polylines given the updated ArrayList of mapPoints.
-			
-			for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-				utilities.getMapPoints().get(i).setOrder(i + 1);
-			}
-			// Sets the order of the waypoints for display purposes.
-			
-			utilities.getGrid().setItems(utilities.getMapPoints());
-			// Update the grid to reflect the updated mapPoints ArrayList.
-			
-			onMapEdited(storedPoints);
-			// Sets the number of waypoints and updates the displays the map in edit mode.
+			this.getMainLayout().getDeleteWayPointConfirmation().showWindow(event);
 		});
 		
 		toDelete.setId("toDelete");
@@ -340,11 +313,6 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("bring_back");
 		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-	}
-	// Called when the delete button is clicked. It passes the correct FlightRouteInfo object to the FRDeleteRoute class.
-	public void deleteClick() {
-		delete.setRouteInfoTobeDeleted(selectedRoute);
-		UI.getCurrent().addWindow(delete.getWindow());
 	}
 	/* Called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct
 	 * waypoints on the map. */
@@ -619,10 +587,6 @@ public class FRMapComponent extends CustomComponent {
 	// Gets whether or not the map zooms to the route.
 	public boolean getZoomRoute() {
 		return zoomRoute;
-	}
-	// Gets the window that asks the user to delete a route. This class also contains the function that deletes a route.
-	public FRDeleteRoute getDeleteBar() {
-		return delete;
 	}
 	// Returns FlightRouteInfo object representing the currently selected route.
 	public FlightRouteInfo getSelectedRoute() {

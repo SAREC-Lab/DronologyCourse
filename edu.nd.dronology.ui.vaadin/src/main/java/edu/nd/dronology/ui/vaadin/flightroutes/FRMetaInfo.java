@@ -18,6 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.ui.vaadin.flightroutes.confirmation.FRUnsavedChangesConfirmation.ChangeType;
 
 /**
  * 
@@ -123,9 +124,11 @@ public class FRMetaInfo extends CustomComponent {
 		});
 		deleteButton.addClickListener(e -> {
 			if (map.getUtilities().isEditable()) {
-				map.getMainLayout().deleteInEdit();
+				map.getMainLayout().getUnsavedChangesConfirmation().showWindow(
+						map.getMainLayout().getCurrentRouteName(), ChangeType.DELETE_ROUTE, e);
 			} else {
-				map.deleteClick();
+				map.getMainLayout().getDeleteRouteConfirmation().showWindow(
+						map.getSelectedRoute());
 			}
 		});
 		

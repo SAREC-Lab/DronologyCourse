@@ -8,12 +8,11 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.ui.vaadin.flightroutes.confirmation.FRUnsavedChangesConfirmation.ChangeType;
 
 /**
  * 
@@ -23,8 +22,9 @@ import edu.nd.dronology.services.core.info.FlightRouteInfo;
  *
  */
 
+@SuppressWarnings("serial")
 public class FRInfoBox extends CustomComponent {
-	private static final long serialVersionUID = 1L;
+	private FRInfoPanel infoPanel;
 	
 	private VerticalLayout allContent;
 	private VerticalLayout routeDescription;
@@ -32,19 +32,14 @@ public class FRInfoBox extends CustomComponent {
 	private String name;
 	private String id;
 	private String modified;
-	private String whichBox;
 	private Button editButton;
 	private Button trashButton;
-	private FRDeleteRoute deleteRoute = new FRDeleteRoute();
-	private FlightRouteInfo finfo;
 	private Label nameIdLabel;
-	private int counter;
-	private int index = 0;
 	
 	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	
-	public FRInfoBox(String name, String id, String created, String modified, String length, FRInfoPanel panel){
-	
+	public FRInfoBox(String name, String id, String created, String modified, String length, FRInfoPanel infoPanel){
+		this.infoPanel = infoPanel;
 		this.name = name;
 		this.id = id;
 		this.modified = modified;
@@ -86,72 +81,31 @@ public class FRInfoBox extends CustomComponent {
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
-
+		
 		// Adds listener to the delete button on the route box /
 		trashButton.addListener(e->{
-			if (panel.getControls().getLayout().getMap().getUtilities().isEditable()) {
+			if (infoPanel.getControls().getMainLayout().getMap().getUtilities().isEditable()) {
 				// Checks if the route is in edit mode.
-				panel.getControls().getLayout().deleteInEdit();
-			} else {
-				UI.getCurrent().addWindow(deleteRoute.getWindow());
-				whichBox = this.getId();
-				// Uses the id of the specific infobox and the route list from the infopanel to find the index of the route that should be deleted.
-				for (int i = 0; i < panel.getRoutes().getComponentCount(); i++) {
-					FRInfoBox local = (FRInfoBox) panel.getRoutes().getComponent(i);
-					if (local.getId().equals(whichBox)) {
-						index = counter;
-					} else {
-						counter++;
-					}
-				}
-				// Gets the FlightRouteInfo at that index and sets it to be deleted.
-				finfo = panel.getFlight(index);
-				deleteRoute.setRouteInfoTobeDeleted(finfo);
+				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
+						infoPanel.getControls().getMainLayout().getCurrentRouteName(), ChangeType.DELETE_ROUTE, e);
+			} else {	
+				infoPanel.getControls().getMainLayout().getDeleteRouteConfirmation().showWindow(getFlightRouteInfo());
 			}
-		});
-		// Refreshes routes immediately after the "yes" on window is clicked.
-		deleteRoute.getYesButton().addClickListener(e -> {
-			panel.refreshRoutes();
 		});
 		// A click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes.
 		editButton.addClickListener(e -> {
-			if (!panel.getControls().getLayout().getMap().getUtilities().isEditable()) {
-				panel.getControls().getLayout().enableMapEdit();
-				panel.getControls().getLayout().editClick(this);
+			if (infoPanel.getControls().getMainLayout().getMap().getSelectedRoute() != null &&
+					this.id.equals(infoPanel.getControls().getMainLayout().getMap().getSelectedRoute().getId()))
+				return;
+			
+			if (!infoPanel.getControls().getMainLayout().getMap().getUtilities().isEditable()) {
+				infoPanel.getControls().getMainLayout().enableMapEdit();
+				infoPanel.getControls().getMainLayout().editClick(this);
 			} else {
-				HorizontalLayout buttons = new HorizontalLayout();
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				buttons.addComponents(yes, no);
-				
-				VerticalLayout windowContent = new VerticalLayout();
-				Label statement = new Label("You have unsaved changes on " + name + ".");
-				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
-				
-				windowContent.addComponents(statement, question, buttons);
-				
-				Window warning;
-				warning = new Window(null, windowContent);
-				warning.setModal(true);
-				warning.setClosable(false);
-				warning.setResizable(false);
-				
-				warning.addStyleName("confirm_window");
-				buttons.addStyleName("confirm_button_area");
-				yes.addStyleName("btn-danger");
-				
-				UI.getCurrent().addWindow(warning);
-				// Click listeners for the buttons on the window asking the user about discarding unsaved changes.
-				yes.addClickListener(event -> {
-					UI.getCurrent().removeWindow(warning);
-					panel.getControls().getLayout().getMap().displayNoRoute();
-					panel.getControls().getLayout().getMap().exitEditMode();
-				});
-				no.addClickListener(event -> {
-					UI.getCurrent().removeWindow(warning);
-				});
+				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
+						infoPanel.getControls().getMainLayout().getCurrentRouteName(), ChangeType.EDIT_ANOTHER, e);
 			}
-			panel.getControls().getLayout().getMap().editButton();
+			infoPanel.getControls().getMainLayout().getMap().editButton();
 		});
 	}
 	// This infobox constructor is called from activeflights.
@@ -203,6 +157,18 @@ public class FRInfoBox extends CustomComponent {
 	public FRInfoBox(FRInfoPanel panel) {	
 		this("NAME", "id", "Jun 3, 2017, 9:24 AM", "Jun 8, 2017, 11:04 AM", "2.1 miles", panel);
 	}
+	
+	public FlightRouteInfo getFlightRouteInfo() {
+		String id = this.getId();
+		// Uses the id of the specific infobox and the route list from the infopanel to find the index of the route that should be deleted.
+		for (int i = 0; i < infoPanel.getRoutes().getComponentCount(); i++) {
+			FRInfoBox local = (FRInfoBox) infoPanel.getRoutes().getComponent(i);
+			if (local.getId().equals(id)) {
+				return infoPanel.getFlightRouteInfo(i);
+			}
+		}
+		return null;
+	}
 	// Gets the name of the route.
 	public String getName() {
 		return name;
@@ -227,10 +193,6 @@ public class FRInfoBox extends CustomComponent {
 	// Sets the modified time and date.
 	public void setModified(String modified) {
 		this.modified = modified;
-	}
-	// Gets the window that asks the user if they want to delete the route or not.
-	public FRDeleteRoute getDeleteBar() {
-		return deleteRoute;
 	}
 	// Gets the delete button on the edit box.
 	public Button getTrashButton() {

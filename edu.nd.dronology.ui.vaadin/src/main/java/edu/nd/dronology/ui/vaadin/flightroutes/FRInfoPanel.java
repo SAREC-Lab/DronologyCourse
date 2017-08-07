@@ -59,7 +59,7 @@ public class FRInfoPanel extends CustomComponent {
 	private ArrayList<FRInfoBox> boxList = new ArrayList<>();
 	private FRControlsComponent controlComponent;
 	private Button newRoute;
-	private Window window;
+	private Window newRouteWindow;
 	private TextArea descriptionField;
 	private String routeDescription;
 	private FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
@@ -123,14 +123,14 @@ public class FRInfoPanel extends CustomComponent {
 
 		// Box to input new route info.
 		newRouteDisplay = new FRNewRoute();
-		window = new Window();
+		newRouteWindow = new Window();
 		
-		window.addStyleName("confirm_window");
+		newRouteWindow.addStyleName("confirm_window");
 		
-		window.setContent(newRouteDisplay);
-		window.setPosition(200, 80);
-		window.setResizable(false);
-		window.setClosable(false);
+		newRouteWindow.setContent(newRouteDisplay);
+		newRouteWindow.setPosition(200, 80);
+		newRouteWindow.setResizable(false);
+		newRouteWindow.setClosable(false);
 		
 		// Gets the buttons on the new route window.
 		drawButton = newRouteDisplay.getDrawButton();
@@ -162,18 +162,18 @@ public class FRInfoPanel extends CustomComponent {
 				
 				nameField.clear();
 				descriptionField.clear();
-				UI.getCurrent().removeWindow(window);
-				controls.getLayout().drawRoute();
+				UI.getCurrent().removeWindow(newRouteWindow);
+				controls.getMainLayout().drawRoute();
 				topPanel.setCaption(String.valueOf(routeListLayout.getComponentCount()) + " routes in database");
 			}
 		});
 		// Displays the route creation window.
 		newRoute.addClickListener(e -> {
-			UI.getCurrent().addWindow(window);
+			UI.getCurrent().addWindow(newRouteWindow);
 		});
 		// Removes route creation window on cancel.
 		cancelButton.addClickListener(e -> {
-			UI.getCurrent().removeWindow(window);
+			UI.getCurrent().removeWindow(newRouteWindow);
 		});
 		// If the vertical layout is clicked, then a route is assumed to be selected.
 		routeListLayout.addLayoutClickListener(e -> {
@@ -182,8 +182,8 @@ public class FRInfoPanel extends CustomComponent {
 		// Iterates through the infoboxes and adds a click listener to each of the edit buttons.
 		for (FRInfoBox infoBox: boxList) {
 			infoBox.getEditButton().addClickListener(e -> {
-				if (!controlComponent.getLayout().getMap().getUtilities().isEditable()) {
-					controls.getLayout().editClick(infoBox);
+				if (!controlComponent.getMainLayout().getMap().getUtilities().isEditable()) {
+					controls.getMainLayout().editClick(infoBox);
 				}
 			});
 		}
@@ -262,7 +262,7 @@ public class FRInfoPanel extends CustomComponent {
 		}
 	}
 	// Gets FlightRouteInfo from Dronology based on route index.
-	public FlightRouteInfo getFlight(int index) {
+	public FlightRouteInfo getFlightRouteInfo(int index) {
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 			
@@ -387,7 +387,7 @@ public class FRInfoPanel extends CustomComponent {
 		return newRoute;
 	}
 	// Removes the current window (used to remove route creation window).
-	public void removeWindow() {
-		UI.getCurrent().removeWindow(window);
+	public void removeNewRouteWindow() {
+		UI.getCurrent().removeWindow(newRouteWindow);
 	}
 }

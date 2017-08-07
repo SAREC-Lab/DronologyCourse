@@ -7,18 +7,18 @@ import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.ui.vaadin.flightroutes.confirmation.FRDeleteRouteConfirmation;
+import edu.nd.dronology.ui.vaadin.flightroutes.confirmation.FRDeleteWayPointConfirmation;
+import edu.nd.dronology.ui.vaadin.flightroutes.confirmation.FRUnsavedChangesConfirmation;
+import edu.nd.dronology.ui.vaadin.flightroutes.confirmation.FRUnsavedChangesConfirmation.ChangeType;
 import edu.nd.dronology.ui.vaadin.utils.WayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
@@ -36,11 +36,15 @@ public class FRMainLayout extends CustomComponent {
 	private VerticalLayout routeLayout;
 	private boolean isNew = false;
 	private boolean toDo = true;
-	private String name = "";
+	private String currentRouteName = "";
 	private String newRouteName;
 	private FlightRouteInfo flightInfo;
 	private FlightRouteInfo newRoute;
 	private int index = -1;
+	
+	private FRDeleteRouteConfirmation deleteRouteConfirmation;
+	private FRUnsavedChangesConfirmation unsavedChangesConfirmation;
+	private FRDeleteWayPointConfirmation deleteWayPointConfirmation;
 
 	@WaypointReplace
 	public FRMainLayout() {
@@ -59,43 +63,12 @@ public class FRMainLayout extends CustomComponent {
 		routeLayout = controls.getInfoPanel().getRoutes();	
 		
 		map.display();
-		name = controls.getInfoPanel().getName();
+		currentRouteName = controls.getInfoPanel().getName();
 		
 		// Adds click listener to route list.
 		routeLayout.addLayoutClickListener(e -> {
 			if (map.getUtilities().isEditable()) {
-				HorizontalLayout buttons = new HorizontalLayout();
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				buttons.addComponents(yes, no);
-				
-				// Creates a window to warn the user about discarding unsaved changes.
-				VerticalLayout windowContent = new VerticalLayout();
-				Label statement = new Label("You have unsaved changes on " + name + ".");
-				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
-				
-				windowContent.addComponents(statement, question, buttons);
-				Window warning;
-				warning = new Window(null, windowContent);
-				warning.setModal(true);
-				warning.setClosable(false);
-				warning.setResizable(false);
-				
-				warning.addStyleName("confirm_window");
-				buttons.addStyleName("confirm_button_area");
-				yes.addStyleName("btn-danger");
-				
-				UI.getCurrent().addWindow(warning);
-				
-				// Click listeners for buttons on window.
-				yes.addClickListener(event -> {
-					UI.getCurrent().removeWindow(warning);
-					switchWindows(e, map, null);
-					map.exitEditMode();
-				});
-				no.addClickListener(event -> {
-					UI.getCurrent().removeWindow(warning);
-				});
+				unsavedChangesConfirmation.showWindow(currentRouteName, ChangeType.SWITCH_ROUTE, e);
 			} else {
 				// If map is not in edit mode, then just switch to the other route.
 				switchWindows(e, map, null);
@@ -105,45 +78,30 @@ public class FRMainLayout extends CustomComponent {
 		controls.getInfoPanel().getNewRouteButton().addClickListener(e -> {
 			// Only prompts user if map is in edit mode.
 			if (map.getUtilities().isEditable()) {
-				HorizontalLayout buttons = new HorizontalLayout();
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				buttons.addComponents(yes, no);
-				
-				// Creates a window to warn the user about discarding unsaved changes.
-				VerticalLayout windowContent = new VerticalLayout();
-				Label statement = new Label("You have unsaved changes on " + name + ".");
-				Label question = new Label ("Are you sure you want to discard all unsaved changes?");
-				
-				windowContent.addComponents(statement, question, buttons);
-				Window warning;
-				warning = new Window(null, windowContent);
-				warning.setModal(true);
-				warning.setClosable(false);
-				warning.setResizable(false);
-				
-				warning.addStyleName("confirm_window");
-				buttons.addStyleName("confirm_button_area");
-				yes.addStyleName("btn-danger");
-				
-				UI.getCurrent().addWindow(warning);
-				
-				// Click listeners for buttons on window.
-				yes.addClickListener(event -> {
-					UI.getCurrent().removeWindow(warning);
-					map.displayNoRoute();
-					map.exitEditMode();
-				});
-				no.addClickListener(event -> {
-					UI.getCurrent().removeWindow(warning);
-					controls.getInfoPanel().removeWindow();
-				});
+				unsavedChangesConfirmation.showWindow(currentRouteName, ChangeType.NEW_ROUTE, e);
 			}
 		});
+		
+		deleteRouteConfirmation = new FRDeleteRouteConfirmation(this);
+		unsavedChangesConfirmation = new FRUnsavedChangesConfirmation(this);
+		deleteWayPointConfirmation = new FRDeleteWayPointConfirmation(this);
 		
 		content.addComponents(controls, map);
 		setCompositionRoot(content);
 	}
+	
+	public FRDeleteRouteConfirmation getDeleteRouteConfirmation() {
+		return deleteRouteConfirmation;
+	}
+
+	public FRUnsavedChangesConfirmation getUnsavedChangesConfirmation() {
+		return unsavedChangesConfirmation;
+	}
+
+	public FRDeleteWayPointConfirmation getDeleteWayPointConfirmation() {
+		return deleteWayPointConfirmation;
+	}
+	
 	// Displays the route that is clicked. Passes in the click event, map, and infobox that was clicked.
 	public void switchWindows(LayoutClickEvent e, FRMapComponent map, FRInfoBox component) {
 		isNew = false;
@@ -168,24 +126,13 @@ public class FRMainLayout extends CustomComponent {
 		index = routeLayout.getComponentIndex(child);
 
 		// Gets the flight info for that route.
-		flightInfo = controls.getInfoPanel().getFlight(index);
-		
-		// Creates an arraylist of infoboxes and adds click listeners to the 'yes' buttons on their respective delete bars.
-		ArrayList<FRInfoBox> list = controls.getInfoPanel().getBoxList();
-		for(FRInfoBox box: list){
-			box.getDeleteBar().getYesButton().addClickListener(even->{
-				// If the 'yes' button is clicked, no route is displayed and the info panel is refreshed (route is deleted in FRDeleteRoute).
-				map.displayNoRoute();
-				map.exitEditMode();
-				controls.getInfoPanel().refreshRoutes();
-			});
-		}
+		flightInfo = controls.getInfoPanel().getFlightRouteInfo(index);
 		
 		// Stores list of waypoints of relevant flight.
 		List<Waypoint> flightWaypoints = new ArrayList<>();
 		if (routeLayout.getComponentIndex(child) != -1) {
 			flightWaypoints = flightInfo.getWaypoints();
-			name = flightInfo.getName();
+			currentRouteName = flightInfo.getName();
 		} else {
 			flightWaypoints = new ArrayList<>();
 		}
@@ -249,44 +196,6 @@ public class FRMainLayout extends CustomComponent {
 			map.getUtilities().setMapPointsTransit(wayPoints);
 		}
 	}
-	// Handles what should happen when the user clicks on one of the delete buttons while still in edit mode.
-	public void deleteInEdit() {
-			HorizontalLayout buttons = new HorizontalLayout();
-			Button yes = new Button("Yes");
-			Button no = new Button("No");
-			buttons.addComponents(yes, no);
-			
-			// Creates a window to warn the user.
-			VerticalLayout windowContent = new VerticalLayout();
-			Label statement = new Label("You have unsaved changes on " + name + ".");
-			Label question = new Label ("Are you sure you want to discard all unsaved changes?");
-			
-			windowContent.addComponents(statement, question, buttons);
-			Window warning;
-			warning = new Window(null, windowContent);
-			warning.setModal(true);
-			warning.setClosable(false);
-			warning.setResizable(false);
-			
-			warning.addStyleName("confirm_window");
-			buttons.addStyleName("confirm_button_area");
-			yes.addStyleName("btn-danger");
-			
-			UI.getCurrent().addWindow(warning);
-			
-			// Click listeners for yes and no button on window.
-			yes.addClickListener(event -> {
-				map.getDeleteBar().deleteRoute(map.getSelectedRoute());
-				UI.getCurrent().removeWindow(warning);
-				map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
-				map.displayNoRoute();
-				map.exitEditMode();
-			});
-			no.addClickListener(event -> {
-				UI.getCurrent().removeWindow(warning);
-				controls.getInfoPanel().removeWindow();
-			});
-	}
 	// Called if a new route is made, and displays the route on the map and table while enabling edit mode.
 	public void drawRoute() {
 		isNew = true;
@@ -307,7 +216,7 @@ public class FRMainLayout extends CustomComponent {
 		map.getTableDisplay().getGrid().setItems();
 		map.enableEdit();
 		
-		flightInfo = controls.getInfoPanel().getFlight(index);
+		flightInfo = controls.getInfoPanel().getFlightRouteInfo(index);
 	}
 	// When a route is deleted, this refreshes the routes in the info panel to reflect the data stored in Dronology.
 	public void deleteRouteUpdate() {
@@ -354,5 +263,8 @@ public class FRMainLayout extends CustomComponent {
 	// Signals if the selected infobox is representing a new route (false if not).
 	public boolean isNew() {
 		return isNew;
+	}
+	public String getCurrentRouteName() {
+		return currentRouteName;
 	}
 }

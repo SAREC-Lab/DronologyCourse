@@ -11,20 +11,20 @@ import com.vaadin.ui.CustomComponent;
 public class FRControlsComponent extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	FRInfoPanel information = new FRInfoPanel(this);
-	FRMainLayout main;
+	FRMainLayout mainLayout;
 	
 	public FRControlsComponent(FRMainLayout layout) {
 		this.setWidth("100%");
 		addStyleName("controls_component");
 		setCompositionRoot(information);
-		main = layout;
+		mainLayout = layout;
 	}
 	public FRInfoPanel getInfoPanel() {
 		return information;
 		// Returns the list of flight routes, which appears on the left hand side of the display.
 	}
-	public FRMainLayout getLayout() {
-		return main;
+	public FRMainLayout getMainLayout() {
+		return mainLayout;
 		// Returns the table and grid combination, which appears on the right hand side of the display.
 	}
 }

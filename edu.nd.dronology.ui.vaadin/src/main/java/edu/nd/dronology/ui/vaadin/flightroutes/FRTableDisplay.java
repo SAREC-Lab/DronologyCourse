@@ -3,15 +3,9 @@ import java.util.List;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToFloatConverter;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.renderers.ButtonRenderer;
 
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
@@ -112,58 +106,7 @@ public class FRTableDisplay {
 			grid.addColumn(event -> "Delete",
 				new ButtonRenderer<WayPoint> (clickEvent -> {
 					if (utilities.isEditable()) {
-						// This check ensures that a column of Delete buttons should logically be added to the grid.
-						Window deletePanel = new Window(" ");
-						VerticalLayout deletePanelContent = new VerticalLayout();
-						HorizontalLayout buttons = new HorizontalLayout();
-						Button yes = new Button("Yes");
-						Button no = new Button("No");
-						deletePanel.setContent(deletePanelContent);
-						
-						deletePanel.addStyleName("confirm_window");
-						buttons.addStyleName("confirm_button_area");
-						yes.addStyleName("btn-danger");
-						
-						deletePanelContent.addComponent(new Label("Are you sure you want to delete this waypoint?"));
-						deletePanel.setWidth("425px");
-						
-						buttons.addComponent(yes);
-						buttons.addComponent(no);
-						
-						deletePanel.setModal(true);
-						deletePanel.setClosable(false);
-						deletePanel.setResizable(false);
-						
-						yes.addClickListener(event -> {
-							WayPoint w = clickEvent.getItem();
-							utilities.removeAllLines(utilities.getPolylines());
-							
-							for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-								if (utilities.getMapPoints().get(i).getId().equals(w.getId())) {
-									utilities.getMapPoints().remove(utilities.getMapPoints().get(i));
-									utilities.getMap().removeComponent(utilities.getPins().get(i));
-								}
-							}
-							
-							utilities.drawLines(utilities.getMapPoints(), true, 1, false);
-	
-							for (int i = 0; i < this.utilities.getMapPoints().size(); i++) {
-								this.utilities.getMapPoints().get(i).setOrder(i + 1);
-							}
-						
-							grid.setItems(this.utilities.getMapPoints());
-							grid.setItems(utilities.getMapPoints());
-							UI.getCurrent().removeWindow(deletePanel);
-							utilities.updatePinColors();
-						});
-							
-						no.addClickListener(event -> {
-							UI.getCurrent().removeWindow(deletePanel);
-						});
-							
-						deletePanelContent.addComponent(buttons);
-						
-						UI.getCurrent().addWindow(deletePanel);
+						utilities.getMapComponent().getMainLayout().getDeleteWayPointConfirmation().showWindow(clickEvent);;
 					}
 				})
 			);

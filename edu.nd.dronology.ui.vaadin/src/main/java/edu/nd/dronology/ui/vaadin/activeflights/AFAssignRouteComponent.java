@@ -171,7 +171,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 		//when adding a route to be assigned
 		left.addClickListener( e-> {
 			if (frLayout.getIndex() != -1){
-				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
+				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlightRouteInfo(frLayout.getIndex());
 				if (selectedFlight.getWaypoints().size() < 1){
 					Notification.show("There is no waypoint defined in " + selectedFlight.getName() +". You cannot assign an empty route to a UAV.");
 				}
