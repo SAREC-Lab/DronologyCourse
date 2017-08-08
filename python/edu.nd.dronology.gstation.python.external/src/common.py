@@ -29,11 +29,11 @@ DEFAULT_SAR_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), DEFAU
 
 
 class Waypoint:
-    def __init__(self, lat, lon, alt, groundpseed=None):
+    def __init__(self, lat, lon, alt, groundspeed=None):
         self.lat = lat
         self.lon = lon
         self.alt = alt
-        self.gs = groundpseed
+        self.gs = groundspeed
 
     def get_lla(self):
         return self.lat, self.lon, self.alt

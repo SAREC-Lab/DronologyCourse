@@ -16,11 +16,16 @@ _LOG = util.get_logger()
 arr = np.array
 
 
-def _init_tsp(start, point_last_seen):
-    path = [start]
+def _init_tsp(start, points, point_last_seen):
+    path = []
 
     if point_last_seen is not None:
         path.append(point_last_seen)
+    else:
+        dists = [start.distance(a) for a in points]
+        i = np.argmin(dists)
+        path.append(points[i])
+        points.pop(i)
 
     return path
 
@@ -38,7 +43,7 @@ def tsp_christofides(start, points, point_last_seen=None):
 
 
 def tsp_greedy(start, points, point_last_seen=None):
-    path = _init_tsp(start, point_last_seen)
+    path = _init_tsp(start, points, point_last_seen)
     to_visit = arr(points)
     while to_visit.size:
         dists = [path[-1].distance(b) for b in to_visit]
@@ -247,9 +252,9 @@ class SaR(Mission):
         start = Lla(home[0], home[1], 0)
         path = get_search_path(start, bounds, point_last_seen=pls)
 
-        waypoints = []
-        for lat, lon, _ in path:
-            waypoints.append(Waypoint(lat, lon, alt, groundpseed=gs))
+        waypoints = [Waypoint(path[0][0], path[0][1], alt, groundspeed=gs)]
+        for lat, lon, _ in path[1:]:
+            waypoints.append(Waypoint(lat, lon, alt, groundspeed=5.0))
 
         # START MESSAGE TIMERS
         send_state_message_timer = util.RepeatedTimer(1.0, gen_state_message, vehicle)

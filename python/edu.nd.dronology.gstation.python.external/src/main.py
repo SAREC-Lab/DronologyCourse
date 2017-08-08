@@ -11,11 +11,10 @@ def _parse_mission(mission_str):
     """
     e.g. missions.sar.SingleUAVSAR [... [...]]
     """
-    toks = mission_str.split('.')
-    module = '.'.join(toks[:2])
-    clazz = toks[2]
-    args = '.'.join(toks[3:])
-
+    toks = mission_str.split()
+    module = '.'.join(toks[0].split('.')[:2])
+    clazz = toks[0].split('.')[2]
+    args = ' '.join(toks[1:])
     mission = getattr(importlib.import_module(module), clazz)
     kwargs = mission.parse_args(args)
 

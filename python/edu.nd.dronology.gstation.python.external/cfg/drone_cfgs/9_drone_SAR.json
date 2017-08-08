@@ -3,7 +3,7 @@
     "class": "VRTL",
     "home": [41.683202, -86.250413],
     "altitude": 10,
-    "groundspeed": 10,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -12,7 +12,7 @@
     "class": "VRTL",
     "home": [41.683202, -86.250381],
     "altitude": 12,
-    "groundspeed": 7,
+    "groundspeed": 14,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -21,7 +21,7 @@
     "class": "VRTL",
     "home":[41.683202,-86.250349],
     "altitude": 15,
-    "groundspeed": 11,
+    "groundspeed": 13,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -30,7 +30,7 @@
     "class": "VRTL",
     "home":[41.683202,-86.250317],
     "altitude": 13,
-    "groundspeed": 15,
+    "groundspeed": 12,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -39,7 +39,7 @@
     "class": "VRTL",
     "home":[41.683202,-86.250285],
     "altitude": 17,
-    "groundspeed": 10,
+    "groundspeed": 12,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -48,7 +48,7 @@
     "class": "VRTL",
     "home":[41.683202,-86.250253],
     "altitude": 20,
-    "groundspeed": 14,
+    "groundspeed": 11,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -66,7 +66,7 @@
     "class": "VRTL",
     "home":[41.683202,-86.250189],
     "altitude": 10,
-    "groundspeed": 5,
+    "groundspeed": 10,
     "baud": 115200,
     "rate": 10,
     "ip": null
@@ -75,7 +75,7 @@
     "class": "VRTL",
     "home":[41.683202,-86.250157],
     "altitude": 15,
-    "groundspeed": 14,
+    "groundspeed": 10,
     "baud": 115200,
     "rate": 10,
     "ip": null
