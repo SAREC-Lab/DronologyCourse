@@ -14,11 +14,18 @@ DRONE_1 = (DRONE_TYPE_SITL_VRTL, {'instance': 0, 'home': (41.519408, -86.239996,
 DRONE_2 = (DRONE_TYPE_SITL_VRTL, {'instance': 1, 'home': (41.519408, -86.239496, 0, 0)})
 
 DEFAULT_DRONE_SPECS = (DRONE_1,)
-DEFAULT_SAR_START = (41.519412, -86.239830, 0)
-DEFAULT_SAR_BOUNDS = ((41.519362, -86.240411, 0),
-                      (41.519391, -86.239414, 0),
-                      (41.519028, -86.239411, 0),
-                      (41.519007, -86.240396, 0))
+DEFAULT_SAR_START = (41.519412, -86.239830)
+DEFAULT_SAR_BOUNDS = ((41.519362, -86.240411),
+                      (41.519391, -86.239414),
+                      (41.519028, -86.239411),
+                      (41.519007, -86.240396))
+
+SAR_BOUNDS_SIM = ((41.680370, -86.251986),
+                  (41.671081, -86.251939),
+                  (41.670975, -86.241677),
+                  (41.680476, -86.242008))
+
+DEFAULT_SAR_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), DEFAULT_SAR_BOUNDS))
 
 
 class Waypoint:
@@ -33,6 +40,9 @@ class Waypoint:
 
     def get_groundspeed(self):
         return self.gs
+
+    def as_array(self):
+        return [self.lat, self.lon, self.alt, self.gs]
 
 
 class DronologyMessage(object):

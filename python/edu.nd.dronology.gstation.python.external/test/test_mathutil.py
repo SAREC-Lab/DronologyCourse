@@ -156,7 +156,5 @@ class TestEarth(unittest.TestCase):
         self.assertAlmostEqual(expected, actual, places=6)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()

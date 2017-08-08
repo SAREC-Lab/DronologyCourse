@@ -1,6 +1,5 @@
 import numpy as np
 import nvector as nv
-from shapely.geometry import Polygon, Point
 
 
 arr = np.array
@@ -24,7 +23,6 @@ class GeoShape(object):
         self._verts = vertices
         self._grid_xyz = arr([v.to_pvector() for v in vertices])
         self._grid_lla = arr([v.to_lla() for v in vertices])
-        self._poly = Polygon([v.to_pvector()[:] for v in vertices])
 
 
 class GeoPoly(GeoShape):
@@ -80,12 +78,13 @@ class GeoPoly(GeoShape):
         return self._s_max
 
     def contains(self, p):
-        ll = p.to_pvector()[:]
-        p_ = Point(*ll)
-        return p_.within(self._poly) or p_.touches(self._poly)
+        # ll = p.to_pvector()[:]
+        # p_ = Point(*ll)
+        # return p_.within(self._poly) or p_.touches(self._poly)
+        pass
 
 
-class Earth:
+class Earth(object):
     radius_m = 6371E3
     @staticmethod
     def meridional_radius_curvature(latitude, a=SEMI_MAJOR, b=SEMI_MINOR):
@@ -165,20 +164,15 @@ class Position(object):
 
         return R_EN
 
-    def move_azimuth_distance(self, azimuth, distance):
-        """
-        Find the destination point B that is distance away from this point on the given azimuth.
-        :param azimuth: degrees relative to north (clockwise)
-        :param distance: distance to travel (m)
-        :return: the destination, B
-        """
-        n_EA_E = self.to_nvector().get_xyz(shape=(3, 1))
-        az_rad = nv.rad(azimuth)
+    def move_ned(self, north, east, down):
+        p_EA_E = self.to_pvector().get_xyz()
 
-        distance_rad = distance / Earth.radius_m
-        n_EB_E = nv.n_EA_E_distance_and_azimuth2n_EB_E(n_EA_E, distance_rad, az_rad).ravel()
+        R_NE = self.n_E2R_EN()
+        p_delta_E = R_NE.dot([north, east, down])
 
-        return self.coerce(Nvector(n_EB_E[0], n_EB_E[1], n_EB_E[2], 0))
+        p_EA_E_delta = p_EA_E + p_delta_E
+
+        return self.coerce(Pvector(*p_EA_E_delta))
 
     def __repr__(self):
         return '{}'.format(','.join(self.as_array().astype(str)))

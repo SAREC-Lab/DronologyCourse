@@ -109,7 +109,7 @@ class VehicleControl(object):
 
 class ArduPilot(VehicleControl):
     @staticmethod
-    def connect_vehicle(vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, speed=1, rate=10,
+    def connect_vehicle(vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, rate=10,
                         home=(41.732955, -86.180886, 0, 0), baud=115200):
         """
         Connect to a SITL vehicle or a real vehicle.
@@ -141,16 +141,16 @@ class ArduPilot(VehicleControl):
                 '-I{}'.format(instance),
                 '--model', '+',
                 '--home', ','.join(map(str, home)),
-                '--speedup', str(speed),
                 '--rate', str(rate),
                 '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
             ]
+            _LOG.debug('Trying to launch SITL instance {} on tcp:127.0.0.1:{}'.format(instance, 5760 + instance * 10))
             sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
-            sitl.launch(sitl_args, await_ready=True, verbose=True)
+            sitl.launch(sitl_args, await_ready=True)
             tcp, ip, port = sitl.connection_string().split(':')
             port = str(int(port) + instance * 10)
             conn_string = ':'.join([tcp, ip, port])
-            _LOG.info('SITL instance {} launched on: {}'.format(instance ,conn_string))
+            _LOG.debug('SITL instance {} launched on: {}'.format(instance ,conn_string))
             vehicle = dronekit.connect(conn_string, wait_ready=True, baud=baud)
             _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
             shutdown_cb = lambda: _sitl_shutdown_cb(vehicle, sitl)
@@ -229,7 +229,7 @@ class ArduPilot(VehicleControl):
         :param groundspeed:
         :return:
         """
-        vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), groundspeed=groundspeed)
+        vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), airspeed=groundspeed)
 
     @staticmethod
     def is_lla_reached(vehicle, lat, lon, alt, threshold=1):
@@ -262,6 +262,7 @@ class ArduPilot(VehicleControl):
                 _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
                 if waypoints:
                     cur_wp = waypoints.pop(0)
+                    _LOG.info('Vehicle en route ({}, {}, {}) at {} m/s'.format(*cur_wp.as_array()))
                     ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
                 else:
                     is_complete = True
@@ -303,8 +304,8 @@ class Host:
     _CONNECTED = 2
     _DEAD = -1
 
-    def __init__(self, host='', port=1234, accept_timeout=5.0):
-        self._host = host
+    def __init__(self, addr='', port=1234, accept_timeout=15.0):
+        self._addr = addr
         self._port = port
         self._accept_timeout = accept_timeout
         self._socket = None
@@ -355,10 +356,10 @@ class Host:
                 try:
                     self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     self._socket.settimeout(self._accept_timeout)
-                    self._socket.bind((self._host, self._port))
+                    self._socket.bind((self._addr, self._port))
                     self._socket.listen(0)
+                    _LOG.info('Waiting for Dronology connection.')
                     while self.get_status() == Host._WAITING:
-                        _LOG.info('Waiting for Dronology connection.')
                         try:
                             conn, addr = self._socket.accept()
                             self._conn = conn
@@ -367,7 +368,7 @@ class Host:
                             _LOG.info('Established Dronology connection.')
                             time.sleep(1.0)
                         except socket.timeout:
-                            _LOG.info('No connection attempted')
+                            _LOG.debug('No connection attempted')
                 except socket.error as e:
                     _LOG.info('Socket error ({})'.format(e))
                     time.sleep(5.0)

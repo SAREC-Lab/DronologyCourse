@@ -8,7 +8,7 @@ from common import *
 from threading import Timer
 
 
-def get_logger(name='default_file', p2cfg='../cfg/logging.conf'):
+def get_logger(name='default', p2cfg='../cfg/logging.conf'):
     with open(p2cfg, 'r') as f:
         cfg = yaml.load(f)
 

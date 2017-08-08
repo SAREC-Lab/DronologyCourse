@@ -1,33 +1,44 @@
 import core
 import argparse
 import util
-from missions import sar
-from common import *
+import importlib
+
 
 _LOG = util.get_logger()
 
 
-def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUNDS):
-    _LOG.info('STARTING NEW MISSION.')
-    connection = core.Host(host=host, port=port)
-    # start a thread to monitor dronology connection
-    connection.start()
-    _LOG.info('Accepting connection on tcp:{}:{}'.format(host, port))
+def _parse_mission(mission_str):
+    """
+    e.g. missions.sar.SingleUAVSAR [... [...]]
+    """
+    toks = mission_str.split('.')
+    module = '.'.join(toks[:2])
+    clazz = toks[2]
+    args = '.'.join(toks[3:])
 
-    # TODO: make this configurable
-    sar.SingleUAVSAR.start(connection, vehicle_type, vehicle_id, bounds, ardupath=ardupath)
-    # mission_single_uav_sar(connection, vehicle_type, vehicle_id, bounds, ardupath=ardupath)
+    mission = getattr(importlib.import_module(module), clazz)
+    kwargs = mission.parse_args(args)
+
+    return mission, kwargs
+
+
+def main(addr, port, mission, **kwargs):
+    _LOG.info('STARTING NEW MISSION.')
+    connection = core.Host(addr=addr, port=port)
+    connection.start()
+    _LOG.info('Accepting connection on tcp:{}:{}'.format(addr, port))
+    mission.start(connection, **kwargs)
     connection.stop()
     _LOG.info('MISSION ENDED.')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-ap', '--ardupath', type=str, required=True)
-    parser.add_argument('-host', '--host', type=str, default='')
-    parser.add_argument('-p', '--port', type=int, default=1234)
-    parser.add_argument('-vtype', '--vehicle_type', type=str, default=DRONE_TYPE_SITL_VRTL)
-    parser.add_argument('-vid', '--vehicle_id', type=int, default=1)
+    parser.add_argument('-addr', '--address',
+                        type=str, default='')
+    parser.add_argument('-p', '--port',
+                        type=int, default=1234)
+    parser.add_argument('-m', '--mission',
+                        type=_parse_mission, default='missions.sar.SaR', help=_parse_mission.__doc__)
     args = parser.parse_args()
-
-    main(args.host, args.port, args.vehicle_type, args.vehicle_id, args.ardupath)
+    main(args.address, args.port, args.mission[0], **args.mission[1])

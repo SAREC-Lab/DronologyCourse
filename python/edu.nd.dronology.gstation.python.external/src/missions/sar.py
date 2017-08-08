@@ -49,34 +49,30 @@ def tsp_greedy(start, points, point_last_seen=None):
     return arr(path)
 
 
-def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
+def _get_search_path_default(start, vertices, N=16, point_last_seen=None):
+    m = int(np.ceil(np.sqrt(N)))
     p_ES_E = start.to_pvector()
     grid = GeoPoly(vertices)
 
     p_EA_E = grid.sw_vertex()
-    _LOG.debug('SW SAR corner: {}'.format(p_EA_E.to_lla()))
-    p_EC_E = grid.ne_vertex()
-    _LOG.debug('NE SAR corner: {}'.format(p_EC_E.to_lla()))
-    p_ED_E = grid.se_vertex()
-    _LOG.debug('SE SAR corner: {}'.format(p_ED_E.to_lla()))
-    p_furthest_north_E = grid.furthest_north()
+    p_EB_E = grid.ne_vertex()
+    p_EC_E = grid.se_vertex()
 
-    R_EN = p_EA_E.n_E2R_EN()
-    p_AD_N = R_EN.T.dot(p_ED_E - p_EA_E)
-    p_AC_N = R_EN.T.dot(p_EC_E - p_EA_E)
-    e_dist = int(max(p_AD_N[1], p_AC_N[1]))
-    azimuth = np.rad2deg(np.arctan2(p_AD_N[1], p_AD_N[0]))
+    R_NE = p_EA_E.n_E2R_EN().T
+    p_AB_N = R_NE.dot(p_EB_E - p_EA_E)
+    p_AC_N = R_NE.dot(p_EC_E - p_EA_E)
+
+    n_dist = p_AB_N[0]
+    e_dist = p_AC_N[1]
+
+    n_step = n_dist / m
+    e_step = e_dist / m
 
     S = []
 
-    for x in range(0, e_dist + step, step):
-        p_EA1_E = p_EA_E.move_azimuth_distance(azimuth, x)
-        p_A1FN_E = p_furthest_north_E - p_EA1_E
-        p_A1FN_N = p_EA1_E.n_E2R_EN().T.dot(p_A1FN_E)
-        n_dist = int(p_A1FN_N[0])
-        for y in range(0, n_dist + step, step):
-            p_new = p_EA1_E.move_azimuth_distance(0, y)
-            S.append(p_new)
+    for x in np.arange(0, e_dist, e_step):
+        for y in np.arange(0, n_dist, n_step):
+            S.append(p_EA_E.move_ned(y, x, 0).to_lla())
 
     # TODO: fix the filter
     # S = [s for s in S if grid.contains(s)]
@@ -84,77 +80,163 @@ def _get_search_path_default(start, vertices, step=5, point_last_seen=None):
     return [pos.to_lla() for pos in path]
 
 
+def _partition_grid(bounds, N):
+    m = int(np.ceil(np.sqrt(N)))
+    grid = GeoPoly(bounds)
+    p_EA_E = grid.sw_vertex()
+    p_EB_E = grid.nw_vertex()
+    p_EC_E = grid.se_vertex()
+
+    R_NE = p_EA_E.n_E2R_EN().T
+    p_AB_N = R_NE.dot(p_EB_E - p_EA_E)
+    p_AC_N = R_NE.dot(p_EC_E - p_EA_E)
+
+    n_dist = p_AB_N[0]
+    e_dist = p_AC_N[1]
+
+    n_step = n_dist / m
+    e_step = e_dist / m
+
+    quads = []
+    for i in np.arange(0, e_dist, e_step):
+        for j in np.arange(0, n_dist, n_step):
+            sw = p_EA_E.move_ned(j, i, 0)
+            nw = p_EA_E.move_ned(j + n_step, i, 0)
+            ne = p_EA_E.move_ned(j + n_step, i + e_step, 0)
+            se = p_EA_E.move_ned(j, i + e_step, 0)
+            quads.append(list(map(lambda pos: pos.to_lla(), [sw, nw, ne, se])))
+
+    return quads
+
 _search_strats = {
     SEARCH_DEFAULT: _get_search_path_default,
 }
 
 
-def get_search_path(start, vertices, strat=SEARCH_DEFAULT, step=10, point_last_seen=None):
+def get_search_path(start, vertices, strat=SEARCH_DEFAULT, N=16, point_last_seen=None):
     """
 
     :param start: the starting location of the drone (Position)
     :param vertices: the vertices of the search space ([Position, ... ])
     :param strat: the search strategy (choose from search strategies in common.py)
-    :param step: the number of meters between each waypoint
+    :param N: number of sectors
     :param point_last_seen: optional, the last known location of the target (lat, lon, alt)
     :return:
     """
     if strat not in _search_strats:
         raise ValueError('invalid search strategy specified {}'.format(strat))
 
-    return _search_strats[strat](start, vertices, step=step, point_last_seen=point_last_seen)
+    return _search_strats[strat](start, vertices, N=N, point_last_seen=point_last_seen)
 
 
-class SingleUAVSAR(Mission):
+class SaR(Mission):
     @staticmethod
-    def start(connection, v_type=DRONE_TYPE_SITL_VRTL, v_id='VRTL_0', bounds=DEFAULT_SAR_BOUNDS,
-              point_last_seen=None, altitude=10, groundspeed=10, ip=None, instance=0, ardupath=ARDUPATH, baud=115200,
-              speed=1, rate=10, home=(41.519412, -86.239830, 0, 0), control=core.ArduPilot, **kwargs):
+    def _parse_coord(coord):
+        """
+        e.g. -pls 41.519362,-86.240411
+        """
+        if coord:
+            res = tuple(map(float, coord.split(',')))
+        else:
+            res = None
+        return res
+
+    @staticmethod
+    def _parse_sar_bounds(bounds):
+        """
+        e.g. -b 41.519362,-86.240411|41.519391,-86.239414|41.519028,-86.239411|41.519007,-86.240396
+        """
+        coords = [SaR._parse_coord(c) for c in bounds.split('|')]
+        return coords
+
+    @staticmethod
+    def parse_args(cla):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-c', '--control',
+                            type=Mission._parse_controller, default='core.ArduPilot',
+                            help=Mission._parse_controller.__doc__)
+        parser.add_argument('-b', '--bounds',
+                            type=SaR._parse_sar_bounds, default=DEFAULT_SAR_BOUNDS_STR,
+                            help=SaR._parse_sar_bounds.__doc__)
+        parser.add_argument('-pls', '--point_last_seen',
+                            type=SaR._parse_coord, default='', help=SaR._parse_coord.__doc__)
+        parser.add_argument('-cfg', '--drone_configs',
+                            type=Mission._parse_drone_cfg, default='../cfg/drone_cfgs/9_drone_SAR.json',
+                            help=Mission._parse_drone_cfg.__doc__)
+        parser.add_argument('-ap', '--ardupath',
+                            type=str, default=ARDUPATH, help='the path to ardupilot static resources')
+
+        args = parser.parse_args(cla.split())
+        return vars(args)
+
+    @staticmethod
+    def start(connection, drone_configs=None, ardupath=ARDUPATH, control=core.ArduPilot,
+              bounds=DEFAULT_SAR_BOUNDS, point_last_seen=None):
         """
         Conduct a search and rescue mission with a single UAV using waypoint navigation.
 
+
+        :param control: the UAV controller to use
         :param connection: core.Connection object used to talk to Dronology
-        :param v_type: vehicle type (PHYS or VRTL)
-        :param v_id: vehicle id
-        :param bounds: the bounds of the search space ([(lat, lon, alt), ...])
-                       NOTE: alt will be ignored but still must be provided
-        :param point_last_seen: the last point the target was seen (lat, lon, alt)
-        :param altitude: the altitude at which the uav should fly during the search (meters)
-        :param groundspeed: the speed at which the uav should fly (m/s)
-        :param ip: the ip used to connect to the vehicle (only necessary for a physical drone)
-        :param instance: the SITL instance (only necessary if multiple simulated uavs are required)
-        :param ardupath: the path to the ardupilot repository
-        :param baud: internal SITL parameter (see documentation)
-        :param speed: internal SITL parameter (see documentation)
-        :param rate: internal SITL parameter (see documentation)
-        :param home: internal SITL parameter (see documentation)
+        :param drone_configs:
+        :param ardupath:
         :param control:
+        :param bounds:
+        :param point_last_seen:
+        :return:
         """
-        SingleUAVSAR._start(connection, v_type, v_id, bounds, point_last_seen, altitude, groundspeed,
-                            ip, instance, ardupath, baud, speed, rate, home, control)
+        if drone_configs is not None:
+            n_drones = len(drone_configs)
+            n_vrtl = 0
+            n_phys = 0
+
+            bounds = map(lambda tup: Lla(tup[0], tup[1], 0), bounds)
+            quadrants = _partition_grid(bounds, n_drones)
+            workers = []
+
+            for i, dc in enumerate(drone_configs):
+                clazz = dc['class']
+                vid = clazz
+                if clazz == DRONE_TYPE_SITL_VRTL:
+                    n_vrtl += 1
+                    vid += str(n_vrtl)
+                else:
+                    n_phys += 1
+                    vid += str(n_phys)
+
+                args = [connection, control, quadrants[i], point_last_seen,
+                        vid, clazz, dc['altitude'], dc['groundspeed'], n_vrtl - 1, ardupath,
+                        dc['baud'], dc['rate'], tuple(dc['home']), dc['ip']]
+
+                worker = threading.Thread(target=SaR._start, args=args)
+                workers.append(worker)
+                worker.start()
+                time.sleep(3.0)
+
+            for worker in workers:
+                worker.join()
 
     @staticmethod
-    def _start(connection, v_type, v_id, bounds, pls, alt, gs, ip, inst, ardu, baud, speed, rate, home, control):
-        v_id = '{}_{}'.format(v_type, v_id)
+    def _start(connection, control, bounds, pls, v_id, v_type, alt, gs, inst, ardu, baud, rate, home, ip):
         vehicle, shutdown_cb = control.connect_vehicle(v_type, vehicle_id=v_id, ip=ip,
-                                                       instance=inst, ardupath=ardu, speed=speed,
-                                                       rate=rate, home=home, baud=baud)
+                                                       instance=inst, ardupath=ardu,
+                                                       rate=rate, home=home + (0,0,), baud=baud)
         handshake_lock = threading.Lock()
         handshake_complete = False
 
         # SET UP TIMERS
         def gen_state_message(m_vehicle):
+            msg = StateMessage.from_vehicle(m_vehicle, v_id)
             with handshake_lock:
                 if handshake_complete:
-                    msg = StateMessage.from_vehicle(m_vehicle, v_id)
-                    _LOG.info(str(msg))
                     connection.send(str(msg))
 
         def gen_monitor_message(m_vehicle):
+            msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
+            if not int(round(time.time())) % 10:
+                _LOG.info(str(msg))
             with handshake_lock:
                 if handshake_complete:
-                    msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
-                    _LOG.info(str(msg))
                     connection.send(str(msg))
 
         # ARM & READY
@@ -162,10 +244,8 @@ class SingleUAVSAR(Mission):
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
 
-        home = vehicle.home_location
-        start = Lla(home.lat, home.lon, 0)
-        vertices = [Lla(lat, lon, 0) for lat, lon, _ in bounds]
-        path = get_search_path(start, vertices, point_last_seen=pls)
+        start = Lla(home[0], home[1], 0)
+        path = get_search_path(start, bounds, point_last_seen=pls)
 
         waypoints = []
         for lat, lon, _ in path:
@@ -180,8 +260,8 @@ class SingleUAVSAR(Mission):
         _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
         # FLY
+        _LOG.info('Vehicle {} en route!'.format(v_id))
         worker = control.goto_lla_sequential(vehicle, waypoints, block=False)
-
         try:
             # HANDLE INCOMING MESSAGES
             while worker.isAlive():
@@ -217,19 +297,22 @@ class SingleUAVSAR(Mission):
         shutdown_cb()
 
 
-
 def main():
     v1 = 41.5190146513, -86.2400358089, 0
     v2 = 41.5192946477, -86.239555554, 0
     v3 = 41.5190274009, -86.2394354903, 0
-    bounds = DEFAULT_SAR_BOUNDS
+    bounds = SAR_BOUNDS_SIM
     # bounds = [v1, v2, v3]
-    s = Lla(*DEFAULT_SAR_START)
-    v = [Lla(*loc) for loc in bounds]
+    # s = Lla(DEFAULT_SAR_START[0], DEFAULT_SAR_START[1], 0)
+    s = Lla(41.683202, -86.250413, 0)
+    v = [Lla(loc[0], loc[1], 0) for loc in bounds]
 
-    p = get_search_path(s, v)
+    quads = _partition_grid(v, 9)
+    # print(len(quads))
+    # for quad in quads:
+    #     print('{}\n'.format('\n'.join(map(lambda pos: ','.join(map(str, pos[:2])), quad))))
+    p = get_search_path(s, quads[0])
     print('\n'.join([','.join(x[:-1].astype(str)) for x in p]))
-
 
 if __name__ == '__main__':
     main()
