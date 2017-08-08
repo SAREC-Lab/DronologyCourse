@@ -24,7 +24,7 @@ def main(host, port, vehicle_type, vehicle_id, ardupath, bounds=DEFAULT_SAR_BOUN
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-ap', '--ardupath', type=str, required=True)
-    parser.add_argument('-host', '--host', type=str, default='127.0.0.1')
+    parser.add_argument('-host', '--host', type=str, default='')
     parser.add_argument('-p', '--port', type=int, default=1234)
     parser.add_argument('-vtype', '--vehicle_type', type=str, default=DRONE_TYPE_SITL_VRTL)
     parser.add_argument('-vid', '--vehicle_id', type=int, default=1)

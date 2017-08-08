@@ -6,7 +6,6 @@ import time
 SEARCH_DEFAULT = 'search_default'
 
 
-
 ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
 DRONE_TYPE_PHYS = 'PHYS'
 DRONE_TYPE_SITL_VRTL = 'VRTL'
@@ -37,14 +36,16 @@ class Waypoint:
 
 
 class DronologyMessage(object):
-    def __init__(self, m_type, uav_id, data, **kwargs):
+    def __init__(self, m_type, uav_id, data):
         self.m_type = m_type
         self.uav_id = uav_id
         self.data = data
 
     def __str__(self):
-        return json.dumps({'type': self.m_type, 'sendtimestamp': long(round(time.time() * 1000)),
-                           'uavid': str(self.uav_id), 'data': self.data})
+        return json.dumps({'type': self.m_type,
+                           'sendtimestamp': long(round(time.time() * 1000)),
+                           'uavid': str(self.uav_id),
+                           'data': self.data})
 
     def __repr__(self):
         return str(self)
@@ -72,8 +73,10 @@ class HandshakeMessage(DronologyMessage):
 
         lla = vehicle.location.global_frame
         data = {
-                'home': {'x': lla.lat, 'y': lla.lon, 'z': lla.alt},
-                'safetycase': sac}
+                'home': {'x': lla.lat,
+                         'y': lla.lon,
+                         'z': lla.alt},
+                'safetycase': json.dumps(sac)}
         return cls(v_id, data)
 
 
@@ -178,7 +181,7 @@ class SetMonitorFrequency(Command):
         return self._data['frequency']
 
 
-class CommandFactory:
+class CommandFactory(object):
     @staticmethod
     def get_command(msg):
         cmd = json.loads(msg)

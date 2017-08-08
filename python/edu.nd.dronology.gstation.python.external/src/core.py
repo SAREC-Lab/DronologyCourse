@@ -9,7 +9,7 @@ import Queue
 from pymavlink import mavutil
 from common import *
 
-_LOG = util.get_logger('default_file')
+_LOG = util.get_logger()
 
 _CMD_LOCK = threading.Lock()
 _CMD_DICT = {}
@@ -303,7 +303,7 @@ class Host:
     _CONNECTED = 2
     _DEAD = -1
 
-    def __init__(self, host='127.0.0.1', port=1234, accept_timeout=5.0):
+    def __init__(self, host='', port=1234, accept_timeout=5.0):
         self._host = host
         self._port = port
         self._accept_timeout = accept_timeout
@@ -397,8 +397,8 @@ class Host:
                     pass
                 except socket.error as e:
                     _LOG.warn('connection interrupted! ({})'.format(e))
-                    self._conn.shutdown(socket.SHUT_RD)
-                    self._conn.close()
+                    # self._conn.shutdown(socket.SHUT_RD)
+                    # self._conn.close()
                     self._conn = None
                     self._socket.shutdown(socket.SHUT_RDWR)
                     self._socket.close()
