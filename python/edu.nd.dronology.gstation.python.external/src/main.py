@@ -14,9 +14,8 @@ def _parse_mission(mission_str):
     toks = mission_str.split()
     module = '.'.join(toks[0].split('.')[:2])
     clazz = toks[0].split('.')[2]
-    args = ' '.join(toks[1:])
     mission = getattr(importlib.import_module(module), clazz)
-    kwargs = mission.parse_args(args)
+    kwargs = mission.parse_args(' '.join(toks[1:]))
 
     return mission, kwargs
 

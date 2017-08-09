@@ -1,0 +1,146 @@
+[
+  {
+    "class": "VRTL",
+    "home": [41.679945,-86.2455200285],
+    "altitude": 10,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6799720098,-86.2455200285],
+    "altitude": 12,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6799990196,-86.2455200286],
+    "altitude": 15,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6800260294,-86.2455200286],
+    "altitude": 13,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6800530393,-86.2455200286],
+    "altitude": 17,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6800800491,-86.2455200286],
+    "altitude": 20,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6801070589,-86.2455200286],
+    "altitude": 16,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6801340687,-86.2455200286],
+    "altitude": 10,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+    {
+    "class": "VRTL",
+    "home": [41.679945,-86.245484],
+    "altitude": 10,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6799720098,-86.245484],
+    "altitude": 12,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6799990196,-86.245484],
+    "altitude": 15,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6800260294,-86.245484],
+    "altitude": 13,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6800530393,-86.245484],
+    "altitude": 17,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6800800491,-86.245484],
+    "altitude": 20,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6801070589,-86.245484],
+    "altitude": 16,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  },
+  {
+    "class": "VRTL",
+    "home": [41.6801340687,-86.245484],
+    "altitude": 10,
+    "groundspeed": 15,
+    "baud": 115200,
+    "rate": 10,
+    "ip": null
+  }
+]

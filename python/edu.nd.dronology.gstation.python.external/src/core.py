@@ -150,7 +150,7 @@ class ArduPilot(VehicleControl):
             tcp, ip, port = sitl.connection_string().split(':')
             port = str(int(port) + instance * 10)
             conn_string = ':'.join([tcp, ip, port])
-            _LOG.debug('SITL instance {} launched on: {}'.format(instance ,conn_string))
+            _LOG.debug('SITL instance {} launched on: {}'.format(instance, conn_string))
             vehicle = dronekit.connect(conn_string, wait_ready=True, baud=baud)
             _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
             shutdown_cb = lambda: _sitl_shutdown_cb(vehicle, sitl)

@@ -1,7 +1,7 @@
 [
   {
     "class": "VRTL",
-    "home": [41.683202, -86.250413],
+    "home": [41.679945,-86.245484],
     "altitude": 10,
     "groundspeed": 15,
     "baud": 115200,
@@ -10,72 +10,72 @@
   },
   {
     "class": "VRTL",
-    "home": [41.683202, -86.250381],
+    "home": [41.6799630065,-86.245484],
     "altitude": 12,
-    "groundspeed": 14,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250349],
+    "home": [41.6799810131,-86.245484],
     "altitude": 15,
-    "groundspeed": 13,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250317],
+    "home": [41.6799990196,-86.245484],
     "altitude": 13,
-    "groundspeed": 12,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250285],
+    "home": [41.6800170262,-86.245484],
     "altitude": 17,
-    "groundspeed": 12,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250253],
+    "home": [41.6800350327,-86.245484],
     "altitude": 20,
-    "groundspeed": 11,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250221],
+    "home": [41.6800530393,-86.245484],
     "altitude": 16,
-    "groundspeed": 10,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250189],
+    "home": [41.6800710458,-86.245484],
     "altitude": 10,
-    "groundspeed": 10,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null
   },
   {
     "class": "VRTL",
-    "home":[41.683202,-86.250157],
+    "home": [41.6800890523,-86.245484],
     "altitude": 15,
-    "groundspeed": 10,
+    "groundspeed": 15,
     "baud": 115200,
     "rate": 10,
     "ip": null

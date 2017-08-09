@@ -1,12 +1,12 @@
 import unittest
 import mathutil
 import numpy as np
-from common import DEFAULT_SAR_BOUNDS
+from common import FLY_FIELD_BOUNDS
 
 
 class TestGeoPoly(unittest.TestCase):
     def setUp(self):
-        self.verts = map(lambda args: mathutil.Lla(*args), DEFAULT_SAR_BOUNDS)
+        self.verts = map(lambda args: mathutil.Lla(*args), FLY_FIELD_BOUNDS)
         self.gp = mathutil.GeoPoly(self.verts)
 
     def test_furthest_east(self):

@@ -321,3 +321,10 @@ def mean_position(positions):
     return positions[0].coerce(Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z))
 
 
+if __name__ == '__main__':
+    origin = Lla(41.679945, -86.245484, 210)
+
+    sep = 3
+    for i in range(-1, 1):
+        for j in range(8):
+            print('"home": [{}],'.format(','.join(map(str, origin.move_ned(sep * j, sep * i, 0).as_array()[:2]))))

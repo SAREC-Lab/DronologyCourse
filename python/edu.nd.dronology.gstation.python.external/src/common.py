@@ -10,22 +10,20 @@ ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot
 DRONE_TYPE_PHYS = 'PHYS'
 DRONE_TYPE_SITL_VRTL = 'VRTL'
 
-DRONE_1 = (DRONE_TYPE_SITL_VRTL, {'instance': 0, 'home': (41.519408, -86.239996, 0, 0)})
-DRONE_2 = (DRONE_TYPE_SITL_VRTL, {'instance': 1, 'home': (41.519408, -86.239496, 0, 0)})
+FLY_FIELD_START = (41.519412, -86.239830)
+FLY_FIELD_BOUNDS = ((41.519362, -86.240411),
+                    (41.519391, -86.239414),
+                    (41.519028, -86.239411),
+                    (41.519007, -86.240396))
 
-DEFAULT_DRONE_SPECS = (DRONE_1,)
-DEFAULT_SAR_START = (41.519412, -86.239830)
-DEFAULT_SAR_BOUNDS = ((41.519362, -86.240411),
-                      (41.519391, -86.239414),
-                      (41.519028, -86.239411),
-                      (41.519007, -86.240396))
+URBAN_SAR_BOUNDS = ((41.681070, -86.249625),
+                    (41.679557, -86.249625),
+                    (41.679557, -86.247696),
+                    (41.681070, -86.247696))
 
-SAR_BOUNDS_SIM = ((41.680370, -86.251986),
-                  (41.671081, -86.251939),
-                  (41.670975, -86.241677),
-                  (41.680476, -86.242008))
+DEFAULT_SB_ALT = 210
 
-DEFAULT_SAR_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), DEFAULT_SAR_BOUNDS))
+DEFAULT_SAR_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), URBAN_SAR_BOUNDS))
 
 
 class Waypoint:

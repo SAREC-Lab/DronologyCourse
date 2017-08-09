@@ -54,7 +54,7 @@ def tsp_greedy(start, points, point_last_seen=None):
     return arr(path)
 
 
-def _get_search_path_default(start, vertices, N=16, point_last_seen=None):
+def _get_search_path_default(start, vertices, N=32, point_last_seen=None):
     m = int(np.ceil(np.sqrt(N)))
     p_ES_E = start.to_pvector()
     grid = GeoPoly(vertices)
@@ -75,8 +75,8 @@ def _get_search_path_default(start, vertices, N=16, point_last_seen=None):
 
     S = []
 
-    for x in np.arange(0, e_dist, e_step):
-        for y in np.arange(0, n_dist, n_step):
+    for x in np.arange(0, e_dist - e_step, e_step):
+        for y in np.arange(0, n_dist - n_step, n_step):
             S.append(p_EA_E.move_ned(y, x, 0).to_lla())
 
     # TODO: fix the filter
@@ -118,7 +118,7 @@ _search_strats = {
 }
 
 
-def get_search_path(start, vertices, strat=SEARCH_DEFAULT, N=16, point_last_seen=None):
+def get_search_path(start, vertices, strat=SEARCH_DEFAULT, N=36, point_last_seen=None):
     """
 
     :param start: the starting location of the drone (Position)
@@ -176,7 +176,7 @@ class SaR(Mission):
 
     @staticmethod
     def start(connection, drone_configs=None, ardupath=ARDUPATH, control=core.ArduPilot,
-              bounds=DEFAULT_SAR_BOUNDS, point_last_seen=None):
+              bounds=URBAN_SAR_BOUNDS, point_last_seen=None):
         """
         Conduct a search and rescue mission with a single UAV using waypoint navigation.
 
@@ -252,9 +252,12 @@ class SaR(Mission):
         start = Lla(home[0], home[1], 0)
         path = get_search_path(start, bounds, point_last_seen=pls)
 
+        _LOG.debug('vehicle {} dispatched to {}'.format(v_id, '|'.join([','.join(x[:-1].astype(str)) for x in path])))
+
         waypoints = [Waypoint(path[0][0], path[0][1], alt, groundspeed=gs)]
         for lat, lon, _ in path[1:]:
-            waypoints.append(Waypoint(lat, lon, alt, groundspeed=5.0))
+            waypoints.append(Waypoint(lat, lon, alt, groundspeed=np.random.uniform(1, 3)))
+        waypoints.append(Waypoint(home[0], home[1], alt, groundspeed=gs))
 
         # START MESSAGE TIMERS
         send_state_message_timer = util.RepeatedTimer(1.0, gen_state_message, vehicle)
@@ -291,7 +294,7 @@ class SaR(Mission):
                         send_monitor_message_timer.start()
 
             worker.join()
-            control.goto_lla_and_wait(vehicle, *start.as_array(), groundspeed=gs)
+            control.land(vehicle)
             _LOG.info('Vehicle {} landed.'.format(v_id))
             control.set_armed(vehicle, armed=False)
             _LOG.info('Vehicle {} disarmed.'.format(v_id))
@@ -306,17 +309,17 @@ def main():
     v1 = 41.5190146513, -86.2400358089, 0
     v2 = 41.5192946477, -86.239555554, 0
     v3 = 41.5190274009, -86.2394354903, 0
-    bounds = SAR_BOUNDS_SIM
+    bounds = URBAN_SAR_BOUNDS
     # bounds = [v1, v2, v3]
     # s = Lla(DEFAULT_SAR_START[0], DEFAULT_SAR_START[1], 0)
     s = Lla(41.683202, -86.250413, 0)
     v = [Lla(loc[0], loc[1], 0) for loc in bounds]
 
-    quads = _partition_grid(v, 9)
+    quads = _partition_grid(v, 16)
     # print(len(quads))
     # for quad in quads:
     #     print('{}\n'.format('\n'.join(map(lambda pos: ','.join(map(str, pos[:2])), quad))))
-    p = get_search_path(s, quads[0])
+    p = get_search_path(s, quads[1])
     print('\n'.join([','.join(x[:-1].astype(str)) for x in p]))
 
 if __name__ == '__main__':
