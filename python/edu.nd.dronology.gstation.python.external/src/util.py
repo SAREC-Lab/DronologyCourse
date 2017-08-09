@@ -21,10 +21,10 @@ _LOG = get_logger('default_file')
 
 
 class RepeatedTimer(object):
-    def __init__(self, interval, function, *args, **kwargs):
+    def __init__(self, interval, func, *args, **kwargs):
         self._timer = None
         self.interval = interval
-        self.function = function
+        self.function = func
         self.args = args
         self.kwargs = kwargs
         self.is_running = False

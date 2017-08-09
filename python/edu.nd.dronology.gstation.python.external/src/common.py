@@ -2,9 +2,7 @@ import os
 import json
 import time
 
-
 SEARCH_DEFAULT = 'search_default'
-
 
 ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
 DRONE_TYPE_PHYS = 'PHYS'
@@ -20,6 +18,8 @@ URBAN_SAR_BOUNDS = ((41.681070, -86.249625),
                     (41.679557, -86.249625),
                     (41.679557, -86.247696),
                     (41.681070, -86.247696))
+
+SOUTH_BEND_BOUNDS = [[41.68832, -86.24319], [41.68831, -86.25979], [41.67302, -86.25961], [41.67326, -86.24268]]
 
 DEFAULT_SB_ALT = 210
 
@@ -73,7 +73,7 @@ class HandshakeMessage(DronologyMessage):
         battery = {
             'voltage': vehicle.battery.voltage,
             'current': vehicle.battery.current,
-            'level'	: vehicle.battery.level,
+            'level': vehicle.battery.level,
         }
 
         with open(p2sac) as f:
@@ -81,10 +81,10 @@ class HandshakeMessage(DronologyMessage):
 
         lla = vehicle.location.global_frame
         data = {
-                'home': {'x': lla.lat,
-                         'y': lla.lon,
-                         'z': lla.alt},
-                'safetycase': json.dumps(sac)}
+            'home': {'x': lla.lat,
+                     'y': lla.lon,
+                     'z': lla.alt},
+            'safetycase': json.dumps(sac)}
         return cls(v_id, data)
 
 
@@ -100,7 +100,7 @@ class StateMessage(DronologyMessage):
         battery = {
             'voltage': vehicle.battery.voltage,
             'current': vehicle.battery.current,
-            'level'	: vehicle.battery.level,
+            'level': vehicle.battery.level,
         }
         data = {
             'location': {'x': lla.lat, 'y': lla.lon, 'z': lla.alt},
@@ -136,7 +136,7 @@ class MonitorMessage(DronologyMessage):
             'down': vel[2],
             'voltage': vehicle.battery.voltage,
             'current': vehicle.battery.current,
-            'level'	: vehicle.battery.level,
+            'level': vehicle.battery.level,
             'eph': vehicle.gps_0.eph,
             'epv': vehicle.gps_0.epv,
             'n_satellites': vehicle.gps_0.satellites_visible,

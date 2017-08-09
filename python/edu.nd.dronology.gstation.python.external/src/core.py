@@ -188,7 +188,7 @@ class ArduPilot(VehicleControl):
         cur_alt = 0
         vehicle.simple_takeoff(alt=alt)
 
-        while abs(alt - cur_alt) > 3:
+        while abs(alt - cur_alt) > 1:
             cur_alt = vehicle.location.global_frame.alt
             time.sleep(1)
 
@@ -201,7 +201,7 @@ class ArduPilot(VehicleControl):
         """
         vehicle.mode = dronekit.VehicleMode("LAND")
 
-        while vehicle.location.global_frame.alt:
+        while abs(vehicle.location.global_frame.alt - 1) > 1:
             time.sleep(2)
 
     @staticmethod
@@ -213,23 +213,23 @@ class ArduPilot(VehicleControl):
 
     @staticmethod
     def goto_lla_and_wait(vehicle, lat, lon, alt, groundspeed=None):
-        ArduPilot.goto_lla(vehicle, lat, lon, alt, groundspeed=groundspeed)
+        ArduPilot.goto_lla(vehicle, lat, lon, alt, airspeed=groundspeed)
 
         while not ArduPilot.is_lla_reached(vehicle, lat, lon, alt):
             time.sleep(2)
 
     @staticmethod
-    def goto_lla(vehicle, lat, lon, alt, groundspeed=None):
+    def goto_lla(vehicle, lat, lon, alt, airspeed=None):
         """
 
         :param vehicle:
         :param lat:
         :param lon:
         :param alt:
-        :param groundspeed:
+        :param airspeed:
         :return:
         """
-        vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), airspeed=groundspeed)
+        vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt), airspeed=airspeed)
 
     @staticmethod
     def is_lla_reached(vehicle, lat, lon, alt, threshold=1):
@@ -245,42 +245,44 @@ class ArduPilot(VehicleControl):
         return ArduPilot.vehicle_to_lla(vehicle).distance(mathutil.Lla(lat, lon, alt)) <= threshold
 
     @staticmethod
-    def _goto_sequential(vehicle, waypoints):
+    def _goto_sequential(vehicle, v_id, waypoints):
         """
 
         :param vehicle:
+        :param v_id:
         :param waypoints:
         :return:
         """
         is_complete = False
         waypoints = list(waypoints)
         cur_wp = waypoints.pop(0)
-        ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
+        ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), airspeed=cur_wp.get_groundspeed())
 
         while not is_complete and vehicle.mode.name == 'GUIDED':
             if ArduPilot.is_lla_reached(vehicle, *cur_wp.get_lla()):
-                _LOG.info('Vehicle reached ({}, {}, {})'.format(*cur_wp.get_lla()))
+                _LOG.debug('Vehicle {} reached ({}, {}, {})'.format(v_id, *cur_wp.get_lla()))
                 if waypoints:
                     cur_wp = waypoints.pop(0)
-                    _LOG.info('Vehicle en route ({}, {}, {}) at {} m/s'.format(*cur_wp.as_array()))
-                    ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), groundspeed=cur_wp.get_groundspeed())
+                    _LOG.debug('Vehicle {} en route ({}, {}, {}) at {} m/s'.format(v_id, *cur_wp.as_array()))
+                    ArduPilot.goto_lla(vehicle, *cur_wp.get_lla(), airspeed=cur_wp.get_groundspeed())
                 else:
                     is_complete = True
 
     @staticmethod
-    def goto_lla_sequential(vehicle, waypoints, block=False):
+    def goto_lla_sequential(vehicle, v_id, waypoints, block=False):
         """
         Execute a series of "goto commands":
             (lat, lon, alt, groundspeed)
         :param vehicle:
+        :param v_id:
         :param waypoints:
         :param block:
         :return:
         """
         if block:
-            ArduPilot._goto_sequential(vehicle, waypoints)
+            ArduPilot._goto_sequential(vehicle, v_id, waypoints)
         else:
-            worker = threading.Thread(target=ArduPilot._goto_sequential, args=[vehicle, waypoints])
+            worker = threading.Thread(target=ArduPilot._goto_sequential, args=[vehicle, v_id, waypoints])
             worker.start()
             return worker
 
@@ -346,13 +348,23 @@ class Host:
         return success
 
     def _work(self):
+        """
+        Main loop.
+            1. Wait for a connection
+            2. Once connected, wait for commands from dronology
+            3. If connection interrupted, wait for another connection again.
+            4. Shut down when status is set to DEAD
+        :return:
+        """
         cont = True
         while cont:
             status = self.get_status()
             if status == Host._DEAD:
+                # Shut down
                 cont = False
                 _LOG.info('shutting down connection...')
             elif status == Host._WAITING:
+                # Accept a connection, timeout after 15 seconds.
                 try:
                     self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     self._socket.settimeout(self._accept_timeout)
@@ -373,10 +385,10 @@ class Host:
                     _LOG.info('Socket error ({})'.format(e))
                     time.sleep(5.0)
             else:
+                # Try to receive messages, timeout after 5 seconds.
                 try:
-                    # msg = ''
                     msg = self._conn.recv(2048)
-                    _LOG.info('Message received: {}'.format(msg))
+                    _LOG.info(r'Message received: {}'.format(msg))
                     if os.linesep in msg:
                         toks = msg.split(os.linesep)
                         msg_end = toks[0]
@@ -406,6 +418,7 @@ class Host:
                     self._socket = None
                     self.set_status(Host._WAITING)
                     time.sleep(20.0)
+        # Cleanup
         if self._conn is not None:
             self._conn.shutdown(socket.SHUT_RD)
             self._conn.close()

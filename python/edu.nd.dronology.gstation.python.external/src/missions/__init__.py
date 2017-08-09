@@ -16,8 +16,8 @@ class Mission(object):
         """
         e.g. core.ArduPilot
         """
-        module, attr = control_str.split('.')
-        control = getattr(importlib.import_module(module), attr)
+        module_id, attr = control_str.split('.')
+        control = getattr(importlib.import_module(module_id), attr)
 
         return control
 

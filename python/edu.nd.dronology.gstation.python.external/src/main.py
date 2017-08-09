@@ -12,9 +12,9 @@ def _parse_mission(mission_str):
     e.g. missions.sar.SingleUAVSAR [... [...]]
     """
     toks = mission_str.split()
-    module = '.'.join(toks[0].split('.')[:2])
+    module_id = '.'.join(toks[0].split('.')[:2])
     clazz = toks[0].split('.')[2]
-    mission = getattr(importlib.import_module(module), clazz)
+    mission = getattr(importlib.import_module(module_id), clazz)
     kwargs = mission.parse_args(' '.join(toks[1:]))
 
     return mission, kwargs
@@ -25,6 +25,7 @@ def main(addr, port, mission, **kwargs):
     connection = core.Host(addr=addr, port=port)
     connection.start()
     _LOG.info('Accepting connection on tcp:{}:{}'.format(addr, port))
+
     mission.start(connection, **kwargs)
     connection.stop()
     _LOG.info('MISSION ENDED.')
