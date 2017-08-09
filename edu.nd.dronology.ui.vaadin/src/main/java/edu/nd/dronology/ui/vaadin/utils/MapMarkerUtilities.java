@@ -57,13 +57,13 @@ public class MapMarkerUtilities {
 			leafletMarker = (LMarker)event.getSource();
 			// Determines which marker the mouse was hovering over.
 			
-    	for (int i = 0; i < mapPoints.size(); i++) {
-    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
-    			w = mapPoints.get(i);
-    		}
-    	}
-    	selectedWayPointId = w.getId();
-    	// Retrieves the id of the waypoint of interest.
+		    	for (int i = 0; i < mapPoints.size(); i++) {
+		    		if (mapPoints.get(i).getId().equals(leafletMarker.getId())) {
+		    			w = mapPoints.get(i);
+		    		}
+		    	}
+		    	selectedWayPointId = w.getId();
+		    	// Retrieves the id of the waypoint of interest.
 
 			VerticalLayout popupContent = (VerticalLayout)popup.getContent().getPopupComponent();
 			Iterator<Component> it = popupContent.iterator();
@@ -170,14 +170,14 @@ public class MapMarkerUtilities {
 		@Override
 		public void dragEnd(DragEndEvent event) {
 			LMarker leafletMarker = (LMarker)event.getSource();
-    	int index = -1;
-    	for (int i = 0; i < mapPoints.size(); i++) {
-    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
-  				index = i;
-    	}
-    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
-    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
-    	refreshMapAndGrid();
+		    	int index = -1;
+		    	for (int i = 0; i < mapPoints.size(); i++) {
+		    		if (mapPoints.get(i).getId().equals(leafletMarker.getId()))
+		  				index = i;
+		    	}
+		    	mapPoints.get(index).setLatitude(Double.toString(leafletMarker.getPoint().getLat()));
+		    	mapPoints.get(index).setLongitude(Double.toString(leafletMarker.getPoint().getLon()));
+		    	refreshMapAndGrid();
 		}
 	}
 	private class PolylineClickListener implements LeafletClickListener {
@@ -209,9 +209,9 @@ public class MapMarkerUtilities {
 	private PopupView popup;
 	private FRMapComponent mapComponent;
 	private MapAddMarkerListener mapAddMarkerListener;
-	private Grid<WayPoint> grid;
-	private List<WayPoint> mapPoints = new ArrayList<>();
-	private WayPoint w = null;
+	private Grid<UIWayPoint> grid;
+	private List<UIWayPoint> mapPoints = new ArrayList<>();
+	private UIWayPoint w = null;
 	private LMarker leafletMarker;
 	private String selectedWayPointId = "";
 	private boolean isEditable = false;
@@ -236,9 +236,8 @@ public class MapMarkerUtilities {
 		this.map = map;
 	}
 	//adds a new pin at a specified point and at a certain index in the list of waypoints (index is relevant when adding a waypoint between two other waypoints)
-	public WayPoint addNewPin(Point point, int index) {
-		WayPoint p = new WayPoint(point, false);
-		p.setId(UUID.randomUUID().toString());
+	public UIWayPoint addNewPin(Point point, int index) {
+		UIWayPoint p = new UIWayPoint(point, false);
 		// Creates a waypoint at the given point, and assigns it a random id.
 		
 		//if a marker is added in the middle of a route, then the colors will not be updated, as the first and last markers are the same
@@ -268,18 +267,12 @@ public class MapMarkerUtilities {
 		
 		return p;
 	}
-	public WayPoint addNewPinRemoveOld(Point point, boolean first) {
+	public UIWayPoint addNewPinRemoveOld(Point point) {
 		// Called in a loop in the FRMainLayout class, this function clears mapPoints if is the first point added, then adds all of the pins back from Dronology.
 		
-		WayPoint p = new WayPoint(point, false);
-		p.setId(UUID.randomUUID().toString());
+		UIWayPoint p = new UIWayPoint(point, false);
 		addPinForWayPoint(p, true);
 		// Adds the new pin.
-		
-		if (first) {
-			mapPoints.clear();
-		}
-		// Clears mapPoints the first time.
 		
 		mapPoints.add(p);
 		refreshMapAndGrid();
@@ -292,7 +285,7 @@ public class MapMarkerUtilities {
 		return p;
 	}
 	//adds a pin in a location designated by the wayPoints. Also takes an argument determining whether or not to update marker colors when called
-	public void addPinForWayPoint(WayPoint wayPoint, boolean updateColors) {
+	public void addPinForWayPoint(UIWayPoint wayPoint, boolean updateColors) {
 		LMarker leafletMarker = new LMarker(wayPoint.toPoint());
 		addPinListeners(leafletMarker);
 		leafletMarker.setId(wayPoint.getId());
@@ -345,7 +338,7 @@ public class MapMarkerUtilities {
 		}
 	}
 	// Updates the latitude and longitude of a waypoint to the wayPoint passed in as an argument.
-	public void updatePinForWayPoint(WayPoint wayPoint) {
+	public void updatePinForWayPoint(UIWayPoint wayPoint) {
 		Iterator<Component> itr = map.iterator();
 		while (itr.hasNext()) {
 			Object o = itr.next();
@@ -374,7 +367,7 @@ public class MapMarkerUtilities {
 	 * 			be in the flight routes UI). 
 	 * @return list of polylines drawn on the map
 	 */
-	public List<LPolyline> drawLines(List<WayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
+	public List<LPolyline> drawLines(List<UIWayPoint> mapPoints, boolean drawOnMap, int mode, boolean fromActive) {
 		// Draws polylines based on a list of waypoints, then outputs the newly formed arraylist of polylines.
 		List<LPolyline> currentLines = getPolylines();
 		for (int i = 0; i < currentLines.size(); i++) {
@@ -382,7 +375,7 @@ public class MapMarkerUtilities {
 		}
 		List<LPolyline> polylines = new ArrayList<>();
 		for (int i = 0; i < mapPoints.size() - 1; i++) {
-			WayPoint current =	mapPoints.get(i);
+			UIWayPoint current =	mapPoints.get(i);
 			LPolyline polyline = new LPolyline(current.toPoint(), mapPoints.get(i + 1).toPoint());
 			polyline.setId(UUID.randomUUID().toString());
 			
@@ -498,11 +491,11 @@ public class MapMarkerUtilities {
 		return isEditable;
 	}
 	// Returns the mapPoints list.
-	public List<WayPoint> getMapPoints() {
+	public List<UIWayPoint> getMapPoints() {
 		return mapPoints;
 	}
 	// Returns the grid that is in the table.
-	public Grid<WayPoint> getGrid() {
+	public Grid<UIWayPoint> getGrid() {
 		return grid;
 	}
 	// Gets all of the polylines that are on the map.
@@ -533,21 +526,21 @@ public class MapMarkerUtilities {
 		return map;
 	}
 	// Sets an arraylist of waypoints so that the grid displays them correctly.
-	public void setAllItems(ArrayList<WayPoint> dronologyPoints) {
+	public void setAllItems(ArrayList<UIWayPoint> dronologyPoints) {
 		grid.setItems(dronologyPoints);
 	}
 	// Takes a list of waypoints and sets it as the stored mapPoints.
-	public void setMapPoints(List<WayPoint> waypoints) {
+	public void setMapPoints(List<UIWayPoint> waypoints) {
 		mapPoints = waypoints;
 	}
 	// Takes a list of waypoints and sets the altitude so that they match the altitude of the waypoint in the parameter at the same index.
-	public void setMapPointsAltitude(List<WayPoint> wayPoints) {
+	public void setMapPointsAltitude(List<UIWayPoint> wayPoints) {
 		for (int i = 0; i < wayPoints.size(); i++) {
 			mapPoints.get(i).setAltitude(wayPoints.get(i).getAltitude());
 		}
 	}
 	// Takes a list of waypoints and sets the transit speed so that they match the altitude of the waypoint in the parameter at the same index.
-	public void setMapPointsTransit(List<WayPoint> wayPoints) {
+	public void setMapPointsTransit(List<UIWayPoint> wayPoints) {
 		for (int i = 0; i < wayPoints.size(); i++) {
 			mapPoints.get(i).setTransitSpeed(wayPoints.get(i).getAltitude());		
 		}

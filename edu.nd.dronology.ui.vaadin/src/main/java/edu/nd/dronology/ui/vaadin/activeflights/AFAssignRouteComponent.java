@@ -2,8 +2,6 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.io.File;
 import java.rmi.RemoteException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.vaadin.teemu.switchui.Switch;
@@ -170,21 +168,14 @@ public class AFAssignRouteComponent extends CustomComponent{
 		
 		//when adding a route to be assigned
 		left.addClickListener( e-> {
-			if (frLayout.getIndex() != -1){
-				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlightRouteInfo(frLayout.getIndex());
+			if (frLayout.getControls().getInfoPanel().getHighlightedFRInfoBox() != null){
+				FlightRouteInfo selectedFlight =
+						frLayout.getControls().getInfoPanel().getHighlightedFRInfoBox().getFlightRouteInfo();
 				if (selectedFlight.getWaypoints().size() < 1){
 					Notification.show("There is no waypoint defined in " + selectedFlight.getName() +". You cannot assign an empty route to a UAV.");
 				}
 				else {
-					long creationTime = selectedFlight.getDateCreated();
-					SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
-					String creationFormatted = sdf.format(new Date(creationTime));
-					
-					long modifiedTime = selectedFlight.getDateModified();
-					String modifiedFormatted = sdf.format(new Date(modifiedTime));
-					
-					String length = String.valueOf(selectedFlight.getLenght());
-					addRoute(selectedFlight.getName(), selectedFlight.getId(), creationFormatted, modifiedFormatted, length);
+					addRoute(selectedFlight);
 				}
 			}
 			else
@@ -207,7 +198,7 @@ public class AFAssignRouteComponent extends CustomComponent{
 			Component childContent = child.getContent();
 			if(panelContent.getComponentIndex(childContent) != -1){
 				((FRInfoBox) childContent).addStyleName("info_box_focus");
-				frLayout.switchWindows(null, frLayout.getMap(), ((FRInfoBox) childContent));
+				frLayout.switchRoute(((FRInfoBox) childContent));
 			}
 			index = panelContent.getComponentIndex(childContent);
 			
@@ -231,7 +222,6 @@ public class AFAssignRouteComponent extends CustomComponent{
 		
 	}
 	
-	@SuppressWarnings("null")
 	/**
 	 * 
 	 * @return in-order list of flight routes to be assigned to the UAV based on the order in the AFDragLayout
@@ -267,8 +257,8 @@ public class AFAssignRouteComponent extends CustomComponent{
 	 * @param modified
 	 * @param length
 	 */
-	public void addRoute(String name, String ID, String created, String modified, String length) {
-		FRInfoBox box = new FRInfoBox(name, ID, created, modified, length);
+	public void addRoute(FlightRouteInfo routeInfo) {
+		FRInfoBox box = new FRInfoBox(routeInfo);
 		box.setId(Integer.toString(this.boxID));
 		this.boxID++;
 		panelContent.addNewComponent(box);

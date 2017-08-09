@@ -1,6 +1,10 @@
 package edu.nd.dronology.ui.vaadin.utils;
 
+import java.util.UUID;
+
 import org.vaadin.addon.leaflet.shared.Point;
+
+import edu.nd.dronology.core.util.Waypoint;
 
 /**
  * This is the class that contains methods related to each WayPoint.
@@ -8,16 +12,24 @@ import org.vaadin.addon.leaflet.shared.Point;
  * @author Michelle Galbavy
  */
 
-public class WayPoint {
-	private String id = "";
+public class UIWayPoint {
+	private String id = UUID.randomUUID().toString();
 	private String longitude = "";
 	private String latitude = "";
 	private String altitude = "";
 	private String transitSpeed = "";
-	private boolean isreached;
+	private boolean isreached = false;
 	private int order = 0;
 	
-	public WayPoint (Point point, boolean isreached) {
+	public UIWayPoint (Waypoint waypoint) {
+		longitude = CoordinateUtilities.toSignedDegreesFormat(waypoint.getCoordinate().getLongitude());
+		latitude = CoordinateUtilities.toSignedDegreesFormat(waypoint.getCoordinate().getLatitude());
+		
+		altitude = String.valueOf(waypoint.getCoordinate().getAltitude());
+		transitSpeed = String.valueOf(waypoint.getApproachingspeed());
+	}
+	
+	public UIWayPoint (Point point, boolean isreached) {
 		longitude = CoordinateUtilities.toSignedDegreesFormat(point.getLon());
 		latitude = CoordinateUtilities.toSignedDegreesFormat(point.getLat());
 		this.isreached = isreached;

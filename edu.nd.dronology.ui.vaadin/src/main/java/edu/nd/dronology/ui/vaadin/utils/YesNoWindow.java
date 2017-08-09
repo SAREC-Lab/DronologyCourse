@@ -52,19 +52,16 @@ public class YesNoWindow extends Window {
 	
 	public void initForNewMessage (String message) {
 		label.setValue(message);
-		label.markAsDirty();
 		removeAllYesButtonListeners ();
 		removeAllNoButtonListeners ();
 	}
 	
 	public void setYesBtnText (String text) {
 		yesBtn.setCaption(text);
-		yesBtn.markAsDirty();
 	}
 	
 	public void setNoBtnText (String text) {
 		noBtn.setCaption(text);
-		noBtn.markAsDirty();
 	}
 	
 	public void addYesButtonClickListener (ClickListener listener) {

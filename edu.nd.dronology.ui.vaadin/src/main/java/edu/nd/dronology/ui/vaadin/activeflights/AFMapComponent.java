@@ -39,7 +39,7 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
-import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
@@ -158,12 +158,12 @@ public class AFMapComponent extends CustomComponent {
 			currentFlights = flightRouteService.getCurrentFlights();
 			for (FlightPlanInfo e : currentFlights) { //goes through each route
 				List<Waypoint> coordinates = e.getWaypoints();
-				List<WayPoint> wayPoints = new ArrayList<>();
+				List<UIWayPoint> wayPoints = new ArrayList<>();
 				List<LMarker> wayPointMarker = new ArrayList<>();
 				int i = 0;
 				for (Waypoint coord : coordinates) { //goes through all the coordinates in each route
 					Point point = new Point(coord.getCoordinate().getLatitude(), coord.getCoordinate().getLongitude());
-					WayPoint wayPoint = new WayPoint(point, nextReached(coordinates, i + 1));
+					UIWayPoint wayPoint = new UIWayPoint(point, nextReached(coordinates, i + 1));
 					wayPoints.add(wayPoint);
 					if (wayPointMarkers.size() != currentFlights.size()) { //adds the waypoints to the map first
 						LMarker marker = new LMarker(point);

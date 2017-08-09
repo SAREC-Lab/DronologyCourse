@@ -9,7 +9,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.ButtonRenderer;
 
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
-import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
 
 /**
  * This is the class that contains all logic for displaying the latitude and longitude locations of the pins on the map. There is code in its constructor
@@ -20,14 +20,14 @@ import edu.nd.dronology.ui.vaadin.utils.WayPoint;
  */
 
 public class FRTableDisplay {
-	private Grid<WayPoint> grid = new Grid<>(WayPoint.class);
+	private Grid<UIWayPoint> grid = new Grid<>(UIWayPoint.class);
 	private MapMarkerUtilities utilities;
 	private boolean hasDeleteColumn;
 	private TextField latitude = new TextField();
 	private TextField longitude = new TextField();
 	private TextField altitude = new TextField();
 	private TextField transitSpeed = new TextField();
-	private Binder<WayPoint> binder = new Binder<>();
+	private Binder<UIWayPoint> binder = new Binder<>();
 	
 	public FRTableDisplay() {
 		binder = grid.getEditor().getBinder();
@@ -36,28 +36,28 @@ public class FRTableDisplay {
 			.withConverter(
 				new StringToFloatConverter("Must enter a number."))
 			.withValidator(latitude -> latitude >= -90 && latitude <= 90, "Must be between -90 and 90.")
-			.bind(WayPoint::getLatitudeFloat, WayPoint::setLatitudeFloat);
+			.bind(UIWayPoint::getLatitudeFloat, UIWayPoint::setLatitudeFloat);
 		// Check that the input for latitude is a float between -90 and 90.
 		
 		binder.forField(longitude)
 			.withConverter(
 				new StringToFloatConverter("Must enter a number."))
 			.withValidator(longitude -> longitude >= -180 && longitude <= 180, "Must be between -180 and 180.")
-			.bind(WayPoint::getLongitudeFloat, WayPoint::setLongitudeFloat);
+			.bind(UIWayPoint::getLongitudeFloat, UIWayPoint::setLongitudeFloat);
 		// Check that the input for longitude is a float between -180 and 180.
 		
 		binder.forField(altitude)
 			.withConverter(
 				new StringToFloatConverter("Must enter a number."))
 			.withValidator(altitude -> altitude > 0 && altitude <= 100, "Must be between 0 and 100.")
-			.bind(WayPoint::getAltitudeFloat, WayPoint::setAltitudeFloat);
+			.bind(UIWayPoint::getAltitudeFloat, UIWayPoint::setAltitudeFloat);
 		// Check that the input for altitude is a float between 0 and 100.
 		
 		binder.forField(transitSpeed)
 			.withConverter(
 				new StringToFloatConverter("Must be a number."))
 			.withValidator(transitSpeed -> transitSpeed > 0, "Must be greater than zero.")
-			.bind(WayPoint::getTransitSpeedFloat, WayPoint::setTransitSpeedFloat);
+			.bind(UIWayPoint::getTransitSpeedFloat, UIWayPoint::setTransitSpeedFloat);
 		// Check that the input for transit speed is a float greater than 0.
 		
 		grid.addStyleName("fr_table_component");
@@ -104,7 +104,7 @@ public class FRTableDisplay {
 			// This check ensures that only one column of Delete buttons will be added to the grid at a time.
 			hasDeleteColumn = true;
 			grid.addColumn(event -> "Delete",
-				new ButtonRenderer<WayPoint> (clickEvent -> {
+				new ButtonRenderer<UIWayPoint> (clickEvent -> {
 					if (utilities.isEditable()) {
 						utilities.getMapComponent().getMainLayout().getDeleteWayPointConfirmation().showWindow(clickEvent);;
 					}
@@ -123,10 +123,10 @@ public class FRTableDisplay {
 			}
 		});
 	}
-	public Grid<WayPoint> getGrid() {
+	public Grid<UIWayPoint> getGrid() {
 		return grid;
 	}
-	public void setGrid(List<WayPoint> points) {
+	public void setGrid(List<UIWayPoint> points) {
 		// Takes in waypoints, sets their order, then adds them to the grid.
 		grid.setItems(points);
 		for (int i = 0; i < points.size(); i++) {

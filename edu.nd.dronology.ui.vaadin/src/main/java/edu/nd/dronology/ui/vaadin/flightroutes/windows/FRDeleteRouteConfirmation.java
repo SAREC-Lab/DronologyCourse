@@ -1,11 +1,15 @@
-package edu.nd.dronology.ui.vaadin.flightroutes.confirmation;
+package edu.nd.dronology.ui.vaadin.flightroutes.windows;
 
 import java.rmi.RemoteException;
+
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Component.Event;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
@@ -22,23 +26,31 @@ public class FRDeleteRouteConfirmation {
 		this.mainLayout = mainLayout;
 	}
 	
-	public void showWindow (FlightRouteInfo routeInfoTobeDeleted){
+	public void showWindow (FlightRouteInfo routeTobeDeleted, Event externalEvent){
 		MyUI.getYesNoWindow().initForNewMessage(
-				"Are you sure you want to delete the route <b>" + routeInfoTobeDeleted.getName() + "</b>?");
+				"Are you sure you want to delete the route <b>" + routeTobeDeleted.getName() + "</b>?");
+		
+		//Switch to the to be deleted route before showing the window
+		if (externalEvent != null) {
+			AbstractComponent c = (AbstractComponent)externalEvent.getComponent();
+			if (c.findAncestor(FRInfoBox.class) != null) {
+				mainLayout.switchRoute((FRInfoBox)c.findAncestor(FRInfoBox.class));
+			}
+		}
 		
 		// Click listeners for yes and no buttons on window.
 		MyUI.getYesNoWindow().addYesButtonClickListener(e -> {
 			MyUI.getYesNoWindow().close();
 			
 			// Only delete if the route to be deleted has been set.
-			if (routeInfoTobeDeleted != null) {
-				deleteRoute(routeInfoTobeDeleted);
+			if (routeTobeDeleted != null) {
+				deleteRoute(routeTobeDeleted);
 			}
 			
-			if (mainLayout.getMap().getSelectedRoute().getId().equals(routeInfoTobeDeleted.getId())) {
-				mainLayout.getMap().exitEditMode();
-				mainLayout.getMap().displayNoRoute();	
-				mainLayout.getMap().getMainLayout().deleteRouteUpdate();
+			if (routeTobeDeleted.getId().equals(mainLayout.getControls().getInfoPanel().getHighlightedFRInfoBox().getId())) {
+				mainLayout.getMapComponent().exitEditMode();
+				mainLayout.getMapComponent().displayNoRoute();	
+				mainLayout.getControls().getInfoPanel().refreshRoutes();
 			}
 
 			// Refreshes routes immediately after the "yes" on window is clicked.

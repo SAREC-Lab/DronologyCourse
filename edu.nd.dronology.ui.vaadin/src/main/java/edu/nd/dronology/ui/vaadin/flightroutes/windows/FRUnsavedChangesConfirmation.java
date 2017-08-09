@@ -1,7 +1,8 @@
-package edu.nd.dronology.ui.vaadin.flightroutes.confirmation;
+package edu.nd.dronology.ui.vaadin.flightroutes.windows;
 
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Component.Event;
 
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
@@ -29,26 +30,30 @@ public class FRUnsavedChangesConfirmation {
 				+ "Are you sure you want to discard all unsaved changes?");
 		
 		MyUI.getYesNoWindow().addYesButtonClickListener(e -> {
-			mainLayout.getMap().exitEditMode();
+			mainLayout.getMapComponent().exitEditMode();
 			MyUI.getYesNoWindow().close();
 			
 			if (changeType == ChangeType.EDIT_ANOTHER) {
 				Button editBtn = (Button)externalEvent.getComponent();
 				if (editBtn.findAncestor(FRInfoBox.class) != null) {
 					FRInfoBox infoBox = editBtn.findAncestor(FRInfoBox.class);
-					mainLayout.enableMapEdit();
-					mainLayout.editClick(infoBox);
+					mainLayout.switchAndEdit(infoBox);
 				}
 			} else if (changeType == ChangeType.SWITCH_ROUTE) {
-				mainLayout.switchWindows((LayoutClickEvent)externalEvent, mainLayout.getMap(), null);
+				if (externalEvent.getClass().equals(LayoutClickEvent.class)) {
+					Component childComponent = ((LayoutClickEvent)externalEvent).getChildComponent();
+					if (childComponent != null && childComponent.getClass().equals(FRInfoBox.class)) {
+						mainLayout.switchRoute((FRInfoBox)childComponent);
+					}
+				}
 			} else if (changeType == ChangeType.DELETE_ROUTE) {
 				Button deleteBtn = (Button)externalEvent.getComponent();
 				if (deleteBtn.findAncestor(FRInfoBox.class) != null) {
 					FRInfoBox infoBox = deleteBtn.findAncestor(FRInfoBox.class);
-					mainLayout.getDeleteRouteConfirmation().showWindow(
-							infoBox.getFlightRouteInfo());
+					mainLayout.getDeleteRouteConfirmation().showWindow(infoBox.getFlightRouteInfo(), externalEvent);
 				} else if (deleteBtn.findAncestor(FRMetaInfo.class) != null) {
-					mainLayout.getDeleteRouteConfirmation().showWindow(mainLayout.getMap().getSelectedRoute());
+					mainLayout.getDeleteRouteConfirmation().showWindow(
+							mainLayout.getControls().getInfoPanel().getHighlightedFRInfoBox().getFlightRouteInfo(), externalEvent);
 				}
 			}
 		});

@@ -1,4 +1,4 @@
-package edu.nd.dronology.ui.vaadin.flightroutes.confirmation;
+package edu.nd.dronology.ui.vaadin.flightroutes.windows;
 
 import com.vaadin.ui.Component.Event;
 import com.vaadin.ui.renderers.ClickableRenderer.RendererClickEvent;
@@ -6,7 +6,7 @@ import com.vaadin.ui.renderers.ClickableRenderer.RendererClickEvent;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
-import edu.nd.dronology.ui.vaadin.utils.WayPoint;
+import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
 
 public class FRDeleteWayPointConfirmation {
 	private FRMainLayout mainLayout = null;
@@ -21,14 +21,14 @@ public class FRDeleteWayPointConfirmation {
 		// Click listeners for yes and no buttons on window.
 		MyUI.getYesNoWindow().addYesButtonClickListener(e -> {
 			MyUI.getYesNoWindow().close();
-			MapMarkerUtilities utilities = mainLayout.getMap().getUtilities();
+			MapMarkerUtilities utilities = mainLayout.getMapComponent().getUtilities();
 			
 			String waypointID = "";
 			
 			if (deleteWaypointClickEvent.getClass().equals(RendererClickEvent.class)) {
 				//clicked remove waypoint on the table
 				RendererClickEvent<?> event = (RendererClickEvent<?>)deleteWaypointClickEvent;
-				waypointID = ((WayPoint)event.getItem()).getId();
+				waypointID = ((UIWayPoint)event.getItem()).getId();
 			} else {
 				//clicked remove waypoint from the popup view
 				waypointID = utilities.getSelectedWayPointId();
@@ -49,7 +49,8 @@ public class FRDeleteWayPointConfirmation {
 				utilities.getMapPoints().get(i).setOrder(i + 1);
 			}
 		
-			mainLayout.getMap().getUtilities().getGrid().setItems(utilities.getMapPoints());
+			mainLayout.getMapComponent().getUtilities().getGrid().setItems(utilities.getMapPoints());
+			mainLayout.getMapComponent().onMapEdited(utilities.getMapPoints());
 			utilities.updatePinColors();
 		});
 		

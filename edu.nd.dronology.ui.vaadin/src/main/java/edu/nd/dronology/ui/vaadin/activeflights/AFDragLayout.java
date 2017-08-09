@@ -1,8 +1,6 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.rmi.RemoteException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -68,7 +66,6 @@ public class AFDragLayout extends VerticalLayout {
 	 * 
 	 * @return list of pending plans for the UAV
 	 */
-	@SuppressWarnings("null")
 	private List<Component> createComponents() {
 		FlightInfo flightRouteInfo = null;
 		Collection<FlightRouteInfo> items = null;
@@ -92,15 +89,7 @@ public class AFDragLayout extends VerticalLayout {
 				String flightName = flight.getName().length() < info.getName().length() ? flight.getName() : 
 					flight.getName().substring(flight.getName().length() - info.getName().length());
 				if(flightName.equals(info.getName())){
-					long creationTime = info.getDateCreated();
-					SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
-					String creationFormatted = sdf.format(new Date(creationTime));
-					
-					long modifiedTime = info.getDateModified();
-					String modifiedFormatted = sdf.format(new Date(modifiedTime));
-					
-					String length = String.valueOf(info.getLenght());
-					FRInfoBox box = new FRInfoBox(info.getName(), info.getId(), creationFormatted, modifiedFormatted, length);
+					FRInfoBox box = new FRInfoBox(info);
 					box.setId(Integer.toString(this.boxID));
 					this.boxID++;
 					components.add(box);
