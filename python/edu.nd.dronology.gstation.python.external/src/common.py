@@ -110,7 +110,8 @@ class StateMessage(DronologyMessage):
             'status': vehicle.system_status.state,
             'heading': vehicle.heading,
             'armable': vehicle.is_armable,
-            'groundspeed': vehicle.groundspeed,
+            'airspeed': vehicle.airspeed,
+            'groundspeed': vehicle.airspeed,
             'armed': vehicle.armed,
             'mode': vehicle.mode.name,
             'batterystatus': battery
@@ -144,7 +145,8 @@ class MonitorMessage(DronologyMessage):
             'roll': att.roll,
             'pitch': att.pitch,
             'yaw': att.yaw,
-            'groundspeed': vehicle.groundspeed
+            'airspeed': vehicle.airspeed,
+            'groundspeed': vehicle.airspeed,
         }
 
         return cls(v_id, data)

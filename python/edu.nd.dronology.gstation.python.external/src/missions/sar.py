@@ -285,7 +285,7 @@ class SaR(Mission):
                     for cmd in cmds:
                         if isinstance(cmd, (SetMonitorFrequency,)):
                             # acknowledge
-                            connection.send(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id()))
+                            connection.send(str(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id())))
                             # stop the timer, send message, reset interval, restart timer
                             monitor_msg_timer.stop()
                             gen_monitor_message(vehicle)
