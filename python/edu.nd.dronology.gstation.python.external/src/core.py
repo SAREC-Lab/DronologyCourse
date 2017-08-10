@@ -212,8 +212,8 @@ class ArduPilot(VehicleControl):
             _LOG.warn('unsupported mode ({})'.format(mode))
 
     @staticmethod
-    def goto_lla_and_wait(vehicle, lat, lon, alt, groundspeed=None):
-        ArduPilot.goto_lla(vehicle, lat, lon, alt, airspeed=groundspeed)
+    def goto_lla_and_wait(vehicle, lat, lon, alt, airspeed=None):
+        ArduPilot.goto_lla(vehicle, lat, lon, alt, airspeed=airspeed)
 
         while not ArduPilot.is_lla_reached(vehicle, lat, lon, alt):
             time.sleep(2)

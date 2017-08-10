@@ -115,6 +115,7 @@ def _partition_grid(bounds, N):
 
     return quads
 
+
 _search_strats = {
     SEARCH_DEFAULT: _get_search_path_default,
 }
@@ -181,10 +182,6 @@ class SaR(Mission):
         """
         workers = []
         if drone_configs is not None:
-
-            while not connection.is_connected():
-                time.sleep(3.0)
-
             n_drones = len(drone_configs)
             n_vrtl = 0
             n_phys = 0
@@ -200,9 +197,9 @@ class SaR(Mission):
             # np.random.shuffle(drone_configs)
             for i, dc in enumerate(drone_configs):
                 clazz = dc['class']
-                vid = 'UAV{}{}{}'.format(random.randint(1, 1000),
-                                         random.sample(string.letters, 2),
-                                         random.randint(1, 50))
+                vid = 'UAV{:03d}{}{:02d}'.format(random.randint(1, 1000),
+                                                 ''.join(random.sample(string.letters, 2)),
+                                                 random.randint(1, 50))
 
                 dc_bounds = map(lambda tup: Lla(tup[0], tup[1], 0), dc['bounds'])
                 args = [connection, control, dc_bounds, point_last_seen,
@@ -218,6 +215,10 @@ class SaR(Mission):
                 workers.append(worker)
 
         np.random.shuffle(workers)
+
+        while not connection.is_connected():
+            time.sleep(3.0)
+
         for worker in workers:
             worker.start()
             time.sleep(1.5)
@@ -229,7 +230,7 @@ class SaR(Mission):
     def _start(connection, control, bounds, pls, v_id, v_type, alt, gs, inst, ardu, baud, rate, home, ip):
         vehicle, shutdown_cb = control.connect_vehicle(v_type, vehicle_id=v_id, ip=ip,
                                                        instance=inst, ardupath=ardu,
-                                                       rate=rate, home=home + (0,0,), baud=baud)
+                                                       rate=rate, home=home + (0, 0,), baud=baud)
 
         handshake_complete = False
 
@@ -246,60 +247,65 @@ class SaR(Mission):
             if handshake_complete:
                 connection.send(str(msg))
 
+        start = Lla(home[0], home[1], 0)
+        path = get_search_path(start, bounds, point_last_seen=pls)
+
         # ARM & READY
         control.set_armed(vehicle, armed=True)
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
 
-        start = Lla(home[0], home[1], 0)
-        path = get_search_path(start, bounds, point_last_seen=pls)
-
-        # log the expected route
-        _LOG.debug('vehicle {} dispatched to {}'.format(v_id, '|'.join([','.join(x[:-1].astype(str)) for x in path])))
-
-        waypoints = [Waypoint(path[0][0], path[0][1], alt, groundspeed=gs)]
-        for lat, lon, _ in path[1:]:
-            waypoints.append(Waypoint(lat, lon, np.random.uniform(alt - 3, alt + 3),
-                                      groundspeed=np.random.uniform(1, 3)))
-        waypoints.append(Waypoint(home[0], home[1], alt, groundspeed=gs))
-
-        # WAIT FOR DRONOLOGY TO CONNECT BEFORE STARTING
+        # WAIT FOR HANDSHAKE BEFORE STARTING
         while not handshake_complete:
             handshake_complete = connection.send(str(HandshakeMessage.from_vehicle(vehicle, v_id)))
+            time.sleep(3)
 
         # START MESSAGE TIMERS
         util.RepeatedTimer(1.0, gen_state_message, vehicle)
         monitor_msg_timer = util.RepeatedTimer(5.0, gen_monitor_message, vehicle)
-        # TAKEOFF
-        control.takeoff(vehicle, alt=alt)
-        _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
-        # FLY
-        _LOG.info('Vehicle {} en route!'.format(v_id))
-        worker = control.goto_lla_sequential(vehicle, v_id, waypoints, block=False)
-        try:
-            # HANDLE INCOMING MESSAGES
-            while worker.isAlive():
-                cmds = core.get_commands(v_id)
-                for cmd in cmds:
-                    if isinstance(cmd, (SetMonitorFrequency,)):
-                        # acknowledge
-                        connection.send(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id()))
-                        # stop the timer, send message, reset interval, restart timer
-                        monitor_msg_timer.stop()
-                        gen_monitor_message(vehicle)
-                        monitor_msg_timer.set_interval(cmd.get_monitor_frequency() / 1000)
-                        monitor_msg_timer.start()
+        for i in range(10):
+            # log the expected route
+            _LOG.debug(
+                'vehicle {} dispatched to {}'.format(v_id, '|'.join([','.join(x[:-1].astype(str)) for x in path])))
+
+            waypoints = [Waypoint(path[0][0], path[0][1], alt, groundspeed=gs)]
+            for lat, lon, _ in path[1:]:
+                waypoints.append(Waypoint(lat, lon, np.random.uniform(alt - 3, alt + 3),
+                                          groundspeed=np.random.uniform(1, 3)))
+            waypoints.append(Waypoint(home[0], home[1], alt, groundspeed=gs))
+
+            # TAKEOFF
+            control.takeoff(vehicle, alt=alt)
+            _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
+
+            # FLY
+            _LOG.info('Vehicle {} en route!'.format(v_id))
+            worker = control.goto_lla_sequential(vehicle, v_id, waypoints, block=False)
+            try:
+                # HANDLE INCOMING MESSAGES
+                while worker.isAlive():
+                    cmds = core.get_commands(v_id)
+                    for cmd in cmds:
+                        if isinstance(cmd, (SetMonitorFrequency,)):
+                            # acknowledge
+                            connection.send(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id()))
+                            # stop the timer, send message, reset interval, restart timer
+                            monitor_msg_timer.stop()
+                            gen_monitor_message(vehicle)
+                            monitor_msg_timer.set_interval(cmd.get_monitor_frequency() / 1000)
+                            monitor_msg_timer.start()
+
+                worker.join()
+                control.land(vehicle)
+                _LOG.info('Vehicle {} landed.'.format(v_id))
+                control.set_armed(vehicle, armed=False)
+                _LOG.info('Vehicle {} disarmed.'.format(v_id))
+            except KeyboardInterrupt:
+                vehicle.mode = dronekit.VehicleMode('LOITER')
 
             worker.join()
-            control.land(vehicle)
-            _LOG.info('Vehicle {} landed.'.format(v_id))
-            control.set_armed(vehicle, armed=False)
-            _LOG.info('Vehicle {} disarmed.'.format(v_id))
-        except KeyboardInterrupt:
-            vehicle.mode = dronekit.VehicleMode('LOITER')
 
-        worker.join()
         shutdown_cb()
 
 
@@ -329,8 +335,10 @@ def main():
     dcs = Mission._parse_drone_cfg('../cfg/drone_cfgs/16_drone_SAR.json')
 
     for dc in dcs:
-        path = get_search_path(Lla(dc['home'][0], dc['home'][1], 0), map(lambda tup: Lla(tup[0], tup[1], 0), dc['bounds']))
+        path = get_search_path(Lla(dc['home'][0], dc['home'][1], 0),
+                               map(lambda tup: Lla(tup[0], tup[1], 0), dc['bounds']))
         print(path)
+
 
 if __name__ == '__main__':
     main()

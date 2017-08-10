@@ -121,6 +121,17 @@ class GeoPoly(GeoShape):
 
         return dist_ned[0]
 
+    def point_in_rectangle(self, p):
+        p_lla = p.to_lla()
+        lat = p_lla.get_latitude()
+        lon = p_lla.get_longitude()
+
+        contained = False
+        if self.furthest_south().to_lla().get_latitude() < lat < self.furthest_north().to_lla().get_latitude():
+            contained = self.furthest_west().to_lla().get_longitude() < lon < self.furthest_east().to_lla().get_longitude()
+
+        return contained
+
     def contains(self, p):
         # ll = p.to_pvector()[:]
         # p_ = Point(*ll)

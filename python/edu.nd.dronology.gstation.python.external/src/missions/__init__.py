@@ -4,7 +4,7 @@ import json
 
 class Mission(object):
     @staticmethod
-    def start(self, connection, **kwargs):
+    def start(connection, **kwargs):
         raise NotImplementedError
 
     @staticmethod

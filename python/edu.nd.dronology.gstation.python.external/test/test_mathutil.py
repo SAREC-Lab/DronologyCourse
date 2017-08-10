@@ -6,7 +6,7 @@ from common import FLY_FIELD_BOUNDS
 
 class TestGeoPoly(unittest.TestCase):
     def setUp(self):
-        self.verts = map(lambda args: mathutil.Lla(*args), FLY_FIELD_BOUNDS)
+        self.verts = map(lambda (lat, lon): mathutil.Lla(lat, lon, 0), FLY_FIELD_BOUNDS)
         self.gp = mathutil.GeoPoly(self.verts)
 
     def test_furthest_east(self):
@@ -29,6 +29,27 @@ class TestGeoPoly(unittest.TestCase):
         actual = self.gp.furthest_south().to_lla()
         self.assertEqual(expected, actual)
 
+    def test_contained_rectangle(self):
+        grid = [[41.68645504, -86.25961],
+                [41.6869052178, -86.25961],
+                [41.6869052163, -86.2590094402],
+                [41.6864550384, -86.2590094444]]
+        grid_lla = map(lambda (lat, lon): mathutil.Lla(lat, lon, 0), grid)
+        grid_geo = mathutil.GeoPoly(grid_lla)
+        contained = grid_geo.point_in_rectangle(mathutil.Lla(41.68675,-86.25957, 0))
+
+        self.assertTrue(contained)
+
+    def test_not_contained_rectangle(self):
+        grid = [[41.68645504, -86.25961],
+                [41.6869052178, -86.25961],
+                [41.6869052163, -86.2590094402],
+                [41.6864550384, -86.2590094444]]
+        grid_lla = map(lambda (lat, lon): mathutil.Lla(lat, lon, 0), grid)
+        grid_geo = mathutil.GeoPoly(grid_lla)
+        contained = grid_geo.point_in_rectangle(mathutil.Lla(41.68675,-86.25964, 0))
+
+        self.assertFalse(contained)
 
 class TestNVector(unittest.TestCase):
     def test_to_pvector(self):

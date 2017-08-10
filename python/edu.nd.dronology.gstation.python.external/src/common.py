@@ -25,7 +25,7 @@ DEFAULT_SB_ALT = 210
 
 SOUTH_BEND_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), SOUTH_BEND_BOUNDS))
 DEFAULT_SAR_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), URBAN_SAR_BOUNDS))
-
+DEFAULT_NB_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), DEFAULT_NB_BOUNDS))
 
 class Waypoint:
     def __init__(self, lat, lon, alt, groundspeed=None):
