@@ -389,23 +389,14 @@ class Host:
                 try:
                     msg = self._conn.recv(2048)
                     _LOG.info(r'Message received: {}'.format(msg))
-                    if os.linesep in msg:
-                        toks = msg.split(os.linesep)
-                        msg_end = toks[0]
-                        new_msgs = [self._msg_buffer + msg_end]
+                    msgs = msg.split('\n')
 
-                        for msg_ in toks[1:-1]:
-                            new_msgs.append(msg_)
+                    for msg_ in msgs:
+                        _LOG.info('Command received: {}'.format(msg_))
+                        cmd = CommandFactory.get_command(msg_)
+                        if isinstance(cmd, (SetMonitorFrequency,)):
+                            put_command(cmd.get_target(), cmd)
 
-                        for msg_ in new_msgs:
-                            _LOG.info('Command received: {}'.format(msg_))
-                            cmd = CommandFactory.get_command(msg_)
-                            if isinstance(cmd, (SetMonitorFrequency,)):
-                                put_command(cmd.get_target(), cmd)
-
-                        msg = toks[-1]
-                        self._msg_buffer = ''
-                    self._msg_buffer += msg
                 except socket.timeout:
                     pass
                 except socket.error as e:

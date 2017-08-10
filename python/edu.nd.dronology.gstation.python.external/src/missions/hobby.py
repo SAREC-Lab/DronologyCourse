@@ -109,8 +109,10 @@ class Neighborhood(Mission):
         dist_e = grid_geo.distance_east()
 
         for i in range(n_drones):
-            offset_n = random.uniform(0, dist_n)
-            offset_e = random.uniform(0, dist_e)
+            temp_n = dist_n / (i + 1)
+            temp_e = dist_e / (i + 1)
+            offset_n = random.uniform(temp_n, temp_n + (dist_n / n_drones))
+            offset_e = random.uniform(temp_e, temp_e + (dist_e / n_drones))
             d_origin = origin.move_ned(offset_n, offset_e, 0).to_lla()[:-1]
             vid = 'UAV{:02d}{}{:02d}'.format(random.randint(1, 100),
                                              ''.join(random.sample(string.letters, 3)),
@@ -125,7 +127,7 @@ class Neighborhood(Mission):
 
         for worker in workers:
             worker.start()
-            time.sleep(0.5)
+            time.sleep(1.5)
 
         for worker in workers:
             worker.join()
@@ -136,26 +138,23 @@ class Neighborhood(Mission):
         vehicle, shutdown_cb = control.connect_vehicle(DRONE_TYPE_SITL_VRTL,
                                                        vehicle_id=v_id, instance=inst, ardupath=ardu, home=home_)
 
-        handshake_complete = False
+
 
         # SET UP TIMERS
         def gen_state_message(m_vehicle):
             msg = StateMessage.from_vehicle(m_vehicle, v_id)
-            if handshake_complete:
-                connection.send(str(msg))
+            connection.send(str(msg))
 
         def gen_monitor_message(m_vehicle):
             msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
-            # if not int(round(time.time())) % 10:
-            #     _LOG.info(str(msg))
-            if handshake_complete:
-                connection.send(str(msg))
+            connection.send(str(msg))
 
         # ARM & READY
         control.set_armed(vehicle, armed=True)
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
 
+        handshake_complete = False
         # WAIT FOR HANDSHAKE BEFORE STARTING
         while not handshake_complete:
             handshake_complete = connection.send(str(HandshakeMessage.from_vehicle(vehicle, v_id)))

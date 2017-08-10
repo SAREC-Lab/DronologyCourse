@@ -237,15 +237,11 @@ class SaR(Mission):
         # SET UP TIMERS
         def gen_state_message(m_vehicle):
             msg = StateMessage.from_vehicle(m_vehicle, v_id)
-            if handshake_complete:
-                connection.send(str(msg))
+            connection.send(str(msg))
 
         def gen_monitor_message(m_vehicle):
             msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
-            # if not int(round(time.time())) % 10:
-            #     _LOG.info(str(msg))
-            if handshake_complete:
-                connection.send(str(msg))
+            connection.send(str(msg))
 
         start = Lla(home[0], home[1], 0)
         path = get_search_path(start, bounds, point_last_seen=pls)
@@ -295,17 +291,16 @@ class SaR(Mission):
                             gen_monitor_message(vehicle)
                             monitor_msg_timer.set_interval(cmd.get_monitor_frequency() / 1000)
                             monitor_msg_timer.start()
-
                 worker.join()
-                control.land(vehicle)
-                _LOG.info('Vehicle {} landed.'.format(v_id))
-                control.set_armed(vehicle, armed=False)
-                _LOG.info('Vehicle {} disarmed.'.format(v_id))
             except KeyboardInterrupt:
                 vehicle.mode = dronekit.VehicleMode('LOITER')
 
             worker.join()
 
+        control.land(vehicle)
+        _LOG.info('Vehicle {} landed.'.format(v_id))
+        control.set_armed(vehicle, armed=False)
+        _LOG.info('Vehicle {} disarmed.'.format(v_id))
         shutdown_cb()
 
 
