@@ -216,6 +216,9 @@ class SaR(Mission):
 
         np.random.shuffle(workers)
 
+        while not connection.is_connected():
+            time.sleep(3.0)
+
         for worker in workers:
             worker.start()
             time.sleep(1.5)
@@ -251,9 +254,6 @@ class SaR(Mission):
         control.set_armed(vehicle, armed=True)
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
-
-        while not connection.is_connected():
-            time.sleep(3.0)
 
         # WAIT FOR HANDSHAKE BEFORE STARTING
         while not handshake_complete:

@@ -120,6 +120,9 @@ class Neighborhood(Mission):
             worker = threading.Thread(target=Neighborhood._start, args=args)
             workers.append(worker)
 
+        while not connection.is_connected():
+            time.sleep(3.0)
+
         for worker in workers:
             worker.start()
             time.sleep(0.5)
@@ -152,9 +155,6 @@ class Neighborhood(Mission):
         control.set_armed(vehicle, armed=True)
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
-        
-        while not connection.is_connected():
-            time.sleep(3.0)
 
         # WAIT FOR HANDSHAKE BEFORE STARTING
         while not handshake_complete:
