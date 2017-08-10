@@ -217,6 +217,35 @@
       "weight": 0.0,
       "params": {},
       "mapping": {}
+    },
+    {
+      "id": "A_1_1_19",
+      "content": "ability to react to communication loss... -> safety ass. case (stay safe....)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 1.0,
+      "params": {
+
+      },
+      "mapping": {
+        "#E_lat": "lat",
+        "#E_lon": "lon"
+      }
+    },
+    {
+      "id": "A_1_1_20",
+      "content": "ability to react to communication loss... -> safety ass. case (stay safe....)",
+      "is-monitorable": true,
+      "is-static": false,
+      "is-plugable": true,
+      "weight": 1.0,
+      "params": {
+
+      },
+      "mapping": {
+
+      }
     }
   ]
 }
