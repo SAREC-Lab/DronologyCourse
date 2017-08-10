@@ -18,6 +18,24 @@ def column_vector(a):
     return arr(a).reshape(-1, 1)
 
 
+def make_grid(a, north, east):
+    """
+
+    :param a: lower left (sw) corner
+    :param north: distance north
+    :param east: distance east
+    :return:
+    """
+    grid = [
+        a,
+        a.move_ned(north, 0, 0),
+        a.move_ned(north, east, 0),
+        a.move_ned(0, east, 0)
+    ]
+
+    return GeoPoly(grid)
+
+
 class GeoShape(object):
     def __init__(self, vertices):
         self._verts = vertices
@@ -25,6 +43,7 @@ class GeoShape(object):
         self._grid_lla = arr([v.to_lla() for v in vertices])
 
 
+# noinspection PyNoneFunctionAssignment
 class GeoPoly(GeoShape):
     def __init__(self, vertices):
         super(GeoPoly, self).__init__(vertices)
@@ -36,6 +55,15 @@ class GeoPoly(GeoShape):
         self._e_max = None
         self._s_max = None
         self._w_max = None
+
+    def __str__(self):
+        return str(self._grid_lla)
+
+    def __repr__(self):
+        return str(self)
+
+    def get_lla(self):
+        return self._grid_lla
 
     def sw_vertex(self):
         if self._sw is None:
@@ -76,6 +104,22 @@ class GeoPoly(GeoShape):
         if not self._s_max:
             self._s_max = min(self._grid_xyz, key=lambda l: l[2])
         return self._s_max
+
+    def distance_east(self):
+        p_EA_A = self.sw_vertex()
+        p_EB_A = self.se_vertex()
+
+        dist_ned = p_EA_A.distance_ned(p_EB_A)
+
+        return dist_ned[1]
+
+    def distance_north(self):
+        p_EA_A = self.sw_vertex()
+        p_EB_A = self.nw_vertex()
+
+        dist_ned = p_EA_A.distance_ned(p_EB_A)
+
+        return dist_ned[0]
 
     def contains(self, p):
         # ll = p.to_pvector()[:]
@@ -173,6 +217,14 @@ class Position(object):
         p_EA_E_delta = p_EA_E + p_delta_E
 
         return self.coerce(Pvector(*p_EA_E_delta))
+
+    def distance_ned(self, other):
+        R_NE = self.n_E2R_EN().T
+
+        p_AB_E = other.to_pvector().as_array() - self.to_pvector().as_array()
+        p_AB_N = R_NE.dot(p_AB_E)
+
+        return p_AB_N
 
     def __repr__(self):
         return '{}'.format(','.join(self.as_array().astype(str)))

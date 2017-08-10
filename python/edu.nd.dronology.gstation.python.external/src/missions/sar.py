@@ -33,7 +33,7 @@ def _init_tsp(start, points, point_last_seen):
 
 
 def tsp_christofides(start, points, point_last_seen=None):
-    path = _init_tsp(start, point_last_seen)
+    path = _init_tsp(start, points, point_last_seen)
 
     g = nx.Graph()
     for a, b in itertools.combinations(points, 2):
@@ -138,25 +138,6 @@ def get_search_path(start, vertices, strat=SEARCH_DEFAULT, N=36, point_last_seen
 
 class SaR(Mission):
     @staticmethod
-    def _parse_coord(coord):
-        """
-        e.g. -pls 41.519362,-86.240411
-        """
-        if coord:
-            res = tuple(map(float, coord.split(',')))
-        else:
-            res = None
-        return res
-
-    @staticmethod
-    def _parse_sar_bounds(bounds):
-        """
-        e.g. -b 41.519362,-86.240411|41.519391,-86.239414|41.519028,-86.239411|41.519007,-86.240396
-        """
-        coords = [SaR._parse_coord(c) for c in bounds.split('|')]
-        return coords
-
-    @staticmethod
     def parse_args(cla):
         parser = argparse.ArgumentParser()
         parser.add_argument('-c', '--control',
@@ -167,8 +148,8 @@ class SaR(Mission):
                             help='flag to indicate that the search space needs to be partitioned'
                                  '\notherwise it is assumed each drone has its own grid')
         parser.add_argument('-b', '--bounds',
-                            type=SaR._parse_sar_bounds, default=DEFAULT_SAR_BOUNDS_STR,
-                            help=SaR._parse_sar_bounds.__doc__)
+                            type=Mission._parse_sar_bounds, default=DEFAULT_SAR_BOUNDS_STR,
+                            help=Mission._parse_sar_bounds.__doc__)
         parser.add_argument('-pls', '--point_last_seen',
                             type=SaR._parse_coord, default='', help=SaR._parse_coord.__doc__)
         parser.add_argument('-cfg', '--drone_configs',
@@ -326,11 +307,7 @@ class SaRLoop(SaR):
     @staticmethod
     def start(connection, drone_configs=None, ardupath=ARDUPATH, control=core.ArduPilot,
               bounds=None, point_last_seen=None, partition_grid=False):
-        if bounds is not None:
-            while True:
-                pass
-
-
+        pass
 
 
 def main():

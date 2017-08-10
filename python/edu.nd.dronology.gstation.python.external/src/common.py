@@ -18,11 +18,12 @@ URBAN_SAR_BOUNDS = ((41.681070, -86.249625),
                     (41.679557, -86.249625),
                     (41.679557, -86.247696),
                     (41.681070, -86.247696))
-
+DEFAULT_NB_BOUNDS = [[41.6855319096, -86.25961], [41.6859820875, -86.25961], [41.685982086, -86.2590094488],
+                     [41.685531908, -86.259009453]]
 SOUTH_BEND_BOUNDS = [[41.68832, -86.24319], [41.68831, -86.25979], [41.67302, -86.25961], [41.67326, -86.24268]]
-
 DEFAULT_SB_ALT = 210
 
+SOUTH_BEND_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), SOUTH_BEND_BOUNDS))
 DEFAULT_SAR_BOUNDS_STR = '|'.join(map(lambda tup: ','.join(map(str, tup)), URBAN_SAR_BOUNDS))
 
 

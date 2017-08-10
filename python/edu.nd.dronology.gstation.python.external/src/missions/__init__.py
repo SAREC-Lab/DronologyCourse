@@ -9,7 +9,7 @@ class Mission(object):
 
     @staticmethod
     def parse_args(cla):
-        raise NotImplementedError
+        return {}
 
     @staticmethod
     def _parse_controller(control_str):
@@ -27,3 +27,22 @@ class Mission(object):
             cfg = json.load(f)
 
         return cfg
+
+    @staticmethod
+    def _parse_coord(coord):
+        """
+        e.g. -pls 41.519362,-86.240411
+        """
+        if coord:
+            res = tuple(map(float, coord.split(',')))
+        else:
+            res = None
+        return res
+
+    @staticmethod
+    def _parse_sar_bounds(bounds):
+        """
+        e.g. -b 41.519362,-86.240411|41.519391,-86.239414|41.519028,-86.239411|41.519007,-86.240396
+        """
+        coords = [Mission._parse_coord(c) for c in bounds.split('|')]
+        return coords
