@@ -270,7 +270,7 @@ class SaR(Mission):
 
         for i in range(10):
             # log the expected route
-            _LOG.debug(
+            _LOG.info(
                 'vehicle {} dispatched to {}'.format(v_id, '|'.join([','.join(x[:-1].astype(str)) for x in path])))
 
             waypoints = [Waypoint(path[0][0], path[0][1], alt, groundspeed=gs)]
