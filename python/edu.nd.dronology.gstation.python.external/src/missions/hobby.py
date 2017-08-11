@@ -137,7 +137,6 @@ class Neighborhood(Mission):
 
         grid_lla = map(lambda (lat, lon): mu.Lla(lat, lon, 0), bounds)
         grid_geo = mu.GeoPoly(grid_lla)
-        max_move = np.sqrt(99)
 
         while not connection.is_connected():
             time.sleep(3.0)
@@ -178,20 +177,22 @@ class Neighborhood(Mission):
         start_time = time.time()
         # loop for some specified number of seconds
         while time.time() - start_time < duration:
-            north = random.uniform(0, max_move)
+            dist = random.uniform(10, 25)
+            max_move = dist ** 2
+            north = random.uniform(0, dist)
             proposed = control.vehicle_to_lla(vehicle).move_ned(north, 0, 0)
 
             if not grid_geo.point_in_rectangle(proposed):
                 north *= -1
 
-            east = np.sqrt(99 - north ** 2)
+            east = np.sqrt(max_move - north ** 2)
             proposed = control.vehicle_to_lla(vehicle).move_ned(north, east, 0)
 
             if not grid_geo.point_in_rectangle(proposed):
                 east *= -1
 
-            target = control.vehicle_to_lla(vehicle).move_ned(north, east, random.uniform(-1, 1))
-            speed = random.uniform(10, 20)
+            target = control.vehicle_to_lla(vehicle).move_ned(north, east, random.uniform(-2, 2))
+            speed = random.uniform(15, 25)
 
             _LOG.debug('Vehicle {} heading at {} m/s to ({}, {}, {}) '.format(v_id, speed, *target.as_array()))
 
