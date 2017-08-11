@@ -61,7 +61,7 @@ class Neighborhoods(Mission):
 
         for worker in workers:
             worker.start()
-            time.sleep(1.0)
+            time.sleep(2.0)
 
         for worker in workers:
             worker.join()
@@ -122,12 +122,9 @@ class Neighborhood(Mission):
             worker = threading.Thread(target=Neighborhood._start, args=args)
             workers.append(worker)
 
-        while not connection.is_connected():
-            time.sleep(3.0)
-
         for worker in workers:
             worker.start()
-            time.sleep(1.5)
+            time.sleep(0.2)
 
         for worker in workers:
             worker.join()
@@ -138,8 +135,6 @@ class Neighborhood(Mission):
         vehicle, shutdown_cb = control.connect_vehicle(DRONE_TYPE_SITL_VRTL,
                                                        vehicle_id=v_id, instance=inst, ardupath=ardu, home=home_)
 
-
-
         # SET UP TIMERS
         def gen_state_message(m_vehicle):
             msg = StateMessage.from_vehicle(m_vehicle, v_id)
@@ -149,16 +144,19 @@ class Neighborhood(Mission):
             msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
             connection.send(str(msg))
 
-        # ARM & READY
-        control.set_armed(vehicle, armed=True)
-        _LOG.info('Vehicle {} armed.'.format(v_id))
-        vehicle.mode = dronekit.VehicleMode('GUIDED')
+        while not connection.is_connected():
+            time.sleep(3.0)
 
         handshake_complete = False
         # WAIT FOR HANDSHAKE BEFORE STARTING
         while not handshake_complete:
             handshake_complete = connection.send(str(HandshakeMessage.from_vehicle(vehicle, v_id)))
-            time.sleep(2.0)
+            time.sleep(3.0)
+
+        # ARM & READY
+        control.set_armed(vehicle, armed=True)
+        _LOG.info('Vehicle {} armed.'.format(v_id))
+        vehicle.mode = dronekit.VehicleMode('GUIDED')
 
         # START MESSAGE TIMERS
         util.RepeatedTimer(1.0, gen_state_message, vehicle)

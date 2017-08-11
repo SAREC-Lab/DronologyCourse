@@ -214,11 +214,6 @@ class SaR(Mission):
                 worker = threading.Thread(target=SaR._start, args=args)
                 workers.append(worker)
 
-        np.random.shuffle(workers)
-
-        while not connection.is_connected():
-            time.sleep(3.0)
-
         for worker in workers:
             worker.start()
             time.sleep(1.5)
@@ -246,15 +241,18 @@ class SaR(Mission):
         start = Lla(home[0], home[1], 0)
         path = get_search_path(start, bounds, point_last_seen=pls)
 
-        # ARM & READY
-        control.set_armed(vehicle, armed=True)
-        _LOG.info('Vehicle {} armed.'.format(v_id))
-        vehicle.mode = dronekit.VehicleMode('GUIDED')
+        while not connection.is_connected():
+            time.sleep(3.0)
 
         # WAIT FOR HANDSHAKE BEFORE STARTING
         while not handshake_complete:
             handshake_complete = connection.send(str(HandshakeMessage.from_vehicle(vehicle, v_id)))
             time.sleep(3)
+
+        # ARM & READY
+        control.set_armed(vehicle, armed=True)
+        _LOG.info('Vehicle {} armed.'.format(v_id))
+        vehicle.mode = dronekit.VehicleMode('GUIDED')
 
         # START MESSAGE TIMERS
         util.RepeatedTimer(1.0, gen_state_message, vehicle)
