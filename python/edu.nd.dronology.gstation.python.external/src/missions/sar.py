@@ -250,6 +250,7 @@ class SaR(Mission):
 
         def gen_monitor_message(m_vehicle):
             battery_level = (battery_dur - (time.time() - mission_start)) / battery_dur
+            battery_level *= 100
             msg = MonitorMessage.from_vehicle(m_vehicle, v_id, battery_level=battery_level)
             connection.send(str(msg))
 
