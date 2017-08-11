@@ -259,9 +259,14 @@ class SaR(Mission):
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
 
+        # TAKEOFF
+        control.takeoff(vehicle, alt=alt)
+
         # START MESSAGE TIMERS
         util.RepeatedTimer(1.0, gen_state_message, vehicle)
         monitor_msg_timer = util.RepeatedTimer(5.0, gen_monitor_message, vehicle)
+
+        _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
         for i in range(10):
             # log the expected route
@@ -274,9 +279,6 @@ class SaR(Mission):
                                           groundspeed=np.random.uniform(1, 3)))
             waypoints.append(Waypoint(home[0], home[1], alt, groundspeed=gs))
 
-            # TAKEOFF
-            control.takeoff(vehicle, alt=alt)
-            _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
             # FLY
             _LOG.info('Vehicle {} en route!'.format(v_id))

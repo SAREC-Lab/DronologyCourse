@@ -135,6 +135,10 @@ class Neighborhood(Mission):
         vehicle, shutdown_cb = control.connect_vehicle(DRONE_TYPE_SITL_VRTL,
                                                        vehicle_id=v_id, instance=inst, ardupath=ardu, home=home_)
 
+        grid_lla = map(lambda (lat, lon): mu.Lla(lat, lon, 0), bounds)
+        grid_geo = mu.GeoPoly(grid_lla)
+        max_move = np.sqrt(99)
+
         while not connection.is_connected():
             time.sleep(3.0)
 
@@ -163,16 +167,14 @@ class Neighborhood(Mission):
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
 
+        # TAKEOFF
+        control.takeoff(vehicle, alt=random.uniform(10, 20))
+
         # START MESSAGE TIMERS
         util.RepeatedTimer(1.0, gen_state_message, vehicle)
         monitor_msg_timer = util.RepeatedTimer(5.0, gen_monitor_message, vehicle)
-        # TAKEOFF
-        control.takeoff(vehicle, alt=random.uniform(10, 20))
         _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
-        grid_lla = map(lambda (lat, lon): mu.Lla(lat, lon, 0), bounds)
-        grid_geo = mu.GeoPoly(grid_lla)
-        max_move = np.sqrt(99)
         start_time = time.time()
         # loop for some specified number of seconds
         while time.time() - start_time < duration:
@@ -191,11 +193,11 @@ class Neighborhood(Mission):
             target = control.vehicle_to_lla(vehicle).move_ned(north, east, random.uniform(-1, 1))
             speed = random.uniform(10, 20)
 
-            _LOG.info('Vehicle {} heading at {} m/s to ({}, {}, {}) '.format(v_id, speed, *target.as_array()))
+            _LOG.debug('Vehicle {} heading at {} m/s to ({}, {}, {}) '.format(v_id, speed, *target.as_array()))
 
             control.goto_lla_and_wait(vehicle, *target.as_array(), airspeed=speed)
 
-            _LOG.info('Vehicle {} reached ({}, {}, {})'.format(v_id, *target.as_array()))
+            _LOG.debug('Vehicle {} reached ({}, {}, {})'.format(v_id, *target.as_array()))
 
             cmds = core.get_commands(v_id)
             for cmd in cmds:

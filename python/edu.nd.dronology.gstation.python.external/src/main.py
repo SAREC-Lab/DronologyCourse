@@ -1,6 +1,7 @@
 import core
 import argparse
 import util
+import time
 import importlib
 
 
@@ -24,6 +25,7 @@ def main(addr, port, mission, **kwargs):
     _LOG.info('STARTING NEW MISSION.')
     connection = core.Host(addr=addr, port=port)
     connection.start()
+    time.sleep(1.0)
     _LOG.info('Accepting connection on tcp:{}:{}'.format(addr, port))
 
     mission.start(connection, **kwargs)
