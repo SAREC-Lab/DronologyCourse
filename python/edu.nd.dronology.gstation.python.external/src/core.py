@@ -389,13 +389,14 @@ class Host:
                 try:
                     msg = self._conn.recv(2048)
                     _LOG.info(r'Message received: {}'.format(msg))
-                    msgs = msg.split('\n')
+                    msgs = msg.split('\r\n')
 
                     for msg_ in msgs:
-                        _LOG.info('Command received: {}'.format(msg_))
-                        cmd = CommandFactory.get_command(msg_)
-                        if isinstance(cmd, (SetMonitorFrequency,)):
-                            put_command(cmd.get_target(), cmd)
+                        if msg_:
+                            _LOG.info('Command received: {}'.format(msg_))
+                            cmd = CommandFactory.get_command(msg_)
+                            if isinstance(cmd, (SetMonitorFrequency,)):
+                                put_command(cmd.get_target(), cmd)
 
                 except socket.timeout:
                     pass
