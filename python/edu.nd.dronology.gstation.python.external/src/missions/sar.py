@@ -194,7 +194,6 @@ class SaR(Mission):
                     dc['bounds'] = quadrants[i]
 
             workers = []
-            # np.random.shuffle(drone_configs)
             for i, dc in enumerate(drone_configs):
                 clazz = dc['class']
                 vid = 'UAV{:03d}{}{:02d}'.format(random.randint(1, 1000),
@@ -213,6 +212,7 @@ class SaR(Mission):
 
                 worker = threading.Thread(target=SaR._start, args=args)
                 workers.append(worker)
+            np.random.shuffle(drone_configs)
 
         for worker in workers:
             worker.start()
@@ -315,29 +315,29 @@ class SaRLoop(SaR):
         pass
 
 
-def main():
-    v1 = 41.5190146513, -86.2400358089, 0
-    v2 = 41.5192946477, -86.239555554, 0
-    v3 = 41.5190274009, -86.2394354903, 0
-    # bounds = URBAN_SAR_BOUNDS
-    # # bounds = [v1, v2, v3]
-    # # s = Lla(DEFAULT_SAR_START[0], DEFAULT_SAR_START[1], 0)
-    # s = Lla(41.683202, -86.250413, 0)
-    # v = [Lla(loc[0], loc[1], 0) for loc in bounds]
-    #
-    # quads = _partition_grid(v, 16)
-    # # print(len(quads))
-    # # for quad in quads:
-    # #     print('{}\n'.format('\n'.join(map(lambda pos: ','.join(map(str, pos[:2])), quad))))
-    # p = get_search_path(s, quads[1])
-    # print('\n'.join([','.join(x[:-1].astype(str)) for x in p]))
-    dcs = Mission._parse_drone_cfg('../cfg/drone_cfgs/16_drone_SAR.json')
-
-    for dc in dcs:
-        path = get_search_path(Lla(dc['home'][0], dc['home'][1], 0),
-                               map(lambda tup: Lla(tup[0], tup[1], 0), dc['bounds']))
-        print(path)
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     v1 = 41.5190146513, -86.2400358089, 0
+#     v2 = 41.5192946477, -86.239555554, 0
+#     v3 = 41.5190274009, -86.2394354903, 0
+#     # bounds = URBAN_SAR_BOUNDS
+#     # # bounds = [v1, v2, v3]
+#     # # s = Lla(DEFAULT_SAR_START[0], DEFAULT_SAR_START[1], 0)
+#     # s = Lla(41.683202, -86.250413, 0)
+#     # v = [Lla(loc[0], loc[1], 0) for loc in bounds]
+#     #
+#     # quads = _partition_grid(v, 16)
+#     # # print(len(quads))
+#     # # for quad in quads:
+#     # #     print('{}\n'.format('\n'.join(map(lambda pos: ','.join(map(str, pos[:2])), quad))))
+#     # p = get_search_path(s, quads[1])
+#     # print('\n'.join([','.join(x[:-1].astype(str)) for x in p]))
+#     dcs = Mission._parse_drone_cfg('../cfg/drone_cfgs/16_drone_SAR.json')
+#
+#     for dc in dcs:
+#         path = get_search_path(Lla(dc['home'][0], dc['home'][1], 0),
+#                                map(lambda tup: Lla(tup[0], tup[1], 0), dc['bounds']))
+#         print(path)
+#
+#
+# if __name__ == '__main__':
+#     main()

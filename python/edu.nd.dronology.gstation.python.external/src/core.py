@@ -375,7 +375,7 @@ class Host:
                         try:
                             conn, addr = self._socket.accept()
                             self._conn = conn
-                            self._conn.settimeout(5.0)
+                            self._conn.settimeout(0.1)
                             self.set_status(Host._CONNECTED)
                             _LOG.info('Established Dronology connection.')
                             time.sleep(1.0)
@@ -389,10 +389,10 @@ class Host:
                 try:
                     msg = self._conn.recv(2048)
                     _LOG.info(r'Message received: {}'.format(msg))
-                    msgs = msg.split('\r\n')
+                    msgs = msg.split('\r')
 
                     for msg_ in msgs:
-                        if msg_:
+                        if msg_ and msg_ != '\r':
                             _LOG.info('Command received: {}'.format(msg_))
                             cmd = CommandFactory.get_command(msg_)
                             if isinstance(cmd, (SetMonitorFrequency,)):
