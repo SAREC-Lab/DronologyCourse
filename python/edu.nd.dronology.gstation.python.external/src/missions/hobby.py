@@ -135,15 +135,6 @@ class Neighborhood(Mission):
         vehicle, shutdown_cb = control.connect_vehicle(DRONE_TYPE_SITL_VRTL,
                                                        vehicle_id=v_id, instance=inst, ardupath=ardu, home=home_)
 
-        # SET UP TIMERS
-        def gen_state_message(m_vehicle):
-            msg = StateMessage.from_vehicle(m_vehicle, v_id)
-            connection.send(str(msg))
-
-        def gen_monitor_message(m_vehicle):
-            msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
-            connection.send(str(msg))
-
         while not connection.is_connected():
             time.sleep(3.0)
 
@@ -152,6 +143,19 @@ class Neighborhood(Mission):
         while not handshake_complete:
             handshake_complete = connection.send(str(HandshakeMessage.from_vehicle(vehicle, v_id)))
             time.sleep(3.0)
+
+        battery_dur = 40 * 60
+        mission_start = time.time()
+
+        # SET UP TIMERS
+        def gen_state_message(m_vehicle):
+            msg = StateMessage.from_vehicle(m_vehicle, v_id)
+            connection.send(str(msg))
+
+        def gen_monitor_message(m_vehicle):
+            battery_level = (battery_dur - (time.time() - mission_start)) / battery_dur
+            msg = MonitorMessage.from_vehicle(m_vehicle, v_id, battery_level=battery_level)
+            connection.send(str(msg))
 
         # ARM & READY
         control.set_armed(vehicle, armed=True)

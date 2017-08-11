@@ -203,7 +203,7 @@ class SaR(Mission):
 
                 dc_bounds = map(lambda tup: Lla(tup[0], tup[1], 0), dc['bounds'])
                 args = [connection, control, dc_bounds, point_last_seen,
-                        vid, clazz, dc['altitude'], dc['groundspeed'], n_vrtl - 1, ardupath,
+                        vid, clazz, dc['altitude'], dc['groundspeed'], n_vrtl, ardupath,
                         dc['baud'], dc['rate'], tuple(dc['home']), dc['ip']]
 
                 if clazz == DRONE_TYPE_SITL_VRTL:
@@ -229,15 +229,6 @@ class SaR(Mission):
 
         handshake_complete = False
 
-        # SET UP TIMERS
-        def gen_state_message(m_vehicle):
-            msg = StateMessage.from_vehicle(m_vehicle, v_id)
-            connection.send(str(msg))
-
-        def gen_monitor_message(m_vehicle):
-            msg = MonitorMessage.from_vehicle(m_vehicle, v_id)
-            connection.send(str(msg))
-
         start = Lla(home[0], home[1], 0)
         path = get_search_path(start, bounds, point_last_seen=pls)
 
@@ -248,6 +239,19 @@ class SaR(Mission):
         while not handshake_complete:
             handshake_complete = connection.send(str(HandshakeMessage.from_vehicle(vehicle, v_id)))
             time.sleep(3)
+
+        battery_dur = 40 * 60
+        mission_start = time.time()
+
+        # SET UP TIMERS
+        def gen_state_message(m_vehicle):
+            msg = StateMessage.from_vehicle(m_vehicle, v_id)
+            connection.send(str(msg))
+
+        def gen_monitor_message(m_vehicle):
+            battery_level = (battery_dur - (time.time() - mission_start)) / battery_dur
+            msg = MonitorMessage.from_vehicle(m_vehicle, v_id, battery_level=battery_level)
+            connection.send(str(msg))
 
         # ARM & READY
         control.set_armed(vehicle, armed=True)

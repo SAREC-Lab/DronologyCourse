@@ -125,7 +125,10 @@ class MonitorMessage(DronologyMessage):
         super(MonitorMessage, self).__init__('monitoring', uav_id, data)
 
     @classmethod
-    def from_vehicle(cls, vehicle, v_id, **kwargs):
+    def from_vehicle(cls, vehicle, v_id, battery_level=None, **kwargs):
+        if battery_level is None:
+            battery_level = vehicle.battery.level
+
         lla = vehicle.location.global_frame
         att = vehicle.attitude
         vel = vehicle.velocity
@@ -138,7 +141,7 @@ class MonitorMessage(DronologyMessage):
             'down': vel[2],
             'voltage': vehicle.battery.voltage,
             'current': vehicle.battery.current,
-            'level': vehicle.battery.level,
+            'level': battery_level,
             'eph': vehicle.gps_0.eph,
             'epv': vehicle.gps_0.epv,
             'n_satellites': vehicle.gps_0.satellites_visible,
