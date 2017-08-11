@@ -282,12 +282,13 @@ class SaR(Mission):
                     cmds = core.get_commands(v_id)
                     for cmd in cmds:
                         if isinstance(cmd, (SetMonitorFrequency,)):
+                            freq = cmd.get_monitor_frequency() / 1000
+                            _LOG.info('Setting vehicle {} monitoring period to {}'.format(v_id, freq))
                             # acknowledge
                             connection.send(str(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id())))
-                            # stop the timer, send message, reset interval, restart timer
+                            # stop the timer, reset interval, restart timer
                             monitor_msg_timer.stop()
-                            gen_monitor_message(vehicle)
-                            monitor_msg_timer.set_interval(cmd.get_monitor_frequency() / 1000)
+                            monitor_msg_timer.set_interval(freq)
                             monitor_msg_timer.start()
                 worker.join()
             except KeyboardInterrupt:
