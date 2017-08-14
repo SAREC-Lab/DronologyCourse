@@ -38,11 +38,12 @@ class NewsStations(Mission):
                 vid = 'UAV{}{:05d}'.format(''.join(random.sample(string.letters, 2)),
                                            random.randint(1, 100000))
                 # 20% of drones should try to cheat
-                is_cheater = random.uniform() <= 0.2
+                is_cheater = random.uniform(0, 1) <= 0.2
                 home = station['lat'], station['lon']
                 args = [connection, control, crash_site_geo, deepcopy(no_fly_zones), vid, inst, home, is_cheater,
                         ardupath]
                 workers.append(threading.Thread(target=NewsStations._start, args=args))
+                inst += 1
 
         for worker in workers:
             worker.start()
