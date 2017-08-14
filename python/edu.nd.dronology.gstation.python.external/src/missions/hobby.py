@@ -73,8 +73,8 @@ class Neighborhoods(Mission):
                             type=Mission._parse_controller, default='core.ArduPilot',
                             help=Mission._parse_controller.__doc__)
         parser.add_argument('-b', '--bounds',
-                            type=Mission._parse_sar_bounds, default=SOUTH_BEND_BOUNDS_STR,
-                            help=Mission._parse_sar_bounds.__doc__)
+                            type=Mission._parse_coord_bounds, default=SOUTH_BEND_BOUNDS_STR,
+                            help=Mission._parse_coord_bounds.__doc__)
         parser.add_argument('-n', '--n_neighborhoods',
                             type=int, default=10, help='the number of neighborhoods to create')
         parser.add_argument('-ap', '--ardupath',
@@ -214,6 +214,11 @@ class Neighborhood(Mission):
                     monitor_msg_timer.set_interval(freq)
                     monitor_msg_timer.start()
 
+        control.land(vehicle)
+        _LOG.info('Vehicle {} landed.'.format(v_id))
+        control.set_armed(vehicle, armed=False)
+        shutdown_cb()
+
     @staticmethod
     def parse_args(cla):
         parser = argparse.ArgumentParser()
@@ -221,8 +226,8 @@ class Neighborhood(Mission):
                             type=Mission._parse_controller, default='core.ArduPilot',
                             help=Mission._parse_controller.__doc__)
         parser.add_argument('-b', '--bounds',
-                            type=Mission._parse_sar_bounds, default=DEFAULT_NB_BOUNDS_STR,
-                            help=Mission._parse_sar_bounds.__doc__)
+                            type=Mission._parse_coord_bounds, default=DEFAULT_NB_BOUNDS_STR,
+                            help=Mission._parse_coord_bounds.__doc__)
         parser.add_argument('-n', '--n_drones',
                             type=int, default=3, help='the number of drones to fly in the neighborhood.')
         parser.add_argument('-d', '--duration',

@@ -40,7 +40,7 @@ class Mission(object):
         return res
 
     @staticmethod
-    def _parse_sar_bounds(bounds):
+    def _parse_coord_bounds(bounds):
         """
         e.g. -b 41.519362,-86.240411|41.519391,-86.239414|41.519028,-86.239411|41.519007,-86.240396
         """

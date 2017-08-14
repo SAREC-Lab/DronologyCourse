@@ -149,8 +149,8 @@ class SaR(Mission):
                             help='flag to indicate that the search space needs to be partitioned'
                                  '\notherwise it is assumed each drone has its own grid')
         parser.add_argument('-b', '--bounds',
-                            type=Mission._parse_sar_bounds, default=DEFAULT_SAR_BOUNDS_STR,
-                            help=Mission._parse_sar_bounds.__doc__)
+                            type=Mission._parse_coord_bounds, default=DEFAULT_SAR_BOUNDS_STR,
+                            help=Mission._parse_coord_bounds.__doc__)
         parser.add_argument('-pls', '--point_last_seen',
                             type=SaR._parse_coord, default='', help=SaR._parse_coord.__doc__)
         parser.add_argument('-cfg', '--drone_configs',
@@ -216,7 +216,7 @@ class SaR(Mission):
 
         for worker in workers:
             worker.start()
-            time.sleep(1.5)
+            time.sleep(0.3)
 
         for worker in workers:
             worker.join()
