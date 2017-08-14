@@ -1,4 +1,4 @@
-package edu.nd.dronology.ui.vaadin.utils;
+package edu.nd.dronology.ui.vaadin.flightroutes.mapoperations;
 
 import java.awt.MouseInfo;
 import java.util.Iterator;
@@ -15,6 +15,9 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
+import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
+
 /**
  * This is the class that contains all logic for the map click listener. It contains code for adding a waypoint and popping up a window for the user to
  * input the altitude and transit speed for the newly created waypoint. It also contains code for deleting a waypoint if the user decides they do not want
@@ -28,27 +31,25 @@ public class MapAddMarkerListener implements LeafletClickListener {
 	private String altitude = "";
 	private String transitSpeed = "";
 	private UIWayPoint currentWayPoint;
-	private MapMarkerUtilities route;
+	private MapMarkerUtilities mapUtilities;
 	private Window window;
 	
 	public MapAddMarkerListener(MapMarkerUtilities route, Window window) {
-		this.route = route;
+		this.mapUtilities = route;
 		this.window = window;
 	}
 	@Override
 	public void onClick(LeafletClickEvent e) {
-		if (route.isEditable() && !route.isPolyline() && e.getPoint().getLat() >= -90 && e.getPoint().getLat() <= 90 &&
-				e.getPoint().getLon() >= -180 && e.getPoint().getLon() <= 180) {
-			// Adds a pin if the user clicks on the map in a valid place while the map is editable.
+		if (!mapUtilities.isEditable())
+			return;
+		
+		if (!mapUtilities.getPolylineClickListener().isPolylineIsClickedInThisEvent()) {
 			processOnClick(e.getPoint(), -1);
-		} else {
-			route.setIsPolyline(false);
-			/* If the user clicked on a polyline, isPolyline in the MapMarkerUtilities class is set to false, as the PolylineClickListener will correctly add
-			 * the waypoint to the map. */
 		}
+		mapUtilities.getPolylineClickListener().resetPolylineIsClickedInThisEvent();
 	}
 	public void processOnClick(Point p, int index) {
-		currentWayPoint = route.addNewPin(p, index);
+		currentWayPoint = mapUtilities.addNewPin(p, index);
 		
 		window.setPosition((int) MouseInfo.getPointerInfo().getLocation().getX(), (int) MouseInfo.getPointerInfo().getLocation().getY() - 45);
 
@@ -100,14 +101,14 @@ public class MapAddMarkerListener implements LeafletClickListener {
 			
 		    	if (canSave) {
 		    		UI.getCurrent().removeWindow(window);
-		    		for (int i = 0; i < route.getMapPoints().size(); i++) {
-		    			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
-		    				route.getMapPoints().get(i).setAltitude(altitude);
-		    				route.getMapPoints().get(i).setTransitSpeed(transitSpeed);
-		    				route.getGrid().setItems(route.getMapPoints());
+		    		for (int i = 0; i < mapUtilities.getMapPoints().size(); i++) {
+		    			if (mapUtilities.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
+		    				mapUtilities.getMapPoints().get(i).setAltitude(altitude);
+		    				mapUtilities.getMapPoints().get(i).setTransitSpeed(transitSpeed);
+		    				mapUtilities.getMapComponent().getTableDisplay().getGrid().setItems(mapUtilities.getMapPoints());
 		    			}
 		    		}
-		    		route.getMapComponent().onMapEdited(route.getMapPoints());
+		    		mapUtilities.getMapComponent().onMapEdited(mapUtilities.getMapPoints());
 		    	}
 		    	else {
 		    		Notification.show(caption);
@@ -118,28 +119,28 @@ public class MapAddMarkerListener implements LeafletClickListener {
 		cancelButton.addClickListener(event -> {
 			removeCurrentWayPoint();
 			UI.getCurrent().removeWindow(window);
-			route.drawLines(route.getMapPoints(), true, 0, false);
-			route.updatePinColors();
+			mapUtilities.drawLines(mapUtilities.getMapPoints(), 0, false);
+			mapUtilities.updatePinColors();
 		});
 	}
 	public void removeCurrentWayPoint() {
-		for (int i = 0; i < route.getMapPoints().size(); i++) {
-			if (route.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
+		for (int i = 0; i < mapUtilities.getMapPoints().size(); i++) {
+			if (mapUtilities.getMapPoints().get(i).getId().equals(currentWayPoint.getId())) {
 				// Removes the point from mapPoints, updates the grid, then redraws all of the lines.
-				route.getMapPoints().remove(route.getMapPoints().get(i));
-				route.getGrid().setItems(route.getMapPoints());
-				route.removeAllLines(route.getPolylines());
-				route.drawLines(route.getMapPoints(), false, 1, false);
+				mapUtilities.getMapPoints().remove(mapUtilities.getMapPoints().get(i));
+				mapUtilities.getMapComponent().getTableDisplay().getGrid().setItems(mapUtilities.getMapPoints());
+				mapUtilities.removeAllLines(mapUtilities.getPolylines());
+				mapUtilities.drawLines(mapUtilities.getMapPoints(), 1, false);
 			}
 		}
-		for (int i = 0; i < route.getPins().size(); i++) {
-			if (route.getPins().get(i).getId().equals(currentWayPoint.getId())) {
+		for (int i = 0; i < mapUtilities.getPins().size(); i++) {
+			if (mapUtilities.getPins().get(i).getId().equals(currentWayPoint.getId())) {
 				// Removes the pin from the map.
-				route.getMap().removeComponent(route.getPins().get(i));
+				mapUtilities.getMap().removeComponent(mapUtilities.getPins().get(i));
 			}
 		}
-		for(int i = 0; i < route.getPolylines().size(); i++){
-			route.getMap().addComponent(route.getPolylines().get(i));
+		for(int i = 0; i < mapUtilities.getPolylines().size(); i++){
+			mapUtilities.getMap().addComponent(mapUtilities.getPolylines().get(i));
 			// Adds lines back to the polyline arraylist.
 		}
 	}

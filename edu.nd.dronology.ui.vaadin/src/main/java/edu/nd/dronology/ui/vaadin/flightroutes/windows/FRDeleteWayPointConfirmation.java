@@ -1,26 +1,26 @@
 package edu.nd.dronology.ui.vaadin.flightroutes.windows;
 
-import com.vaadin.ui.Component.Event;
 import com.vaadin.ui.renderers.ClickableRenderer.RendererClickEvent;
 
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
-import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
+import edu.nd.dronology.ui.vaadin.utils.YesNoWindow;
 
-public class FRDeleteWayPointConfirmation {
+@SuppressWarnings("serial")
+public class FRDeleteWayPointConfirmation extends YesNoWindow {
 	private FRMainLayout mainLayout = null;
 	public FRDeleteWayPointConfirmation(FRMainLayout mainLayout){
 		this.mainLayout = mainLayout;
 	}
 	
 	public void showWindow (Event deleteWaypointClickEvent) {
-		MyUI.getYesNoWindow().initForNewMessage(
+		this.initForNewMessage(
 				"Are you sure you want to delete this waypoint?");
 		
 		// Click listeners for yes and no buttons on window.
-		MyUI.getYesNoWindow().addYesButtonClickListener(e -> {
-			MyUI.getYesNoWindow().close();
+		this.addYesButtonClickListener(e -> {
+			this.close();
 			MapMarkerUtilities utilities = mainLayout.getMapComponent().getUtilities();
 			
 			String waypointID = "";
@@ -43,22 +43,22 @@ public class FRDeleteWayPointConfirmation {
 				}
 			}
 			
-			utilities.drawLines(utilities.getMapPoints(), true, 1, false);
+			utilities.drawLines(utilities.getMapPoints(), 0, false);
 
 			for (int i = 0; i < utilities.getMapPoints().size(); i++) {
 				utilities.getMapPoints().get(i).setOrder(i + 1);
 			}
 		
-			mainLayout.getMapComponent().getUtilities().getGrid().setItems(utilities.getMapPoints());
+			mainLayout.getMapComponent().getTableDisplay().getGrid().setItems(utilities.getMapPoints());
 			mainLayout.getMapComponent().onMapEdited(utilities.getMapPoints());
 			utilities.updatePinColors();
 		});
 		
-		MyUI.getYesNoWindow().addNoButtonClickListener(e -> {
-			MyUI.getYesNoWindow().close();
+		this.addNoButtonClickListener(e -> {
+			this.close();
 		});
 		
-		MyUI.getYesNoWindow().showWindow();
+		this.showWindow();
 	}
 
 }

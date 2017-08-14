@@ -3,7 +3,6 @@ package edu.nd.dronology.ui.vaadin.flightroutes.windows;
 import java.rmi.RemoteException;
 
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.Component.Event;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
@@ -12,6 +11,7 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
+import edu.nd.dronology.ui.vaadin.utils.YesNoWindow;
 
 /**
  * This class defines the window that asks the user if they want to delete a specified route.
@@ -19,7 +19,8 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
  * @author James Holland
  */
 
-public class FRDeleteRouteConfirmation {
+@SuppressWarnings("serial")
+public class FRDeleteRouteConfirmation extends YesNoWindow {
 	private FRMainLayout mainLayout = null;
 	
 	public FRDeleteRouteConfirmation(FRMainLayout mainLayout){
@@ -27,7 +28,7 @@ public class FRDeleteRouteConfirmation {
 	}
 	
 	public void showWindow (FlightRouteInfo routeTobeDeleted, Event externalEvent){
-		MyUI.getYesNoWindow().initForNewMessage(
+		this.initForNewMessage(
 				"Are you sure you want to delete the route <b>" + routeTobeDeleted.getName() + "</b>?");
 		
 		//Switch to the to be deleted route before showing the window
@@ -39,8 +40,8 @@ public class FRDeleteRouteConfirmation {
 		}
 		
 		// Click listeners for yes and no buttons on window.
-		MyUI.getYesNoWindow().addYesButtonClickListener(e -> {
-			MyUI.getYesNoWindow().close();
+		this.addYesButtonClickListener(e -> {
+			this.close();
 			
 			// Only delete if the route to be deleted has been set.
 			if (routeTobeDeleted != null) {
@@ -57,11 +58,11 @@ public class FRDeleteRouteConfirmation {
 			mainLayout.getControls().getInfoPanel().refreshRoutes();
 		});
 		
-		MyUI.getYesNoWindow().addNoButtonClickListener(e -> {
-			MyUI.getYesNoWindow().close();
+		this.addNoButtonClickListener(e -> {
+			this.close();
 		});
 		
-		MyUI.getYesNoWindow().showWindow();
+		this.showWindow();
 	}
 	
 	// Deletes a route from Dronology based on the FlightRouteInfo.

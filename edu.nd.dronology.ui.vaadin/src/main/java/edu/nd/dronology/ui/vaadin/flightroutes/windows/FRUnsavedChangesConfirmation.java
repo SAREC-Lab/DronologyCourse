@@ -3,14 +3,14 @@ package edu.nd.dronology.ui.vaadin.flightroutes.windows;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Component.Event;
 
 import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.flightroutes.FRMetaInfo;
-import edu.nd.dronology.ui.vaadin.start.MyUI;
+import edu.nd.dronology.ui.vaadin.utils.YesNoWindow;
 
-public class FRUnsavedChangesConfirmation {
+@SuppressWarnings("serial")
+public class FRUnsavedChangesConfirmation extends YesNoWindow {
 	private FRMainLayout mainLayout = null;
 	
 	public enum ChangeType {
@@ -25,13 +25,13 @@ public class FRUnsavedChangesConfirmation {
 	}
 	
 	public void showWindow (String currentRouteName, ChangeType changeType, Event externalEvent) {
-		MyUI.getYesNoWindow().initForNewMessage(
+		this.initForNewMessage(
 				"You have unsaved changes on <b>" + currentRouteName + "</b>.<br>"
 				+ "Are you sure you want to discard all unsaved changes?");
 		
-		MyUI.getYesNoWindow().addYesButtonClickListener(e -> {
+		this.addYesButtonClickListener(e -> {
 			mainLayout.getMapComponent().exitEditMode();
-			MyUI.getYesNoWindow().close();
+			this.close();
 			
 			if (changeType == ChangeType.EDIT_ANOTHER) {
 				Button editBtn = (Button)externalEvent.getComponent();
@@ -58,13 +58,13 @@ public class FRUnsavedChangesConfirmation {
 			}
 		});
 		
-		MyUI.getYesNoWindow().addNoButtonClickListener(e -> {
+		this.addNoButtonClickListener(e -> {
 			if (changeType == ChangeType.NEW_ROUTE) {
 				mainLayout.getControls().getInfoPanel().removeNewRouteWindow();
 			}
-			MyUI.getYesNoWindow().close();
+			this.close();
 		});
 		
-		MyUI.getYesNoWindow().showWindow();
+		this.showWindow();
 	}
 }

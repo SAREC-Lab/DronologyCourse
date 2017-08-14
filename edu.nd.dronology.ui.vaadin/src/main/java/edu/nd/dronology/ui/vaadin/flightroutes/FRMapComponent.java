@@ -12,11 +12,10 @@ import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -30,6 +29,7 @@ import edu.nd.dronology.services.core.persistence.PersistenceException;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRWayPointPopupView;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
@@ -46,14 +46,17 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 public class FRMapComponent extends CustomComponent {
 	private FRMainLayout mainLayout;
 	private MapMarkerUtilities utilities;
+	private Window newWayPointWindow;
+	private FRWayPointPopupView waypointPopupView;
 	
 	private VerticalLayout content = new VerticalLayout();
 	private AbsoluteLayout mapAndPopup = new AbsoluteLayout();
 	private FRTableDisplay tableDisplay = new FRTableDisplay();
 	private FREditBar editBar = new FREditBar(this);
 	private FRMetaInfo metaInfo = new FRMetaInfo(this);
-	private List<UIWayPoint> storedPoints = new ArrayList<>();
 	private LMap leafletMap;
+	
+	private List<UIWayPoint> storedPoints = new ArrayList<>();
 
 	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName, FRMainLayout mainLayout) {
 		this.mainLayout = mainLayout;
@@ -68,15 +71,15 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addBaseLayer(tiles, name);
 		leafletMap.addOverlay(satelliteTiles, satelliteLayerName);
 	
-		Window newWayPointWindow = createNewWayPointWindow();
+		newWayPointWindow = createNewWayPointWindow();
 		/* Creates a window that allows the user to input altitude and transit speed information about a newly created waypoint. 
 		 * Values are read in and used in the MapMarkerUtilties class. */
 		
-		PopupView waypointPopup = createWayPointPopupView();
+		waypointPopupView = new FRWayPointPopupView(this.getMainLayout());
 		/* Creates a popup view that shows information about a waypoint once a mouse over listener is activated corresponding to a waypoint.
 		 * Values are set in the MapMarkerUtilities class. */
 		
-		mapAndPopup.addComponents(waypointPopup, leafletMap);
+		mapAndPopup.addComponents(waypointPopupView, leafletMap);
 		content.addComponents(metaInfo, mapAndPopup, tableDisplay.getGrid());
 		setCompositionRoot(content);
 
@@ -87,7 +90,7 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("bring_back");
 		editBar.addStyleName("bring_front");
 
-		utilities = new MapMarkerUtilities(mapAndPopup, leafletMap, tableDisplay, waypointPopup, this, newWayPointWindow);
+		utilities = new MapMarkerUtilities(this, newWayPointWindow);
 		tableDisplay.setUtilities(utilities);
 		utilities.disableRouteEditing();
 		
@@ -123,52 +126,13 @@ public class FRMapComponent extends CustomComponent {
 
 		return window;
 	}
-	// Popup that displays on pin mouse-over. Contains a button, which allows the waypoint to be deleted.
-	public PopupView createWayPointPopupView() {
-		VerticalLayout popupContent = new VerticalLayout();
-		popupContent.removeAllComponents();
-		// Remove all components before adding new ones because only one set of waypoint information should be shown at a time.
-		
-		Label latitudeLabel = new Label();
-		latitudeLabel.setId("latitude");
-		
-		Label longitudeLabel = new Label();
-		longitudeLabel.setId("longitude");
-		
-		Label altitudeLabel = new Label();
-		altitudeLabel.setId("altitude");
-		
-		Label transitSpeedLabel = new Label();
-		transitSpeedLabel.setId("transitSpeed");
-		
-		popupContent.addComponents(latitudeLabel, longitudeLabel, altitudeLabel, transitSpeedLabel);
-	
-		// Uses popupContent vertical layout to instantiate popup.
-		PopupView waypointPopup = new PopupView(null, popupContent);
-		
-		Button toDelete = new Button("Remove Waypoint");
-		toDelete.addClickListener(event -> {
-			waypointPopup.setPopupVisible(false);
-			this.getMainLayout().getDeleteWayPointConfirmation().showWindow(event);
-		});
-		
-		toDelete.setId("toDelete");
-		popupContent.addComponent(toDelete);
-		
-		waypointPopup.addStyleName("bring_front");
-		popupContent.addStyleName("fr_waypoint_popup");
-		waypointPopup.setVisible(false);
-		waypointPopup.setPopupVisible(false);
-		
-		return waypointPopup;
-	}
 	// Displays with the map and table empty. Called when a route is deleted so that its waypoints are no longer displayed.
 	public void displayNoRoute() {
 		metaInfo.showInfoWhenNoRouteIsSelected();
 		
 		utilities.disableRouteEditing();
 		utilities.getMapPoints().clear();
-		utilities.getGrid().setItems(utilities.getMapPoints());
+		this.getTableDisplay().getGrid().setItems(utilities.getMapPoints());
 		
 		utilities.removeAllMarkers(utilities.getPins());
 		utilities.removeAllLines(utilities.getPolylines());
@@ -195,7 +159,7 @@ public class FRMapComponent extends CustomComponent {
 		utilities.setMapPointsTransit(wayPoints);
 
 		// Adds the lines to the map.
-		utilities.drawLines(wayPoints, true, 1, false);
+		utilities.drawLines(wayPoints, 0, false);
 		
 		setRouteCenter();
 		
@@ -252,7 +216,7 @@ public class FRMapComponent extends CustomComponent {
 		for (int i = 0; i < storedPoints.size(); i++) {
 			utilities.getMapPoints().add(storedPoints.get(i));
 		}
-		utilities.getTableDisplay().setGrid(utilities.getMapPoints());
+		this.getTableDisplay().setGrid(utilities.getMapPoints());
 		// Reverts the changes by clearing mapPoints and adding storedPoints.
 
 		utilities.removeAllMarkers(utilities.getPins());
@@ -264,7 +228,7 @@ public class FRMapComponent extends CustomComponent {
 		}
 		
 		utilities.updatePinColors();
-		utilities.drawLines(storedPoints, true, 0, false);
+		utilities.drawLines(storedPoints, 0, false);
 	
 		mapAndPopup.removeComponent(editBar);
 		leafletMap.addStyleName("bring_back");
@@ -364,7 +328,7 @@ public class FRMapComponent extends CustomComponent {
 		}
 		
 		// Then, the map has the points and lines redrawn.
-		utilities.getGrid().setItems(utilities.getMapPoints());
+		this.getTableDisplay().getGrid().setItems(utilities.getMapPoints());
 		
 		utilities.removeAllMarkers(utilities.getPins());
 		utilities.removeAllLines(utilities.getPolylines());
@@ -374,7 +338,7 @@ public class FRMapComponent extends CustomComponent {
 			utilities.addPinForWayPoint(point, true);
 		}
 		
-		utilities.drawLines(storedPoints, true, 0, false);
+		utilities.drawLines(storedPoints, 0, false);
 
 		// Adds mouse over and mouse out listeners to the pins.
 		List<LMarker> oldPins = utilities.getPins();
@@ -437,7 +401,7 @@ public class FRMapComponent extends CustomComponent {
 	}
 	// Sets the center of the route based on the stored waypoints such that the map is as visible as possible.
 	public void setRouteCenter() {
-		if (getMetaInfo().getAutoZooming().getValue() == true) {
+		if (getMetaInfo().isAutoZoomingChecked()) {
 			// Calculates the mean point and sets the route.
 			double meanLat = 0;
 			double meanLon = 0;
@@ -531,6 +495,22 @@ public class FRMapComponent extends CustomComponent {
 	// Gets the main layout (passed into constructor).
 	public FRMainLayout getMainLayout() {
 		return mainLayout;
+	}
+	public Window getNewWayPointWindow () {
+		return newWayPointWindow;
+	}
+	public FRWayPointPopupView getWaypointPopupView () {
+		return waypointPopupView;
+	}
+	public LMap getMap() {
+		return leafletMap;
+	}
+	
+	public ComponentPosition getWaypointPopupViewPosition() {
+		return mapAndPopup.getPosition(waypointPopupView);
+	}	
+	public void setWaypointPopupViewPosition(ComponentPosition position) {
+		mapAndPopup.setPosition(waypointPopupView, position);
 	}
 	// Allows the longitude and latitude to be set manually.
 	public void setCenter(double centerLat, double centerLon) {

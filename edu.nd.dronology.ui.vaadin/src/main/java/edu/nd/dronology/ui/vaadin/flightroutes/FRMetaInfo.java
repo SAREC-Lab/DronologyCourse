@@ -240,10 +240,10 @@ public class FRMetaInfo extends CustomComponent {
 		}
 	}
 	
-	public CheckBox getAutoZooming() {
-		return autoZoomingCheckBox;
+	public boolean isAutoZoomingChecked() {
+		return autoZoomingCheckBox.getValue() == true;
 	}
-	public CheckBox getCheckBox() {
-		return tableViewCheckBox;
+	public boolean isTableViewChecked() {
+		return tableViewCheckBox.getValue() == true;
 	}
 }

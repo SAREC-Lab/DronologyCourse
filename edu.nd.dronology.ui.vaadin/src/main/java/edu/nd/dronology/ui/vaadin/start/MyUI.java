@@ -16,7 +16,6 @@ import com.vaadin.ui.UI;
 
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
-import edu.nd.dronology.ui.vaadin.utils.YesNoWindow;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -34,11 +33,6 @@ public class MyUI extends UI {
 	private static BaseServiceProvider provider = new BaseServiceProvider();
 	public static BaseServiceProvider getProvider(){
 		return provider;
-	}
-
-	private static YesNoWindow yesNoWindow = new YesNoWindow();	
-	public static YesNoWindow getYesNoWindow() {
-		return yesNoWindow;
 	}
 
 	@Override

@@ -39,10 +39,4 @@ public class FREditBar extends CustomComponent{
 			map.saveClick();
 		});
 	}
-	public Button getCancelButton() {
-		return cancelButton;
-	}
-	public Button getSaveButton() {
-		return saveButton;
-	}
 }

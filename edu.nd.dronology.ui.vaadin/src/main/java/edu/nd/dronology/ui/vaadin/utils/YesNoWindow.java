@@ -28,7 +28,7 @@ public class YesNoWindow extends Window {
 	ArrayList<Registration> yesBtnListerReg = new ArrayList<>();
 	ArrayList<Registration> noBtnListerReg = new ArrayList<>();
 	
-	public YesNoWindow() {
+	protected YesNoWindow() {
 		label.setContentMode(ContentMode.HTML);
 		
 		buttonLayout.addComponents(yesBtn, noBtn);
@@ -46,40 +46,40 @@ public class YesNoWindow extends Window {
 		this.setDraggable(false);
 	}
 	
-	public void showWindow () {
+	protected void showWindow () {
 		UI.getCurrent().addWindow(this);
 	}
 	
-	public void initForNewMessage (String message) {
+	protected void initForNewMessage (String message) {
 		label.setValue(message);
 		removeAllYesButtonListeners ();
 		removeAllNoButtonListeners ();
 	}
 	
-	public void setYesBtnText (String text) {
+	protected void setYesBtnText (String text) {
 		yesBtn.setCaption(text);
 	}
 	
-	public void setNoBtnText (String text) {
+	protected void setNoBtnText (String text) {
 		noBtn.setCaption(text);
 	}
 	
-	public void addYesButtonClickListener (ClickListener listener) {
+	protected void addYesButtonClickListener (ClickListener listener) {
 		yesBtnListerReg.add(yesBtn.addClickListener(listener));
 	}
 	
-	public void addNoButtonClickListener (ClickListener listener) {
+	protected void addNoButtonClickListener (ClickListener listener) {
 		noBtnListerReg.add(noBtn.addClickListener(listener));
 	}
 	
-	public void removeAllYesButtonListeners () {
+	private void removeAllYesButtonListeners () {
 		for (Registration r : yesBtnListerReg) {
 			r.remove();
 		}
 		yesBtnListerReg.clear();
 	}
 	
-	public void removeAllNoButtonListeners () {
+	private void removeAllNoButtonListeners () {
 		for (Registration r : noBtnListerReg) {
 			r.remove();
 		}
