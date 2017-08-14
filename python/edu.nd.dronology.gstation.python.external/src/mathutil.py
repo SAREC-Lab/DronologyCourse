@@ -11,6 +11,14 @@ NV_A = SEMI_MAJOR
 NV_F = 1 - (SEMI_MINOR / SEMI_MAJOR)
 
 
+def mean_position(positions):
+    nvecs = arr([pos.to_nvector().as_array() for pos in positions]).T
+    n_EM_E = nv.mean_horizontal_position(nvecs[:-1, :]).ravel()
+    m_Z = np.mean(nvecs[-1, :])
+
+    return positions[0].coerce(Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z))
+
+
 def column_vector(a):
     if not isinstance(a, (list, tuple, np.ndarray)):
         raise ValueError('invalid type')
@@ -105,6 +113,10 @@ class GeoPoly(GeoShape):
             self._s_max = min(self._grid_xyz, key=lambda l: l[2])
         return self._s_max
 
+    def cpa(self, pos):
+        dists = [pos.dist(a) for a in self._verts]
+        return self._verts[np.argmin(dists)]
+
     def distance_east(self):
         p_EA_A = self.sw_vertex()
         p_EB_A = self.se_vertex()
@@ -137,6 +149,9 @@ class GeoPoly(GeoShape):
         # p_ = Point(*ll)
         # return p_.within(self._poly) or p_.touches(self._poly)
         pass
+
+    def mean_position(self):
+        return mean_position(self._verts)
 
 
 class Earth(object):
@@ -375,13 +390,6 @@ class Pvector(Position):
     def _as_array(self):
         return self.p_EB_E.ravel()
 
-
-def mean_position(positions):
-    nvecs = arr([pos.to_nvector().as_array() for pos in positions]).T
-    n_EM_E = nv.mean_horizontal_position(nvecs[:-1, :]).ravel()
-    m_Z = np.mean(nvecs[-1, :])
-
-    return positions[0].coerce(Nvector(n_EM_E[0], n_EM_E[1], n_EM_E[2], m_Z))
 
 
 if __name__ == '__main__':
