@@ -80,23 +80,20 @@ class NewsStations(Mission):
         mission_complete = False
 
         def work():
-            try:
-                # HANDLE INCOMING MESSAGES
-                while not mission_complete:
-                    cmds = core.get_commands(v_id)
-                    for cmd in cmds:
-                        if isinstance(cmd, (SetMonitorFrequency,)):
-                            freq = cmd.get_monitor_frequency() / 1000
-                            _LOG.info('Setting vehicle {} monitoring period to {}'.format(v_id, freq))
-                            # acknowledge
-                            connection.send(
-                                str(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id())))
-                            # stop the timer, reset interval, restart timer
-                            monitor_msg_timer.stop()
-                            monitor_msg_timer.set_interval(freq)
-                            monitor_msg_timer.start()
-            except KeyboardInterrupt:
-                vehicle.mode = dronekit.VehicleMode('LOITER')
+            # HANDLE INCOMING MESSAGES
+            while not mission_complete:
+                cmds = core.get_commands(v_id)
+                for cmd in cmds:
+                    if isinstance(cmd, (SetMonitorFrequency,)):
+                        freq = cmd.get_monitor_frequency() / 1000
+                        _LOG.info('Setting vehicle {} monitoring period to {}'.format(v_id, freq))
+                        # acknowledge
+                        connection.send(
+                            str(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id())))
+                        # stop the timer, reset interval, restart timer
+                        monitor_msg_timer.stop()
+                        monitor_msg_timer.set_interval(freq)
+                        monitor_msg_timer.start()
 
         # ARM & READY
         control.set_armed(vehicle, armed=True)
@@ -150,7 +147,7 @@ class NewsStations(Mission):
 
         mission_complete = True
         cb()
-        
+
     @staticmethod
     def parse_args(cla):
         parser = argparse.ArgumentParser()
