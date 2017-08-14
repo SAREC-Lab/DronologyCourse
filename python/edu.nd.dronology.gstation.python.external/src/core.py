@@ -388,22 +388,15 @@ class Host:
                 # Try to receive messages, timeout after 5 seconds.
                 try:
                     msg = self._conn.recv(2048)
-                    if self._msg_buffer:
-                        msg = self._msg_buffer + msg
-                        self._msg_buffer = ''
-                        
                     _LOG.info(r'Message received: {}'.format(msg))
                     msgs = msg.split('\r')
 
                     for msg_ in msgs:
                         if msg_ and msg_ != '\r':
                             _LOG.info('Command received: {}'.format(msg_))
-                            try:
-                                cmd = CommandFactory.get_command(msg_)
-                                if isinstance(cmd, (SetMonitorFrequency,)):
-                                    put_command(cmd.get_target(), cmd)
-                            except ValueError:
-                                self._msg_buffer = msg_
+                            cmd = CommandFactory.get_command(msg_)
+                            if isinstance(cmd, (SetMonitorFrequency,)):
+                                put_command(cmd.get_target(), cmd)
 
                 except socket.timeout:
                     pass
