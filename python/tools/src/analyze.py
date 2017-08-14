@@ -1,14 +1,10 @@
-import os
+import db
 import argparse
-import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-_ADIR = '../analysis'
-
-if not os.path.exists(_ADIR):
-    os.makedirs(_ADIR)
+_db = db.Database()
 
 
 def main():
