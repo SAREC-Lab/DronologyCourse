@@ -19,6 +19,7 @@ public class PolylineClickListener  implements LeafletClickListener {
 
 	@Override
 	public void onClick(LeafletClickEvent event) {
+		polylineIsClickedInThisEvent = true;
 		if (!mapUtilities.isEditable())
 			return;
 		
@@ -27,12 +28,11 @@ public class PolylineClickListener  implements LeafletClickListener {
 		
 		for (int j = 0; j < polylines.size(); j++) {
 			if (polylines.get(j).getId().equals(polyline.getId())) {
-				int index = j + 1;
-				mapUtilities.getMapAddMarkerListener().processOnClick(event.getPoint(), index);
 				// Opens the window to enter altitude and transit speed for the newly added waypoint.
+				mapUtilities.getMapAddMarkerListener().processOnClick(event.getPoint(), j+1);
+				break;
 			}
 		}
-		polylineIsClickedInThisEvent = true;
 	}
 
 	public boolean isPolylineIsClickedInThisEvent() {

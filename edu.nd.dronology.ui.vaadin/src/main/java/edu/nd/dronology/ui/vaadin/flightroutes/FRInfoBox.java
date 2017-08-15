@@ -50,7 +50,7 @@ public class FRInfoBox extends CustomComponent {
 			
 		// Adds listener to the delete button on the route box /
 		trashButton.addListener(e->{
-			if (infoPanel.getControls().getMainLayout().getMapComponent().getUtilities().isEditable()) {
+			if (infoPanel.getControls().getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
 				// Checks if the route is in edit mode.
 				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
 						infoPanel.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.DELETE_ROUTE, e);
@@ -60,8 +60,9 @@ public class FRInfoBox extends CustomComponent {
 		});
 		// A click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes.
 		editButton.addClickListener(e -> {
-			if (!infoPanel.getControls().getMainLayout().getMapComponent().getUtilities().isEditable()) {
-				infoPanel.getControls().getMainLayout().switchAndEdit(this);
+			if (!infoPanel.getControls().getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
+				infoPanel.getControls().getMainLayout().switchRoute(this);
+				infoPanel.getControls().getMainLayout().getMapComponent().enterEditMode();
 			} else {
 				if (infoPanel.getHighlightedFRInfoBox() != null &&
 						flightRouteInfo.getId().equals(infoPanel.getHighlightedFRInfoBox().getId()))
@@ -69,7 +70,7 @@ public class FRInfoBox extends CustomComponent {
 				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
 						infoPanel.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.EDIT_ANOTHER, e);
 			}
-			infoPanel.getControls().getMainLayout().getMapComponent().processEditButtonClicked();
+			infoPanel.getControls().getMainLayout().getMapComponent().enterEditMode();
 		});
 		
 		titleBar.addComponents(trashButton, editButton);

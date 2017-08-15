@@ -105,10 +105,10 @@ public class FRMetaInfo extends CustomComponent {
 		
 		// Click listeners for the edit and delete buttons.
 		editButton.addClickListener(e -> {
-			map.processEditButtonClicked();
+			map.enterEditMode();
 		});
 		deleteButton.addClickListener(e -> {
-			if (map.getUtilities().isEditable()) {
+			if (map.getMapUtilities().isEditable()) {
 				map.getMainLayout().getUnsavedChangesConfirmation().showWindow(
 						map.getMainLayout().getControls().getInfoPanel().getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.DELETE_ROUTE, e);
 			} else {

@@ -31,7 +31,7 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
  */
 
 @SuppressWarnings("serial")
-public class FRNewRouteWindow extends Window{
+public class FRNewRouteWindow extends Window {
 	public FRNewRouteWindow(FRInfoPanel infoPanel) {
 		VerticalLayout totalLayout = new VerticalLayout();
 		
@@ -79,13 +79,13 @@ public class FRNewRouteWindow extends Window{
 						closeEvent -> {
 							// Dronology finally updates the route
 							infoPanel.refreshRoutes();		
-				
-							// Switch to the newly added route
-							infoPanel.getControls().getMainLayout().switchRoute(infoPanel.getRouteInfoBox(addedRoute));
-							
+
 							nameField.clear();
 							descriptionField.clear();
-							infoPanel.getControls().getMainLayout().getMapComponent().processEditButtonClicked();
+							
+							// Switch to the newly added route and enter edit mode
+							infoPanel.getControls().getMainLayout().switchRoute(infoPanel.getRouteInfoBox(addedRoute));
+							infoPanel.getControls().getMainLayout().getMapComponent().enterEditMode();
 						});
 			}
 		});

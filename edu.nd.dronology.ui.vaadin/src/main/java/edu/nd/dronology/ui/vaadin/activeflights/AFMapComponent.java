@@ -176,18 +176,22 @@ public class AFMapComponent extends CustomComponent {
 					i++;
 				}
 				List<LPolyline> polyLines = new ArrayList<>(); //draws the lines and loads them into a list
-				if (e.getDroneId().equals(focused))
-					polyLines = utilities.drawLines(wayPoints, 2, true);
-				else {
+				if (e.getDroneId().equals(focused)) {
+					utilities.removeAllLines();
+					polyLines = utilities.drawLinesForWayPoints(wayPoints, 2, true);
+				} else {
 					boolean drawn = false;
 					for (String name : checked){
 						if (e.getDroneId().equals(name)){
-							polyLines = utilities.drawLines(wayPoints, 1, true);
+							utilities.removeAllLines();
+							polyLines = utilities.drawLinesForWayPoints(wayPoints, 1, true);
 							drawn = true;
 						}
 					}
-					if (!drawn)
-						polyLines = utilities.drawLines(wayPoints, 0, true);
+					if (!drawn) {
+						utilities.removeAllLines();
+						polyLines = utilities.drawLinesForWayPoints(wayPoints, 0, true);
+					}
 				}
 				flightRoutes.add(polyLines); //keep a list of all lines and markers
 				if (wayPointMarkers.size() != currentFlights.size())
@@ -235,9 +239,7 @@ public class AFMapComponent extends CustomComponent {
 		try {
 			currentFlights = flightRouteService.getCurrentFlights();
 			if (currentFlights.size() != flightRoutes.size() || true) {
-				for (List<LPolyline> e : flightRoutes) { //removes each set of lines from the map
-					utilities.removeAllLines(e);
-				}
+				utilities.removeAllLines();
 				boolean exists = true; //determines if flight route is still active
 				for (List<LMarker> e : wayPointMarkers){
 					boolean individualExist = false; //helper variable to determine if each flight route is still active
@@ -251,9 +253,7 @@ public class AFMapComponent extends CustomComponent {
 						exists = false;
 				}
 				if (!exists || wayPointMarkers.size() != currentFlights.size()) { //if flight doesn't exist, remove it's waypoint markers
-					for (List<LMarker> e : wayPointMarkers) {
-						utilities.removeAllMarkers(e);
-					}
+					utilities.removeAllPins();
 					wayPointMarkers.clear();
 					if (!follow && flightRoutes.size() < currentFlights.size()) //only reset the center when a flight route is added
 						this.setAverageCenter();

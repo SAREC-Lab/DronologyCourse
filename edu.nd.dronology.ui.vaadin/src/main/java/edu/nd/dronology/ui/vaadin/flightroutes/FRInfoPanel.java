@@ -50,7 +50,7 @@ public class FRInfoPanel extends CustomComponent {
 		// Displays the route creation window.
 		newRouteButton.addClickListener(e -> {
 			UI.getCurrent().addWindow(newRouteWindow);
-			if (controls.getMainLayout().getMapComponent().getUtilities().isEditable()) {
+			if (controls.getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
 				controls.getMainLayout().getUnsavedChangesConfirmation().showWindow(
 						this.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.NEW_ROUTE, e);
 			}
@@ -70,7 +70,7 @@ public class FRInfoPanel extends CustomComponent {
 		refreshRoutes();
 		
 		routeListLayout.addLayoutClickListener(e -> {
-			if (controls.getMainLayout().getMapComponent().getUtilities().isEditable()) {
+			if (controls.getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
 				controls.getMainLayout().getUnsavedChangesConfirmation().showWindow(
 					this.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.SWITCH_ROUTE, e);
 			} else {
@@ -125,6 +125,15 @@ public class FRInfoPanel extends CustomComponent {
 	public FRInfoBox getRouteInfoBox(FlightRouteInfo info) {
 		for (int i = 0; i < routeListLayout.getComponentCount(); i++) {
 			if (info.equals(((FRInfoBox)routeListLayout.getComponent(i)).getFlightRouteInfo()))
+				return (FRInfoBox)routeListLayout.getComponent(i);
+		}
+		return null;
+	}
+
+	//Gets the route info box based on the FlightRouteInfo id.
+	public FRInfoBox getRouteInfoBox(String id) {
+		for (int i = 0; i < routeListLayout.getComponentCount(); i++) {
+			if (id.equals(((FRInfoBox)routeListLayout.getComponent(i)).getFlightRouteInfo().getId()))
 				return (FRInfoBox)routeListLayout.getComponent(i);
 		}
 		return null;

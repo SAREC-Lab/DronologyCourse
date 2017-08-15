@@ -14,6 +14,7 @@ import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
 // Sets the values for the popup views shown when hovering the mouse over a waypoint. Window is created in the FRMapComponent class.
 public class MarkerMouseOverListener implements LeafletMouseOverListener {
 	private MapMarkerUtilities mapUtilities;
+	private String selectedWayPointId = "";
 
 	public MarkerMouseOverListener (MapMarkerUtilities mapUtilities) {
 		this.mapUtilities = mapUtilities;
@@ -30,7 +31,7 @@ public class MarkerMouseOverListener implements LeafletMouseOverListener {
 		// Determines which marker the mouse was hovering over.
 		
 		UIWayPoint w = (UIWayPoint)leafletMarker.getData();
-	    	mapUtilities.setSelectedWayPointId(leafletMarker.getId());
+		selectedWayPointId = leafletMarker.getId();
 		// Retrieves the id of the waypoint of interest.
 		
 		wayPointPopupView.setLatitute(w.getLatitude());
@@ -66,5 +67,9 @@ public class MarkerMouseOverListener implements LeafletMouseOverListener {
 		wayPointPopupView.setVisible(true);
 		wayPointPopupView.setPopupVisible(true);
 		// Puts the popup view on the screen once all of its new parameters are set.
+	}
+
+	public String getSelectedWayPointId() {
+		return selectedWayPointId;
 	}
 }

@@ -6,14 +6,11 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.VerticalLayout;
 
-import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
+import edu.nd.dronology.ui.vaadin.flightroutes.FRMapComponent;
 
 @SuppressWarnings("serial")
 public class FRWayPointPopupView extends PopupView {
 	private class FRWayPointPopupViewContent implements PopupView.Content {
-		private PopupView popupView;
-		private FRMainLayout mainLayout;
-		
 		VerticalLayout popupContent = new VerticalLayout();
 		Label latitudeLabel = new Label();
 		Label longitudeLabel = new Label();
@@ -21,9 +18,17 @@ public class FRWayPointPopupView extends PopupView {
 		Label transitSpeedLabel = new Label();
 		Button toDelete = new Button("Remove Waypoint");
 		
-		public FRWayPointPopupViewContent(FRMainLayout mainLayout, PopupView popupView) {
-            this.popupView = popupView;
-            this.mainLayout = mainLayout;
+		public FRWayPointPopupViewContent(FRMapComponent mapComponent, PopupView popupView) {
+            popupContent.addComponents(latitudeLabel, longitudeLabel, altitudeLabel, transitSpeedLabel);
+    		
+			toDelete.addClickListener(event -> {
+				popupView.setPopupVisible(false);
+				mapComponent.getDeleteWayPointConfirmation().showWindow(event);
+			});
+			toDelete.setId("toDelete");
+			popupContent.addComponent(toDelete);
+			
+			popupContent.addStyleName("fr_waypoint_popup");
         }
 		@Override
 		public String getMinimizedValueAsHTML() {
@@ -31,17 +36,6 @@ public class FRWayPointPopupView extends PopupView {
 		}
 		@Override
 		public Component getPopupComponent() {
-	    		popupContent.addComponents(latitudeLabel, longitudeLabel, altitudeLabel, transitSpeedLabel);
-	    		
-	    		toDelete.addClickListener(event -> {
-	    			popupView.setPopupVisible(false);
-	    			mainLayout.getDeleteWayPointConfirmation().showWindow(event);
-	    		});
-	    		
-	    		toDelete.setId("toDelete");
-	    		popupContent.addComponent(toDelete);
-	    		
-	    		popupContent.addStyleName("fr_waypoint_popup");
 	    		return popupContent;
 		}
 		
@@ -63,9 +57,9 @@ public class FRWayPointPopupView extends PopupView {
 	}
 	
 	FRWayPointPopupViewContent content;
-	public FRWayPointPopupView(FRMainLayout mainLayout) {
+	public FRWayPointPopupView(FRMapComponent mapComponent) {
         super(null, null);
-        content = new FRWayPointPopupViewContent(mainLayout, this);
+        content = new FRWayPointPopupViewContent(mapComponent, this);
         this.setContent(content);
 		this.addStyleName("bring_front");
 		this.setVisible(false);

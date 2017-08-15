@@ -1,15 +1,18 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.util.List;
 
+import org.vaadin.addon.leaflet.LMarker;
+
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.ButtonRenderer;
+import com.vaadin.ui.renderers.TextRenderer;
 
-import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
+import elemental.json.JsonValue;
 
 /**
  * This is the class that contains all logic for displaying the latitude and longitude locations of the pins on the map. There is code in its constructor
@@ -21,15 +24,17 @@ import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
 
 public class FRTableDisplay {
 	private Grid<UIWayPoint> grid = new Grid<>(UIWayPoint.class);
-	private MapMarkerUtilities utilities;
+	private FRMapComponent mapComponent;
 	private boolean hasDeleteColumn;
 	private TextField latitude = new TextField();
 	private TextField longitude = new TextField();
 	private TextField altitude = new TextField();
 	private TextField transitSpeed = new TextField();
 	private Binder<UIWayPoint> binder = new Binder<>();
-	
-	public FRTableDisplay() {
+		
+	@SuppressWarnings("serial")
+	public FRTableDisplay (FRMapComponent mapComponent) {
+		this.mapComponent = mapComponent;
 		binder = grid.getEditor().getBinder();
 
 		binder.forField(latitude)
@@ -67,6 +72,13 @@ public class FRTableDisplay {
 				grid.removeColumn(c);
 			}
 			else if (c.getCaption().equals("Order")) {
+				c.setRenderer(new TextRenderer() {
+					@Override
+				    public JsonValue encode(Object value) {
+						int order = (Integer)value + 1;
+						return super.encode(order);
+					}
+				});
 				c.setCaption("#");
 			}
 		});
@@ -76,7 +88,7 @@ public class FRTableDisplay {
 		grid.setColumnResizeMode(null);
 		grid.setSelectionMode(SelectionMode.NONE);
 	}
-	public void makeEditable(MapMarkerUtilities mapMarkers) {
+	public void makeEditable() {
 		grid.getColumn("latitude").setEditorComponent(latitude);
 		grid.getColumn("longitude").setEditorComponent(longitude);
 		grid.getColumn("altitude").setEditorComponent(altitude);
@@ -85,19 +97,26 @@ public class FRTableDisplay {
 		
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
-			mapMarkers.updatePinForWayPoint(event.getBean());
+			updatePinForWayPoint(event.getBean());
 			grid.getEditor().cancel();
-			utilities.removeAllLines(utilities.getPolylines());
-			grid.setItems(utilities.getMapPoints());
-			grid.getEditor().cancel();
+			mapComponent.updateLinesAndGrid();
 		});
 		addButtonColumn();
 		// Adds a column of Delete buttons to the grid when in edit mode.
 	}
-	public void makeUneditable(MapMarkerUtilities mapMarkers) {
+	public void makeUneditable() {
 		grid.getEditor().setEnabled(false);
 		removeButtonColumn();
 		// Removes the column of Delete buttons from the grid when in edit mode.
+	}
+
+	public void updatePinForWayPoint(UIWayPoint wayPoint) {
+		LMarker pin = mapComponent.getMapUtilities().getPinById(wayPoint.getId());
+		if (pin != null) {
+			pin.getPoint().setLat(Double.valueOf(wayPoint.getLatitude()));
+			pin.getPoint().setLon(Double.valueOf(wayPoint.getLongitude()));
+			pin.setData(wayPoint);
+		}
 	}
 	public void addButtonColumn() {
 		if (!hasDeleteColumn) {
@@ -105,8 +124,8 @@ public class FRTableDisplay {
 			hasDeleteColumn = true;
 			grid.addColumn(event -> "Delete",
 				new ButtonRenderer<UIWayPoint> (clickEvent -> {
-					if (utilities.isEditable()) {
-						utilities.getMapComponent().getMainLayout().getDeleteWayPointConfirmation().showWindow(clickEvent);;
+					if (mapComponent.getMapUtilities().isEditable()) {
+						mapComponent.getDeleteWayPointConfirmation().showWindow(clickEvent);;
 					}
 				})
 			);
@@ -129,12 +148,5 @@ public class FRTableDisplay {
 	public void setGrid(List<UIWayPoint> points) {
 		// Takes in waypoints, sets their order, then adds them to the grid.
 		grid.setItems(points);
-		for (int i = 0; i < points.size(); i++) {
-			points.get(i).setOrder(i + 1);
-			points.get(i).setId(utilities.getMapPoints().get(i).getId());
-		}
-	}
-	public void setUtilities(MapMarkerUtilities utilities) {
-		this.utilities = utilities;
 	}
 }

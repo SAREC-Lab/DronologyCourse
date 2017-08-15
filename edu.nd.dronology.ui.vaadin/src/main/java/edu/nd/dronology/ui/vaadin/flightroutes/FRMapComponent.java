@@ -4,21 +4,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
-import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
@@ -29,6 +25,8 @@ import edu.nd.dronology.services.core.persistence.PersistenceException;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRDeleteWayPointConfirmation;
+import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRNewWayPointWindow;
 import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRWayPointPopupView;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
@@ -46,40 +44,48 @@ import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 public class FRMapComponent extends CustomComponent {
 	private FRMainLayout mainLayout;
 	private MapMarkerUtilities utilities;
-	private Window newWayPointWindow;
-	private FRWayPointPopupView waypointPopupView;
 	
+	private FRNewWayPointWindow newWayPointWindow;
+	private FRWayPointPopupView waypointPopupView;
+	private FRDeleteWayPointConfirmation deleteWayPointConfirmation;
+
 	private VerticalLayout content = new VerticalLayout();
 	private AbsoluteLayout mapAndPopup = new AbsoluteLayout();
-	private FRTableDisplay tableDisplay = new FRTableDisplay();
+	private FRTableDisplay tableDisplay;
 	private FREditBar editBar = new FREditBar(this);
 	private FRMetaInfo metaInfo = new FRMetaInfo(this);
 	private LMap leafletMap;
 	
 	private List<UIWayPoint> storedPoints = new ArrayList<>();
 
-	public FRMapComponent(String tileDataURL, String name, String satelliteTileDataURL, String satelliteLayerName, FRMainLayout mainLayout) {
+	public FRMapComponent(FRMainLayout mainLayout) {
 		this.mainLayout = mainLayout;
 		this.setWidth("100%");
 
 		LTileLayer tiles = new LTileLayer();
-		tiles.setUrl(tileDataURL);
+		tiles.setUrl("VAADIN/sbtiles/{z}/{x}/{y}.png");
 		LTileLayer satelliteTiles = new LTileLayer();
-		satelliteTiles.setUrl(satelliteTileDataURL);
+		satelliteTiles.setUrl("VAADIN/sateltiles/{z}/{x}/{y}.png");
 
 		leafletMap = new LMap();
-		leafletMap.addBaseLayer(tiles, name);
-		leafletMap.addOverlay(satelliteTiles, satelliteLayerName);
-	
-		newWayPointWindow = createNewWayPointWindow();
+		leafletMap.addBaseLayer(tiles, "Main map");
+		leafletMap.addOverlay(satelliteTiles, "Satellite");		
+		leafletMap.setCenter(41.68, -86.25);
+		leafletMap.setZoomLevel(13);
+		
 		/* Creates a window that allows the user to input altitude and transit speed information about a newly created waypoint. 
 		 * Values are read in and used in the MapMarkerUtilties class. */
-		
-		waypointPopupView = new FRWayPointPopupView(this.getMainLayout());
+		newWayPointWindow = new FRNewWayPointWindow(this);
+
 		/* Creates a popup view that shows information about a waypoint once a mouse over listener is activated corresponding to a waypoint.
 		 * Values are set in the MapMarkerUtilities class. */
+		waypointPopupView = new FRWayPointPopupView(this);
 		
+		deleteWayPointConfirmation = new FRDeleteWayPointConfirmation(this);
+
 		mapAndPopup.addComponents(waypointPopupView, leafletMap);
+		
+		tableDisplay = new FRTableDisplay(this);
 		content.addComponents(metaInfo, mapAndPopup, tableDisplay.getGrid());
 		setCompositionRoot(content);
 
@@ -90,82 +96,39 @@ public class FRMapComponent extends CustomComponent {
 		leafletMap.addStyleName("bring_back");
 		editBar.addStyleName("bring_front");
 
-		utilities = new MapMarkerUtilities(this, newWayPointWindow);
-		tableDisplay.setUtilities(utilities);
+		utilities = new MapMarkerUtilities(this);
 		utilities.disableRouteEditing();
-		
-		this.setRouteCenter();
 	}
 
-	private Window createNewWayPointWindow() {
-		// Window that allows the user to enter altitude and transit speed information.
-		HorizontalLayout buttons = new HorizontalLayout();
-		Button saveButton = new Button("Save");
-		Button cancelButton = new Button("Cancel");
-		buttons.addComponents(saveButton, cancelButton);
-
-		// Creates a vertical layout, which is then used to instantiate a window.
-		VerticalLayout windowContent = new VerticalLayout();
-		TextField altitudeField = new TextField("Altitude: ");
-		TextField transitSpeedField = new TextField("Transit Speed: ");
-
-		windowContent.addComponent(altitudeField);
-		windowContent.addComponent(transitSpeedField);
-		windowContent.addComponent(buttons);
-
-		Window window;
-		window = new Window(null, windowContent);
-		
-		window.addStyleName("confirm_window");
-		buttons.addStyleName("confirm_button_area");
-		saveButton.addStyleName("btn-okay");
-		
-		window.setModal(true);
-		window.setClosable(false);
-		window.setResizable(false);
-
-		return window;
-	}
 	// Displays with the map and table empty. Called when a route is deleted so that its waypoints are no longer displayed.
 	public void displayNoRoute() {
 		metaInfo.showInfoWhenNoRouteIsSelected();
 		
 		utilities.disableRouteEditing();
-		utilities.getMapPoints().clear();
-		this.getTableDisplay().getGrid().setItems(utilities.getMapPoints());
+		utilities.removeAllPins();
 		
-		utilities.removeAllMarkers(utilities.getPins());
-		utilities.removeAllLines(utilities.getPolylines());
+		updateLinesAndGrid();
 	}
+	
 	@WaypointReplace
 	public void displayFlightRoute(FlightRouteInfo info) {
 		metaInfo.showInfoForSelectedRoute(info);
 		
 		utilities.disableRouteEditing();
 		
-		// Removes old pins, polylines, and style when switching routes.
-		utilities.removeAllMarkers(this.getUtilities().getPins());
-		utilities.removeAllLines(this.getUtilities().getPolylines());
-		utilities.clearMapPoints();
-		
+		// Removes old pins when switching routes.
+		utilities.removeAllPins();		
 		// Iterates through the flight info and adds to internal waypoints list.
-		List<UIWayPoint> wayPoints = new ArrayList<>();
 		for (Waypoint waypoint : info.getWaypoints()) {
 			UIWayPoint way = new UIWayPoint(waypoint);
-			utilities.addNewPinRemoveOld(way.toPoint());
-			wayPoints.add(way);
+			utilities.addNewPin(way, -1);
 		}
-		utilities.setMapPointsAltitude(wayPoints);
-		utilities.setMapPointsTransit(wayPoints);
 
-		// Adds the lines to the map.
-		utilities.drawLines(wayPoints, 0, false);
-		
+		// redraw the lines to the map.
+		updateLinesAndGrid();
 		setRouteCenter();
-		
-		// Sets grid.
-		tableDisplay.setGrid(utilities.getMapPoints());
 	}
+	
 	// Removes the grid and changes the style of the map accordingly.
 	public void displayNoTable() {
 		content.removeComponent(tableDisplay.getGrid());
@@ -176,8 +139,12 @@ public class FRMapComponent extends CustomComponent {
 		content.addComponent(tableDisplay.getGrid());
 		this.removeStyleName("fr_map_component_no_table");
 	}
+	
 	// Enables editing, adds the edit bar, and calls the enableRouteEditing function from MapMarkerUtilities.
-	public void enableEdit() {
+	public void enterEditMode() {
+		storedPoints.clear();
+		storedPoints = utilities.getOrderedWayPoints();
+		
 		mapAndPopup.addComponent(editBar);
 
 		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
@@ -185,79 +152,49 @@ public class FRMapComponent extends CustomComponent {
 
 		utilities.enableRouteEditing();
 	}
+	
 	// Disables editing, removes the edit bar, and changes the component styles accordingly.
 	public void exitEditMode() {
-		utilities.disableRouteEditing();
-
-		mapAndPopup.removeComponent(editBar);
-		leafletMap.setStyleName("fr_leaflet_map");
-		tableDisplay.getGrid().setStyleName("fr_table_component");
-	}
-	// Called when the edit button is clicked. Stores the current contents of route.getMapPoints() in case the changes are reverted.
-	public void processEditButtonClicked() {
 		storedPoints.clear();
-
-		for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-			storedPoints.add(utilities.getMapPoints().get(i));
-		}
-		
-		utilities.enableRouteEditing();
-		editBar.addStyleName("bring_front");
-		mapAndPopup.addComponent(editBar);
-
-		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
-		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
-	}
-	// Called when the cancel button is clicked. Disables editing and reverts changes back to the contents of storedPoints.
-	public void cancelClick() {
 		utilities.disableRouteEditing();
-		
-		utilities.getMapPoints().clear();
-		for (int i = 0; i < storedPoints.size(); i++) {
-			utilities.getMapPoints().add(storedPoints.get(i));
-		}
-		this.getTableDisplay().setGrid(utilities.getMapPoints());
-		// Reverts the changes by clearing mapPoints and adding storedPoints.
 
-		utilities.removeAllMarkers(utilities.getPins());
-		utilities.removeAllLines(utilities.getPolylines());
-		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			UIWayPoint point = storedPoints.get(i);
-			utilities.addPinForWayPoint(point, true);
-		}
-		
-		utilities.updatePinColors();
-		utilities.drawLines(storedPoints, 0, false);
-	
 		mapAndPopup.removeComponent(editBar);
-		leafletMap.addStyleName("bring_back");
 		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
 		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
 	}
+	
+	//TODO: need to move this into the edit bar class
+	// Called when the cancel button is clicked. Disables editing and reverts changes back to the contents of storedPoints.
+	public void cancelClick() {		
+		// Reverts the changes by clearing mapPoints and adding storedPoints.
+		utilities.removeAllPins();		
+		for (int i = 0; i < storedPoints.size(); i++) {
+			UIWayPoint point = storedPoints.get(i);
+			utilities.addNewPin(point, -1);
+		}		
+		
+		updateLinesAndGrid();
+		exitEditMode();
+	}
+	//TODO: need to move this into the edit bar class
 	/* Called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct
 	 * waypoints on the map. */
 	public void saveClick() {
-		exitEditMode();
-		
-		List<UIWayPoint> newWaypoints = utilities.getMapPoints();
+		List<UIWayPoint> newWaypoints = utilities.getOrderedWayPoints();
 		
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
 		ByteArrayInputStream inStream;
-		IFlightRoute froute;
+		IFlightRoute froute = null;
 
 		IFlightRouteplanningRemoteService service;
 		BaseServiceProvider provider = MyUI.getProvider();
 
+		String id = this.getMainLayout().getControls().getInfoPanel().getHighlightedFRInfoBox().getId();
+		
 		// Sends the information to dronology to be saved.
 		try {
 			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
 					.getService(IFlightRouteplanningRemoteService.class);
-
-			String id;
-
-			// Gets routes from dronology and requests their id.
-			id = this.getMainLayout().getControls().getInfoPanel().getHighlightedFRInfoBox().getId();
 
 			byte[] information = service.requestFromServer(id);
 			inStream = new ByteArrayInputStream(information);
@@ -306,66 +243,57 @@ public class FRMapComponent extends CustomComponent {
 			byte[] bytes = outs.toByteArray();
 
 			service.transmitToServer(froute.getId(), bytes);
-
 		} catch (DronologyServiceException | RemoteException e1) {
 			e1.printStackTrace();
 		} catch (PersistenceException e1) {
 			e1.printStackTrace();
 		}
-		// Tests if points were added or deleted. If added, an identical ArrayList of waypoints is created (this is a workaround to remove the click-listeners).
-
-		storedPoints.clear();
 		
-		for (int i = 0; i < utilities.getMapPoints().size(); i++) {			
-			storedPoints.add(utilities.getMapPoints().get(i));
-		}
+		List<Waypoint> newWaypointsToSave = froute.getWaypoints();
+		getMainLayout().getWaitingWindow().showWindow(
+				"Saving route...",
+				() -> {
+					// Test if the route is updated in dronology
+					Collection<FlightRouteInfo> routes = getMainLayout().getControls().getInfoPanel().getRoutesFromDronology();
+					List<Waypoint> waypointsFromDronology = null;
+					for (FlightRouteInfo route : routes) {
+						if (route.getId().equals(id)) {
+							waypointsFromDronology = route.getWaypoints();
+							break;
+						}
+					}
+					
+					if (waypointsFromDronology == null || 
+							waypointsFromDronology.size() != newWaypointsToSave.size()) {
+						//if the waypoint sizes are different, then it is not updated
+						return false;
+					} else {
+						for (int i = 0; i < newWaypointsToSave.size(); ++i) {
+							//if the waypoint info is different, then it is not updated
+							if (!newWaypointsToSave.get(i).equals(waypointsFromDronology.get(i))) {
+								return false;
+							}
+						}
+						//otherwise, it is updated
+						return true;
+					}
+				},
+				closeEvent -> {
+					storedPoints.clear();
+					utilities.disableRouteEditing();
+					getMainLayout().getControls().getInfoPanel().refreshRoutes();
+					getMainLayout().switchRoute(
+							getMainLayout().getControls().getInfoPanel().getRouteInfoBox(id));
+				});
 		
-		utilities.getMapPoints().clear();
-		
-		// Waypoints are re-loaded into mapPoints, but without click listeners.
-		for (int i = 0; i < storedPoints.size(); i++) {
-			utilities.getMapPoints().add(storedPoints.get(i));
-		}
-		
-		// Then, the map has the points and lines redrawn.
-		this.getTableDisplay().getGrid().setItems(utilities.getMapPoints());
-		
-		utilities.removeAllMarkers(utilities.getPins());
-		utilities.removeAllLines(utilities.getPolylines());
-		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			UIWayPoint point = storedPoints.get(i);
-			utilities.addPinForWayPoint(point, true);
-		}
-		
-		utilities.drawLines(storedPoints, 0, false);
-
-		// Adds mouse over and mouse out listeners to the pins.
-		List<LMarker> oldPins = utilities.getPins();
-		List<LMarker> newPins = new ArrayList<>();
-		
-		for (int i = 0; i < oldPins.size(); i++) {
-			LMarker newPin = new LMarker(oldPins.get(i).getPoint());
-			utilities.addPinListeners(newPin);
-			newPins.add(newPin);
-		}
-		
-		utilities.getPins().clear();
-		
-		for (int i = 0; i < newPins.size(); i++) {
-			utilities.getPins().add(newPins.get(i));
-		}
-
-		utilities.disableRouteEditing();
-		
-		for (int i = 0; i < utilities.getMapPoints().size(); i++) {
-			utilities.getMapPoints().get(i).setOrder(i+1);
-		}
+		exitEditMode();
 	}
+	
 	// Displays the waypoints in edit mode depending on whether or not the route is new.
-	public void onMapEdited(List<UIWayPoint> waypoints) {
-		metaInfo.setNumWaypoints(waypoints.size());
+	public void updateWayPointCount(MapMarkerUtilities mapUtilities) {
+		metaInfo.setNumWaypoints(mapUtilities.getOrderedWayPoints().size());
 	}
+	
 	// Gets the route description using the currently selected route stored by "selectedRoute".
 	public String getRouteDescription() {
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
@@ -396,52 +324,9 @@ public class FRMapComponent extends CustomComponent {
 		} catch (PersistenceException e1) {
 			e1.printStackTrace();
 		}
-		return description;
-		
+		return description;	
 	}
-	// Sets the center of the route based on the stored waypoints such that the map is as visible as possible.
-	public void setRouteCenter() {
-		if (getMetaInfo().isAutoZoomingChecked()) {
-			// Calculates the mean point and sets the route.
-			double meanLat = 0;
-			double meanLon = 0;
-			int numberPoints;
-			double farthestLat = 0;
-			double farthestLon = 0;
-			double zoom;
-			
-			List<UIWayPoint> currentWayPoints = utilities.getMapPoints();
-			numberPoints = utilities.getMapPoints().size();
-			
-			for (UIWayPoint p: currentWayPoints) {
-					meanLat += Double.valueOf(p.getLatitude());
-					meanLon += Double.valueOf(p.getLongitude());
-			}
-			
-			meanLat /= (numberPoints * 1.0);
-			meanLon /= (numberPoints * 1.0);
-			
-			// Finds farthest latitude and longitude from mean.
-			for (UIWayPoint p: currentWayPoints) {
-				if ((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)) {
-					farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
-				}
-				if ((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)) {
-					farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
-				}
-			}  
-			
-			// Used to calculate zoom level.
-			Point centerPoint = new Point(meanLat, meanLon);
-			if (farthestLat == 0 && farthestLon == 0) {
-				zoom = 17;
-			} else {
-				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
-			}
-			
-			leafletMap.setCenter(centerPoint, zoom+1);
-		}
-	}
+	
 	// Sets either the name or description of the selected route based on the boolean passed in.
 	public void setRouteNameDescription(String name, String description) {
 		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
@@ -480,44 +365,91 @@ public class FRMapComponent extends CustomComponent {
 			e1.printStackTrace();
 		}
 	}
-	// Gets the route information bar above the map.
-	public FRMetaInfo getMetaInfo() {
-		return metaInfo;
-	}
-	// Gets the class that represents the utilities.
-	public MapMarkerUtilities getUtilities() {
-		return utilities;
-	}
-	// Gets the table beneath the map.
-	public FRTableDisplay getTableDisplay() {
-		return tableDisplay;
-	}
-	// Gets the main layout (passed into constructor).
-	public FRMainLayout getMainLayout() {
-		return mainLayout;
-	}
-	public Window getNewWayPointWindow () {
-		return newWayPointWindow;
-	}
-	public FRWayPointPopupView getWaypointPopupView () {
-		return waypointPopupView;
-	}
-	public LMap getMap() {
-		return leafletMap;
+
+	//TODO: Seems to be buggy...
+	// Sets the center of the route based on the stored waypoints such that the map is as visible as possible.
+	public void setRouteCenter() {
+		if (metaInfo.isAutoZoomingChecked()) {
+			// Calculates the mean point and sets the route.
+			double meanLat = 0;
+			double meanLon = 0;
+			int numberPoints;
+			double farthestLat = 0;
+			double farthestLon = 0;
+			double zoom;
+			
+			List<UIWayPoint> currentWayPoints = utilities.getOrderedWayPoints();
+			numberPoints = utilities.getOrderedWayPoints().size();
+			
+			for (UIWayPoint p: currentWayPoints) {
+					meanLat += Double.valueOf(p.getLatitude());
+					meanLon += Double.valueOf(p.getLongitude());
+			}
+			
+			meanLat /= (numberPoints * 1.0);
+			meanLon /= (numberPoints * 1.0);
+			
+			// Finds farthest latitude and longitude from mean.
+			for (UIWayPoint p: currentWayPoints) {
+				if ((Math.abs(Double.valueOf(p.getLatitude()) - meanLat) > farthestLat)) {
+					farthestLat = (Math.abs((Double.valueOf(p.getLatitude())) - meanLat));
+				}
+				if ((Math.abs(Double.valueOf(p.getLongitude()) - meanLon) > farthestLon)) {
+					farthestLon = (Math.abs((Double.valueOf(p.getLongitude()) - meanLon)));
+				}
+			}  
+			
+			// Used to calculate zoom level.
+			Point centerPoint = new Point(meanLat, meanLon);
+			if (farthestLat == 0 && farthestLon == 0) {
+				zoom = 17;
+			} else {
+				zoom = Math.floor(Math.log10(180.0 / Math.max(farthestLat, farthestLon)) / Math.log10(2));
+			}
+			
+			leafletMap.setCenter(centerPoint, zoom+1);
+		}
 	}
 	
+	// Refreshes the map and grid by removing lines, redrawing them, and then setting the map again.
+	public void updateLinesAndGrid() {
+		utilities.redrawAllLines(0, false);
+		tableDisplay.setGrid(utilities.getOrderedWayPoints());
+	}
+
 	public ComponentPosition getWaypointPopupViewPosition() {
 		return mapAndPopup.getPosition(waypointPopupView);
 	}	
 	public void setWaypointPopupViewPosition(ComponentPosition position) {
 		mapAndPopup.setPosition(waypointPopupView, position);
 	}
-	// Allows the longitude and latitude to be set manually.
-	public void setCenter(double centerLat, double centerLon) {
-		leafletMap.setCenter(centerLat, centerLon);
+	
+	// Gets the class that represents the utilities.
+	public MapMarkerUtilities getMapUtilities() {
+		return utilities;
+	}	
+	public LMap getMap() {
+		return leafletMap;
 	}
-	// Allows the zoomLevel to be set manually.
-	public void setZoomLevel(double zoomLevel) {
-		leafletMap.setZoomLevel(zoomLevel);
+	// Gets the main layout (passed into constructor).
+	public FRMainLayout getMainLayout() {
+		return mainLayout;
+	}
+	// Gets the route information bar above the map.
+	public FRMetaInfo getMetaInfo() {
+		return metaInfo;
+	}
+	// Gets the table beneath the map.
+	public FRTableDisplay getTableDisplay() {
+		return tableDisplay;
+	}
+	public FRWayPointPopupView getWaypointPopupView () {
+		return waypointPopupView;
+	}
+	public FRNewWayPointWindow getNewWayPointWindow () {
+		return newWayPointWindow;
+	}
+	public FRDeleteWayPointConfirmation getDeleteWayPointConfirmation() {
+		return deleteWayPointConfirmation;
 	}
 }
