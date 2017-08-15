@@ -85,7 +85,7 @@ public class FRNewRouteWindow extends Window {
 							
 							// Switch to the newly added route and enter edit mode
 							infoPanel.getControls().getMainLayout().switchRoute(infoPanel.getRouteInfoBox(addedRoute));
-							infoPanel.getControls().getMainLayout().getMapComponent().enterEditMode();
+							infoPanel.getControls().getMainLayout().getMapComponent().getEditModeController().enterEditMode();
 						});
 			}
 		});

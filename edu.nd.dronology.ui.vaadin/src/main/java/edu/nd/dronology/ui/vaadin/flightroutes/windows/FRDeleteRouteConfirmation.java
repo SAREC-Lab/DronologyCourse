@@ -49,7 +49,7 @@ public class FRDeleteRouteConfirmation extends YesNoWindow {
 			}
 			
 			if (routeTobeDeleted.getId().equals(mainLayout.getControls().getInfoPanel().getHighlightedFRInfoBox().getId())) {
-				mainLayout.getMapComponent().exitEditMode();
+				mainLayout.getMapComponent().getEditModeController().exitEditMode();
 				mainLayout.getMapComponent().displayNoRoute();	
 				mainLayout.getControls().getInfoPanel().refreshRoutes();
 			}

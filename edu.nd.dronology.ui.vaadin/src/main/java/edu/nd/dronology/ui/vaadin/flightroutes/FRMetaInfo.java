@@ -105,7 +105,7 @@ public class FRMetaInfo extends CustomComponent {
 		
 		// Click listeners for the edit and delete buttons.
 		editButton.addClickListener(e -> {
-			map.enterEditMode();
+			map.getEditModeController().enterEditMode();
 		});
 		deleteButton.addClickListener(e -> {
 			if (map.getMapUtilities().isEditable()) {

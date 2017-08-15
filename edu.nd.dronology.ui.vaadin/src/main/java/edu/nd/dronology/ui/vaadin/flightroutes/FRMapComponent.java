@@ -3,8 +3,6 @@ package edu.nd.dronology.ui.vaadin.flightroutes;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
@@ -16,7 +14,6 @@ import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
@@ -50,14 +47,12 @@ public class FRMapComponent extends CustomComponent {
 	private FRDeleteWayPointConfirmation deleteWayPointConfirmation;
 
 	private VerticalLayout content = new VerticalLayout();
-	private AbsoluteLayout mapAndPopup = new AbsoluteLayout();
+	private AbsoluteLayout mapAndComponentsLayout = new AbsoluteLayout();
 	private FRTableDisplay tableDisplay;
-	private FREditBar editBar = new FREditBar(this);
+	private FREditModeController editModeController = new FREditModeController(this);
 	private FRMetaInfo metaInfo = new FRMetaInfo(this);
 	private LMap leafletMap;
 	
-	private List<UIWayPoint> storedPoints = new ArrayList<>();
-
 	public FRMapComponent(FRMainLayout mainLayout) {
 		this.mainLayout = mainLayout;
 		this.setWidth("100%");
@@ -83,42 +78,36 @@ public class FRMapComponent extends CustomComponent {
 		
 		deleteWayPointConfirmation = new FRDeleteWayPointConfirmation(this);
 
-		mapAndPopup.addComponents(waypointPopupView, leafletMap);
+		mapAndComponentsLayout.addComponents(waypointPopupView, leafletMap, editModeController);
 		
 		tableDisplay = new FRTableDisplay(this);
-		content.addComponents(metaInfo, mapAndPopup, tableDisplay.getGrid());
+		content.addComponents(metaInfo, mapAndComponentsLayout, tableDisplay.getGrid());
 		setCompositionRoot(content);
 
 		this.addStyleName("map_component");
 		this.addStyleName("fr_map_component");
-		mapAndPopup.addStyleName("fr_mapabsolute_layout");
+		mapAndComponentsLayout.addStyleName("fr_mapabsolute_layout");
 		leafletMap.addStyleName("fr_leaflet_map");
 		leafletMap.addStyleName("bring_back");
-		editBar.addStyleName("bring_front");
+		editModeController.addStyleName("bring_front");
+		editModeController.setVisible(false);
 
 		utilities = new MapMarkerUtilities(this);
-		utilities.disableRouteEditing();
 	}
 
 	// Displays with the map and table empty. Called when a route is deleted so that its waypoints are no longer displayed.
 	public void displayNoRoute() {
 		metaInfo.showInfoWhenNoRouteIsSelected();
-		
-		utilities.disableRouteEditing();
 		utilities.removeAllPins();
-		
 		updateLinesAndGrid();
 	}
 	
 	@WaypointReplace
 	public void displayFlightRoute(FlightRouteInfo info) {
 		metaInfo.showInfoForSelectedRoute(info);
-		
-		utilities.disableRouteEditing();
-		
-		// Removes old pins when switching routes.
+				
+		// Removes old pins and show the new pins
 		utilities.removeAllPins();		
-		// Iterates through the flight info and adds to internal waypoints list.
 		for (Waypoint waypoint : info.getWaypoints()) {
 			UIWayPoint way = new UIWayPoint(waypoint);
 			utilities.addNewPin(way, -1);
@@ -138,155 +127,6 @@ public class FRMapComponent extends CustomComponent {
 	public void displayTable() {
 		content.addComponent(tableDisplay.getGrid());
 		this.removeStyleName("fr_map_component_no_table");
-	}
-	
-	// Enables editing, adds the edit bar, and calls the enableRouteEditing function from MapMarkerUtilities.
-	public void enterEditMode() {
-		storedPoints.clear();
-		storedPoints = utilities.getOrderedWayPoints();
-		
-		mapAndPopup.addComponent(editBar);
-
-		leafletMap.addStyleName("fr_leaflet_map_edit_mode");
-		tableDisplay.getGrid().addStyleName("fr_table_component_edit_mode");
-
-		utilities.enableRouteEditing();
-	}
-	
-	// Disables editing, removes the edit bar, and changes the component styles accordingly.
-	public void exitEditMode() {
-		storedPoints.clear();
-		utilities.disableRouteEditing();
-
-		mapAndPopup.removeComponent(editBar);
-		leafletMap.removeStyleName("fr_leaflet_map_edit_mode");
-		tableDisplay.getGrid().removeStyleName("fr_table_component_edit_mode");
-	}
-	
-	//TODO: need to move this into the edit bar class
-	// Called when the cancel button is clicked. Disables editing and reverts changes back to the contents of storedPoints.
-	public void cancelClick() {		
-		// Reverts the changes by clearing mapPoints and adding storedPoints.
-		utilities.removeAllPins();		
-		for (int i = 0; i < storedPoints.size(); i++) {
-			UIWayPoint point = storedPoints.get(i);
-			utilities.addNewPin(point, -1);
-		}		
-		
-		updateLinesAndGrid();
-		exitEditMode();
-	}
-	//TODO: need to move this into the edit bar class
-	/* Called when the save button on the edit bar is clicked. It exits edit mode, sends the points to dronology, and uses stored points to display the correct
-	 * waypoints on the map. */
-	public void saveClick() {
-		List<UIWayPoint> newWaypoints = utilities.getOrderedWayPoints();
-		
-		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
-		ByteArrayInputStream inStream;
-		IFlightRoute froute = null;
-
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-
-		String id = this.getMainLayout().getControls().getInfoPanel().getHighlightedFRInfoBox().getId();
-		
-		// Sends the information to dronology to be saved.
-		try {
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-
-			byte[] information = service.requestFromServer(id);
-			inStream = new ByteArrayInputStream(information);
-			froute = routePersistor.loadItem(inStream);
-
-			ArrayList<Waypoint> oldCoords = new ArrayList<>(froute.getWaypoints());
-			for (Waypoint cord : oldCoords) {
-				froute.removeWaypoint(cord);
-			}
-			
-			// The old waypoints are of type "Waypoint." We are converting to "WayPoint" as this is what we need later, and then adding it back to froute.
-			for (UIWayPoint way : newWaypoints) {
-				double alt = 0;
-				double lon = 0;
-				double lat = 0;
-				double approach = 0;
-			
-				try {
-					lon = Double.parseDouble(way.getLongitude());
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
-				try {
-					lat = Double.parseDouble(way.getLatitude());
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
-				try {
-					alt = Double.parseDouble(way.getAltitude());
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
-				try{
-					approach = Double.parseDouble(way.getTransitSpeed());
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
-				
-				Waypoint toSend = new Waypoint(new LlaCoordinate(lat, lon, alt));
-				toSend.setApproachingspeed(approach);
-				froute.addWaypoint(toSend);
-			}
-
-			ByteArrayOutputStream outs = new ByteArrayOutputStream();
-			routePersistor.saveItem(froute, outs);
-			byte[] bytes = outs.toByteArray();
-
-			service.transmitToServer(froute.getId(), bytes);
-		} catch (DronologyServiceException | RemoteException e1) {
-			e1.printStackTrace();
-		} catch (PersistenceException e1) {
-			e1.printStackTrace();
-		}
-		
-		List<Waypoint> newWaypointsToSave = froute.getWaypoints();
-		getMainLayout().getWaitingWindow().showWindow(
-				"Saving route...",
-				() -> {
-					// Test if the route is updated in dronology
-					Collection<FlightRouteInfo> routes = getMainLayout().getControls().getInfoPanel().getRoutesFromDronology();
-					List<Waypoint> waypointsFromDronology = null;
-					for (FlightRouteInfo route : routes) {
-						if (route.getId().equals(id)) {
-							waypointsFromDronology = route.getWaypoints();
-							break;
-						}
-					}
-					
-					if (waypointsFromDronology == null || 
-							waypointsFromDronology.size() != newWaypointsToSave.size()) {
-						//if the waypoint sizes are different, then it is not updated
-						return false;
-					} else {
-						for (int i = 0; i < newWaypointsToSave.size(); ++i) {
-							//if the waypoint info is different, then it is not updated
-							if (!newWaypointsToSave.get(i).equals(waypointsFromDronology.get(i))) {
-								return false;
-							}
-						}
-						//otherwise, it is updated
-						return true;
-					}
-				},
-				closeEvent -> {
-					storedPoints.clear();
-					utilities.disableRouteEditing();
-					getMainLayout().getControls().getInfoPanel().refreshRoutes();
-					getMainLayout().switchRoute(
-							getMainLayout().getControls().getInfoPanel().getRouteInfoBox(id));
-				});
-		
-		exitEditMode();
 	}
 	
 	// Displays the waypoints in edit mode depending on whether or not the route is new.
@@ -418,10 +258,10 @@ public class FRMapComponent extends CustomComponent {
 	}
 
 	public ComponentPosition getWaypointPopupViewPosition() {
-		return mapAndPopup.getPosition(waypointPopupView);
+		return mapAndComponentsLayout.getPosition(waypointPopupView);
 	}	
 	public void setWaypointPopupViewPosition(ComponentPosition position) {
-		mapAndPopup.setPosition(waypointPopupView, position);
+		mapAndComponentsLayout.setPosition(waypointPopupView, position);
 	}
 	
 	// Gets the class that represents the utilities.
@@ -438,6 +278,9 @@ public class FRMapComponent extends CustomComponent {
 	// Gets the route information bar above the map.
 	public FRMetaInfo getMetaInfo() {
 		return metaInfo;
+	}
+	public FREditModeController getEditModeController() {
+		return editModeController;
 	}
 	// Gets the table beneath the map.
 	public FRTableDisplay getTableDisplay() {

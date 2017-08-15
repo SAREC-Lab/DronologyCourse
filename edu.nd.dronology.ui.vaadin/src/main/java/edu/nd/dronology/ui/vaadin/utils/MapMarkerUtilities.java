@@ -288,16 +288,9 @@ public class MapMarkerUtilities {
 		return null;
 	}
 	
-	// Enables route editing.
-	public void enableRouteEditing () {
-		isEditable = true;
-		mapComponent.getTableDisplay().makeEditable();
-	}
-	
-	// Disables route editing
-	public void disableRouteEditing () {
-		isEditable = false;		
-		mapComponent.getTableDisplay().makeUneditable();
+	// Enables/disable route editing.
+	public void setEditable (boolean isEditable) {
+		this.isEditable = isEditable;
 	}
 
 	// Returns whether or not edit mode has been enabled.

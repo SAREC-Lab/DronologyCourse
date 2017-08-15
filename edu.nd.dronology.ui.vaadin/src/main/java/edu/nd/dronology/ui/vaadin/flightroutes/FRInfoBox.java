@@ -62,7 +62,7 @@ public class FRInfoBox extends CustomComponent {
 		editButton.addClickListener(e -> {
 			if (!infoPanel.getControls().getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
 				infoPanel.getControls().getMainLayout().switchRoute(this);
-				infoPanel.getControls().getMainLayout().getMapComponent().enterEditMode();
+				infoPanel.getControls().getMainLayout().getMapComponent().getEditModeController().enterEditMode();
 			} else {
 				if (infoPanel.getHighlightedFRInfoBox() != null &&
 						flightRouteInfo.getId().equals(infoPanel.getHighlightedFRInfoBox().getId()))
@@ -70,7 +70,7 @@ public class FRInfoBox extends CustomComponent {
 				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
 						infoPanel.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.EDIT_ANOTHER, e);
 			}
-			infoPanel.getControls().getMainLayout().getMapComponent().enterEditMode();
+			infoPanel.getControls().getMainLayout().getMapComponent().getEditModeController().enterEditMode();
 		});
 		
 		titleBar.addComponents(trashButton, editButton);

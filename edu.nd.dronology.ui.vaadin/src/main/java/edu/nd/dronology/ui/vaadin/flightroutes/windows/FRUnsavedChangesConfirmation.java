@@ -30,12 +30,14 @@ public class FRUnsavedChangesConfirmation extends YesNoWindow {
 				+ "Are you sure you want to discard all unsaved changes?");
 		
 		this.addYesButtonClickListener(e -> {
+			mainLayout.getMapComponent().getEditModeController().exitEditMode();
+			
 			if (changeType == ChangeType.EDIT_ANOTHER) {
 				Button editBtn = (Button)externalEvent.getComponent();
 				if (editBtn.findAncestor(FRInfoBox.class) != null) {
 					FRInfoBox infoBox = editBtn.findAncestor(FRInfoBox.class);
 					mainLayout.switchRoute(infoBox);
-					mainLayout.getMapComponent().enterEditMode();
+					mainLayout.getMapComponent().getEditModeController().enterEditMode();
 				}
 			} else if (changeType == ChangeType.SWITCH_ROUTE) {
 				if (externalEvent.getClass().equals(LayoutClickEvent.class)) {
@@ -55,7 +57,6 @@ public class FRUnsavedChangesConfirmation extends YesNoWindow {
 				}
 			}
 			
-			mainLayout.getMapComponent().exitEditMode();
 			this.close();
 		});
 		
