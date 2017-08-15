@@ -10,6 +10,7 @@ _CLAS = {
     'hobby2': 'missions.hobby.Neighborhoods -N 20 -n 2 -ap /home/vierhauser/.ardupilot/ardupilot',
     'hobby3': 'missions.hobby.Neighborhoods -N 20 -n 2 -ap /home/vierhauser/.ardupilot/ardupilot',
     'sar': 'missions.sar.SaR -ap /home/vierhauser/.ardupilot/ardupilot',
+    'news1': 'missions.news.NewsStations -n 3 -ap /home/vierhauser/.ardupilot/ardupilot',
     'news2': 'missions.news.NewsStations -n 3 -ap /home/vierhauser/.ardupilot/ardupilot',
     'news3': 'missions.news.NewsStations -n 6 -ap /home/vierhauser/.ardupilot/ardupilot'
 }
@@ -18,11 +19,11 @@ _CLAS = {
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--duration',
-                        type=int, default=30)
+                        type=int, default=35)
     parser.add_argument('-c', '--cooldown',
-                        type=int, default=10)
+                        type=int, default=6)
     parser.add_argument('-w', '--warmup',
-                        type=int, default=3)
+                        type=int, default=9)
     parser.add_argument('-n', '--n_reps',
                         type=int, default=1)
     parser.add_argument('-m', '--missions',

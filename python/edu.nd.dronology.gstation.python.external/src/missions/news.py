@@ -110,28 +110,29 @@ class NewsStations(Mission):
                         monitor_msg_timer.start()
 
         threading.Thread(target=work).start()
-        nfz = random.choice(no_fly_zones_geo)
-        nfz_cpa = nfz.cpa(control.vehicle_to_lla(vehicle)).to_lla()
-        lat, lon = nfz_cpa[:2]
-        _LOG.info('Vehicle {} heading to the no fly zone at ({}, {})'.format(v_id, lat, lon))
-        control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
+        # nfz = random.choice(no_fly_zones_geo)
+        # nfz_cpa = nfz.cpa(control.vehicle_to_lla(vehicle)).to_lla()
+        # lat, lon = nfz_cpa[:2]
+        # _LOG.info('Vehicle {} heading to the no fly zone at ({}, {})'.format(v_id, lat, lon))
+        # control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
+        #
+        # if is_cheater:
+        #     _LOG.info('Vehicle {} decided to go into the no fly zone'.format(v_id))
+        #     nfz_mp = nfz.mean_position().to_lla()
+        #     lat, lon = nfz_mp[:2]
+        #     control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
 
-        if is_cheater:
-            _LOG.info('Vehicle {} decided to go into the no fly zone'.format(v_id))
-            nfz_mp = nfz.mean_position().to_lla()
-            lat, lon = nfz_mp[:2]
-            control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
-
-        crash_site_cpa = crash_site_geo.cpa(control.vehicle_to_lla(vehicle)).to_lla()
-        lat, lon = crash_site_cpa[:2]
+        crash_site_mp = crash_site_geo.mean_position().to_lla()
+        crash_site_mp = crash_site_mp.move_ned(random.uniform(-100, 100), random.uniform(-250, 250), 0)
+        lat, lon = crash_site_mp[:2]
         _LOG.info('Vehicle {} heading to the crash site at ({}, {})'.format(v_id, lat, lon))
         control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
         _LOG.info('Vehicle {} arrived at the crash site.'.format(v_id))
         # move randomly for 20 minutes
-        duration = 20 * 60
+        duration = 40 * 60
         start_time = time.time()
         while time.time() - start_time < duration:
-            dist = random.uniform(10, 25)
+            dist = random.uniform(50, 150)
             max_move = dist ** 2
             north = random.uniform(0, dist)
             proposed = control.vehicle_to_lla(vehicle).move_ned(north, 0, 0)
@@ -146,7 +147,7 @@ class NewsStations(Mission):
                 east *= -1
 
             target = control.vehicle_to_lla(vehicle).move_ned(north, east, random.uniform(-2, 2))
-            speed = random.uniform(1, 5)
+            speed = random.uniform(5, 15)
 
             _LOG.debug('Vehicle {} heading at {} m/s to ({}, {}, {}) '.format(v_id, speed, *target.as_array()))
 
