@@ -48,7 +48,7 @@ def gen_neighborhoods(bounds, n_neighborhoods):
 class Neighborhoods(Mission):
     @staticmethod
     def start(connection, control=core.ArduPilot, bounds=SOUTH_BEND_BOUNDS, ardupath=ARDUPATH,
-              n_neighborhoods=10, n_drones=3):
+              n_neighborhoods=10, n_drones=2):
         workers = []
         nb_bounds = gen_neighborhoods(bounds, n_neighborhoods)
 
@@ -56,7 +56,7 @@ class Neighborhoods(Mission):
             worker = threading.Thread(target=Neighborhood.start,
                                       args=[connection],
                                       kwargs={'control': control, 'ardupath': ardupath, 'bounds': nb_bound,
-                                              'inst_offset': n_drones * i})
+                                              'inst_offset': n_drones * i, 'n_drones': n_drones})
             workers.append(worker)
 
         for worker in workers:
@@ -75,8 +75,10 @@ class Neighborhoods(Mission):
         parser.add_argument('-b', '--bounds',
                             type=Mission._parse_coord_bounds, default=SOUTH_BEND_BOUNDS_STR,
                             help=Mission._parse_coord_bounds.__doc__)
-        parser.add_argument('-n', '--n_neighborhoods',
+        parser.add_argument('-N', '--n_neighborhoods',
                             type=int, default=10, help='the number of neighborhoods to create')
+        parser.add_argument('-n', '--n_drones',
+                            type=int, default=2, help='the number of neighborhoods to create')
         parser.add_argument('-ap', '--ardupath',
                             type=str, default=ARDUPATH, help='the path to ardupilot static resources')
 
