@@ -18,7 +18,7 @@ _LOG = util.get_logger()
 
 class NewsStations(Mission):
     @staticmethod
-    def start(connection, control=core.ArduPilot, n_drones=4, config=DEFAULT_NEWS_CFG, ardupath=ARDUPATH):
+    def start(connection, control=core.ArduPilot, n_drones=3, config=DEFAULT_NEWS_CFG, ardupath=ARDUPATH):
         workers = []
 
         with open(config) as f:
@@ -37,8 +37,8 @@ class NewsStations(Mission):
                 crash_site_geo = mu.GeoPoly(crash_site[:])
                 vid = 'UAV{}{:05d}'.format(''.join(random.sample(string.letters, 2)),
                                            random.randint(1, 100000))
-                # 20% of drones should try to cheat
-                is_cheater = random.uniform(0, 1) <= 0.2
+                # some drones should try to cheat
+                is_cheater = random.uniform(0, 1) <= 0.4
                 home = station['lat'], station['lon']
                 args = [connection, control, crash_site_geo, deepcopy(no_fly_zones), vid, inst, home, is_cheater,
                         ardupath]
@@ -80,50 +80,53 @@ class NewsStations(Mission):
 
         mission_complete = False
 
-        def work():
-            try:
-                # HANDLE INCOMING MESSAGES
-                while not mission_complete:
-                    cmds = core.get_commands(v_id)
-                    for cmd in cmds:
-                        if isinstance(cmd, (SetMonitorFrequency,)):
-                            freq = cmd.get_monitor_frequency() / 1000
-                            _LOG.info('Setting vehicle {} monitoring period to {}'.format(v_id, freq))
-                            # acknowledge
-                            connection.send(
-                                str(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id())))
-                            # stop the timer, reset interval, restart timer
-                            monitor_msg_timer.stop()
-                            monitor_msg_timer.set_interval(freq)
-                            monitor_msg_timer.start()
-            except KeyboardInterrupt:
-                vehicle.mode = dronekit.VehicleMode('LOITER')
-
         # ARM & READY
         control.set_armed(vehicle, armed=True)
         _LOG.info('Vehicle {} armed.'.format(v_id))
         vehicle.mode = dronekit.VehicleMode('GUIDED')
-
         # TAKEOFF
-        control.takeoff(vehicle, alt=random.uniform(30, 50))
+        altitude = random.uniform(30, 60)
+        control.takeoff(vehicle, alt=altitude)
+        _LOG.info('Vehicle {} takeoff complete at ({}, {}, {}).'.format(v_id, home[0], home[1], altitude))
 
         # START MESSAGE TIMERS
-        threading.Thread(target=work).start()
         util.RepeatedTimer(1.0, gen_state_message, vehicle)
         monitor_msg_timer = util.RepeatedTimer(5.0, gen_monitor_message, vehicle)
-        _LOG.info('Vehicle {} takeoff complete.'.format(v_id))
 
+        def work():
+            # HANDLE INCOMING MESSAGES
+            while not mission_complete:
+                cmds = core.get_commands(v_id)
+                for cmd in cmds:
+                    if isinstance(cmd, (SetMonitorFrequency,)):
+                        freq = cmd.get_monitor_frequency() / 1000
+                        _LOG.debug('Setting vehicle {} monitoring period to {}'.format(v_id, freq))
+                        # acknowledge
+                        connection.send(
+                            str(AcknowledgeMessage.from_vehicle(vehicle, v_id, msg_id=cmd.get_msg_id())))
+                        # stop the timer, reset interval, restart timer
+                        monitor_msg_timer.stop()
+                        monitor_msg_timer.set_interval(freq)
+                        monitor_msg_timer.start()
+
+        threading.Thread(target=work).start()
         nfz = random.choice(no_fly_zones_geo)
-        nfz_cpa = nfz.cpa(control.vehicle_to_lla(vehicle))
-        control.goto_lla_and_wait(vehicle, *nfz_cpa.as_array(), airspeed=random.uniform(15, 25))
+        nfz_cpa = nfz.cpa(control.vehicle_to_lla(vehicle)).to_lla()
+        lat, lon = nfz_cpa[:2]
+        _LOG.info('Vehicle {} heading to the no fly zone at ({}, {})'.format(v_id, lat, lon))
+        control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
 
         if is_cheater:
-            nfz_mp = nfz.mean_position()
-            control.goto_lla_and_wait(vehicle, *nfz_mp.as_array(), airspeed=random.uniform(15, 25))
+            _LOG.info('Vehicle {} decided to go into the no fly zone'.format(v_id))
+            nfz_mp = nfz.mean_position().to_lla()
+            lat, lon = nfz_mp[:2]
+            control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
 
-        crash_site_cpa = crash_site_geo.cpa(control.vehicle_to_lla(vehicle))
-        control.goto_lla_and_wait(vehicle, *crash_site_cpa.as_array(), airspeed=random.uniform(15, 25))
-
+        crash_site_cpa = crash_site_geo.cpa(control.vehicle_to_lla(vehicle)).to_lla()
+        lat, lon = crash_site_cpa[:2]
+        _LOG.info('Vehicle {} heading to the crash site at ({}, {})'.format(v_id, lat, lon))
+        control.goto_lla_and_wait(vehicle, lat, lon, altitude, airspeed=random.uniform(15, 25))
+        _LOG.info('Vehicle {} arrived at the crash site.'.format(v_id))
         # move randomly for 20 minutes
         duration = 20 * 60
         start_time = time.time()
@@ -143,7 +146,7 @@ class NewsStations(Mission):
                 east *= -1
 
             target = control.vehicle_to_lla(vehicle).move_ned(north, east, random.uniform(-2, 2))
-            speed = random.uniform(3, 10)
+            speed = random.uniform(1, 5)
 
             _LOG.debug('Vehicle {} heading at {} m/s to ({}, {}, {}) '.format(v_id, speed, *target.as_array()))
 
@@ -151,7 +154,7 @@ class NewsStations(Mission):
 
         mission_complete = True
         cb()
-        
+
     @staticmethod
     def parse_args(cla):
         parser = argparse.ArgumentParser()

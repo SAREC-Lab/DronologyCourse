@@ -393,7 +393,7 @@ class Host:
 
                     for msg_ in msgs:
                         if msg_ and msg_ != '\r':
-                            _LOG.info('Command received: {}'.format(msg_))
+                            _LOG.debug('Command received: {}'.format(msg_))
                             cmd = CommandFactory.get_command(msg_)
                             if isinstance(cmd, (SetMonitorFrequency,)):
                                 put_command(cmd.get_target(), cmd)

@@ -114,7 +114,7 @@ class GeoPoly(GeoShape):
         return self._s_max
 
     def cpa(self, pos):
-        dists = [pos.dist(a) for a in self._verts]
+        dists = [pos.distance(a) for a in self._verts]
         return self._verts[np.argmin(dists)]
 
     def distance_east(self):

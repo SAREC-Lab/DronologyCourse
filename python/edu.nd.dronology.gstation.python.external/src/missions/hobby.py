@@ -89,10 +89,9 @@ class Neighborhoods(Mission):
 
 class Neighborhood(Mission):
     @staticmethod
-    def start(connection, control=core.ArduPilot, ardupath=ARDUPATH, bounds=DEFAULT_NB_BOUNDS, n_drones=3, duration=30,
+    def start(connection, control=core.ArduPilot, ardupath=ARDUPATH, bounds=DEFAULT_NB_BOUNDS, n_drones=2, duration=30,
               inst_offset=0):
         """
-
         :param control:
         :param ardupath:
         :param connection:
@@ -108,13 +107,15 @@ class Neighborhood(Mission):
         grid_geo = mu.GeoPoly(grid_lla)
         origin = grid_geo.sw_vertex()
         dist_n = grid_geo.distance_north()
+        step_n = dist_n / n_drones
         dist_e = grid_geo.distance_east()
+        step_e = dist_e / n_drones
 
         for i in range(n_drones):
-            temp_n = dist_n / (i + 1)
-            temp_e = dist_e / (i + 1)
-            offset_n = random.uniform(temp_n, temp_n + (dist_n / n_drones))
-            offset_e = random.uniform(temp_e, temp_e + (dist_e / n_drones))
+            temp_n = step_n * i
+            temp_e = step_e * i
+            offset_n = random.uniform(temp_n, temp_n + step_n)
+            offset_e = random.uniform(temp_e, temp_e + step_e)
             d_origin = origin.move_ned(offset_n, offset_e, 0).to_lla()[:-1]
             vid = 'UAV{:02d}{}{:02d}'.format(random.randint(1, 100),
                                              ''.join(random.sample(string.letters, 3)),
@@ -179,7 +180,7 @@ class Neighborhood(Mission):
         start_time = time.time()
         # loop for some specified number of seconds
         while time.time() - start_time < duration:
-            dist = random.uniform(10, 25)
+            dist = random.uniform(50, 75)
             max_move = dist ** 2
             north = random.uniform(0, dist)
             proposed = control.vehicle_to_lla(vehicle).move_ned(north, 0, 0)
@@ -193,14 +194,15 @@ class Neighborhood(Mission):
             if not grid_geo.point_in_rectangle(proposed):
                 east *= -1
 
-            target = control.vehicle_to_lla(vehicle).move_ned(north, east, random.uniform(-2, 2))
+            down = random.uniform(-2, 2)
+            target = control.vehicle_to_lla(vehicle).move_ned(north, east, down)
             speed = random.uniform(15, 25)
 
-            _LOG.debug('Vehicle {} heading at {} m/s to ({}, {}, {}) '.format(v_id, speed, *target.as_array()))
+            _LOG.info('Vehicle {} heading ({}, {}, {}) NED at m/s {} '.format(v_id, north, east, down, speed))
 
             control.goto_lla_and_wait(vehicle, *target.as_array(), airspeed=speed)
 
-            _LOG.debug('Vehicle {} reached ({}, {}, {})'.format(v_id, *target.as_array()))
+            # _LOG.debug('Vehicle {} reached ({}, {}, {})'.format(v_id, *target.as_array()))
 
             cmds = core.get_commands(v_id)
             for cmd in cmds:
