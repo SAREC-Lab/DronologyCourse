@@ -21,6 +21,8 @@ def main():
                         type=int, default=30)
     parser.add_argument('-c', '--cooldown',
                         type=int, default=10)
+    parser.add_argument('-w', '--warmup',
+                        type=int, default=3)
     parser.add_argument('-n', '--n_reps',
                         type=int, default=1)
     parser.add_argument('-m', '--missions',
@@ -29,7 +31,7 @@ def main():
     args = parser.parse_args()
     for m_id in args.missions:
         for i in range(args.n_reps):
-            _LOG.info('Starting run {} with args: -m "{}"'.format(i + 1, _CLAS[m_id]))
+            time.sleep(args.warmup * 60)
             p = subprocess.Popen(['python', 'main.py', '-m', _CLAS[m_id]])
             time.sleep(args.duration * 60)
             p.terminate()

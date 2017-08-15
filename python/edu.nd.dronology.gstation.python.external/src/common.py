@@ -75,12 +75,12 @@ class DronologyMessage(object):
 
 
 class HandshakeMessage(DronologyMessage):
-    def __init__(self, uav_id, data, p2sac='../resources/sac.json'):
+    def __init__(self, uav_id, data, p2sac='../cfg/sac.json'):
         super(HandshakeMessage, self).__init__('handshake', uav_id, data)
         self.p2sac = p2sac
 
     @classmethod
-    def from_vehicle(cls, vehicle, v_id, p2sac='../resources/sac.json'):
+    def from_vehicle(cls, vehicle, v_id, p2sac='../cfg/sac.json'):
         battery = {
             'voltage': vehicle.battery.voltage,
             'current': vehicle.battery.current,
