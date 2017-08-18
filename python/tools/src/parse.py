@@ -1,13 +1,10 @@
-import db
 import os
 import re
 import json
 import argparse
 import datetime
-
-
-_db = db.Database()
-
+import numpy as np
+from collections import defaultdict as ddict
 
 def _load_txt(p2r):
     with open(p2r) as f:
@@ -23,47 +20,57 @@ def _load_json(p2r):
     return resource
 
 
-def _parse(p2l):
-    run_id = os.path.basename(p2l)
-    txt = _load_txt(os.path.join(p2l, 'run[0]_LOG.txt'))
-    pat = re.compile(r'.*;(\d+);(.*);(.*);(.*)')
-
-    documents = []
-
-    for ts, uav_id, r, f in pat.findall(txt):
-        time = datetime.datetime.fromtimestamp(int(float(ts) / 1000))
-        rep = float(r)
-        freq = float(f)
-
-        documents.append({'uav': uav_id, 'time': time, 'rep': rep, 'freq': freq, 'run': run_id})
-
-    _db.remove(collection='log', query={'run': run_id})
-    _db.insert_many(collection='log', documents=documents)
-
-    txt = _load_txt(os.path.join(p2l, 'run[0]_ERR.txt'))
-    pat = re.compile(r'.*;RATE;(.*);(.*)')
-    err = {k: float(v) for k,v in pat.findall(txt)}
-    pat = re.compile(r'.*;(\d+);(INJECT|DETECT);(.*);(.*)')
-
-    documents = []
-
-    for ts, action, uav_id, assumption_id in pat.findall(txt):
-        time = datetime.datetime.fromtimestamp(int(float(ts) / 1000))
-        proba = err[uav_id] if uav_id in err else None
-        documents.append({'uav': uav_id, 'time': time, 'action': action, 'assumption': assumption_id.strip(),
-                          'proba': proba, 'run': run_id})
-
-    _db.remove(collection='fault', query={'run': run_id})
-    _db.insert_many(collection='fault', documents=documents)
-
-
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path_to_logs',
-                        type=str, help='path to folder containing logs')
+    parser.add_argument('path_to_logs', type=str)
     args = parser.parse_args()
-    _parse(args.path_to_logs)
+    p2l = args.path_to_logs
+
+    injected = []
+    detected = []
+    eval_times = ddict(list)
+    inject_pat = re.compile(r'.*;(\d+);(INJECT|DETECT);(.*);(.*)')
+    eval_pat = re.compile(r'.*;(\d+);(.*);(.*);(?:true|false);(.*)')
+    duration_s = 30 * 60
+
+    for i in range(20):
+        faults_txt = _load_txt(os.path.join(p2l, 'run[{}]_ERR.txt'.format(i)))
+        start_time = None
+
+        for j, (ts, ttype, uav_id, a_id) in enumerate(inject_pat.findall(faults_txt)):
+            if not j:
+                start_time = datetime.datetime.fromtimestamp(int(float(ts) / 1000))
+
+            cur_time = datetime.datetime.fromtimestamp(int(float(ts) / 1000))
+            elapsed_s = (cur_time - start_time).total_seconds()
+            if elapsed_s < duration_s:
+                if ttype == 'INJECT':
+                    injected.append((uav_id, a_id))
+                else:
+                    detected.append((uav_id, a_id))
+
+        rt_txt = _load_txt(os.path.join(p2l, 'run[{}]_RT.txt'.format(i)))
+        start_time = None
+
+        for j, (ts, uav_id, a_id, e_time) in enumerate(eval_pat.findall(rt_txt)):
+            if not j:
+                start_time = datetime.datetime.fromtimestamp(int(float(ts) / 1000))
+
+            cur_time = datetime.datetime.fromtimestamp(int(float(ts) / 1000))
+            elapsed_s = (cur_time - start_time).total_seconds()
+            if elapsed_s < duration_s:
+                e_time_ms = float(e_time) * 1E-6
+                eval_times[a_id].append(e_time_ms)
+
+    print('Finished Processing: {}'.format(p2l))
+    n_inj, n_det = len(injected), len(detected)
+    print('Injected: {}, Detected: {} ({}%)'.format(n_inj, n_det, (n_det / n_inj) * 100))
+    a_ids = sorted(eval_times.keys())
+    data = [eval_times[k] for k in a_ids]
+    data = np.array(data).T
+
+    print(data)
+
 
 if __name__ == '__main__':
     main()
-
