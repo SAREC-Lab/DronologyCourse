@@ -11,7 +11,7 @@ _CLAS = {
     'hobby3': 'missions.hobby.Neighborhoods -N 20 -n 2 -ap /home/vierhauser/.ardupilot/ardupilot',
     'sar': 'missions.sar.SaR -ap /home/vierhauser/.ardupilot/ardupilot',
     'news1': 'missions.news.NewsStations -n 3 -ap /home/vierhauser/.ardupilot/ardupilot',
-    'news2': 'missions.news.NewsStations -n 3 -ap /home/vierhauser/.ardupilot/ardupilot',
+    'news2': 'missions.news.NewsStations -n 6 -ap /home/vierhauser/.ardupilot/ardupilot',
     'news3': 'missions.news.NewsStations -n 6 -ap /home/vierhauser/.ardupilot/ardupilot'
 }
 
