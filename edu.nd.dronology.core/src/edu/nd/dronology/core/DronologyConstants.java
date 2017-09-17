@@ -41,4 +41,6 @@ public class DronologyConstants {
 
 	public static final int NR_MESSAGES_IN_QUEUE = 100;
 
+	public static final int MAX_GROUNDSTATIONS = 5;
+
 }

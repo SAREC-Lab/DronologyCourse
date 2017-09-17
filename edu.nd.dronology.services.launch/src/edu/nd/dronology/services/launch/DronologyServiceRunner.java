@@ -6,6 +6,8 @@ import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
 import edu.nd.dronology.gstation.python.connector.MAVLinkUAVConnector;
+import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
+import edu.nd.dronology.gstation.python.connector.service.IDroneConnectorServiceInstance;
 import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.monitoring.service.DroneSafetyService;
 import edu.nd.dronology.monitoring.service.DroneSafetyServiceRemoteFacade;
@@ -50,13 +52,18 @@ public class DronologyServiceRunner {
 			DroneSpecificationService.getInstance().startService();
 			DroneSimulatorService.getInstance().startService();
 			DroneSafetyService.getInstance().startService();
+			DroneConnectorService.getInstance().startService();
+			
 			RuntimeDroneTypes runtimeMode = RuntimeDroneTypes.getInstance();
 
 			runtimeMode.setPhysicalEnvironment();
 
 			// MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("HERB",
 			// "192.168.102", 1234);
-			MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("LOCAL", "localhost", 1234);
+	
+			
+			
+		//	MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("LOCAL", "localhost", 1234);
 			// MAVLinkUAVConnector groundStation = new MAVLinkUAVConnector("HUEY",
 			// "huey.cse.nd.edu", 1234);
 
@@ -65,16 +72,17 @@ public class DronologyServiceRunner {
 
 			RemoteManager.getInstance().contributeService(IDroneSafetyRemoteService.class,
 					DroneSafetyServiceRemoteFacade.getInstance());
+		
 
-			runtimeMode.registerCommandHandler(groundStation);
+//			runtimeMode.registerCommandHandler(groundStation);
 
 			if (USE_SAFETY_CASES) {
-				BenchmarkLogger.init();
-				groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
-				groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
+//				BenchmarkLogger.init();
+//				groundStation.registerMonitoringMessageHandler(UAVMonitoringManager.getInstance());
+//				groundStation.registerSafetyValidator(SafetyCaseValidationManager.getInstance());
 			}
 
-		} catch (DronologyServiceException | DroneException | FlightZoneException |
+		} catch (DronologyServiceException | FlightZoneException |
 
 				RemoteException e) {
 			LOGGER.error(e);

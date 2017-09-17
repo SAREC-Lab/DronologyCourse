@@ -1,6 +1,8 @@
 package edu.nd.dronology.gstation.python.connector;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -14,69 +16,39 @@ import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
+import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.dispatch.DispatchQueueManager;
 import edu.nd.dronology.gstation.python.connector.dispatch.ReadDispatcher;
 import edu.nd.dronology.gstation.python.connector.dispatch.WriteDispatcher;
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
+import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
-public class MAVLinkUAVConnector implements IDroneCommandHandler {
+public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 
-	private static final ILogger LOGGER = LoggerProvider.getLogger(MAVLinkUAVConnector.class);
+	private static final ILogger LOGGER = LoggerProvider.getLogger(GroundstationConnector.class);
 
 	protected static final ExecutorService servicesExecutor = Executors.newFixedThreadPool(10,
 			new NamedThreadFactory("Groundstation-Threads"));
 
 	// socket for communication with python ground station
-	private Socket pythonSocket;
+	private Socket socket;
 	private final Map<String, IUAVPropertyUpdateNotifier> registeredListeners = new ConcurrentHashMap<>();
 	private ReadDispatcher readDispatcher;
 	private WriteDispatcher writeDispatcher;
-	private final String groundstationid;
-	private final DispatchQueueManager dispatchQueueManager;
-	private final String host;
-	private final int port;
+	private String groundstationid;
+	private DispatchQueueManager dispatchQueueManager;
 	private boolean connected;
+	private IncommingGroundstationConnectionServer server;
 
-	public MAVLinkUAVConnector(String groundstationid, String host, int port) {
-		this.groundstationid = groundstationid;
-		dispatchQueueManager = new DispatchQueueManager(groundstationid);
-		this.host = host;
-		this.port = port;
+	public GroundstationConnector(IncommingGroundstationConnectionServer server, Socket socket) {
+
 		this.connected = false;
-		connect();
-	}
-
-	private void connect() {
-		try {
-			InetAddress hostAddr = InetAddress.getByName(host);
-
-			String hostStr = hostAddr.toString();
-
-			LOGGER.info("Connecting to Python base " + hostStr + "@" + port);
-			pythonSocket = new Socket();
-			pythonSocket.connect(new InetSocketAddress(hostAddr, port), 5000);
-			// pythonSocket.setSoTimeout(20000);
-
-			LOGGER.hwInfo("Connected to " + pythonSocket.getInetAddress().toString() + "@" + pythonSocket.getPort());
-		//	readDispatcher = new ReadDispatcher(pythonSocket, dispatchQueueManager);
-			writeDispatcher = new WriteDispatcher(pythonSocket, dispatchQueueManager.getOutgoingCommandQueue());
-			servicesExecutor.submit(readDispatcher);
-			servicesExecutor.submit(writeDispatcher);
-			connected = true;
-		} catch (UnknownHostException e) {
-			LOGGER.hwFatal("Can't connect to Python Groundstation ");
-			scheduleReconnect();
-		} catch (Throwable e) {
-			LOGGER.hwFatal("Can't connect to Python Groundstation " + e.getMessage());
-			scheduleReconnect();
-		}
-	}
-
-	private void scheduleReconnect() {
-		// TODO implement me...
-
+		this.server = server;
+		this.socket = socket;
 	}
 
 	@Override
@@ -95,14 +67,9 @@ public class MAVLinkUAVConnector implements IDroneCommandHandler {
 	}
 
 	public void tearDown() {
-		try {
-			pythonSocket.close();
-			readDispatcher.tearDonw();
-			writeDispatcher.tearDown();
-			dispatchQueueManager.tearDown();
-		} catch (IOException e) {
-			LOGGER.hwFatal(e);
-		}
+		readDispatcher.tearDonw();
+		writeDispatcher.tearDown();
+		dispatchQueueManager.tearDown();
 	}
 
 	@Override
@@ -117,6 +84,47 @@ public class MAVLinkUAVConnector implements IDroneCommandHandler {
 
 	public void registerSafetyValidator(IUAVSafetyValidator validator) {
 		dispatchQueueManager.registerSafetyValidator(validator);
+
+	}
+
+	@Override
+	public void run() {
+		LOGGER.info("GroundstationConnector started");
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+			String line = reader.readLine();
+			AbstractUAVMessage msg = UAVMessageFactory.create(line);
+			if (!(msg instanceof ConnectionRequestMessage)) {
+				LOGGER.hwFatal("Invalid Connection Request from groundstation! " + line);
+				return;
+			}
+			server.registerConnection(this, (ConnectionRequestMessage) msg);
+			this.groundstationid = msg.getUavid();
+			setupConnection();
+		} catch (Exception e) {
+			LOGGER.hwFatal("Error when establishing connection to groundstation" + e.getMessage());
+		}
+
+	}
+
+	private void setupConnection() {
+		try {
+			dispatchQueueManager = new DispatchQueueManager(groundstationid);
+			readDispatcher = new ReadDispatcher(socket, dispatchQueueManager);
+			writeDispatcher = new WriteDispatcher(socket, dispatchQueueManager.getOutgoingCommandQueue());
+			servicesExecutor.submit(readDispatcher);
+			servicesExecutor.submit(writeDispatcher);
+			connected = true;
+		} catch (Throwable e) {
+			LOGGER.hwFatal("Can't connect to Python Groundstation " + e.getMessage());
+			scheduleReconnect();
+		}
+	}
+
+	private void scheduleReconnect() {
+		// TODO Auto-generated method stub
 
 	}
 

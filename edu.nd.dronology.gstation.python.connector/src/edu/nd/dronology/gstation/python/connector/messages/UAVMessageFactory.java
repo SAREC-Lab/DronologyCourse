@@ -51,6 +51,11 @@ public class UAVMessageFactory {
 			message.timestamp();
 			return message;
 		}
+		case ConnectionRequestMessage.MESSAGE_TYPE: {
+			message = GSON.fromJson(messagestring, ConnectionRequestMessage.class);
+			message.timestamp();
+			return message;
+		}
 		default:
 			throw new GroundStationException("Unknown Message Type! '" + messagetype + "'");
 		}

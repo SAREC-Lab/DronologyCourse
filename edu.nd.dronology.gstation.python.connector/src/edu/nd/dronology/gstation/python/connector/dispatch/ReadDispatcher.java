@@ -13,7 +13,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.core.util.FormatUtil;
+import edu.nd.dronology.gstation.python.connector.GroundStationException;
+import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
+import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
@@ -29,10 +32,12 @@ public class ReadDispatcher implements Runnable {
 
 	private BufferedReader reader;
 	private DispatchQueueManager dispatchQueueManager;
+	private IncommingGroundstationConnectionServer server;
 
 	public ReadDispatcher(Socket pythonSocket, DispatchQueueManager dispatchQueueManager) {
-		this.dispatchQueueManager = dispatchQueueManager;
 		try {
+			this.server = server;
+			this.dispatchQueueManager = dispatchQueueManager;
 			inputStream = pythonSocket.getInputStream();
 			cont.set(true);
 		} catch (IOException e) {
@@ -45,13 +50,13 @@ public class ReadDispatcher implements Runnable {
 		try {
 			LOGGER.info("Read-Dispatcher started");
 			reader = new BufferedReader(new InputStreamReader(inputStream));
-			while (cont.get()) {
+			while (cont.get() && !Thread.currentThread().interrupted()) {
 				String line = reader.readLine();
 				if (line != null) {
 					// TODO: create the timestamp before deserializing the
 					// object....
 					try {
-						AbstractUAVMessage msg = UAVMessageFactory.create(line);
+						AbstractUAVMessage<?> msg = UAVMessageFactory.create(line);
 						processMessage(msg);
 						if (msg == null) {
 							LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
@@ -102,8 +107,10 @@ public class ReadDispatcher implements Runnable {
 
 	private void processMessage(AbstractUAVMessage<?> message) {
 		if (message instanceof UAVStateMessage) {
-//			LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "] "+FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
-//					+ " - " + message.toString());
+			// LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "]
+			// "+FormatUtil.formatTimestamp(message.getTimestamp(),
+			// FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
+			// + " - " + message.toString());
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
 		} else if (message instanceof UAVHandshakeMessage) {
@@ -118,5 +125,9 @@ public class ReadDispatcher implements Runnable {
 
 	public void tearDonw() {
 		cont.set(false);
+	}
+
+	public String getConnectionId() {
+		return "ADS";
 	}
 }

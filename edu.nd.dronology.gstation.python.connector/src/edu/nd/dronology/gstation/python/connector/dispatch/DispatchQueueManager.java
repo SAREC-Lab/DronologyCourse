@@ -49,7 +49,6 @@ public class DispatchQueueManager {
 
 	private static final boolean USE_MONITORING = true;
 
-
 	Map<String, BlockingQueue<UAVStateMessage>> queueMap = new ConcurrentHashMap<>();
 	List<AbstractStatusDispatchThread> dispatchThreads = new ArrayList<>();
 
@@ -69,6 +68,7 @@ public class DispatchQueueManager {
 	}
 
 	public void postDroneStatusUpdate(String id, UAVStateMessage status) {
+		LOGGER.info("Message " + status.getClass().getSimpleName() + " received :: " + groundstationid);
 
 		synchronized (queueMap) {
 			boolean success = false;
@@ -167,6 +167,7 @@ public class DispatchQueueManager {
 		if (!USE_MONITORING) {
 			return;
 		}
+		LOGGER.info("Message " + message.getClass().getSimpleName() + " received :: " + groundstationid);
 		boolean success = false;
 		success = monitoringQueue.offer(message);
 		if (!success) {
@@ -182,6 +183,7 @@ public class DispatchQueueManager {
 
 	public void postDoneHandshakeMessage(String uavid, UAVHandshakeMessage message) {
 		registerNewDrone(uavid, message);
+		LOGGER.info("Message " + message.getClass().getSimpleName() + " received :: " + groundstationid);
 		if (validator != null) {
 			if (message.getSafetyCase() == null) {
 				LOGGER.error("No safety information provided");
