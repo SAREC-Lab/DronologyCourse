@@ -7,18 +7,22 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
+import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
+import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -50,13 +54,17 @@ public class DispatchQueueManager {
 	private static final boolean USE_MONITORING = true;
 
 	Map<String, BlockingQueue<UAVStateMessage>> queueMap = new ConcurrentHashMap<>();
-	List<AbstractStatusDispatchThread> dispatchThreads = new ArrayList<>();
+	List<Future> dispatchThreads = new ArrayList<>();
 
 	private BlockingQueue<IDroneCommand> outgoingCommandQueue = new LinkedBlockingDeque<>(100);
-	private BlockingQueue<UAVMonitoringMessage> monitoringQueue = new LinkedBlockingDeque<>(100);
+	private BlockingQueue<AbstractUAVMessage> monitoringQueue = new LinkedBlockingDeque<>(100);
 	private List<IMonitoringMessageHandler> handlers = new ArrayList<>();
 
 	private final String groundstationid;
+
+	public String getGroundstationid() {
+		return groundstationid;
+	}
 
 	private IUAVSafetyValidator validator;
 
@@ -68,24 +76,31 @@ public class DispatchQueueManager {
 	}
 
 	public void postDroneStatusUpdate(String id, UAVStateMessage status) {
-		LOGGER.info("Message " + status.getClass().getSimpleName() + " received :: " + groundstationid);
-
 		synchronized (queueMap) {
 			boolean success = false;
 			if (queueMap.containsKey(id)) {
 				success = queueMap.get(id).offer(status);
 			} else {
-				// LinkedBlockingQueue<UAVStateMessage> newQueue = new
-				// LinkedBlockingQueue<>(100);
-				// queueMap.put(id, newQueue);
-				// registerNewDrone(id, status);
-				// success = true;
-				LOGGER.hwFatal("No uav with id '" + id + "' registered!");
+				LOGGER.hwInfo("No uav with id '" + id + "' registered - discarding message");
+				return;
 			}
 			if (!success) {
 				LOGGER.hwFatal("Buffer overflow! '" + id + "'");
 			}
 		}
+		forwardToValidator(status);
+	}
+
+	private void forwardToValidator(UAVStateMessage status) {
+		if (!DronologyConstants.USE_MONITORING) {
+			return;
+		}
+		boolean success = false;
+		success = monitoringQueue.offer(status);
+		if (!success) {
+			LOGGER.warn("MonitoringQueue is Full!");
+		}
+
 	}
 
 	// private void registerNewDrone(String id, UAVStateMessage status) {
@@ -128,26 +143,29 @@ public class DispatchQueueManager {
 				}
 			}
 			StatusDispatchThread thread = new StatusDispatchThread(queue, listener);
-			dispatchThreads.add(thread);
+
 			LOGGER.hwInfo("New Dispatch-Thread for UAV '" + id + "' created");
-			SERVICE_EXECUTOR.submit(thread);
+			Future<Object> ftr = SERVICE_EXECUTOR.submit(thread);
+			dispatchThreads.add(ftr);
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		}
 	}
 
-	private void createMonitoringDispatchThread(BlockingQueue<UAVMonitoringMessage> queue) {
+	private void createMonitoringDispatchThread(BlockingQueue<AbstractUAVMessage> queue) {
 		MonitoringDispatchThread thread = new MonitoringDispatchThread(queue, handlers);
-		dispatchThreads.add(thread);
+
 		LOGGER.hwInfo("New Monitoring Dispatch-Thread created");
-		SERVICE_EXECUTOR.submit(thread);
+		Future ftr = SERVICE_EXECUTOR.submit(thread);
+		dispatchThreads.add(ftr);
 	}
 
 	public void tearDown() {
-		for (AbstractStatusDispatchThread<?> th : dispatchThreads) {
-			th.tearDown();
+		DroneConnectorService.getInstance().closeConnection(groundstationid);
+		for (Future<?> ft : dispatchThreads) {
+			ft.cancel(true);
 		}
-		SERVICE_EXECUTOR.shutdown();
+		// SERVICE_EXECUTOR.shutdown();
 	}
 
 	public BlockingQueue<IDroneCommand> getOutgoingCommandQueue() {
@@ -164,9 +182,17 @@ public class DispatchQueueManager {
 	}
 
 	public void postMonitoringMessage(UAVMonitoringMessage message) {
-		if (!USE_MONITORING) {
+		if (!DronologyConstants.USE_MONITORING) {
 			return;
 		}
+		String uavid = message.getUavid();
+		synchronized (queueMap) {
+			if (!queueMap.containsKey(uavid)) {
+				LOGGER.hwInfo("No uav with id '" + uavid + "' registered - discarding message");
+				return;
+			}
+		}
+
 		LOGGER.info("Message " + message.getClass().getSimpleName() + " received :: " + groundstationid);
 		boolean success = false;
 		success = monitoringQueue.offer(message);
@@ -182,16 +208,26 @@ public class DispatchQueueManager {
 	}
 
 	public void postDoneHandshakeMessage(String uavid, UAVHandshakeMessage message) {
-		registerNewDrone(uavid, message);
-		LOGGER.info("Message " + message.getClass().getSimpleName() + " received :: " + groundstationid);
-		if (validator != null) {
-			if (message.getSafetyCase() == null) {
-				LOGGER.error("No safety information provided");
-			} else {
-				validator.validate(uavid, message.getSafetyCase());
-			}
 
+		if (DronologyConstants.USE_SAFETY_CHECKS) {
+			if (validator != null) {
+				if (message.getSafetyCase() == null) {
+					LOGGER.error("No safety information provided");
+				} else {
+					boolean success = validator.validate(uavid, message.getSafetyCase());
+					if (success) {
+						registerNewDrone(uavid, message);
+					} else {
+						LOGGER.error("Safety checks failed - uav '" + uavid + "' not registered!");
+					}
+				}
+			} else {
+				LOGGER.error("No validator provided");
+			}
+		} else {
+			registerNewDrone(uavid, message);
 		}
+
 	}
 
 	public void registerSafetyValidator(IUAVSafetyValidator validator) {

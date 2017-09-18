@@ -2,19 +2,13 @@ package edu.nd.dronology.services.launch;
 
 import java.rmi.RemoteException;
 
-import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
-import edu.nd.dronology.gstation.python.connector.MAVLinkUAVConnector;
 import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
-import edu.nd.dronology.gstation.python.connector.service.IDroneConnectorServiceInstance;
-import edu.nd.dronology.monitoring.monitoring.UAVMonitoringManager;
 import edu.nd.dronology.monitoring.service.DroneSafetyService;
 import edu.nd.dronology.monitoring.service.DroneSafetyServiceRemoteFacade;
 import edu.nd.dronology.monitoring.service.IDroneSafetyRemoteService;
 import edu.nd.dronology.monitoring.trust.TrustManager;
-import edu.nd.dronology.monitoring.util.BenchmarkLogger;
-import edu.nd.dronology.monitoring.validation.SafetyCaseValidationManager;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.services.instances.dronesimulator.DroneSimulatorService;

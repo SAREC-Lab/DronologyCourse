@@ -12,7 +12,9 @@ import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 import org.mapdb.DBMaker;
 
+import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
+import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
 import edu.nd.dronology.monitoring.validation.MonitoringValidator;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -20,7 +22,7 @@ import net.mv.logging.LoggerProvider;
 public class MonitoringDataHandler implements Runnable {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(MonitoringDataHandler.class);
-	private BlockingQueue<UAVMonitoringMessage> queue;
+	private BlockingQueue<AbstractUAVMessage> queue;
 	private AtomicBoolean cont = new AtomicBoolean(true);
 	private String filePath = "D:\\dronemonitoring";
 	private String recordingName = "monitoringlog";
@@ -34,7 +36,7 @@ public class MonitoringDataHandler implements Runnable {
 	private static final String RECORDING_FILENAME_P = "record.prec.p";
 	private static final String RECORDING_FILENAME_T = "record.prec.t";
 
-	public MonitoringDataHandler(final BlockingQueue<UAVMonitoringMessage> queue) {
+	public MonitoringDataHandler(final BlockingQueue<AbstractUAVMessage> queue) {
 		this.queue = queue;
 	}
 
@@ -51,15 +53,18 @@ public class MonitoringDataHandler implements Runnable {
 		while (cont.get()) {
 
 			try {
-				UAVMonitoringMessage monitoringMesasge = queue.take();
-				//LOGGER.info("MONITORING MESSAGE RECEIVED"+ monitoringMesasge.toString());
-				MonitoringValidator validator = UAVMonitoringManager.getInstance()
-						.getValidator(monitoringMesasge.getUavid());
+				AbstractUAVMessage message = queue.take();
+				// LOGGER.info("MONITORING MESSAGE RECEIVED"+ monitoringMesasge.toString());
+				MonitoringValidator validator = UAVMonitoringManager.getInstance().getValidator(message.getUavid());
 				if (validator != null) {
-					validator.validate(monitoringMesasge);
-				}
-				else {
-					//LOGGER.error("No validator found for "+ monitoringMesasge.getUavid());
+					if (message instanceof UAVMonitoringMessage) {
+						validator.validate((UAVMonitoringMessage) message);
+					} else {
+						//TODO: merge from icse branch
+					//	validator.process((UAVStateMessage) message);
+					}
+				} else {
+					// LOGGER.error("No validator found for "+ monitoringMesasge.getUavid());
 				}
 
 			} catch (Exception e) {

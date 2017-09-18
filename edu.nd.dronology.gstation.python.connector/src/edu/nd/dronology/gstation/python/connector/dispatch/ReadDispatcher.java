@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
+import java.security.spec.DSAGenParameterSpec;
 import java.text.DateFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,11 +34,9 @@ public class ReadDispatcher implements Runnable {
 
 	private BufferedReader reader;
 	private DispatchQueueManager dispatchQueueManager;
-	private IncommingGroundstationConnectionServer server;
 
 	public ReadDispatcher(Socket pythonSocket, DispatchQueueManager dispatchQueueManager) {
 		try {
-			this.server = server;
 			this.dispatchQueueManager = dispatchQueueManager;
 			inputStream = pythonSocket.getInputStream();
 			cont.set(true);
@@ -85,6 +85,12 @@ public class ReadDispatcher implements Runnable {
 				LOGGER.error(e);
 			}
 
+		} catch (SocketException sex) {
+			LOGGER.error("Socket Exception groundstation " + dispatchQueueManager.getGroundstationid()
+					+ " disconnected - shutting down connection -- Error: " + sex.getMessage());
+			dispatchQueueManager.tearDown();
+			cont.set(false);
+			
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		} finally {

@@ -12,11 +12,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import edu.nd.dronology.core.DronologyConstants;
+import edu.nd.dronology.gstation.python.connector.GroundStationException;
 import edu.nd.dronology.gstation.python.connector.GroundstationConnector;
 import edu.nd.dronology.gstation.python.connector.dispatch.DispatchQueueManager;
 import edu.nd.dronology.gstation.python.connector.dispatch.ReadDispatcher;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
+import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -31,10 +33,7 @@ public class IncommingGroundstationConnectionServer implements Runnable {
 	private boolean cont = true;
 	private static final ILogger LOGGER = LoggerProvider.getLogger(IncommingGroundstationConnectionServer.class);
 	private String URL = "127.0.0.1";
-	private Map<String, Future> activeConnections = new HashMap<>();
-
-	ExecutorService connectionExecutor = Executors.newFixedThreadPool(DronologyConstants.MAX_GROUNDSTATIONS,
-			new NamedThreadFactory("Connection-Socket-Threads"));
+	
 
 	public IncommingGroundstationConnectionServer() {
 
@@ -55,8 +54,8 @@ public class IncommingGroundstationConnectionServer implements Runnable {
 				Socket socket = null;
 				try {
 					socket = serverSocket.accept();
-					GroundstationConnector handler = new GroundstationConnector(this,socket);
-					handleConnection(handler);
+					GroundstationConnector handler = new GroundstationConnector(this, socket);
+					DroneConnectorService.getInstance().handleConnection(handler);
 				} catch (SocketException e) {
 					LOGGER.info("Socket was closed!");
 				} catch (IOException e) {
@@ -78,60 +77,40 @@ public class IncommingGroundstationConnectionServer implements Runnable {
 
 	}
 
-	public void stop() {
-		cont = false;
-		try {
-			if (serverSocket != null) {
-				serverSocket.close();
-			}
-		} catch (IOException e) {
-			LOGGER.error(e);
-		}
-		closeConnections();
-
-	}
-
-	private void closeConnections() {
-		synchronized (activeConnections) {
-			for (Future f : activeConnections.values()) {
-				f.cancel(true);
-			}
-			activeConnections.clear();
-		}
-
-	}
-
-//	protected void handleConnection(ReadDispatcher connectionHandler) {
-//		if (activeConnections.size() >= DronologyConstants.MAX_GROUNDSTATIONS) {
-//			LOGGER.warn("Connection Limit reached - no new parallel connections can be added!");
-//			return;
+//	public void stop() {
+//		cont = false;
+//		try {
+//			if (serverSocket != null) {
+//				serverSocket.close();
+//			}
+//		} catch (IOException e) {
+//			LOGGER.error(e);
 //		}
-//		Future<?> future = connectionExecutor.submit(connectionHandler);
-//		activeConnections.put(connectionHandler.getConnectionId(), future);
+//		closeConnections();
+//
 //	}
 
-	protected void removeConnection(String connectionId) {
-		if (activeConnections.containsKey(connectionId)) {
-			LOGGER.info("Removing connection!" + connectionId);
-			Future<?> conn = activeConnections.remove(connectionId);
-			conn.cancel(true);
-		} else {
-			LOGGER.warn("Connection with id " + connectionId + " not found");
-		}
-	}
+//	private void closeConnections() {
+//		synchronized (activeConnections) {
+//			for (Future f : activeConnections.values()) {
+//				f.cancel(true);
+//			}
+//			activeConnections.clear();
+//		}
+//
+//	}
 
-	public void handleConnection(GroundstationConnector connectionHandler) {
-		if (activeConnections.size() >= DronologyConstants.MAX_GROUNDSTATIONS) {
-			LOGGER.warn("Connection Limit reached - no new parallel connections can be added!");
-			return;
-		}
-		
-	Future<?> future = connectionExecutor.submit(connectionHandler);		
-	}
-	
-	public void registerConnection(GroundstationConnector connector, ConnectionRequestMessage msg) {
-		LOGGER.info("Connection established with groundstation '"+msg.getUavid()+"'");
-		activeConnections.put(msg.getUavid(), null);
-	}
+	// protected void handleConnection(ReadDispatcher connectionHandler) {
+	// if (activeConnections.size() >= DronologyConstants.MAX_GROUNDSTATIONS) {
+	// LOGGER.warn("Connection Limit reached - no new parallel connections can be
+	// added!");
+	// return;
+	// }
+	// Future<?> future = connectionExecutor.submit(connectionHandler);
+	// activeConnections.put(connectionHandler.getConnectionId(), future);
+	// }
+
+
+
 
 }

@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.commands.ConnectionResponseCommand;
 import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
@@ -55,7 +56,7 @@ public class FakePassivPythonGroundstation {
 			BufferedReader br = new BufferedReader(isr);
 
 			//UAVHandshakeMessage handshake = new UAVHandshakeMessage("Drone1", "Drone1");
-			ConnectionRequestMessage connect = new ConnectionRequestMessage("FAKE_GS2");
+			ConnectionRequestMessage connect = new ConnectionRequestMessage("FAKE_GROUND_1");
 			
 		
 			String handshakeString = GSON.toJson(connect);
@@ -67,6 +68,14 @@ public class FakePassivPythonGroundstation {
 			bw.write("\n");
 			System.out.println("Message sent to the client is " + handshakeString);
 			bw.flush();
+			
+			
+
+			String ackMesasge = br.readLine();
+			ConnectionResponseCommand response = GSON.fromJson(ackMesasge, ConnectionResponseCommand.class);
+			System.out.println("RESPONSE:" + response.toJsonString());
+			Thread.sleep(3000);
+			
 			Thread.sleep(10000);
 
 			int i=2;

@@ -9,4 +9,5 @@ public class CommandIds {
 	public static final String SET_VELOCITY_COMMAND = "setVelocity";
 	public static final String SET_MONITOR_FREQUENCY_COMMAND = "setMonitorFrequency";
 	public static final String SET_STATE_FREQUENCY_COMMAND = "setStateFrequency";
+	public static final String CONNECTION_RESPONSE = "connectionResponse";
 }

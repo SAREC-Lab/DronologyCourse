@@ -1,8 +1,10 @@
 package edu.nd.dronology.gstation.python.connector;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -12,9 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.gson.Gson;
+
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
+import edu.nd.dronology.core.vehicle.commands.ConnectionResponseCommand;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.dispatch.DispatchQueueManager;
@@ -23,6 +28,8 @@ import edu.nd.dronology.gstation.python.connector.dispatch.WriteDispatcher;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
+import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -100,9 +107,20 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 				LOGGER.hwFatal("Invalid Connection Request from groundstation! " + line);
 				return;
 			}
-			server.registerConnection(this, (ConnectionRequestMessage) msg);
-			this.groundstationid = msg.getUavid();
-			setupConnection();
+			boolean connectionSuccess = false;
+			try {
+				DroneConnectorService.getInstance().registerConnection(this, (ConnectionRequestMessage) msg);
+				this.groundstationid = msg.getUavid();
+				setupConnection();
+				connectionSuccess = true;
+			} catch (GroundStationException ex) {
+				LOGGER.hwFatal(ex.getMessage());
+			}
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			ConnectionResponseCommand ackCommand = new ConnectionResponseCommand(groundstationid, connectionSuccess);
+			writer.write(ackCommand.toJsonString());
+			writer.write(System.lineSeparator());
+			writer.flush();
 		} catch (Exception e) {
 			LOGGER.hwFatal("Error when establishing connection to groundstation" + e.getMessage());
 		}
@@ -119,7 +137,6 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 			connected = true;
 		} catch (Throwable e) {
 			LOGGER.hwFatal("Can't connect to Python Groundstation " + e.getMessage());
-			scheduleReconnect();
 		}
 	}
 

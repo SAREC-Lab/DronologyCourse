@@ -11,6 +11,9 @@ public interface IDroneCommand {
 	public static final String ATTRIBUTE_Y = "y";
 	public static final String ATTRIBUTE_Z = "z";
 
+	
+	public static final String ATTRIBUTE_SUCCESS = "success";
+	
 	String toJsonString();
 
 	void timestamp();
