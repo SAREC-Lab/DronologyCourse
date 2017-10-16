@@ -1,6 +1,7 @@
 package edu.nd.dronology.core.simulator.nvecsimulator;
 
 import edu.nd.dronology.core.simulator.IFlightSimulator;
+import edu.nd.dronology.core.simulator.simplesimulator.DroneVoltageSimulator;
 import edu.nd.dronology.core.simulator.simplesimulator.FlightSimulator;
 import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.NVector;
@@ -13,20 +14,24 @@ public class Simulator implements IFlightSimulator {
 	private VirtualDrone drone;
 	private NVector currentPosition;
 	private NVector targetPosition;
-	
+	private DroneVoltageSimulator voltageSimulator;
+
 	public Simulator(VirtualDrone drone) {
 		this.drone = drone;
+		voltageSimulator = new DroneVoltageSimulator();
 	}
+
 	@Override
 	public boolean isDestinationReached(double distanceMovedPerTimeStep) {
 		return NvecInterpolator.move(currentPosition, targetPosition, distanceMovedPerTimeStep).equals(targetPosition);
 	}
+
 	@Override
 	public boolean move(double i) {
 		currentPosition = NvecInterpolator.move(currentPosition, targetPosition, i);
 		drone.setCoordinates(currentPosition.toLlaCoordinate());
 		LOGGER.trace("Remaining Dinstance: " + NVector.travelDistance(currentPosition, targetPosition));
-		return currentPosition.equals(targetPosition);
+		return !currentPosition.equals(targetPosition);
 	}
 
 	@Override
@@ -35,32 +40,27 @@ public class Simulator implements IFlightSimulator {
 		this.targetPosition = targetCoordinates.toNVector();
 
 	}
+
 	@Override
 	public void startBatteryDrain() {
-		// TODO Auto-generated method stub
-
+		voltageSimulator.startBatteryDrain();
 	}
 
 	@Override
 	public void stopBatteryDrain() {
-		// TODO Auto-generated method stub
+		voltageSimulator.startBatteryDrain();
 
 	}
 
 	@Override
 	public double getVoltage() {
-		// TODO Auto-generated method stub
-		return 0;
+		return voltageSimulator.getVoltage();
 	}
-
-
 
 	@Override
 	public void checkPoint() {
-		// TODO Auto-generated method stub
+		voltageSimulator.checkPoint();
 
 	}
-
-
 
 }

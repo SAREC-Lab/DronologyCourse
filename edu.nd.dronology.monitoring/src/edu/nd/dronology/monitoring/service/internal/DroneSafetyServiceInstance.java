@@ -109,7 +109,7 @@ public class DroneSafetyServiceInstance extends AbstractServiceInstance implemen
 
 		for (IMonitoringValidationListener l : listeners) {
 			try {
-				l.constraintEvaluated(uavid, validationResult.getAssumptionid(), sb.toString(),
+				l.constraintEvaluated(uavid, validationResult.getAssumptionid(), validationResult.getWeight(), sb.toString(),
 						validationResult.getResult());
 			} catch (RemoteException e) {
 				LOGGER.error(e);

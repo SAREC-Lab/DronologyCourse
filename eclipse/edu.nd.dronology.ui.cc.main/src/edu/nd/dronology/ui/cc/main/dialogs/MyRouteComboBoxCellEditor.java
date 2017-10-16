@@ -2,6 +2,7 @@ package edu.nd.dronology.ui.cc.main.dialogs;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -24,6 +25,9 @@ public class MyRouteComboBoxCellEditor extends ComboBoxCellEditor {
 		for (FlightRouteInfo info : uavList) {
 			routeNames.add(info.getName());
 		}
+
+	
+
 		return routeNames.toArray(new String[0]);
 
 	}

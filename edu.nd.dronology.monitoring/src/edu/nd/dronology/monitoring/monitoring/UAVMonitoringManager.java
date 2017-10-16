@@ -1,5 +1,7 @@
 package edu.nd.dronology.monitoring.monitoring;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -31,6 +33,7 @@ public class UAVMonitoringManager implements IMonitoringMessageHandler {
 	public UAVMonitoringManager() {
 
 		SERVICE_EXECUTOR.submit(new MonitoringDataHandler(queue));
+		SERVICE_EXECUTOR.submit(new MonitoringFrequencyAdaptor());
 	}
 
 	/**
@@ -66,6 +69,11 @@ public class UAVMonitoringManager implements IMonitoringMessageHandler {
 
 	public MonitoringValidator getValidator(String uavid) {
 		return validators.get(uavid);
+	}
+
+	public Collection<MonitoringValidator> getValidators() {
+		return Collections.unmodifiableCollection(validators.values());
+		
 	}
 
 }
