@@ -1,7 +1,8 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
@@ -9,123 +10,79 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRUnsavedChangesConfirmation.ChangeType;
 
 /**
  * 
- * This gives information about each of the flight routes and buttons for
- * editing or deleting a route
+ * This layout gives information about each of the flight routes along with options to edit or delete.
  * 
- * @author jhollan4
+ * @author James Holland
  *
  */
 
+@SuppressWarnings("serial")
 public class FRInfoBox extends CustomComponent {
-	private static final long serialVersionUID = 1L;
+	private FlightRouteInfo flightRouteInfo;
 	
-	private String name;
-	private String id;
-	private String created;
-	private String modified;
-	private String length;
-	private FRDeleteRoute delete = new FRDeleteRoute();
-	private Button trashButton;
-	private FlightRouteInfo finfo;
-	private int index = 0;
-	private Button editButton;
-	
-	String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-	
-	public FRInfoBox(String name, String id, String created, String modified, String length, FRInfoPanel panel){
-			
-		this.name = name;
-		this.id = id;
-		this.created = created;
-		this.modified = modified;
-		this.length = length;
+	private HorizontalLayout titleBar = new HorizontalLayout();
 		
-		this.addStyleName("info_box");
-		this.addStyleName("fr_info_box");
-
-		VerticalLayout routeDescription = new VerticalLayout();
-		routeDescription.addStyleName("detailed_info_well");
+	//Creqte FRInfoBox in Flight Route view -- with edit and delete buttons
+	public FRInfoBox(FRInfoPanel infoPanel, FlightRouteInfo flightRouteInfo){
+		this(flightRouteInfo);
+		this.flightRouteInfo = flightRouteInfo;
 		
-		HorizontalLayout titleBar = new HorizontalLayout();
-		VerticalLayout allContent = new VerticalLayout();
-		
-		//create name id label
-		Label nameidLabel = new Label(name);
-		nameidLabel.addStyleName("info_box_name");
-			
-		//this next section creates 3 different labels and adds styles to format them appropriately
-		Label createdLabel = new Label("Created:  " + created);
-		Label modifiedLabel = new Label("Last Modified:  " + modified);
-		Label lengthLabel = new Label("Total Length: " + length);
-		
-		routeDescription.addComponents(createdLabel, modifiedLabel, lengthLabel);
-		
-		//imports images for buttons
+		// Imports images for buttons.
+		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/edit.png"));
 		FileResource trashIcon = new FileResource(new File(basepath+"/VAADIN/img/trashcan.png"));
 		
-		editButton = new Button();
-		trashButton = new Button();
+		Button editButton = new Button();
+		Button trashButton = new Button();
 		
 		editButton.setIcon(editIcon);
-		trashButton.setIcon(trashIcon);
-		
+		trashButton.setIcon(trashIcon);	
 		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		trashButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		
-		titleBar.addComponents(nameidLabel, trashButton, editButton);
-		
-		//adds all content together and aligns the buttons on the right
-		allContent.addComponents(titleBar, routeDescription);
-		
-		setCompositionRoot(allContent);
-		
-		String whichBox = this.getId();
-		ArrayList<FRInfoBox> listBoxes = panel.getBoxList();
-		int counter = 0;
-		index = 0; 
-		for(FRInfoBox box: listBoxes){
-			if(box.getId() != null && whichBox.equals(box.getId())){
-				index = counter;
-			}
-			counter++;
-		}
 			
+		// Adds listener to the delete button on the route box /
 		trashButton.addListener(e->{
-			UI.getCurrent().addWindow(delete.getWindow());
-			
-			finfo = panel.getFlight(index);
-			delete.setRouteInfoTobeDeleted(finfo);
-			panel.refreshRoutes();
-			
+			if (infoPanel.getControls().getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
+				// Checks if the route is in edit mode.
+				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
+						infoPanel.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.DELETE_ROUTE, e);
+			} else {	
+				infoPanel.getControls().getMainLayout().getDeleteRouteConfirmation().showWindow(getFlightRouteInfo(), e);
+			}
+		});
+		// A click on the edit button enables editing, unless edit mode is already enabled, in which case the user is prompted about losing changes.
+		editButton.addClickListener(e -> {
+			if (!infoPanel.getControls().getMainLayout().getMapComponent().getMapUtilities().isEditable()) {
+				infoPanel.getControls().getMainLayout().switchRoute(this);
+				infoPanel.getControls().getMainLayout().getMapComponent().getEditModeController().enterEditMode();
+			} else {
+				if (infoPanel.getHighlightedFRInfoBox() != null &&
+						flightRouteInfo.getId().equals(infoPanel.getHighlightedFRInfoBox().getId()))
+					return;
+				infoPanel.getControls().getMainLayout().getUnsavedChangesConfirmation().showWindow(
+						infoPanel.getHighlightedFRInfoBox().getFlightRouteInfo().getName(), ChangeType.EDIT_ANOTHER, e);
+			}
+			infoPanel.getControls().getMainLayout().getMapComponent().getEditModeController().enterEditMode();
 		});
 		
-		delete.getYesButton().addClickListener(e->{
-			panel.refreshRoutes();
-		});
-		
-		editButton.addClickListener(e->{
-			panel.getControls().getLayout().enableMapEdit();
-		});
+		titleBar.addComponents(trashButton, editButton);
 	}
-		
 	
-	public FRInfoBox(String name, String id, String created, String modified, String length){
-		
-		this.name = name;
-		this.id = id;
-		this.created = created;
-		this.modified = modified;
-		this.length = length;
+	// This infobox constructor is called from activeflights.
+	public FRInfoBox (FlightRouteInfo flightRouteInfo) {
+		SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
+		long creationTime = flightRouteInfo.getDateCreated();
+		String creationFormatted = sdf.format(new Date(creationTime));
+		long modifiedTime = flightRouteInfo.getDateModified();
+		String modifiedFormatted = sdf.format(new Date(modifiedTime));
 		
 		this.addStyleName("info_box");
 		this.addStyleName("fr_info_box");
@@ -133,86 +90,38 @@ public class FRInfoBox extends CustomComponent {
 		VerticalLayout routeDescription = new VerticalLayout();
 		routeDescription.addStyleName("detailed_info_well");
 		
-		HorizontalLayout titleBar = new HorizontalLayout();
 		VerticalLayout allContent = new VerticalLayout();
 		
-		//create name id label
-		Label nameidLabel = new Label(name);
-		nameidLabel.addStyleName("info_box_name");
+		// Create name id label.
+		Label nameIdLabel = new Label(flightRouteInfo.getName());
+		nameIdLabel.addStyleName("info_box_name");
 			
-		//this next section creates 3 different labels and adds styles to format them appropriately
-		Label createdLabel = new Label("Created:  " + created);
-		Label modifiedLabel = new Label("Last Modified:  " + modified);
-		Label lengthLabel = new Label("Total Length: " + length);
+		// Creates 3 different labels and adds styles to format them appropriately.
+		Label createdLabel = new Label("Created:  " + creationFormatted);
+		Label modifiedLabel = new Label("Last Modified:  " + modifiedFormatted);
+		Label lengthLabel = new Label("Total Length: " + String.valueOf(flightRouteInfo.getLenght()));
 		
 		routeDescription.addComponents(createdLabel, modifiedLabel, lengthLabel);
 		
-		//imports images for buttons
-		FileResource editIcon = new FileResource(new File(basepath+"/VAADIN/img/edit.png"));
-		FileResource trashIcon = new FileResource(new File(basepath+"/VAADIN/img/trashcan.png"));
+		titleBar.addComponents(nameIdLabel);
 		
-		editButton = new Button();
-		trashButton = new Button();
-		
-		editButton.setIcon(editIcon);
-		trashButton.setIcon(trashIcon);
-		
-		editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		trashButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		
-		titleBar.addComponents(nameidLabel, trashButton, editButton);
-		
-		//adds all content together and aligns the buttons on the right
+		// Adds all content together and aligns the buttons on the right.
 		allContent.addComponents(titleBar, routeDescription);
 		
 		setCompositionRoot(allContent);
 	}
 	
-	
-	//default if no parameters are passed
-	public FRInfoBox(FRInfoPanel panel){	
-		this("NAME", "id", "Jun 3, 2017, 9:24 AM", "Jun 8, 2017, 11:04 AM", "2.1 miles", panel);
+	public FlightRouteInfo getFlightRouteInfo() {
+		return flightRouteInfo;
 	}
-	
-	public String getName(){
-		return name;
+	// Gets the name of the route.
+	public String getName() {
+		return flightRouteInfo.getName();
 	}
-	
-	public void setName(String name){
-		this.name = name;
-	}
-	
-	public String getid(){
-		return id;
-	}
-	
-	public void setid(String id){
-		this.id = id;
-	}
-	
-	public String getModified(){
-		return modified;
-	}
-	
-	public void setModified(String modified){
-		this.modified = modified;
-	}
-	
-	public String getLength(String length){
-		return length;
-	}
-	
-	public void setLength(String length){
-		this.length = length;
-	}
-	public FRDeleteRoute getDeleteBar(){
-		return delete;
-	}
-	public Button getTrashButton(){
-		return trashButton;
-	}
-	public Button getEditButton(){
-		return editButton;
+	// Gets the route id.
+	@Override
+	public String getId() {
+		return flightRouteInfo.getId();
 	}
 }
 

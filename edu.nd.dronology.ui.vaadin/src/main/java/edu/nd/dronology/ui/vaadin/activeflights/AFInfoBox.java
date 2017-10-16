@@ -24,20 +24,15 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.flight.IFlightPlan;
-import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.core.util.Waypoint;
-import edu.nd.dronology.services.core.info.FlightInfo;
-import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
-import edu.nd.dronology.ui.vaadin.flightroutes.FRMainLayout;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
 
 /**
+ * This is the box in the side panel that contains a UAV's information
  * 
  * @author Patrick Falvey
  *
@@ -114,10 +109,10 @@ public class AFInfoBox extends CustomComponent {
 		topContent.addStyleName("af_info_top_content");
 		middleContent.addStyleName("detailed_info_well");
 		bottomContent.addStyleName("af_info_bottom_content");
+		
 		/**
 		 * top layer components
 		 */
-
 		check.setValue(this.isChecked);
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource resource = new FileResource(new File(basepath + "/VAADIN/img/drone_icon.png"));
@@ -157,7 +152,7 @@ public class AFInfoBox extends CustomComponent {
 		locationInfo3.setValue("Altitude:\t" + Double.toString(this.alt) + " meters");
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " m/s");
 		middleContent.addComponents(locationInfo1, locationInfo2, locationInfo3, locationInfo4);
 
 		/**
@@ -174,64 +169,43 @@ public class AFInfoBox extends CustomComponent {
 		assignNewRoute.setHeight("30px");
 
 		returnToHome.addClickListener(e -> {
-			Window confirm = new Window("Confirm");
-			VerticalLayout subContent = new VerticalLayout();
-			HorizontalLayout subButtons = new HorizontalLayout();
-			Label label = new Label("Are you sure you want to send " + this.name + " to its home?");
-			Button yes = new Button("Yes");
-			Button no = new Button("No");
-
-			yes.addClickListener(subEvent -> {
-				UI.getCurrent().removeWindow(confirm);
-				IFlightManagerRemoteService service;
-				try {
-					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-					service.returnToHome(this.name);
-				} catch (Exception exc) {
-					exc.printStackTrace();
-				}
-				
-			});
-
-			no.addClickListener(subEvent -> {
-				UI.getCurrent().removeWindow(confirm);
-			});
-
-			subButtons.addComponents(yes, no);
-			subContent.addComponents(label, subButtons);
-			confirm.setContent(subContent);
-			confirm.setModal(true);
-			confirm.center();
-			UI.getCurrent().addWindow(confirm);	
-
+			this.returnHome(null);
 		});
 
-		assignNewRoute.addClickListener(e -> {
+		assignNewRoute.addClickListener(assignEvent -> {  //this opens the assign routes UI 
 			Window window = new Window("Assign New Route");
-			VerticalLayout content = new VerticalLayout();
-			FRMainLayout frLayout = new FRMainLayout();
-			HorizontalLayout buttons = new HorizontalLayout();
-
-			Button cancel = new Button("Cancel");
-			Button apply = new Button("Apply");
-			apply.setEnabled(false);
-			cancel.addClickListener(event -> {
+			
+			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
+					this.lon, this.alt, this.speed);
+			
+			content.getCancel().addClickListener(event -> {
 				UI.getCurrent().removeWindow(window);
 			});
-			window.addClickListener(event -> { //will need to change to if flights are in left panel
-				if (frLayout.getControls().getInfoPanel().getIsRouteSelected())
-					apply.setEnabled(true);
-				else
-					apply.setEnabled(false);
-			});
-
-			apply.addClickListener(event -> {
+			
+			content.getApply().addClickListener( event -> {
+				Collection<FlightRouteInfo> routesToAssign = content.getRoutesToAssign();
 				Window confirm = new Window("Confirm");
 				VerticalLayout subContent = new VerticalLayout();
 				HorizontalLayout subButtons = new HorizontalLayout();
-				FlightRouteInfo selectedFlight = frLayout.getControls().getInfoPanel().getFlight(frLayout.getIndex());
-				String routeName = selectedFlight.getName();
-				Label label = new Label("Are you sure you want " + this.name + " to follow the route " + routeName + "?");
+				String routeNames = "";
+				Label label = new Label();
+				for (FlightRouteInfo e:routesToAssign){
+					if (routesToAssign.size() == 0){
+						label.setValue("Are you sure you want unassign all flight routes for " + this.name + "?");
+					}
+					else if (routesToAssign.size() == 1){
+						routeNames = e.getName();
+						label.setValue("Are you sure you want " + this.name + " to follow the route " + routeNames + "?");
+					}
+					else {
+						routeNames = routeNames + e.getName() + ", ";
+					}
+				}
+				if (routesToAssign.size() > 1){
+					routeNames = routeNames.substring(0, routeNames.length() - 2);
+					label.setValue("Are you sure you want " + this.name + " to follow the routes " + routeNames + "?");
+				}
+				 
 				Button yes = new Button("Yes");
 				Button no = new Button("No");
 				subButtons.addComponents(yes, no);
@@ -245,18 +219,47 @@ public class AFInfoBox extends CustomComponent {
 					UI.getCurrent().removeWindow(confirm);
 				});
 
-				yes.addClickListener(subEvent -> {
-					activate(selectedFlight);
+				yes.addClickListener(subEvent -> { //assign the flight routes to the UAV
+					IFlightManagerRemoteService service;
+					try {
+						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);					
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				  try {
+				  	service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+						service.cancelPendingFlights(this.name);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				 
+				  
+  			  for (FlightRouteInfo e:routesToAssign){
+					  activate(e);
+				  }			
+				  
 					UI.getCurrent().removeWindow(confirm);
 					UI.getCurrent().removeWindow(window);
 				});
 			});
-			buttons.addComponents(cancel, apply);
-			content.addComponents(frLayout, buttons);
-
+			
+			content.getHover().addValueChangeListener( e-> {
+				if (content.getHover().getValue()){
+					this.setHoverInPlace(true);
+				}
+				else {
+					this.setHoverInPlace(false);
+				}
+			});
+			
+			content.getReturnToHome().addClickListener( e -> {
+				this.returnHome(window);
+			});
+			
 			window.setContent(content);
 			window.setModal(true);
-			window.setWidth(1296, Unit.PIXELS);
+			window.setWidth(1496, Unit.PIXELS);
 			UI.getCurrent().addWindow(window);
 		});
 
@@ -267,6 +270,7 @@ public class AFInfoBox extends CustomComponent {
 		mainContent.setSizeUndefined();
 		mainContent.setSpacing(false);
 
+		//this listener assists with whether a box is focused or only checked
 		topContent.addLayoutClickListener( e-> {
 			Component child = e.getChildComponent();
 			if (child != null && child.getClass() == CheckBox.class){
@@ -321,8 +325,8 @@ public class AFInfoBox extends CustomComponent {
 	public void setStatus(String status) {
 		this.status = status;
 		statusInfo2.setValue("Status: " + this.status);
-		/*if (this.status.equals("Hovering"))
-			this.hoverSwitch.setValue(true);
+		/*if (this.status.equals("Hovering"))     //string will need to change when function is implemented with dronology
+			this.hoverSwitch.setValue(true);        //this also may be unnecessary 
 		else
 			this.hoverSwitch.setValue(false);*/
 	}
@@ -342,6 +346,10 @@ public class AFInfoBox extends CustomComponent {
 		return this.batteryLife;
 	}
 
+	/**
+	 * 
+	 * @param healthColor must be green, yellow, or red
+	 */
 	public void setHealthColor(String healthColor) {
 		this.healthColor = healthColor;
 		health.setCaption(
@@ -389,7 +397,7 @@ public class AFInfoBox extends CustomComponent {
 		this.speed = speed;
 		this.speed = Math.round(this.speed * 100);
 		this.speed = this.speed / 100;
-		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " mph");
+		locationInfo4.setValue("Ground Speed:\t" + Double.toString(this.speed) + " m/s");
 	}
 
 	public double getSpeed() {
@@ -400,92 +408,6 @@ public class AFInfoBox extends CustomComponent {
 		this.hoverInPlace = hoverInPlace;
 		hoverSwitch.setValue(this.hoverInPlace);
 		if (this.hoverInPlace) {
-			Window window = new Window("Assign New Route");
-			
-			AFAssignRouteComponent content = new AFAssignRouteComponent(this.name, this.status, this.batteryLife, this.healthColor, this.lat,
-					this.lon, this.alt, this.speed);
-			
-			content.getCancel().addClickListener(event -> {
-				UI.getCurrent().removeWindow(window);
-			});
-			
-			content.getApply().addClickListener( event -> {
-				Collection<FlightRouteInfo> routesToAssign = content.getRoutesToAssign();
-				Window confirm = new Window("Confirm");
-				VerticalLayout subContent = new VerticalLayout();
-				HorizontalLayout subButtons = new HorizontalLayout();
-				String routeNames = "";
-				Label label = new Label();
-				for (FlightRouteInfo e:routesToAssign){
-					if (routesToAssign.size() == 0){
-						label.setValue("Are you sure you want unassign all flight routes for " + this.name + "?");
-					}
-					else if (routesToAssign.size() == 1){
-						routeNames = e.getName();
-						label.setValue("Are you sure you want " + this.name + " to follow the route " + routeNames + "?");
-					}
-					else {
-						routeNames = routeNames + e.getName() + ", ";
-					}
-				}
-				if (routesToAssign.size() > 1){
-					routeNames = routeNames.substring(0, routeNames.length() - 2);
-					label.setValue("Are you sure you want " + this.name + " to follow the routes " + routeNames + "?");
-				}
-				 
-				Button yes = new Button("Yes");
-				Button no = new Button("No");
-				subButtons.addComponents(yes, no);
-				subContent.addComponents(label, subButtons);
-				confirm.setContent(subContent);
-				confirm.setModal(true);
-				confirm.center();
-				UI.getCurrent().addWindow(confirm);
-
-				no.addClickListener(subEvent -> {
-					UI.getCurrent().removeWindow(confirm);
-				});
-
-				yes.addClickListener(subEvent -> {
-					FlightInfo flightRouteInfo = null;
-					IFlightManagerRemoteService service;
-					try {
-						service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-						flightRouteInfo = service.getFlightInfo(this.name);
-						
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				  try {
-				  	service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-						service.cancelPendingFlights(this.name);
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				 
-				  
-  			  for (FlightRouteInfo e:routesToAssign){
-  			    try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					  activate(e);
-				  }			
-				  
-					UI.getCurrent().removeWindow(confirm);
-					UI.getCurrent().removeWindow(window);
-				});
-			});
-			
-			window.setContent(content);
-			window.setModal(true);
-			window.setWidth(1496, Unit.PIXELS);
-			UI.getCurrent().addWindow(window);
-			
 			this.status = "Hovering";
 			statusInfo2.setValue("Status: ");
 		} else {
@@ -502,6 +424,10 @@ public class AFInfoBox extends CustomComponent {
 		return this.hoverSwitch;
 	}
 
+	/**
+	 * Expands and collapses the box
+	 * @param visible
+	 */
 	public void setBoxVisible(boolean visible) {
 		if (visible) {
 			this.visible = false;
@@ -534,13 +460,55 @@ public class AFInfoBox extends CustomComponent {
 		this.checkClicked = checkClicked;
 	}
 
+	private void returnHome(Window parent){
+		if (this.status.equals("ON_GROUND")){
+			Notification.show(this.name + " is already home.");
+			return;
+		}
+		Window confirm = new Window("Confirm");
+		VerticalLayout subContent = new VerticalLayout();
+		HorizontalLayout subButtons = new HorizontalLayout();
+		Label label = new Label("Are you sure you want to send " + this.name + " to its home?");
+		Button yes = new Button("Yes");
+		Button no = new Button("No");
+
+		yes.addClickListener(subEvent -> {
+			UI.getCurrent().removeWindow(confirm);
+			if (parent != null){
+				UI.getCurrent().removeWindow(parent);
+			}
+			IFlightManagerRemoteService service;
+			try {
+				service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
+				service.returnToHome(this.name);
+			} catch (Exception exc) {
+				exc.printStackTrace();
+			}
+			
+		});
+
+		no.addClickListener(subEvent -> {
+			UI.getCurrent().removeWindow(confirm);
+		});
+
+		subButtons.addComponents(yes, no);
+		subContent.addComponents(label, subButtons);
+		confirm.setContent(subContent);
+		confirm.setModal(true);
+		confirm.center();
+		UI.getCurrent().addWindow(confirm);	
+	}
+	
 	@WaypointReplace
+	/**
+	 * Assigns a flight route to the drone
+	 * @param remoteItem
+	 */
 	private void activate(FlightRouteInfo remoteItem) {
 		IFlightManagerRemoteService service;
 		try {
 			service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
 			List<Waypoint> coordds = new ArrayList<>(remoteItem.getWaypoints());
-			// LlaCoordinate initPoint = coordds.remove(0);
 			service.planFlight(this.name, remoteItem.getName(), coordds);
 		} catch (Exception e) {
 			e.printStackTrace();

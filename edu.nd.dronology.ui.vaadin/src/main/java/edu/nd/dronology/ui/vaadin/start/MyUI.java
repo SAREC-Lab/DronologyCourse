@@ -26,27 +26,30 @@ import edu.nd.dronology.ui.vaadin.utils.Configuration;
  * 
  * @author Jinghui Cheng
  */
+@SuppressWarnings("serial")
 @Theme("mytheme")
 @Push
 public class MyUI extends UI {
-	private static final long serialVersionUID = 8561111247076018949L;
-	
+	private static BaseServiceProvider provider = new BaseServiceProvider();
+	public static BaseServiceProvider getProvider(){
+		return provider;
+	}
+
 	@Override
     protected void init(VaadinRequest vaadinRequest) {
-	
-			provider.init("localhost", 9898);
-			NavigationBar navigationBar = new NavigationBar();
-			setContent(navigationBar);
-			
-			navigationBar.setSizeFull();
-			/**
-			 * update drone information every second
-			 */
-			Configuration configuration = Configuration.getInstance();
-			Timer t = new Timer( );
-			t.scheduleAtFixedRate(new TimerTask() {
-			    @Override
-			    public void run() {
+		provider.init("localhost", 9898);
+		NavigationBar navigationBar = new NavigationBar();
+		setContent(navigationBar);
+		
+		navigationBar.setSizeFull();
+		/**
+		 * update drone information every second
+		 */
+		Configuration configuration = Configuration.getInstance();
+		Timer t = new Timer( );
+		t.scheduleAtFixedRate(new TimerTask() {
+		    @Override
+		    public void run() {
 			    	VaadinSession session = getSession();
 			    	if (session != null){
 			    		access(() -> {
@@ -58,14 +61,9 @@ public class MyUI extends UI {
 			    			navigationBar.getAFLayout().continueFollowing();
 			    		});
 			    	}
-			    }
-			}, configuration.getRefreshRate(), configuration.getRefreshRate());
+		    }
+		}, configuration.getRefreshRate(), configuration.getRefreshRate());
     }
-	public static BaseServiceProvider getProvider(){
-		return provider;
-	}
-	
-	private static BaseServiceProvider provider = new BaseServiceProvider();
 	
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
