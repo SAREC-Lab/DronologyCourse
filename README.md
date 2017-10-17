@@ -15,11 +15,7 @@ git clone git@github.com:SAREC-Lab/Dronology.git
 
 5. Convert the project called `edu.nd.dronology.ui.vaadin` into a maven project. Right click on the project in the **Project Explorer** panel. In the context menu, mouse over the **Configure** sub-menu and select **Convert to Maven Project**.
 
-6. Install the maven comand line tools. For information on how to do this see the [Maven website](https://maven.apache.org/). On Arch Linux with `yaourt` you can type:
-```bash
-yaourt maven
-```
-Then follow the wizard.
+6. Install the maven comand line tools. For information on how to do this see the [Maven website](https://maven.apache.org/).
 
 7. Now you need to use maven from within the vaadin project directory. In your terminal:
 ```bash
