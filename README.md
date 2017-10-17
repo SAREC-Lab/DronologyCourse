@@ -2,6 +2,8 @@
 
 ## Getting started
 
+The following directions explain how to setup eclipse and your terminal. By the end you should be able to run the project in eclipse and develop contributions to the project.
+  
 1. Download and install [eclipse for java EE](https://www.eclipse.org/home/index.php). While it's possible to expand the capabilities of another version of eclipse, the procedure for doing so is beyond the scope of this guide and we will make use of features in eclipse for java EE.
 
 2. git clone the project
