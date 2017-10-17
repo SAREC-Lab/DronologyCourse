@@ -56,7 +56,7 @@ Here are things for you to try, if the above directions don't work.
 	```bash
 	cd ~/.m2/repository
 	rm -rf *
-	cd Dronology/edu.nd.dronology.ui.vaadin
+	cd ~/Dronology/edu.nd.dronology.ui.vaadin
 	mvn clean
 	mvn package
 	mvn vaadin:compile
