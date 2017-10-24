@@ -105,9 +105,9 @@ public class MapMarkerUtilities {
 		leafletMarker.setData(wayPoint);
 		leafletMarker.setId(wayPoint.getId());
 		
-		leafletMarker.addMouseOverListener(markerMouseOverListener);
-		leafletMarker.addMouseOutListener(markerMouseOutListener);
-		leafletMarker.addDragEndListener(markerDragEndListener);
+		if (markerMouseOverListener != null) leafletMarker.addMouseOverListener(markerMouseOverListener);
+		if (markerMouseOutListener != null) leafletMarker.addMouseOutListener(markerMouseOutListener);
+		if (markerDragEndListener != null) leafletMarker.addDragEndListener(markerDragEndListener);
 
 		map.addComponent(leafletMarker);
 		
@@ -218,7 +218,8 @@ public class MapMarkerUtilities {
 			
 			map.addComponent(polyline);
 
-			polyline.addClickListener(polylineClickListener);
+			if (polylineClickListener != null) polyline.addClickListener(polylineClickListener);
+			
 			polylines.add(polyline);
 		}
 		return polylines;

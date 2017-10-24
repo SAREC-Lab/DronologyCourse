@@ -33,7 +33,6 @@ public class FRInfoBox extends CustomComponent {
 	//Creqte FRInfoBox in Flight Route view -- with edit and delete buttons
 	public FRInfoBox(FRInfoPanel infoPanel, FlightRouteInfo flightRouteInfo){
 		this(flightRouteInfo);
-		this.flightRouteInfo = flightRouteInfo;
 		
 		// Imports images for buttons.
 		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
@@ -78,6 +77,7 @@ public class FRInfoBox extends CustomComponent {
 	
 	// This infobox constructor is called from activeflights.
 	public FRInfoBox (FlightRouteInfo flightRouteInfo) {
+		this.flightRouteInfo = flightRouteInfo;
 		SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
 		long creationTime = flightRouteInfo.getDateCreated();
 		String creationFormatted = sdf.format(new Date(creationTime));
