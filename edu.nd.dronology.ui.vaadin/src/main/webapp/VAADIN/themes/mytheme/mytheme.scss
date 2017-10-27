@@ -543,6 +543,10 @@ $valo-menu-background-color: #eee;
 		border-color: $color-dark-4;
 		z-index: 0 !important;
 	}
+
+	.v-absolutelayout-wrapper-af_follow_bar {
+		left: calc(100%/2 - 440px) !important;
+	}
 	.af_follow_bar{
 		background-color: $color-dark-4;
 		color: white;
@@ -558,6 +562,12 @@ $valo-menu-background-color: #eee;
 		.small_text{
 			font-size: 60%;
 			padding: 10px 80px 6px 8px;
+		}
+		.v-slot-large_text {
+			width: 155px;
+		}
+		.v-slot-small_text {
+			width: calc(880px - 155px - 150px);
 		}
 	}
 	.af_assign_route {
