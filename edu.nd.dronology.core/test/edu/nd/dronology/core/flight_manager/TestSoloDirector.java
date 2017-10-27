@@ -31,11 +31,11 @@ public class TestSoloDirector {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testReturnHomeWitNullCoordinates() {
-		testInstance.returnHome(null);
-
-	}
+//	@Test(expected = IllegalArgumentException.class)
+//	public void testReturnHomeWitNullCoordinates() {
+//		testInstance.returnHome(null);
+//
+//	}
 
 	/**
 	 * home is the first coordinate
