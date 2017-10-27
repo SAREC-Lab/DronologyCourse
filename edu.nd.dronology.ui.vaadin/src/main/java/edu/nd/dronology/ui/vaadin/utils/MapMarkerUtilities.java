@@ -200,9 +200,11 @@ public class MapMarkerUtilities {
 			if (mode == 1)
 				// Selected.
 				polyline.setColor("#000");
-			if (mode == 2)
+			if (mode == 2) {
 				// Focused.
-				polyline.setColor("#d87703");
+//				polyline.setColor("#d87703");
+				polyline.setColor("#80a2e4");
+			}
 			if (current.isReached()) {
 				polyline.setDashArray("5 10");
 				polyline.setColor("#249b09");
