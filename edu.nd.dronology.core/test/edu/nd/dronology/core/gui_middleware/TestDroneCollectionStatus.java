@@ -83,7 +83,8 @@ public class TestDroneCollectionStatus {
 		
 		try {
 			gate.await();
-			Thread.sleep(500);
+			t1.join();
+			t2.join();
 		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
@@ -94,7 +95,7 @@ public class TestDroneCollectionStatus {
 
 	}
 
-	private DroneCollectionStatus instance1;
-	private DroneCollectionStatus instance2;
+	private volatile DroneCollectionStatus instance1;
+	private volatile DroneCollectionStatus instance2;
 
 }
