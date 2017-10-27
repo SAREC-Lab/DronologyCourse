@@ -253,7 +253,11 @@ public class AFMapComponent extends CustomComponent {
 						exists = false;
 				}
 				if (!exists || wayPointMarkers.size() != currentFlights.size()) { //if flight doesn't exist, remove it's waypoint markers
-					utilities.removeAllPins();
+					for (List<LMarker> lmarkers : wayPointMarkers) {
+						for (LMarker m : lmarkers) {
+							utilities.getMap().removeComponent(m);
+						}
+					}
 					wayPointMarkers.clear();
 					if (!follow && flightRoutes.size() < currentFlights.size()) //only reset the center when a flight route is added
 						this.setAverageCenter();
