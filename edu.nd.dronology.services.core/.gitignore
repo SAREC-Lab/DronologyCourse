@@ -1,3 +1,4 @@
 /bin/
 /.pmd
 /.DS_Store
+/target/

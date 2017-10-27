@@ -5,12 +5,20 @@
 	<artifactId>dronology</artifactId>
 	<version>1.0</version>
   </parent>
-  <groupId>edu.nd.dronology.core</groupId>
-  <artifactId>edu.nd.dronology.core</artifactId>
+  <groupId>edu.nd.dronology.monitoring</groupId>
+  <artifactId>edu.nd.dronology.monitoring</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -18,7 +26,6 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
-          <testFailureIgnore>true</testFailureIgnore>
         </configuration>
       </plugin>
     </plugins>
@@ -34,7 +41,25 @@
   		<artifactId>edu.nd.dronology.util</artifactId>
    		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
-
-    
+    <dependency>
+	  <groupId>edu.nd.dronology.core</groupId>
+	  <artifactId>edu.nd.dronology.core</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  	  <groupId>edu.nd.dronology.services.core</groupId>
+	  <artifactId>edu.nd.dronology.services.core</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+   	  <groupId>edu.nd.dronology.services</groupId>
+	  <artifactId>edu.nd.dronology.services</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  	  <groupId>edu.nd.dronology.gstation.python.connector</groupId>
+	  <artifactId>edu.nd.dronology.gstation.python.connector</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>
