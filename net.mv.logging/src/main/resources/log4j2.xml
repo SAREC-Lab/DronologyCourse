@@ -60,7 +60,7 @@
 
 	</appenders>
 	<loggers>
-		<root level="error"> <!-- We log errors in maven -->
+		<root level="debug"> <!-- We log everything -->
 			<appender-ref ref="Console" /> <!-- To console -->
 			<appender-ref ref="RollingFile" /> <!-- And to a rotated file -->
 			<AppenderRef ref="hwfile" level="FATAL" />
