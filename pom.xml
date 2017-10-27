@@ -32,6 +32,7 @@
 		          <testFailureIgnore>true</testFailureIgnore>
 		        </configuration>
 		      </plugin>
+
 		    </plugins>
 		</pluginManagement>
 	</build>
