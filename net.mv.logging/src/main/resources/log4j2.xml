@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration name="citeomat" packages="net.mv.logging">
+	<properties>
+
+		<property name="net.mv.filepath">logs/dronology.log</property>
+		<property name="net.mv.filename">dronology</property>
+		<property name="net.mv.filepathHW">logs/dronology-hw.log</property>
+		<property name="net.mv.filenameHW">dronology-hw</property>
+		<property name="net.mv.filepathMission">logs/dronology-mission.log</property>
+		<property name="net.mv.filenameMission">dronology-missions</property>
+		<property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5.8p] %-20M
+			|%-5C:%L | %msg%n</property>
+
+	</properties>
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%-8p] %-30M @ (%F:%L) %m%n" />
+		</Console>
+
+
+
+		<RollingFile name="RollingFile" fileName="${net.mv.filepath}"
+			filePattern="logs\${net.mv.filename}-%i.log">
+			<PatternLayout>
+				<pattern>${pattern}</pattern>
+				<!-- <pattern>"%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - 
+					%msg%n"</pattern> -->
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="50 MB" /> <!-- Or every 100 MB -->
+			</Policies>
+			<DefaultRolloverStrategy max="2" />
+
+
+			<Filters>
+
+
+				<ThresholdFilter level="HW_INFO" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+			</Filters>
+
+		</RollingFile>
+
+
+		<File name="hwfile" fileName="${net.mv.filepathHW}" append="true">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</File>
+
+		<File name="missionfile" fileName="${net.mv.filepathMission}"
+			append="true">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+
+			<Filters>
+				  <MarkerFilter marker="MISSION" onMatch="ACCEPT" onMismatch="DENY"/>
+		
+			</Filters>
+
+		</File>
+
+
+	</appenders>
+	<loggers>
+		<root level="debug"> <!-- We log everything -->
+			<appender-ref ref="Console" /> <!-- To console -->
+			<appender-ref ref="RollingFile" /> <!-- And to a rotated file -->
+			<AppenderRef ref="hwfile" level="FATAL" />
+			<AppenderRef ref="missionfile" level="DEBUG" />
+		</root>
+
+
+
+
+
+	</loggers>
+</configuration>
