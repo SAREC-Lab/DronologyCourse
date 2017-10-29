@@ -6,6 +6,7 @@ from pymavlink import mavutil
 from comms import *
 from util import mathtools as mu
 from util import get_logger
+from util.etc import RepeatedTimer
 
 
 _LOG = get_logger()
@@ -44,11 +45,23 @@ def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
 
 
 class VehicleControl(object):
-    def __init__(self, out_msg_queue, vehicle_id=None, state_frequency=1.0):
+    def __init__(self, out_msg_queue, vehicle_id=None, state_interval=1.0):
         self._vehicle = None
         self._vid = vehicle_id
         self._out_msgs = out_msg_queue
-        self._state_freq = state_frequency
+        self._state_t = state_interval
+        self._state_msg_timer = RepeatedTimer(state_interval, self.send_state_message)
+
+    def update_state_interval(self, state_interval):
+        self._state_msg_timer.stop()
+        self._state_msg_timer.set_interval(state_interval)
+        self._state_msg_timer.start()
+
+    def send_state_message(self):
+        self._out_msgs.put(str(self.gen_state_message()))
+
+    def gen_state_message(self):
+        raise NotImplementedError
 
     def get_vehicle(self):
         return self._vehicle
@@ -65,16 +78,13 @@ class VehicleControl(object):
     def stop(self):
         raise NotImplementedError
 
-    def gen_state_message(self):
-        raise NotImplementedError
-
 
 class CopterControl(VehicleControl):
     def __init__(self, out_msg_queue, vehicle_id):
         VehicleControl.__init__(self, out_msg_queue, vehicle_id=vehicle_id)
 
     def gen_state_message(self):
-        return StateMessage.from_vehicle(self)
+        return StateMessage.from_vehicle(self._vehicle, self._vid)
 
     def connect_vehicle(self, **kwargs):
         raise NotImplementedError
@@ -111,7 +121,7 @@ class CopterControl(VehicleControl):
 
 
 class ArduCopter(CopterControl):
-    def __init__(self, out_msg_queue, vehicle_id):
+    def __init__(self, out_msg_queue, vehicle_id=None):
         CopterControl.__init__(self, out_msg_queue, vehicle_id=vehicle_id)
         self._v_type = None
         self._sitl = None
@@ -210,9 +220,19 @@ class ArduCopter(CopterControl):
         status = 0
         vehicle = None
 
+        if home is not None:
+            if len(home) == 2:
+                home = tuple(home) + (0, 0)
+            else:
+                home = tuple(home)
+
         if vehicle_type == DRONE_TYPE_PHYS:
             vehicle = dronekit.connect(ip, wait_ready=True, baud=baud)
             self._v_type = DRONE_TYPE_PHYS
+
+            if vehicle_id is None:
+                vehicle_id = ip
+
         elif vehicle_type == DRONE_TYPE_SITL_VRTL:
             sitl_args = [
                 '-I{}'.format(instance),
@@ -232,6 +252,10 @@ class ArduCopter(CopterControl):
             _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
             self._v_type = DRONE_TYPE_SITL_VRTL
             self._sitl = sitl
+
+            if vehicle_id is None:
+                vehicle_id = vehicle_type + str(instance)
+
         else:
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
             status = -1

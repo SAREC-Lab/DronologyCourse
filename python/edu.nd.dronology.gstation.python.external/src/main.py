@@ -1,38 +1,30 @@
-import os
 import control
-import json
 import comms
-import socket
 import argparse
-from util import get_logger
+import util
+import atexit
 
-_LOG = get_logger()
-
-
-def setup_dronology_connection(gid, addr, port):
-    sock = None
-
-    while not sock:
-        sock = socket.create_connection((addr, port), timeout=5.0)
-
-    handshake = {
-        'type': 'connect',
-        'uavid': gid
-    }
-
-    sock.send(json.dumps(handshake))
-    sock.send(os.linesep)
+_LOG = util.get_logger()
 
 
-def main(gid, addr, port):
-    setup_dronology_connection(gid, addr, port)
-    in_msg_queue = comms.MessageQueue()
-    out_msg_queue = comms.MessageQueue()
-    connection = comms.Connection(in_msg_queue, addr=addr, port=port)
+def main(gid, addr, port, drone_configs):
+    util.setup_dronology_connection(gid, addr, port)
+    dronology_in_msg_queue = comms.MessageQueue()
+    dronology_out_msg_queue = comms.MessageQueue()
+    new_vehicle_msg_queue = comms.MessageQueue()
+    connection = comms.Connection(dronology_in_msg_queue, addr=addr, port=port)
     connection.start()
-    ctrl_station = control.ControlStation(connection, in_msg_queue, out_msg_queue)
+    ctrl_station = control.ControlStation(connection,
+                                          dronology_in_msg_queue, dronology_out_msg_queue, new_vehicle_msg_queue)
     ctrl_station.start()
-    connection.stop()
+
+    for dc in util.load_drone_configs(drone_configs):
+        new_vehicle_msg_queue.put_message(dc)
+
+    @atexit.register
+    def shutdown():
+        connection.stop()
+        ctrl_station.stop()
 
 
 if __name__ == '__main__':
@@ -43,5 +35,6 @@ if __name__ == '__main__':
                         type=str, default='')
     parser.add_argument('-p', '--port',
                         type=int, default=1234)
+    parser.add_argument('-d', '--drone_configs', type=str, default='../cfg/drone_cfgs/default.json')
     args = parser.parse_args()
-    main(args.gcs_id, args.address, args.port)
+    main(args.gcs_id, args.address, args.port, args.drone_configs)
