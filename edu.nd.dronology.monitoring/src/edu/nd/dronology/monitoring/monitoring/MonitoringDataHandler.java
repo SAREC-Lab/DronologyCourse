@@ -60,7 +60,8 @@ public class MonitoringDataHandler implements Runnable {
 					if (message instanceof UAVMonitoringMessage) {
 						validator.validate((UAVMonitoringMessage) message);
 					} else {
-						validator.process((UAVStateMessage) message);
+						//TODO: merge from icse branch
+					//	validator.process((UAVStateMessage) message);
 					}
 				} else {
 					// LOGGER.error("No validator found for "+ monitoringMesasge.getUavid());

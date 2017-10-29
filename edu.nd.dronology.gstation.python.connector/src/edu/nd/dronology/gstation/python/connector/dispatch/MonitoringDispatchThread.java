@@ -26,7 +26,7 @@ public class MonitoringDispatchThread extends AbstractStatusDispatchThread<Abstr
 
 	@Override
 	public Object call() {
-		while (cont.get()) {
+		while (cont.get() && !Thread.currentThread().isInterrupted()) {
 
 			try {
 				AbstractUAVMessage message = queue.take();
@@ -42,12 +42,15 @@ public class MonitoringDispatchThread extends AbstractStatusDispatchThread<Abstr
 
 				}
 
+			} catch (InterruptedException e) {
+				LOGGER.info("Monitoring Dispatcher shutdown! --" + e.getMessage());
+
 			} catch (Exception e) {
 				LOGGER.error(e);
 			}
 
 		}
-		LOGGER.info("Dispatcher shutdown!");
+		LOGGER.info("Monitoring Dispatcher shutdown!");
 		return null;
 	}
 

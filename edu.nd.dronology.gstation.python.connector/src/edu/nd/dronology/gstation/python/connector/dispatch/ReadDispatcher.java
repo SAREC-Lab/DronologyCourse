@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
+import java.security.spec.DSAGenParameterSpec;
 import java.text.DateFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -14,9 +15,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.core.util.FormatUtil;
-import edu.nd.dronology.core.vehicle.commands.GoToCommand;
-import edu.nd.dronology.core.vehicle.commands.PingPongCommand;
+import edu.nd.dronology.gstation.python.connector.GroundStationException;
+import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
+import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
@@ -32,13 +34,11 @@ public class ReadDispatcher implements Runnable {
 
 	private BufferedReader reader;
 	private DispatchQueueManager dispatchQueueManager;
-	private OutputStream outputStream;
 
 	public ReadDispatcher(Socket pythonSocket, DispatchQueueManager dispatchQueueManager) {
-		this.dispatchQueueManager = dispatchQueueManager;
 		try {
+			this.dispatchQueueManager = dispatchQueueManager;
 			inputStream = pythonSocket.getInputStream();
-			outputStream = pythonSocket.getOutputStream();
 			cont.set(true);
 		} catch (IOException e) {
 			LOGGER.error(e);
@@ -50,33 +50,21 @@ public class ReadDispatcher implements Runnable {
 		try {
 			LOGGER.info("Read-Dispatcher started");
 			reader = new BufferedReader(new InputStreamReader(inputStream));
-			while (cont.get()) {
+			while (cont.get() && !Thread.currentThread().interrupted()) {
 				String line = reader.readLine();
 				if (line != null) {
 					// TODO: create the timestamp before deserializing the
 					// object....
 					try {
-						AbstractUAVMessage msg = UAVMessageFactory.create(line);
-						if (msg != null) {
-							processMessage(msg);
-						}
+						AbstractUAVMessage<?> msg = UAVMessageFactory.create(line);
+						processMessage(msg);
 						if (msg == null) {
 							LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
-						}
-						if (msg instanceof UAVHandshakeMessage) {
-							// long startTimestamp = System.currentTimeMillis();
-							// outputStream.write(new
-							// PingPongCommand(msg.getUavid()).toJsonString().getBytes());
-							// outputStream.write('\r');
-							// String response = reader.readLine();
-							// long endTimeStamp = System.currentTimeMillis();
-							// LOGGER.info("Ping-Pong took " + (endTimeStamp - startTimestamp) + " ms");
 						}
 
 					} catch (Exception ex) {
 						ex.printStackTrace();
-						LOGGER.hwFatal(
-								"Error when parsing incomming message: " + ex.getMessage() + " -- '" + line + "' ");
+						LOGGER.hwFatal("Error when parsing incomming message '" + line + "' " + ex.getMessage());
 					}
 
 				} else {
@@ -97,6 +85,12 @@ public class ReadDispatcher implements Runnable {
 				LOGGER.error(e);
 			}
 
+		} catch (SocketException sex) {
+			LOGGER.error("Socket Exception groundstation " + dispatchQueueManager.getGroundstationid()
+					+ " disconnected - shutting down connection -- Error: " + sex.getMessage());
+			dispatchQueueManager.tearDown();
+			cont.set(false);
+			
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		} finally {
@@ -119,11 +113,10 @@ public class ReadDispatcher implements Runnable {
 
 	private void processMessage(AbstractUAVMessage<?> message) {
 		if (message instanceof UAVStateMessage) {
-			// LOGGER.info("State Message received");
-			// LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "]"
-			// + FormatUtil.formatTimestamp(message.getTimestamp(),
-			// FormatUtil.FORMAT_YEAR_FIRST_MILLIS) + " - "
-			// + message.toString());
+			// LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "]
+			// "+FormatUtil.formatTimestamp(message.getTimestamp(),
+			// FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
+			// + " - " + message.toString());
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
 		} else if (message instanceof UAVHandshakeMessage) {
@@ -132,12 +125,15 @@ public class ReadDispatcher implements Runnable {
 			dispatchQueueManager.postDoneHandshakeMessage(message.getUavid(), (UAVHandshakeMessage) message);
 
 		} else if (message instanceof UAVMonitoringMessage) {
-			// LOGGER.info("Monitoring Message received");
 			dispatchQueueManager.postMonitoringMessage((UAVMonitoringMessage) message);
 		}
 	}
 
 	public void tearDonw() {
 		cont.set(false);
+	}
+
+	public String getConnectionId() {
+		return "ADS";
 	}
 }

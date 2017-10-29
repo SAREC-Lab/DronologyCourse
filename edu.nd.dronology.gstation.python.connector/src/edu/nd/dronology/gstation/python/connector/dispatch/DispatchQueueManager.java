@@ -7,11 +7,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
+import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
@@ -20,6 +22,7 @@ import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;
+import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -44,30 +47,35 @@ public class DispatchQueueManager {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DispatchQueueManager.class);
 
-	private static final int NUM_THREADS = DronologyConstants.MAX_DRONE_THREADS;
+	private static final int NUM_THREADS = 20;
 	private static final ExecutorService SERVICE_EXECUTOR = Executors.newFixedThreadPool(NUM_THREADS,
 			new NamedThreadFactory("Dispatch-Threads"));
 
-	Map<String, BlockingQueue<UAVStateMessage>> queueMap = new ConcurrentHashMap<>();
-	List<AbstractStatusDispatchThread> dispatchThreads = new ArrayList<>();
+	private static final boolean USE_MONITORING = true;
 
-	private BlockingQueue<IDroneCommand> outgoingCommandQueue = new LinkedBlockingDeque<>(200);
-	private BlockingQueue<AbstractUAVMessage> monitoringQueue = new LinkedBlockingDeque<>(200);
+	Map<String, BlockingQueue<UAVStateMessage>> queueMap = new ConcurrentHashMap<>();
+	List<Future> dispatchThreads = new ArrayList<>();
+
+	private BlockingQueue<IDroneCommand> outgoingCommandQueue = new LinkedBlockingDeque<>(100);
+	private BlockingQueue<AbstractUAVMessage> monitoringQueue = new LinkedBlockingDeque<>(100);
 	private List<IMonitoringMessageHandler> handlers = new ArrayList<>();
 
 	private final String groundstationid;
+
+	public String getGroundstationid() {
+		return groundstationid;
+	}
 
 	private IUAVSafetyValidator validator;
 
 	public DispatchQueueManager(String groundstationid) {
 		this.groundstationid = groundstationid;
-		if (DronologyConstants.USE_MONITORING) {
+		if (USE_MONITORING) {
 			createMonitoringDispatchThread(monitoringQueue);
 		}
 	}
 
 	public void postDroneStatusUpdate(String id, UAVStateMessage status) {
-
 		synchronized (queueMap) {
 			boolean success = false;
 			if (queueMap.containsKey(id)) {
@@ -95,6 +103,21 @@ public class DispatchQueueManager {
 
 	}
 
+	// private void registerNewDrone(String id, UAVStateMessage status) {
+	// LOGGER.hwInfo("New drone registered with '" + id + "' -> " +
+	// status.toString());
+	// DroneInitializationInfo info = new DroneInitializationInfo(
+	// PysicalDroneIdGenerator.generate(id, groundstationid),
+	// DroneMode.MODE_PHYSICAL, id,
+	// status.getLocation());
+	// try {
+	// DroneSetupService.getInstance().initializeDrones(info);
+	// } catch (DronologyServiceException e) {
+	// LOGGER.error(e);
+	// }
+	//
+	// }
+
 	private void registerNewDrone(String uavid, UAVHandshakeMessage message) {
 		LOGGER.hwInfo("New drone registered with  '" + uavid + "' -> " + message.toString());
 		DroneInitializationInfo info = new DroneInitializationInfo(
@@ -120,9 +143,10 @@ public class DispatchQueueManager {
 				}
 			}
 			StatusDispatchThread thread = new StatusDispatchThread(queue, listener);
-			dispatchThreads.add(thread);
+
 			LOGGER.hwInfo("New Dispatch-Thread for UAV '" + id + "' created");
-			SERVICE_EXECUTOR.submit(thread);
+			Future<Object> ftr = SERVICE_EXECUTOR.submit(thread);
+			dispatchThreads.add(ftr);
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		}
@@ -130,16 +154,18 @@ public class DispatchQueueManager {
 
 	private void createMonitoringDispatchThread(BlockingQueue<AbstractUAVMessage> queue) {
 		MonitoringDispatchThread thread = new MonitoringDispatchThread(queue, handlers);
-		dispatchThreads.add(thread);
+
 		LOGGER.hwInfo("New Monitoring Dispatch-Thread created");
-		SERVICE_EXECUTOR.submit(thread);
+		Future ftr = SERVICE_EXECUTOR.submit(thread);
+		dispatchThreads.add(ftr);
 	}
 
 	public void tearDown() {
-		for (AbstractStatusDispatchThread<?> th : dispatchThreads) {
-			th.tearDown();
+		DroneConnectorService.getInstance().closeConnection(groundstationid);
+		for (Future<?> ft : dispatchThreads) {
+			ft.cancel(true);
 		}
-		SERVICE_EXECUTOR.shutdown();
+		// SERVICE_EXECUTOR.shutdown();
 	}
 
 	public BlockingQueue<IDroneCommand> getOutgoingCommandQueue() {
@@ -148,7 +174,7 @@ public class DispatchQueueManager {
 
 	public void send(IDroneCommand cmd) {
 		boolean taken = outgoingCommandQueue.offer(cmd);
-		// LOGGER.hwInfo("Command added to queue!");
+		LOGGER.hwInfo("Command added to queue!");
 		if (!taken) {
 			LOGGER.hwFatal("Outgoing Command queue limit reached - command dropped!");
 		}
@@ -159,6 +185,15 @@ public class DispatchQueueManager {
 		if (!DronologyConstants.USE_MONITORING) {
 			return;
 		}
+		String uavid = message.getUavid();
+		synchronized (queueMap) {
+			if (!queueMap.containsKey(uavid)) {
+				LOGGER.hwInfo("No uav with id '" + uavid + "' registered - discarding message");
+				return;
+			}
+		}
+
+		LOGGER.info("Message " + message.getClass().getSimpleName() + " received :: " + groundstationid);
 		boolean success = false;
 		success = monitoringQueue.offer(message);
 		if (!success) {
