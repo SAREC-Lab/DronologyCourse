@@ -2,6 +2,7 @@ import time
 import threading
 from vehicle import ArduCopter
 from util import get_logger
+from common import *
 from comms import DroneHandshakeMessage
 
 
@@ -17,14 +18,17 @@ class ControlStation(object):
         self._drone_lock = threading.Lock()
         self._drones = {}
         self._status_lock = threading.Lock()
+        self._v_in_worker = threading.Thread(target=self._v_in_work)
         self._d_in_worker = threading.Thread(target=self._d_in_work)
         self._d_out_worker = threading.Thread(target=self._d_out_work)
+        self._n_vrtl_drones = 0
 
         self._do_work = False
         self._register_retry_wait = 5.0
 
     def start(self):
         self._do_work = True
+        self._v_in_worker.start()
         self._d_in_worker.start()
         self._d_out_worker.start()
 
@@ -64,7 +68,10 @@ class ControlStation(object):
         while cont:
             out_msgs = self._d_out_msgs.get_messages()
             for msg in out_msgs:
-                self._conn.send(msg)
+                success = self._conn.send(str(msg))
+                if not success:
+                    if isinstance(msg, DroneHandshakeMessage):
+                        self._d_out_msgs.put_message(msg)
 
             time.sleep(0.1)
             with self._status_lock:
@@ -85,19 +92,25 @@ class ControlStation(object):
 
     def _register_vehicle(self, v_spec):
         vehicle = ArduCopter(self._d_out_msgs)
-        vehicle.connect_vehicle(**v_spec)
-        v_id = vehicle.get_vehicle_id()
-        registered = self._is_registered(v_id)
 
-        if registered:
-            _LOG.error('Failed to register new vehicle, vehicle with id {} already exists!'.format(v_id))
-        else:
-            self._drones[v_id] = vehicle
-            handshake_complete = False
-            while not handshake_complete:
-                handshake_complete = self._conn.send(DroneHandshakeMessage.from_vehicle(vehicle.get_vehicle(),
-                                                                                        v_id))
-                time.sleep(self._register_retry_wait)
+        vehicle_id = v_spec['vehicle_id']
+        with self._drone_lock:
+            instance = self._n_vrtl_drones
+            if vehicle_id is None:
+                if v_spec['vehicle_type'] == DRONE_TYPE_SITL_VRTL:
+                    self._n_vrtl_drones += 1
+                    vehicle_id = v_spec['vehicle_type'] + str(instance)
+                else:
+                    vehicle_id = v_spec['ip']
+
+            if vehicle_id in self._drones:
+                _LOG.error('Failed to register new vehicle, vehicle with id {} already exists!'.format(vehicle_id))
+
+            else:
+                v_spec['vehicle_id'] = vehicle_id
+                vehicle.connect_vehicle(instance=instance, **v_spec)
+
+        self._drones[vehicle_id] = vehicle
 
     def _remove_vehicle(self, v_id):
         registered = self._is_registered(v_id)

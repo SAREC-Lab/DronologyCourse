@@ -50,7 +50,7 @@ class VehicleControl(object):
         self._vid = vehicle_id
         self._out_msgs = out_msg_queue
         self._state_t = state_interval
-        self._state_msg_timer = RepeatedTimer(state_interval, self.send_state_message)
+        self._state_msg_timer = None
 
     def update_state_interval(self, state_interval):
         self._state_msg_timer.stop()
@@ -58,7 +58,7 @@ class VehicleControl(object):
         self._state_msg_timer.start()
 
     def send_state_message(self):
-        self._out_msgs.put(str(self.gen_state_message()))
+        self._out_msgs.put_message(self.gen_state_message())
 
     def gen_state_message(self):
         raise NotImplementedError
@@ -133,6 +133,10 @@ class ArduCopter(CopterControl):
             SetVelocity: self._set_velocity,
             SetHome: self._set_home_location
         }
+
+    def get_location(self):
+        lla = self._vehicle.location.global_frame
+        return mu.Lla(lla.lat, lla.lon, lla.alt)
 
     def handle_command(self, command):
         if not self._vehicle:
@@ -217,6 +221,11 @@ class ArduCopter(CopterControl):
         :param baud:
         :return:
         """
+        threading.Thread(target=self._connect_vehicle, args=(vehicle_type, vehicle_id, ip, instance, ardupath,
+                                                             rate, home, baud)).start()
+
+    def _connect_vehicle(self, vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud):
+
         status = 0
         vehicle = None
 
@@ -263,7 +272,17 @@ class ArduCopter(CopterControl):
         self._vehicle = vehicle
         self._vid = vehicle_id
 
-        return status
+        init_complete = False
+        while not init_complete:
+            lat, lon, alt = self.get_location()
+            if alt == alt:
+                self._vehicle.home_location = dronekit.LocationGlobal(lat, lon, alt)
+                init_complete = True
+
+        if status >= 0:
+            self._out_msgs.put_message(DroneHandshakeMessage.from_vehicle(self._vehicle, self._vid))
+            self._state_msg_timer = RepeatedTimer(self._state_t, self.send_state_message)
+
 
     def stop(self):
         if self._vehicle:

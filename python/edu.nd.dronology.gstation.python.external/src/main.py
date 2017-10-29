@@ -3,28 +3,30 @@ import comms
 import argparse
 import util
 import atexit
+import time
 
 _LOG = util.get_logger()
 
 
 def main(gid, addr, port, drone_configs):
-    util.setup_dronology_connection(gid, addr, port)
     dronology_in_msg_queue = comms.MessageQueue()
     dronology_out_msg_queue = comms.MessageQueue()
     new_vehicle_msg_queue = comms.MessageQueue()
-    connection = comms.Connection(dronology_in_msg_queue, addr=addr, port=port)
-    connection.start()
+    connection = comms.Connection(dronology_in_msg_queue, addr=addr, port=port, g_id=gid)
     ctrl_station = control.ControlStation(connection,
                                           dronology_in_msg_queue, dronology_out_msg_queue, new_vehicle_msg_queue)
-    ctrl_station.start()
-
-    for dc in util.load_drone_configs(drone_configs):
-        new_vehicle_msg_queue.put_message(dc)
 
     @atexit.register
     def shutdown():
         connection.stop()
         ctrl_station.stop()
+
+    connection.start()
+    ctrl_station.start()
+    time.sleep(1.0)
+
+    for dc in util.load_drone_configs(drone_configs):
+        new_vehicle_msg_queue.put_message(dc)
 
 
 if __name__ == '__main__':

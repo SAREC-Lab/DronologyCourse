@@ -33,7 +33,8 @@ class Connection:
     _CONNECTED = 2
     _DEAD = -1
 
-    def __init__(self, msg_queue, addr='', port=1234):
+    def __init__(self, msg_queue, addr='', port=1234, g_id='default_groundstation'):
+        self._g_id = g_id
         self._msgs = msg_queue
         self._addr = addr
         self._port = port
@@ -97,6 +98,9 @@ class Connection:
                 try:
                     sock = socket.create_connection((self._addr, self._port), timeout=5.0)
                     self._sock = socketutils.BufferedSocket(sock)
+                    handshake = json.dumps({'type': 'connect', 'uavid': self._g_id})
+                    self._sock.send(handshake)
+                    self._sock.send(os.linesep)
                     self.set_status(Connection._CONNECTED)
                 except socket.error as e:
                     _LOG.info('Socket error ({})'.format(e))
@@ -104,7 +108,7 @@ class Connection:
             else:
                 # Receive messages
                 try:
-                    msg = self._sock.recv_until(os.linesep, timeout=None)
+                    msg = self._sock.recv_until(os.linesep, timeout=0.1)
                     _LOG.debug(r'Message received: {}'.format(msg))
                     cmd = CommandFactory.get_command(msg)
                     if isinstance(cmd, (SetMonitorFrequency,)):
@@ -122,6 +126,20 @@ class Connection:
         if self._sock is not None:
             self._sock.shutdown(socket.SHUT_RDWR)
             self._sock.close()
+
+
+class InternalMessage(object):
+    def __init__(self, m_type, data):
+        self._m_type = m_type
+        self._data = data
+
+
+class VehicleConnectedMessage(InternalMessage):
+    def __init__(self, data):
+        super(VehicleConnectedMessage, self).__init__('vehicle_connected', data)
+
+    def get_vehicle(self):
+        return self._data['vehicle']
 
 
 class DronologyMessage(object):
@@ -157,8 +175,12 @@ class DroneHandshakeMessage(DronologyMessage):
             'level': vehicle.battery.level,
         }
 
-        with open(p2sac) as f:
-            sac = json.load(f)
+        try:
+            with open(p2sac) as f:
+                sac = json.load(f)
+        except IOError as e:
+            _LOG.warn(e)
+            sac = {}
 
         lla = vehicle.location.global_frame
         data = {
