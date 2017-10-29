@@ -7,6 +7,12 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 
+/**
+ * This is the bar that indicates when the active flights UI is in follow mode
+ * 
+ * @author Patrick Falvey
+ *
+ */
 public class AFFollowBar extends CustomComponent{
 
 	private static final long serialVersionUID = 2389713576038720628L;
@@ -25,7 +31,7 @@ public class AFFollowBar extends CustomComponent{
 		}
 		UAVNames = UAVNames + uavs.get(uavs.size() - 1);
 		smallText.setValue(UAVNames);
-		setStyleName("fr_edit_bar");
+		setStyleName("af_follow_bar");
 		textLabel.setStyleName("large_text");
 		smallText.setStyleName("small_text");
 		

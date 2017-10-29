@@ -1,3 +1,5 @@
 /bin/
 /.pmd
 /logs/
+/.DS_Store
+/target/

@@ -29,6 +29,7 @@ public class AFMainLayout extends CustomComponent {
 			
 		controls.getPanel().getMapView().getFollowButton().addClickListener(e -> {
 			map.setFollow(true);
+			map.setFollowZoom(true);
 			List<String> names = controls.getPanel().getChecked();
 			map.followDrones(names);	
 		});
@@ -36,7 +37,9 @@ public class AFMainLayout extends CustomComponent {
 			content.addComponents(controls, map);
 			setCompositionRoot(content);
 	}
-	
+	/**
+	 * determines if the map should continue in follow mode
+	 */
 	public void continueFollowing(){
 		if (map.getFollow()){
 			List<String> names = controls.getPanel().getChecked();

@@ -37,10 +37,10 @@ public class TestVirtualDroneFleetFactory {
 
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void testGetDronesModify() {
-	//	List<ManagedDrone> drones = testInstance.getDrones();
-		// drones.add(new ManagedDrone(new VirtualDrone("XXX")));
-	}
+//	@Test(expected = UnsupportedOperationException.class)
+//	public void testGetDronesModify() {
+//		List<ManagedDrone> drones = testInstance.getDrones();
+//		 drones.add(new ManagedDrone(new VirtualDrone("XXX")));
+//	}
 
 }

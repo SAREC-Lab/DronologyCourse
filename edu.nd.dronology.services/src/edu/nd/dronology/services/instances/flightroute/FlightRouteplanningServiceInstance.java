@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import edu.nd.dronology.core.air_traffic_control.DistanceUtil;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.api.IFileChangeNotifyable;
 import edu.nd.dronology.services.core.api.ServiceInfo;

@@ -1,8 +1,6 @@
 package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.rmi.RemoteException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,8 +24,6 @@ import com.vaadin.ui.VerticalLayout;
 import edu.nd.dronology.services.core.info.FlightInfo;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
-import edu.nd.dronology.services.core.info.RemoteInfoObject;
-import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -36,6 +32,8 @@ import edu.nd.dronology.ui.vaadin.flightroutes.FRInfoBox;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 
 /**
+ * This is the drag and drop vertical layout in which the FRInfoBoxes are stored 
+ * in the assign routes UI. 
  * 
  * @author Patrick Falvey
  *
@@ -48,11 +46,11 @@ public class AFDragLayout extends VerticalLayout {
 	*/
 	private static final long serialVersionUID = -978484208144577037L;
 	private SortableLayout layout = new SortableLayout();
-	private IDroneSetupRemoteService service;
 	private IFlightManagerRemoteService flightRouteService;
 	private IFlightRouteplanningRemoteService flightInfoService;
 	private BaseServiceProvider provider = MyUI.getProvider();
 	private String UAVid;
+	private int boxID = 88888; //arbitrary value so the component ID does not overlap boxIDs from AFAssignRouteComponent
 
 	public AFDragLayout(String UAVid) {	
 		this.UAVid = UAVid;
@@ -64,11 +62,14 @@ public class AFDragLayout extends VerticalLayout {
 		addComponent(layout);
 	}
 
+	/**
+	 * 
+	 * @return list of pending plans for the UAV
+	 */
 	private List<Component> createComponents() {
 		FlightInfo flightRouteInfo = null;
 		Collection<FlightRouteInfo> items = null;
 		try {
-			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
 			flightRouteService = (IFlightManagerRemoteService) provider.getRemoteManager()
 					.getService(IFlightManagerRemoteService.class);
 			flightInfoService = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
@@ -81,22 +82,16 @@ public class AFDragLayout extends VerticalLayout {
 			e.printStackTrace();
 		}
 		
-		List<Component> components = new ArrayList<Component>();
+		List<Component> components = new ArrayList<>();
 		
-		for (FlightPlanInfo flight : flightRouteInfo.getPendingFlights()){
+		for (FlightPlanInfo flight : flightRouteInfo.getPendingFlights()){ //convert plans into the FRInfoBoxes
 			for (FlightRouteInfo info : items){
 				String flightName = flight.getName().length() < info.getName().length() ? flight.getName() : 
 					flight.getName().substring(flight.getName().length() - info.getName().length());
 				if(flightName.equals(info.getName())){
-					long creationTime = info.getDateCreated();
-					SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy, hh:mm aaa");
-					String creationFormatted = sdf.format(new Date(creationTime));
-					
-					long modifiedTime = info.getDateModified();
-					String modifiedFormatted = sdf.format(new Date(modifiedTime));
-					
-					String length = String.valueOf(info.getLenght());
-					FRInfoBox box = new FRInfoBox(info.getName(), info.getId(), creationFormatted, modifiedFormatted, length);
+					FRInfoBox box = new FRInfoBox(info);
+					box.setId(Integer.toString(this.boxID));
+					this.boxID++;
 					components.add(box);
 				}
 			}
@@ -157,12 +152,13 @@ public class AFDragLayout extends VerticalLayout {
 		}
 		
 		public int getComponentIndex(Component component) {
+			@SuppressWarnings("deprecation")
 			Iterator<Component> componentIterator = layout.getComponentIterator();
 			WrappedComponent next = null;
 			int index = 0;
-			while (componentIterator.hasNext()) {
+			while (componentIterator.hasNext()) { //important to compare with route name and component ID because some routes have the same name
 				next = (WrappedComponent) componentIterator.next();
-				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName())){
+				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName()) && component.getId().equals(next.getContent().getId())){
 					return index;
 				}
 				else {
@@ -186,12 +182,13 @@ public class AFDragLayout extends VerticalLayout {
 		}
 		
 		public void removeComponent(Component component) {
+			@SuppressWarnings("deprecation")
 			Iterator<Component> componentIterator = layout.getComponentIterator();
 			WrappedComponent next = null;
 			boolean cont = true;
 			while (cont && componentIterator.hasNext()) {
 				next = (WrappedComponent) componentIterator.next();
-				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName())){
+				if (((FRInfoBox) next.getContent()).getName().equals(((FRInfoBox) component).getName()) && component.getId().equals(next.getContent().getId())){
 					layout.removeComponent(next);
 					cont = false;
 				}
@@ -244,7 +241,7 @@ public class AFDragLayout extends VerticalLayout {
 		}
 
 		@Override
-		public void drop(DragAndDropEvent dropEvent) {
+		public void drop(DragAndDropEvent dropEvent) {  //logic to determine the position of the drag and dropped object
 			Transferable transferable = dropEvent.getTransferable();
 			Component sourceComponent = transferable.getSourceComponent();
 			if (sourceComponent instanceof WrappedComponent) {
