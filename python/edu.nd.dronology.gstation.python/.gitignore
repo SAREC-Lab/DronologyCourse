@@ -1,6 +1,0 @@
-*.pyc
-ardupath.conf
-.SITL_workingdir
-ardupilot
-*~
-pyUblox
