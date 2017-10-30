@@ -109,9 +109,8 @@ class Connection:
                 # Receive messages
                 try:
                     msg = self._sock.recv_until(os.linesep, timeout=0.1)
-                    _LOG.debug(r'Message received: {}'.format(msg))
                     cmd = CommandFactory.get_command(msg)
-                    if isinstance(cmd, (SetMonitorFrequency,)):
+                    if isinstance(cmd, Command):
                         self._msgs.put_message(cmd)
                 except socket.timeout:
                     pass
@@ -124,8 +123,14 @@ class Connection:
                     time.sleep(20.0)
 
         if self._sock is not None:
-            self._sock.shutdown(socket.SHUT_RDWR)
+            _LOG.info('Shutting down socket.')
+            try:
+                self._sock.shutdown(socket.SHUT_WR)
+            except Exception as e:
+                _LOG.error(e)
+            _LOG.info('Closing socket.')
             self._sock.close()
+            return
 
 
 class InternalMessage(object):
@@ -272,6 +277,12 @@ class Command(object):
         self._timestamp = timestamp
         self._data = data
         self._msg_id = msg_id
+
+    def __str__(self):
+        return 'Vehicle {}: {}'.format(self._vid, json.dumps(self._data))
+
+    def __repr__(self):
+        return str(self)
 
     def __getitem__(self, item):
         if item in self.__dict__:

@@ -1,25 +1,30 @@
 import control
-import comms
+import communication
 import argparse
 import util
-import atexit
+import signal
 import time
 
 _LOG = util.get_logger()
 
 
 def main(gid, addr, port, drone_configs):
-    dronology_in_msg_queue = comms.MessageQueue()
-    dronology_out_msg_queue = comms.MessageQueue()
-    new_vehicle_msg_queue = comms.MessageQueue()
-    connection = comms.Connection(dronology_in_msg_queue, addr=addr, port=port, g_id=gid)
+    dronology_in_msg_queue = communication.MessageQueue()
+    dronology_handshake_out_msg_queue = communication.MessageQueue()
+    dronology_state_out_msg_queue = communication.MessageQueue()
+    new_vehicle_msg_queue = communication.MessageQueue()
+    connection = communication.Connection(dronology_in_msg_queue, addr=addr, port=port, g_id=gid)
     ctrl_station = control.ControlStation(connection,
-                                          dronology_in_msg_queue, dronology_out_msg_queue, new_vehicle_msg_queue)
+                                          dronology_in_msg_queue,
+                                          dronology_handshake_out_msg_queue, dronology_state_out_msg_queue,
+                                          new_vehicle_msg_queue)
 
-    @atexit.register
-    def shutdown():
-        connection.stop()
+    def shutdown(*args):
         ctrl_station.stop()
+        connection.stop()
+
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
 
     connection.start()
     ctrl_station.start()
@@ -27,6 +32,12 @@ def main(gid, addr, port, drone_configs):
 
     for dc in util.load_drone_configs(drone_configs):
         new_vehicle_msg_queue.put_message(dc)
+
+    while ctrl_station.is_alive():
+        time.sleep(5.0)
+
+    if ctrl_station.is_alive():
+        shutdown(None, None)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import os
 import json
 import time
-import comms
+import communication
 import socket
 import unittest
 import threading
@@ -32,8 +32,8 @@ class TestComms(unittest.TestCase):
         return server
 
     def testConnect(self):
-        mq = comms.MessageQueue()
-        client = comms.Connection(mq)
+        mq = communication.MessageQueue()
+        client = communication.Connection(mq)
         server = self.setup_server()
 
         def t_server():
