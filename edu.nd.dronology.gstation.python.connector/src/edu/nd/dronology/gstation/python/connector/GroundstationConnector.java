@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.exceptions.DroneException;
+import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.commands.ConnectionResponseCommand;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
@@ -122,6 +123,7 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 			writer.write(System.lineSeparator());
 			writer.flush();
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOGGER.hwFatal("Error when establishing connection to groundstation" + e.getMessage());
 		}
 
@@ -134,6 +136,7 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 			writeDispatcher = new WriteDispatcher(socket, dispatchQueueManager.getOutgoingCommandQueue());
 			servicesExecutor.submit(readDispatcher);
 			servicesExecutor.submit(writeDispatcher);
+			RuntimeDroneTypes.getInstance().registerCommandHandler(this);
 			connected = true;
 		} catch (Throwable e) {
 			LOGGER.hwFatal("Can't connect to Python Groundstation " + e.getMessage());
