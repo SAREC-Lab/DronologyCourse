@@ -9,24 +9,28 @@ The following directions explain how to setup your computer as a development mac
 1. Install [Maven](https://maven.apache.org). Make sure that Maven's bin directory is in your `PATH`.
 
 1. Clone the project:
+   ```bash
+   git clone git@github.com:SAREC-Lab/Dronology.git
+   ```
 
-		git clone git@github.com:SAREC-Lab/Dronology.git
 1. Build, test, package, and install the project in your local Maven repository:
-
-		cd /path/to/Dronology
-		mvn install
+    ```bash
+    cd /path/to/Dronology
+    mvn install
+    ````
 	
 1. Run the Vaadin UI:
-
-		cd /path/to/Dronology/edu.nd.dronology.ui.vaadin
-		mvn jetty:run
-
+    ```bash
+    cd /path/to/Dronology/edu.nd.dronology.ui.vaadin
+    mvn jetty:run
+    ```
 	This starts a web server that you will connect to in a later step.
 
 1. Run Dronology
-
-		cd /path/to/Dronology/edu.nd.dronology.services.launch
-		mvn exec:java
+    ```bash
+    cd /path/to/Dronology/edu.nd.dronology.services.launch
+    mvn exec:java
+    ```
 
 1. Open your browser and navigate to the Dronology web UI at [http://localhost:8080/vaadinui](http://localhost:8080/vaadinui).
 
@@ -34,14 +38,16 @@ The following directions explain how to setup your computer as a development mac
 * If you plan to work with the source code, consider installing an IDE. Popular IDEs like [Eclipse](https://www.eclipse.org), [Netbeans](https://netbeans.org/downloads/) and [IntelliJ](https://www.jetbrains.com/idea/) all work well with maven projects like this one.
 
 * Sometimes it's necessary to run the project even if tests are failing. To force the Maven install command use:
-
-		mvn install -Dmaven.test.skip=true
+    ```bash
+    mvn install -Dmaven.test.skip=true
+    ```
 
 * If your local Maven repository gets messed up, you can force maven to re-download dependencies and install:
-
-		cd /path/to/Dronology
-		mvn clean
-		cd ~/.m2/repository
-		rm -rf *
-		cd /path/to/Dronology
-		mvn install
+    ```bash
+    cd /path/to/Dronology
+    mvn clean
+    cd ~/.m2/repository
+    rm -rf *
+    cd /path/to/Dronology
+    mvn install
+    ```
