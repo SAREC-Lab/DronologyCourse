@@ -82,6 +82,8 @@ public class TestRuntimeDroneTypes {
 		
 		try {
 			gate.await();
+			t1.join();
+			t2.join();
 			Thread.sleep(500);
 		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
@@ -93,7 +95,7 @@ public class TestRuntimeDroneTypes {
 
 	}
 
-	private RuntimeDroneTypes instance1;
-	private RuntimeDroneTypes instance2;
+	private volatile RuntimeDroneTypes instance1;
+	private volatile RuntimeDroneTypes instance2;
 
 }
