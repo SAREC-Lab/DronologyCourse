@@ -128,6 +128,6 @@ class Connection:
                 self._sock.shutdown(socket.SHUT_WR)
             except Exception as e:
                 _LOG.error(e)
-            _LOG.info('Closing socket.')
-            self._sock.close()
+            # _LOG.info('Closing socket.')
+            # self._sock.close()
             return

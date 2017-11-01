@@ -10,6 +10,9 @@ class InternalMessage(object):
         self._m_type = m_type
         self._data = data
 
+    def get_data():
+        return self._data
+
 
 class VehicleConnectedMessage(InternalMessage):
     def __init__(self, data):
@@ -37,6 +40,9 @@ class DronologyMessage(object):
     @classmethod
     def from_vehicle(cls, vehicle, v_id, **kwargs):
         raise NotImplementedError
+
+    def get_data(self):
+        return self.data
 
 
 class DroneHandshakeMessage(DronologyMessage):

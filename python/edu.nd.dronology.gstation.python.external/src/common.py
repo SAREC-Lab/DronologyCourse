@@ -3,7 +3,7 @@ import json
 import time
 
 
-ARDUPATH = os.path.join('/', 'Users', 'seanbayley', 'Desktop', 'git', 'ardupilot')
+ARDUPATH = os.path.join('/', 'home', 'sean', 'git', 'ardupilot')
 DRONE_TYPE_PHYS = 'PHYS'
 DRONE_TYPE_SITL_VRTL = 'VRTL'
 

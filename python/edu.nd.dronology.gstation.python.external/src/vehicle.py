@@ -58,7 +58,10 @@ class VehicleControl(object):
         self._state_msg_timer.start()
 
     def send_state_message(self):
-        self._state_out_msgs.put_message(self.gen_state_message())
+        msg = self.gen_state_message()
+        data = msg.get_data()
+        _LOG.debug(json.dumps(data['location']))
+        self._state_out_msgs.put_message(msg)
 
     def gen_state_message(self):
         raise NotImplementedError
@@ -131,7 +134,8 @@ class ArduCopter(CopterControl):
             command.Takeoff: self._takeoff,
             command.SetGroundSpeed: self._set_ground_speed,
             command.SetVelocity: self._set_velocity,
-            command.SetHome: self._set_home_location
+            command.SetHome: self._set_home_location,
+            command.SetArmed: self._set_armed
         }
 
     def get_location(self):
@@ -160,8 +164,8 @@ class ArduCopter(CopterControl):
         self.__takeoff(cmd.get_altitude())
 
     def __takeoff(self, alt):
-        self._vehicle.mode = dronekit.VehicleMode('GUIDED')
         self._set_armed(armed=True)
+        self._vehicle.mode = dronekit.VehicleMode('GUIDED')
         self._vehicle.simple_takeoff(alt)
 
     def _goto_lla(self, cmd):
@@ -224,19 +228,19 @@ class ArduCopter(CopterControl):
         if self._vehicle.armed != armed:
             if armed:
                 while not self._vehicle.is_armable:
-                    time.sleep(1)
+                    time.sleep(0.1)
 
             self._vehicle.armed = armed
 
             while self._vehicle.armed != armed:
                 self._vehicle.armed = armed
-                time.sleep(1)
+                time.sleep(0.1)
 
     def _get_armed(self):
         return self._vehicle.armed
 
     def connect_vehicle(self, vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, rate=10,
-                        home=(41.732955, -86.180886, 0, 0), baud=115200, speedup=1.0, async=True):
+                        home=(41.519412, -86.239830, 0, 0), baud=115200, speedup=1.0, async=True):
         """
         Connect to a SITL vehicle or a real vehicle.
 
@@ -277,8 +281,12 @@ class ArduCopter(CopterControl):
                 vehicle_id = ip
 
         elif vehicle_type == DRONE_TYPE_SITL_VRTL:
+            vehicle_id = self._vid
+            if vehicle_id is None:
+                vehicle_id = vehicle_type + str(instance)
+
             sitl_args = [
-                '--instance', str(instance),
+                '-I{}'.format(str(instance)),
                 '--model', '+',
                 '--home', ','.join(map(str, home)),
                 '--rate', str(rate),
@@ -297,8 +305,7 @@ class ArduCopter(CopterControl):
             self._v_type = DRONE_TYPE_SITL_VRTL
             self._sitl = sitl
 
-            if vehicle_id is None:
-                vehicle_id = vehicle_type + str(instance)
+
 
         else:
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
@@ -307,33 +314,33 @@ class ArduCopter(CopterControl):
         self._vehicle = vehicle
         self._vid = vehicle_id
 
-        init_complete = False
-        while not init_complete:
-            lat, lon, alt = self.get_location()
-            if alt == alt:
-                self._vehicle.send_mavlink(self._vehicle.message_factory.command_long_encode(
-                    0, 0,  # target system, target component
-                    mavutil.mavlink.MAV_CMD_DO_SET_HOME,  # command
-                    0,  # confirmation
-                    1,  # param 1: 1 to use current position, 2 to use the entered values.
-                    0, 0, 0,  # params 2-4
-                    0, 0, 0))
-                self._vehicle.flush()
-                init_complete = True
+        while not self._vehicle.is_armable:
+            time.sleep(1.0)
+
+        lat, lon, alt = self.get_location()
+        self._vehicle.send_mavlink(self._vehicle.message_factory.command_long_encode(
+            0, 0,  # target system, target component
+            mavutil.mavlink.MAV_CMD_DO_SET_HOME,  # command
+            0,  # confirmation
+            1,  # param 1: 1 to use current position, 2 to use the entered values.
+            0, 0, 0,  # params 2-4
+            0, 0, 0))
+        self._vehicle.flush()
 
         if status >= 0:
+            _LOG.info('Vehicle successfully initialized.')
             self._handshake_out_msgs.put_message(message.DroneHandshakeMessage.from_vehicle(self._vehicle, self._vid))
             self._state_msg_timer = util.etc.RepeatedTimer(self._state_t, self.send_state_message)
+        else:
+            _LOG.error('Vehicle failed to initialize.')
 
     def stop(self):
         if self._vehicle:
             _LOG.info('Closing vehicle {} connection.'.format(self._vid))
-
-            self._set_armed(armed=True)
-            self.__set_mode('GUIDED')
             self._land()
             self._set_armed(armed=False)
             self._vehicle.close()
+            self._state_msg_timer.stop()
         if self._sitl:
             _LOG.info('Closing SITL connnection for vehicle {}'.format(self._vid))
             self._sitl.stop()

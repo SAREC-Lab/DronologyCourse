@@ -45,7 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('-gid', '--gcs_id',
                         type=str, default='default_ground_station')
     parser.add_argument('-addr', '--address',
-                        type=str, default='')
+                        type=str, default='localhost')
     parser.add_argument('-p', '--port',
                         type=int, default=1234)
     parser.add_argument('-d', '--drone_configs', type=str, default='../cfg/drone_cfgs/default.json')
