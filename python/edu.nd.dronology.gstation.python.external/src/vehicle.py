@@ -1,25 +1,24 @@
+import util
 import threading
 import dronekit
 import dronekit_sitl
+from communication import message, command
 from common import *
 from pymavlink import mavutil
-from communication import *
-from util import mathtools as mu
-from util import get_logger
-from util.etc import RepeatedTimer
+# from
+
+_LOG = util.get_logger()
 
 
-_LOG = get_logger()
 
-
-def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
+def make_mavlink_command(cmd, trg_sys=0, trg_component=0, seq=0,
                          frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                          param1=0, param2=0, param3=0, param4=0,
                          lat_or_param5=0, lon_or_param6=0, alt_or_param7=0):
     """
     Make a new mavlink command.
 
-    :param command:
+    :param cmd:
     :param trg_sys:
     :param trg_component:
     :param seq:
@@ -36,7 +35,7 @@ def make_mavlink_command(command, trg_sys=0, trg_component=0, seq=0,
     cmd_args = [trg_sys, trg_component,
                 seq,
                 frame,
-                command,
+                cmd,
                 0, 0,
                 param1, param2, param3, param4,
                 lat_or_param5, lon_or_param6, alt_or_param7]
@@ -73,7 +72,7 @@ class VehicleControl(object):
     def connect_vehicle(self, **kwargs):
         raise NotImplementedError
 
-    def handle_command(self, command):
+    def handle_command(self, cmd):
         raise NotImplementedError
 
     def stop(self):
@@ -85,12 +84,12 @@ class CopterControl(VehicleControl):
         VehicleControl.__init__(self, handshake_msg_queue, state_msg_queue, vehicle_id=vehicle_id)
 
     def gen_state_message(self):
-        return StateMessage.from_vehicle(self._vehicle, self._vid)
+        return message.StateMessage.from_vehicle(self._vehicle, self._vid)
 
     def connect_vehicle(self, **kwargs):
         raise NotImplementedError
 
-    def handle_command(self, command):
+    def handle_command(self, cmd):
         raise NotImplementedError
 
     def stop(self):
@@ -127,25 +126,25 @@ class ArduCopter(CopterControl):
         self._v_type = None
         self._sitl = None
         self._cmd_handlers = {
-            SetMode: self._set_mode,
-            GotoLocation: self._goto_lla,
-            Takeoff: self._takeoff,
-            SetGroundSpeed: self._set_ground_speed,
-            SetVelocity: self._set_velocity,
-            SetHome: self._set_home_location
+            command.SetMode: self._set_mode,
+            command.GotoLocation: self._goto_lla,
+            command.Takeoff: self._takeoff,
+            command.SetGroundSpeed: self._set_ground_speed,
+            command.SetVelocity: self._set_velocity,
+            command.SetHome: self._set_home_location
         }
 
     def get_location(self):
         lla = self._vehicle.location.global_frame
-        return mu.Lla(lla.lat, lla.lon, lla.alt)
+        return util.Lla(lla.lat, lla.lon, lla.alt)
 
-    def handle_command(self, command):
+    def handle_command(self, cmd):
         if not self._vehicle:
             _LOG.error('Vehicle {} not connected! Ignoring command.'.format(self._vid))
-        elif type(command) not in self._cmd_handlers:
-            _LOG.warn('Unrecognized command {} for {} controller!'.format(type(command), self.__class__))
+        elif type(cmd) not in self._cmd_handlers:
+            _LOG.warn('Unrecognized command {} for {} controller!'.format(type(cmd), self.__class__))
         else:
-            self._cmd_handlers[type(command)](command)
+            self._cmd_handlers[type(cmd)](cmd)
 
     def _set_mode(self, cmd):
         self.__set_mode(cmd.get_mode())
@@ -237,7 +236,7 @@ class ArduCopter(CopterControl):
         return self._vehicle.armed
 
     def connect_vehicle(self, vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, rate=10,
-                        home=(41.732955, -86.180886, 0, 0), baud=115200, speedup=1.0):
+                        home=(41.732955, -86.180886, 0, 0), baud=115200, speedup=1.0, async=True):
         """
         Connect to a SITL vehicle or a real vehicle.
 
@@ -252,8 +251,12 @@ class ArduCopter(CopterControl):
         :param baud:
         :return:
         """
-        threading.Thread(target=self._connect_vehicle, args=(vehicle_type, vehicle_id, ip, instance, ardupath,
-                                                             rate, home, baud, speedup)).start()
+        args = vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud, speedup
+        if async:
+            threading.Thread(target=self._connect_vehicle, args=args).start()
+        else:
+            self._connect_vehicle(*args)
+
 
     def _connect_vehicle(self, vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud, speedup):
 
@@ -319,8 +322,8 @@ class ArduCopter(CopterControl):
                 init_complete = True
 
         if status >= 0:
-            self._handshake_out_msgs.put_message(DroneHandshakeMessage.from_vehicle(self._vehicle, self._vid))
-            self._state_msg_timer = RepeatedTimer(self._state_t, self.send_state_message)
+            self._handshake_out_msgs.put_message(message.DroneHandshakeMessage.from_vehicle(self._vehicle, self._vid))
+            self._state_msg_timer = util.etc.RepeatedTimer(self._state_t, self.send_state_message)
 
     def stop(self):
         if self._vehicle:

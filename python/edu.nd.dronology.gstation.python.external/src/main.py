@@ -9,11 +9,11 @@ _LOG = util.get_logger()
 
 
 def main(gid, addr, port, drone_configs):
-    dronology_in_msg_queue = communication.MessageQueue()
-    dronology_handshake_out_msg_queue = communication.MessageQueue()
-    dronology_state_out_msg_queue = communication.MessageQueue()
-    new_vehicle_msg_queue = communication.MessageQueue()
-    connection = communication.Connection(dronology_in_msg_queue, addr=addr, port=port, g_id=gid)
+    dronology_in_msg_queue = communication.core.MessageQueue()
+    dronology_handshake_out_msg_queue = communication.core.MessageQueue()
+    dronology_state_out_msg_queue = communication.core.MessageQueue()
+    new_vehicle_msg_queue = communication.core.MessageQueue()
+    connection = communication.core.Connection(dronology_in_msg_queue, addr=addr, port=port, g_id=gid)
     ctrl_station = control.ControlStation(connection,
                                           dronology_in_msg_queue,
                                           dronology_handshake_out_msg_queue, dronology_state_out_msg_queue,

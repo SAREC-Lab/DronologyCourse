@@ -1,8 +1,7 @@
-import socket
 import json
-import os
 import etc
 from mathtools import Lla, Nvector, Pvector
+
 
 
 def get_logger(name='default_file', p2cfg='../cfg/logging.conf'):
