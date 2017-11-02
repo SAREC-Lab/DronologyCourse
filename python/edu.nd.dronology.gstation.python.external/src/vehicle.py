@@ -305,8 +305,6 @@ class ArduCopter(CopterControl):
             self._v_type = DRONE_TYPE_SITL_VRTL
             self._sitl = sitl
 
-
-
         else:
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
             status = -1
@@ -327,12 +325,22 @@ class ArduCopter(CopterControl):
             0, 0, 0))
         self._vehicle.flush()
 
+
+
         if status >= 0:
             _LOG.info('Vehicle successfully initialized.')
             self._handshake_out_msgs.put_message(message.DroneHandshakeMessage.from_vehicle(self._vehicle, self._vid))
             self._state_msg_timer = util.etc.RepeatedTimer(self._state_t, self.send_state_message)
         else:
             _LOG.error('Vehicle failed to initialize.')
+
+    def _do_preflight_check(self):
+        self._do_preflight_sensor_check()
+
+    def _do_preflight_sensor_check(sef):
+        sensors = {'3D_GYRO': mavutil.mavlink.MAV_SYS_STATUS_SENSOR_3D_GYRO}
+
+        pass
 
     def stop(self):
         if self._vehicle:
