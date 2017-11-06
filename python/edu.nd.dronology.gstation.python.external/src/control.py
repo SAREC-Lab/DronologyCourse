@@ -136,5 +136,6 @@ class ControlStation(object):
         if not registered:
             _LOG.error('Attempting to remove unregistered vehicle {}!'.format(v_id))
         else:
-            vehicle = self._drones.pop(v_id)
-            vehicle.stop()
+            with self._drone_lock:
+                vehicle = self._drones.pop(v_id)
+                vehicle.stop()

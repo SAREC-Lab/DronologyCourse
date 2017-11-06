@@ -92,7 +92,6 @@ class Connection:
             if status == Connection._DEAD:
                 # Shut down
                 cont = False
-                _LOG.info('shutting down connection...')
             elif status == Connection._WAITING:
                 # Try to connect, timeout after 10 seconds.
                 try:
@@ -124,10 +123,7 @@ class Connection:
 
         if self._sock is not None:
             _LOG.info('Shutting down socket.')
-            # try:
-            #     self._sock.shutdown(socket.SHUT_WR)
-            # except Exception as e:
-            #     _LOG.error(e)
-            # _LOG.info('Closing socket.')
-            # self._sock.close()
+            self._sock.shutdown(socket.SHUT_WR)
+            _LOG.info('Closing socket.')
+            self._sock.close()
             return

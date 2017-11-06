@@ -141,14 +141,16 @@ class ArduCopter(CopterControl):
         }
 
     def get_location(self):
-        lla = self._vehicle.location.global_frame
+        lla = self._vehicle.location.global_relative_frame
         return util.Lla(lla.lat, lla.lon, lla.alt)
 
     def handle_command(self, cmd):
         if not self._vehicle:
             _LOG.error('Vehicle {} not connected! Ignoring command.'.format(self._vid))
         elif type(cmd) not in self._cmd_handlers:
-            _LOG.warn('Unrecognized command {} for {} controller!'.format(type(cmd), self.__class__))
+            _LOG.warn('Vehicle {} received unrecognized command \"{}\" for \"{}\" controller!'.format(self._vid,
+                                                                                                      cmd.__class__.__name__,
+                                                                                                      self.__class__.__name__))
         else:
             self._cmd_handlers[type(cmd)](cmd)
 
@@ -273,7 +275,6 @@ class ArduCopter(CopterControl):
             self._connect_vehicle(*args)
 
     def _connect_vehicle(self, vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud, speedup):
-
         status = 0
         vehicle = None
 
@@ -319,16 +320,18 @@ class ArduCopter(CopterControl):
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
             status = -1
 
+        _LOG.info('Waiting until Vehicle {} is armable'.format(vehicle_id))
         while not vehicle.is_armable:
             time.sleep(1.0)
 
-        lat, lon, alt = self.get_location()
-        # Home location is GlobalRelative, so use 0 altitude. x`
-        self.__set_home_location(lat, lon, 0)
-        self._register_message_handlers(vehicle)
-
         self._vehicle = vehicle
         self._vid = vehicle_id
+
+        lla = vehicle.location.global_relative_frame
+        lat, lon, alt = lla.lat, lla.lon, lla.alt
+        _LOG.debug('Vehicle {} home location is: {}'.format(self._vid, ','.join(map(str, (lat, lon, alt)))))
+        self.__set_home_location(lat, lon, alt)
+        self._register_message_handlers(vehicle)
 
         if status >= 0:
             _LOG.info('Vehicle {} successfully initialized.'.format(self._vid))
@@ -354,8 +357,6 @@ class ArduCopter(CopterControl):
     def stop(self):
         if self._vehicle:
             _LOG.info('Closing vehicle {} connection.'.format(self._vid))
-            self._land()
-            self._set_armed(armed=False)
             self._vehicle.close()
             self._state_msg_timer.stop()
         if self._sitl:

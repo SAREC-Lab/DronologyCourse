@@ -4,6 +4,7 @@ import argparse
 import util
 import signal
 import time
+from common import ARDUPATH
 
 _LOG = util.get_logger()
 
@@ -32,6 +33,7 @@ def main(gid, addr, port, drone_configs):
 
     for dc in util.load_drone_configs(drone_configs):
         new_vehicle_msg_queue.put_message(dc)
+        time.sleep(2.0)
 
     while ctrl_station.is_alive():
         time.sleep(5.0)

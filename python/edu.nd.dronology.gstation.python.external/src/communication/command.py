@@ -13,7 +13,7 @@ class Command(object):
         self._msg_id = msg_id
 
     def __str__(self):
-        return 'Vehicle {}: {}'.format(self._vid, json.dumps(self._data))
+        return 'Vehicle {} {}: {}'.format(self._vid, self.__class__.__name__, json.dumps(self._data))
 
     def __repr__(self):
         return str(self)
@@ -133,4 +133,4 @@ class CommandFactory(object):
         try:
             return CommandFactory._parsers[cmd['command']](*args)
         except Exception as e:
-            _LOG.warn(e)
+            _LOG.warn('Unrecognized command: {}'.format(e))

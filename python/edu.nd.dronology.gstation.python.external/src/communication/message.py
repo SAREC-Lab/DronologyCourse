@@ -10,7 +10,7 @@ class InternalMessage(object):
         self._m_type = m_type
         self._data = data
 
-    def get_data():
+    def get_data(self):
         return self._data
 
 
