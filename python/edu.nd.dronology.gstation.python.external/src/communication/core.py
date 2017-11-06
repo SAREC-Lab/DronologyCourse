@@ -124,10 +124,10 @@ class Connection:
 
         if self._sock is not None:
             _LOG.info('Shutting down socket.')
-            try:
-                self._sock.shutdown(socket.SHUT_WR)
-            except Exception as e:
-                _LOG.error(e)
+            # try:
+            #     self._sock.shutdown(socket.SHUT_WR)
+            # except Exception as e:
+            #     _LOG.error(e)
             # _LOG.info('Closing socket.')
             # self._sock.close()
             return

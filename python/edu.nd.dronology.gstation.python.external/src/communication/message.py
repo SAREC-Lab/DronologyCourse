@@ -80,7 +80,7 @@ class StateMessage(DronologyMessage):
 
     @classmethod
     def from_vehicle(cls, vehicle, v_id, **kwargs):
-        lla = vehicle.location.global_frame
+        lla = vehicle.location.global_relative_frame
         att = vehicle.attitude
         vel = vehicle.velocity
         battery = {

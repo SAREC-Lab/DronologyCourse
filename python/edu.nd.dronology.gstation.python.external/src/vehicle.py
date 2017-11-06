@@ -59,8 +59,6 @@ class VehicleControl(object):
 
     def send_state_message(self):
         msg = self.gen_state_message()
-        data = msg.get_data()
-        _LOG.debug(json.dumps(data['location']))
         self._state_out_msgs.put_message(msg)
 
     def gen_state_message(self):
@@ -137,6 +135,10 @@ class ArduCopter(CopterControl):
             command.SetHome: self._set_home_location,
             command.SetArmed: self._set_armed
         }
+        self._sensors = {
+            '3D_GYRO': mavutil.mavlink.MAV_SYS_STATUS_SENSOR_3D_GYRO,
+            '3D_ACCEL': mavutil.mavlink.MAV_SYS_STATUS_SENSOR_3D_ACCEL
+        }
 
     def get_location(self):
         lla = self._vehicle.location.global_frame
@@ -164,16 +166,18 @@ class ArduCopter(CopterControl):
         self.__takeoff(cmd.get_altitude())
 
     def __takeoff(self, alt):
+        self.__set_mode('STABILIZE')
         self._set_armed(armed=True)
-        self._vehicle.mode = dronekit.VehicleMode('GUIDED')
+        self.__set_mode('GUIDED')
         self._vehicle.simple_takeoff(alt)
+        time.sleep(2.0)
 
     def _goto_lla(self, cmd):
         lat, lon, alt = cmd.get_lla().as_array()
         self.__goto_lla(lat, lon, alt)
 
     def __goto_lla(self, lat, lon, alt):
-        self._vehicle.simple_goto(dronekit.LocationGlobal(lat, lon, alt))
+        self._vehicle.simple_goto(dronekit.LocationGlobalRelative(lat, lon, alt))
 
     def _land(self, cmd=None):
         self.__land()
@@ -181,7 +185,7 @@ class ArduCopter(CopterControl):
     def __land(self):
         self.__set_mode('LAND')
 
-        while abs(self._vehicle.location.global_frame.alt - 1) > 1:
+        while abs(self._vehicle.location.global_relative_frame.alt - 1) > 1:
             time.sleep(2)
 
     def _set_ground_speed(self, cmd):
@@ -222,7 +226,14 @@ class ArduCopter(CopterControl):
         self.__set_home_location(*cmd.get_lla().as_array())
 
     def __set_home_location(self, lat, lon, alt):
-        self._vehicle.home_location = dronekit.LocationGlobal(lat, lon, alt)
+        self._vehicle.send_mavlink(self._vehicle.message_factory.command_long_encode(
+            0, 0,  # target system, target component
+            mavutil.mavlink.MAV_CMD_DO_SET_HOME,  # command
+            0,  # confirmation
+            2,  # param 1: 1 to use current position, 2 to use the entered values.
+            0, 0, 0,  # params 2-4
+            lat, lon, alt))
+        self._vehicle.flush()
 
     def _set_armed(self, armed=True):
         if self._vehicle.armed != armed:
@@ -240,7 +251,7 @@ class ArduCopter(CopterControl):
         return self._vehicle.armed
 
     def connect_vehicle(self, vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, rate=10,
-                        home=(41.519412, -86.239830, 0, 0), baud=115200, speedup=1.0, async=True):
+                        home=(41.519412, -86.239830, 0, 0), baud=57600, speedup=1.0, async=True):
         """
         Connect to a SITL vehicle or a real vehicle.
 
@@ -261,7 +272,6 @@ class ArduCopter(CopterControl):
         else:
             self._connect_vehicle(*args)
 
-
     def _connect_vehicle(self, vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud, speedup):
 
         status = 0
@@ -274,7 +284,7 @@ class ArduCopter(CopterControl):
                 home = tuple(home)
 
         if vehicle_type == DRONE_TYPE_PHYS:
-            vehicle = dronekit.connect(ip, wait_ready=True, baud=baud)
+            vehicle = dronekit.connect(ip, wait_ready=False, baud=baud)
             self._v_type = DRONE_TYPE_PHYS
 
             if vehicle_id is None:
@@ -309,38 +319,37 @@ class ArduCopter(CopterControl):
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
             status = -1
 
-        self._vehicle = vehicle
-        self._vid = vehicle_id
-
-        while not self._vehicle.is_armable:
+        while not vehicle.is_armable:
             time.sleep(1.0)
 
         lat, lon, alt = self.get_location()
-        self._vehicle.send_mavlink(self._vehicle.message_factory.command_long_encode(
-            0, 0,  # target system, target component
-            mavutil.mavlink.MAV_CMD_DO_SET_HOME,  # command
-            0,  # confirmation
-            1,  # param 1: 1 to use current position, 2 to use the entered values.
-            0, 0, 0,  # params 2-4
-            0, 0, 0))
-        self._vehicle.flush()
+        # Home location is GlobalRelative, so use 0 altitude. x`
+        self.__set_home_location(lat, lon, 0)
+        self._register_message_handlers(vehicle)
 
-
+        self._vehicle = vehicle
+        self._vid = vehicle_id
 
         if status >= 0:
-            _LOG.info('Vehicle successfully initialized.')
+            _LOG.info('Vehicle {} successfully initialized.'.format(self._vid))
             self._handshake_out_msgs.put_message(message.DroneHandshakeMessage.from_vehicle(self._vehicle, self._vid))
             self._state_msg_timer = util.etc.RepeatedTimer(self._state_t, self.send_state_message)
         else:
-            _LOG.error('Vehicle failed to initialize.')
+            _LOG.error('Vehicle {} failed to initialize.'.format(self._vid))
 
-    def _do_preflight_check(self):
-        self._do_preflight_sensor_check()
+    def _register_message_handlers(self, vehicle):
+        self._register_sys_status_handler(vehicle)
 
-    def _do_preflight_sensor_check(sef):
-        sensors = {'3D_GYRO': mavutil.mavlink.MAV_SYS_STATUS_SENSOR_3D_GYRO}
-
-        pass
+    def _register_sys_status_handler(self, vehicle):
+        @vehicle.on_message('SYS_STATUS')
+        def handle_sys_status(_, name, msg):
+            for sid, bits in self._sensors.items():
+                present = True if ((msg.onboard_control_sensors_enabled & bits) == bits) else False
+                healthy = True if ((msg.onboard_control_sensors_health & bits) == bits) else False
+                if not present:
+                    _LOG.warn('Vehicle {} sensor {} not present!'.format(self._vid, sid))
+                elif not healthy:
+                    _LOG.warn('Vehicle {} sensor {} not healthy!'.format(self._vid, sid))
 
     def stop(self):
         if self._vehicle:

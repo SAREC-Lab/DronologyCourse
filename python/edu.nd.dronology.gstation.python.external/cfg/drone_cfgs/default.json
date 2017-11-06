@@ -3,6 +3,7 @@
     "vehicle_type": "VRTL",
     "vehicle_id": null,
     "home": [41.6795175,-86.2524589],
-    "ip": null
+    "ip": null,
+    "ardupath": "/home/uav/git/ardupilot"
   }
 ]

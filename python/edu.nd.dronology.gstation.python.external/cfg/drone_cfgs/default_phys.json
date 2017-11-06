@@ -1,0 +1,8 @@
+[
+  {
+    "vehicle_type": "PHYS",
+    "vehicle_id": "IRIS5",
+    "ip": "/dev/ttyUSB2",
+    "ardupath": "/home/uav/git/ardupilot"
+  }
+]
