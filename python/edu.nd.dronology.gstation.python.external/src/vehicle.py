@@ -51,6 +51,7 @@ class VehicleControl(object):
         self._state_out_msgs = state_msg_queue
         self._state_t = state_interval
         self._state_msg_timer = None
+        self._responsive = True
 
     def update_state_interval(self, state_interval):
         self._state_msg_timer.stop()
@@ -151,6 +152,8 @@ class ArduCopter(CopterControl):
             _LOG.warn('Vehicle {} received unrecognized command \"{}\" for \"{}\" controller!'.format(self._vid,
                                                                                                       cmd.__class__.__name__,
                                                                                                       self.__class__.__name__))
+        elif not self._responsive:
+            _LOG.info('Vehicle {} ignoring command: manual control overrides!')
         else:
             self._cmd_handlers[type(cmd)](cmd)
 
@@ -170,7 +173,7 @@ class ArduCopter(CopterControl):
     def __takeoff(self, alt):
         self.__set_mode('STABILIZE')
         self._set_armed(armed=True)
-        self.__set_mode('GUIDED')
+        self.__set_mode('AUTO')
         self._vehicle.simple_takeoff(alt)
         time.sleep(2.0)
 
@@ -311,7 +314,8 @@ class ArduCopter(CopterControl):
             port = str(int(port) + instance * 10)
             conn_string = ':'.join([tcp, ip, port])
             _LOG.debug('SITL instance {} launched on: {}'.format(instance, conn_string))
-            vehicle = dronekit.connect(conn_string, wait_ready=True, baud=baud)
+            vehicle = dronekit.connect(conn_string, baud=baud)
+            vehicle.wait_ready('parameters', 'gps_0', 'armed', 'mode', 'attitude', 'ekf_ok')
             _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
             self._v_type = DRONE_TYPE_SITL_VRTL
             self._sitl = sitl
@@ -319,10 +323,6 @@ class ArduCopter(CopterControl):
         else:
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
             status = -1
-
-        _LOG.info('Waiting until Vehicle {} is armable'.format(vehicle_id))
-        while not vehicle.is_armable:
-            time.sleep(1.0)
 
         self._vehicle = vehicle
         self._vid = vehicle_id
@@ -342,6 +342,7 @@ class ArduCopter(CopterControl):
 
     def _register_message_handlers(self, vehicle):
         self._register_sys_status_handler(vehicle)
+        self._register_mode_change(vehicle)
 
     def _register_sys_status_handler(self, vehicle):
         @vehicle.on_message('SYS_STATUS')
@@ -349,10 +350,17 @@ class ArduCopter(CopterControl):
             for sid, bits in self._sensors.items():
                 present = True if ((msg.onboard_control_sensors_enabled & bits) == bits) else False
                 healthy = True if ((msg.onboard_control_sensors_health & bits) == bits) else False
+
                 if not present:
                     _LOG.warn('Vehicle {} sensor {} not present!'.format(self._vid, sid))
                 elif not healthy:
                     _LOG.warn('Vehicle {} sensor {} not healthy!'.format(self._vid, sid))
+
+    def _register_mode_change(self, vehicle):
+        @vehicle.on_attribute('mode')
+        def handle_mode_change(_, name, msg):
+            _LOG.info('Vehicle {} mode changed to {}, giving up control!'.format(self._vid, name))
+            self._responsive = False
 
     def stop(self):
         if self._vehicle:
