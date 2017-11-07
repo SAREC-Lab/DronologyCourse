@@ -315,7 +315,7 @@ class ArduCopter(CopterControl):
             conn_string = ':'.join([tcp, ip, port])
             _LOG.debug('SITL instance {} launched on: {}'.format(instance, conn_string))
             vehicle = dronekit.connect(conn_string, baud=baud)
-            vehicle.wait_ready('parameters', 'gps_0', 'armed', 'mode', 'attitude', 'ekf_ok')
+            vehicle.wait_ready(timeout=120)
             _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
             self._v_type = DRONE_TYPE_SITL_VRTL
             self._sitl = sitl
@@ -323,6 +323,9 @@ class ArduCopter(CopterControl):
         else:
             _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
             status = -1
+
+        while not vehicle.is_armable:
+            time.sleep(3.0)
 
         self._vehicle = vehicle
         self._vid = vehicle_id
