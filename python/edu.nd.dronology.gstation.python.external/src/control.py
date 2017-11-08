@@ -1,5 +1,5 @@
 import threading
-from vehicle import ArduCopter
+from vehicle.copter import ArduCopter
 from util import get_logger
 from common import *
 
