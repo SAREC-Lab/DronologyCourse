@@ -42,7 +42,7 @@ The following directions explain how to setup your computer as a development mac
     mvn install -Dmaven.test.skip=true
     ```
 
-* If your local Maven repository gets messed up, you can force maven to re-download dependencies and install:
+* If your local maven repository gets messed up, you can force maven to re-download dependencies, rebuild everything and install:
     ```bash
     cd /path/to/Dronology
     mvn clean
