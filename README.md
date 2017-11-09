@@ -4,7 +4,7 @@
 
 The following directions explain how to setup your computer as a development machine. By the end you should be able to build, test, run, and modify the project.
 
-1. Install a JDK that can accommodate Java 8. Make sure the JDK's bin directory is in your `PATH`. On some platforms, like Windows, you might also need to make sure that the `JAVA_HOME` environment variable is set up and pointing to the directory where the JDK is installed.
+1. Install a JDK that can accommodate Java 8. Make sure the JDK's bin directory is in your `PATH`. On some platforms, like Windows, you might also need to make sure that the `JAVA_HOME` environment variable is set up and pointing to the directory where the JDK is installed. You may also need to add the JDK's bin directory to your `PATH` variable.
 
 1. Install [Maven](https://maven.apache.org). Make sure that Maven's bin directory is in your `PATH`.
 
