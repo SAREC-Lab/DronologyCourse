@@ -12,7 +12,7 @@ import net.mv.logging.LoggerProvider;
 
 public class PlanPoolManager {
 
-	private static PlanPoolManager INSTANCE = null;
+	private static volatile PlanPoolManager INSTANCE = null;
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(PlanPoolManager.class);
 

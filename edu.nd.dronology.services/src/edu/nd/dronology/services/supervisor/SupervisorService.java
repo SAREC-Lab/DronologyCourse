@@ -7,7 +7,7 @@ import edu.nd.dronology.services.core.util.DronologyServiceException;
 
 public class SupervisorService extends AbstractServerService<ISupervisorServiceInstance> {
 
-	private static SupervisorService INSTANCE;
+	private static volatile SupervisorService INSTANCE;
 
 	protected SupervisorService() {
 		super();
@@ -19,7 +19,9 @@ public class SupervisorService extends AbstractServerService<ISupervisorServiceI
 	public static SupervisorService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (SupervisorService.class) {
-				INSTANCE = new SupervisorService();
+				if (INSTANCE == null) {
+					INSTANCE = new SupervisorService();
+				}
 			}
 		}
 		return INSTANCE;
@@ -41,8 +43,7 @@ public class SupervisorService extends AbstractServerService<ISupervisorServiceI
 	public String getFlightPathLocation() {
 		return serviceInstance.getFlightPathLocation();
 	}
-	
-	
+
 	public String getSimScenarioLocation() {
 		return serviceInstance.getSimScenarioLocation();
 	}
@@ -50,7 +51,6 @@ public class SupervisorService extends AbstractServerService<ISupervisorServiceI
 	public String getDroneSpecificationLocation() {
 		return serviceInstance.getDroneSpecificationLocation();
 	}
-	
 
 	public String getWorkspaceLocation() {
 		return serviceInstance.getWorkspaceLocation();
@@ -65,15 +65,9 @@ public class SupervisorService extends AbstractServerService<ISupervisorServiceI
 		return serviceInstance.importItem(fileName, byteArray, overwrite);
 	}
 
-	
-	
-	
-
 	public void restart(String serviceClass) throws DronologyServiceException {
 		getService(serviceClass).restartService();
 
 	}
-
-
 
 }
