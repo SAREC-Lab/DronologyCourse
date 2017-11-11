@@ -4,9 +4,11 @@
 
 The following directions explain how to setup your computer as a development machine. By the end you should be able to build, test, run, and modify the project.
 
-1. Install a JDK that can accommodate Java 8. Make sure the JDK's bin directory is in your `PATH`. On some platforms, like Windows, you might also need to make sure that the `JAVA_HOME` environment variable is set up and pointing to the directory where the JDK is installed. You may also need to add the JDK's bin directory to your `PATH` variable.
-
-1. Install [Maven](https://maven.apache.org). Make sure that Maven's bin directory is in your `PATH`.
+1. Install a [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and [Maven](https://maven.apache.org). Make sure the JDK's bin directory is in your `PATH`. On some platforms, like Windows, you also need to make sure that the `JAVA_HOME` environment variable is set up and pointing to the directory where the JDK is installed. On Windows, you also need to add the JDK's bin directory to your `PATH` variable. Make sure that Maven's bin directory is in your `PATH` too. On Ubuntu you can quickly install a JDK and Maven with:
+	```bash
+	sudo apt install openjdk-8-jdk maven
+	```
+	On Ubuntu, using the above command, you don't need to setup environment variables.
 
 1. Clone the project:
    ```bash
@@ -19,18 +21,19 @@ The following directions explain how to setup your computer as a development mac
     mvn install
     ````
 	
-1. Run the Vaadin UI:
+1. In a terminal, run the Vaadin UI:
     ```bash
     cd /path/to/Dronology/edu.nd.dronology.ui.vaadin
     mvn jetty:run
     ```
-	This starts a web server that you will connect to in a later step.
+    This starts a web server that you will connect to in a later step. This runs until you stop it with Ctrl + C.
 
-1. Run Dronology
+1. In a terminal, run Dronology:
     ```bash
     cd /path/to/Dronology/edu.nd.dronology.services.launch
     mvn exec:java
     ```
+    This runs until you stop it with Ctrl + C.
 
 1. Open your browser and navigate to the Dronology web UI at [http://localhost:8080/vaadinui](http://localhost:8080/vaadinui).
 
