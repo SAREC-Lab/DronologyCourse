@@ -7,7 +7,8 @@ import edu.nd.dronology.services.core.info.FlightRouteCategoryInfo;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 
-public class FlightRouteplanningService extends AbstractFileTransmitServerService<IFlightRouteplanningServiceInstance, FlightRouteInfo> {
+public class FlightRouteplanningService
+		extends AbstractFileTransmitServerService<IFlightRouteplanningServiceInstance, FlightRouteInfo> {
 
 	private static volatile FlightRouteplanningService INSTANCE;
 
@@ -21,7 +22,9 @@ public class FlightRouteplanningService extends AbstractFileTransmitServerServic
 	public static FlightRouteplanningService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (FlightRouteplanningService.class) {
-				INSTANCE = new FlightRouteplanningService();
+				if (INSTANCE == null) {
+					INSTANCE = new FlightRouteplanningService();
+				}
 			}
 		}
 		return INSTANCE;

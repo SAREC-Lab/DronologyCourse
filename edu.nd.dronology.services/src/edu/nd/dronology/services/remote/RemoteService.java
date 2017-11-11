@@ -11,20 +11,22 @@ import edu.nd.dronology.services.instances.remote.RemoteConnectionServiceInstanc
 
 public class RemoteService extends AbstractServerService<IRemoteConnectionServiceInstance> {
 
-	
 	private static volatile RemoteService INSTANCE;
 
 	@Override
 	protected IRemoteConnectionServiceInstance initServiceInstance() {
 		return new RemoteConnectionServiceInstance();
 	}
+
 	/**
 	 * @return The singleton RemoteService instance
 	 */
 	public static RemoteService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (RemoteService.class) {
-				INSTANCE = new RemoteService();
+				if (INSTANCE == null) {
+					INSTANCE = new RemoteService();
+				}
 			}
 		}
 		return INSTANCE;
@@ -32,7 +34,7 @@ public class RemoteService extends AbstractServerService<IRemoteConnectionServic
 
 	public void performCleanup() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public Collection<RemoteInfo> getRegisteredRemoteClients() {
@@ -42,17 +44,17 @@ public class RemoteService extends AbstractServerService<IRemoteConnectionServic
 	public void register(RemoteInfo rInfo) {
 		serviceInstance.register(rInfo);
 	}
-	
+
 	public void unregister(RemoteInfo rInfo) {
 		serviceInstance.unregister(rInfo);
 	}
-	
-//	public void logExternal(LogEventAdapter event) {
-//		serviceInstance.logExternal(event);
-//	}
-	public void addRemoteManager(IRemoteManager manager) throws DronologyServiceException{
+
+	// public void logExternal(LogEventAdapter event) {
+	// serviceInstance.logExternal(event);
+	// }
+	public void addRemoteManager(IRemoteManager manager) throws DronologyServiceException {
 		serviceInstance.addRemoteManager(manager);
-		
+
 	}
-	
+
 }
