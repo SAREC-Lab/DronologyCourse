@@ -17,7 +17,7 @@ public class WaypointCommand extends Command {
      *     For example, to command a UAV to fly to the Notre Dame Stadium (10m above the middle of the 50-yard line)
      *     <pre>
      *         {@code
-     *         Command nd = new WaypointCommand(new LlaCoordinate(41.698394, -86.233923, 236)
+     *         WaypointCommand nd = new WaypointCommand(new LlaCoordinate(41.698394, -86.233923, 236.0))
      *         }
      *     </pre>
      * </p>
