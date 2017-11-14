@@ -12,4 +12,16 @@ public class TestNedCommand {
         assertEquals(3.0, example.getDown(),0.0);
         assertEquals(4.0, example.getTime(),0.0);
     }
+
+    @Test
+    public void testExample() {
+        /*
+        this is the example in the java docs
+         */
+        NedCommand north = new NedCommand(5, 0, 0, 10);
+        assertEquals(5.0, north.getNorth(),0.0);
+        assertEquals(0.0, north.getEast(),0.0);
+        assertEquals(0.0, north.getDown(),0.0);
+        assertEquals(10.0, north.getTime(),0.0);
+    }
 }
