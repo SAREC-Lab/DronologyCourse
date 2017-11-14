@@ -12,7 +12,7 @@ public class NedCommand extends Command {
      * </p>
      *
      * <p>
-     * Each component of the NED vector is given in meters. The time parameter is given in seconds.
+     * Each component of the NED vector is given in meters per second. The time parameter is given in seconds.
      * </p>
      *
      * <p>
