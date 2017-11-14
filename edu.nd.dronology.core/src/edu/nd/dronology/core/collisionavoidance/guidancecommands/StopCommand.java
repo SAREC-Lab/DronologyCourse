@@ -17,7 +17,7 @@ public class StopCommand extends Command {
      * For example, to create a stop command that lasts for 10 seconds
      * <pre>
      *         {@code
-     *         Command stop = new StopCommand(10.0);
+     *         StopCommand stop = new StopCommand(10.0);
      *         }
      *     </pre>
      * </p>
@@ -26,7 +26,7 @@ public class StopCommand extends Command {
      * To create a stop command that lasts until someone or something intervenes
      * <pre>
      *         {@code
-     *         Command stopForever = new StopCommand(0);
+     *         StopCommand stopForever = new StopCommand(0);
      *         }
      *     </pre>
      * </p>
