@@ -109,19 +109,19 @@ class ArduCopter(CopterControl):
         """
         self.__set_mode(cmd.get_mode())
 
-    def __set_mode(self, mode):
+    def __set_mode(self, mode, wait=5.0):
         """
         Set the vehicle mode to the specified mode
         :param mode:
         :return:
         """
         self._vehicle.mode = dronekit.VehicleMode(mode)
-        time.sleep(5.0)
+        time.sleep(wait)
         mode_ = self._vehicle.mode.name
 
         while mode_ != mode:
             self._vehicle.mode = dronekit.VehicleMode(mode)
-            time.sleep(5.0)
+            time.sleep(wait)
             mode_ = self._vehicle.mode.name
 
     def _takeoff(self, cmd):
@@ -132,16 +132,16 @@ class ArduCopter(CopterControl):
         """
         self.__takeoff(cmd.get_altitude())
 
-    def __takeoff(self, alt):
+    def __takeoff(self, alt, wait=2.0):
         """
         Takeoff to the specified altitude
         :param alt:
         :return:
         """
-        self.__set_mode('GUIDED')
+        self.__set_mode(MODE_GUIDED)
         self._set_armed(armed=True)
         self._vehicle.simple_takeoff(alt)
-        time.sleep(2.0)
+        time.sleep(wait)
 
     def _goto_lla(self, cmd):
         """
@@ -175,10 +175,7 @@ class ArduCopter(CopterControl):
         Land the vehicle
         :return:
         """
-        self.__set_mode('LAND')
-
-        while abs(self._vehicle.location.global_relative_frame.alt - 1) > 1:
-            time.sleep(2)
+        self.__set_mode(MODE_LAND)
 
     def _set_ground_speed(self, cmd):
         """
@@ -374,15 +371,11 @@ class ArduCopter(CopterControl):
             while not vehicle.is_armable:
                 time.sleep(3.0)
 
+        # Allow some extra time for things to initialize
+        time.sleep(3.0)
         with self._drone_lock:
             self._vehicle = vehicle
             self._vid = vehicle_id
-
-            # Ensure home location is properly set
-            lla = vehicle.location.global_frame
-            lat, lon, alt = lla.lat, lla.lon, lla.alt
-            _LOG.debug('Vehicle {} home location is: {}'.format(self._vid, ','.join(map(str, (lat, lon, alt)))))
-            self.__set_home_location(lat, lon, alt)
             self._register_message_handlers(vehicle)
 
         if status >= 0:
@@ -427,18 +420,11 @@ class ArduCopter(CopterControl):
         """
         @vehicle.on_attribute('mode')
         def handle_mode_change(_, name, msg):
-            if msg.name != 'GUIDED':
+            if msg.name == MODE_LOITER:
                 _LOG.info('Vehicle {} mode changed to {}, giving up control!'.format(self._vid, msg.name))
                 with self._drone_lock:
-                    mode_name = 'STABILIZE'
-                    mode_ = vehicle.mode.name
-
-                    # Set mode to stabilize: give back control to the RC
-                    while mode_ != mode_name:
-                        mode_ = vehicle.mode.name
-                        vehicle.mode = dronekit.VehicleMode(mode_name)
-
-                    # Set response to false.. ignore all future commands that might be sent by Dronology
+                    # Give control to the RC
+                    # Set responsive to false.. ignore all future commands that might be sent by Dronology
                     self._responsive = False
 
     def stop(self):
