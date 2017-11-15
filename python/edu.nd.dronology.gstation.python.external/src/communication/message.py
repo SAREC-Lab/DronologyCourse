@@ -65,7 +65,7 @@ class DroneHandshakeMessage(DronologyMessage):
             _LOG.warn(e)
             sac = {}
 
-        lla = vehicle.location.global_frame
+        lla = vehicle.location.global_relative_frame
         data = {
             'home': {'x': lla.lat,
                      'y': lla.lon,

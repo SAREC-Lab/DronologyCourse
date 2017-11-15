@@ -17,6 +17,9 @@ class CopterControl(VehicleControl):
     def gen_state_message(self):
         return message.StateMessage.from_vehicle(self._vehicle, self._vid)
 
+    def get_location(self):
+        raise NotImplementedError
+
     def connect_vehicle(self, **kwargs):
         raise NotImplementedError
 
@@ -29,26 +32,23 @@ class CopterControl(VehicleControl):
     def _set_mode(self, cmd):
         raise NotImplementedError
 
+    def _set_armed(self, cmd=None):
+        raise NotImplementedError
+
     def _takeoff(self, cmd):
         raise NotImplementedError
 
     def _goto_lla(self, cmd):
-        raise NotImplementedError
+        pass
 
     def _land(self, cmd):
-        raise NotImplementedError
+        pass
 
     def _set_ground_speed(self, cmd):
-        raise NotImplementedError
+        pass
 
     def _set_velocity(self, cmd):
-        raise NotImplementedError
-
-    def _set_home_location(self, cmd):
-        raise NotImplementedError
-
-    def _set_armed(self, cmd=None):
-        raise NotImplementedError
+        pass
 
 
 class ArduCopter(CopterControl):
@@ -123,6 +123,23 @@ class ArduCopter(CopterControl):
             self._vehicle.mode = dronekit.VehicleMode(mode)
             time.sleep(wait)
             mode_ = self._vehicle.mode.name
+
+    def _set_armed(self, armed=True):
+        """
+        Arm or disarm the vehicle.
+        :param armed:
+        :return:
+        """
+        if self._vehicle.armed != armed:
+            if armed:
+                while not self._vehicle.is_armable:
+                    time.sleep(2.0)
+
+            self._vehicle.armed = armed
+            time.sleep(2.0)
+            while self._vehicle.armed != armed:
+                self._vehicle.armed = armed
+                time.sleep(2.0)
 
     def _takeoff(self, cmd):
         """
@@ -257,30 +274,6 @@ class ArduCopter(CopterControl):
             0, 0, 0,  # params 2-4
             lat, lon, alt))
         self._vehicle.flush()
-
-    def _set_armed(self, armed=True):
-        """
-        Arm or disarm the vehicle.
-        :param armed:
-        :return:
-        """
-        if self._vehicle.armed != armed:
-            if armed:
-                while not self._vehicle.is_armable:
-                    time.sleep(2.0)
-
-            self._vehicle.armed = armed
-            time.sleep(2.0)
-            while self._vehicle.armed != armed:
-                self._vehicle.armed = armed
-                time.sleep(2.0)
-
-    def _get_armed(self):
-        """
-        Determine whether the vehicle is armed
-        :return:
-        """
-        return self._vehicle.armed
 
     def connect_vehicle(self, vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, rate=10,
                         home=(41.519412, -86.239830, 0, 0), baud=57600, speedup=1.0, async=True):
