@@ -15,7 +15,8 @@ public class DroneSnapshot {
 
     private final ArrayList<Command> commands;
 
-    public DroneSnapshot() {
+    public DroneSnapshot(LlaCoordinate position) {
+        this.position = position;
         this.commands = new ArrayList<>();
     }
     

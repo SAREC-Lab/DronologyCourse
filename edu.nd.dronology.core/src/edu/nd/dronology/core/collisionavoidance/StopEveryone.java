@@ -16,14 +16,13 @@ public class StopEveryone implements CollisionAvoider {
     public void avoid(ArrayList<DroneSnapshot> drones) {
         for (int i = 0; i < drones.size() - 1; ++i) {
             for (int j = i + 1; j < drones.size(); ++j) {
-                if (i != j) {
-                    if (drones.get(i).getPosition().distance(drones.get(j).getPosition()) < this.threshold) {
-                        for (int k = 0; k < drones.size(); k++) {
-                            drones.get(k).getCommands().clear();
-                            drones.get(k).getCommands().add(new StopCommand(-1.0));
-                        }
-                        return;
+                if (drones.get(i).getPosition().distance(drones.get(j).getPosition()) < this.threshold) {
+                    System.out.println("Drone "+ i + " is too close to drone " + j +" ("+drones.get(i).getPosition().distance(drones.get(j).getPosition())+" meters)! Stopping everyone ");
+                    for (int k = 0; k < drones.size(); k++) {
+                        drones.get(k).getCommands().clear();
+                        drones.get(k).getCommands().add(new StopCommand(-1.0));
                     }
+                    return;
                 }
             }
         }
