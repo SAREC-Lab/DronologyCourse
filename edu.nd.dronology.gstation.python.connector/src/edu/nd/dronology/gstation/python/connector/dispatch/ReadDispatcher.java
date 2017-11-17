@@ -6,19 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.spec.DSAGenParameterSpec;
-import java.text.DateFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import edu.nd.dronology.core.util.FormatUtil;
-import edu.nd.dronology.gstation.python.connector.GroundStationException;
-import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
-import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
@@ -68,7 +59,8 @@ public class ReadDispatcher implements Runnable {
 					}
 
 				} else {
-					LOGGER.hwFatal("null message received!");
+					LOGGER.hwInfo("null message received: closing socket.");
+					tearDown();
 				}
 
 			}
@@ -129,7 +121,7 @@ public class ReadDispatcher implements Runnable {
 		}
 	}
 
-	public void tearDonw() {
+	public void tearDown() {
 		cont.set(false);
 	}
 
