@@ -1,0 +1,23 @@
+[
+  {
+    "vehicle_type": "VRTL",
+    "vehicle_id": null,
+    "home": [41.6795175,-86.2525],
+    "ip": null,
+    "ardupath": "/home/bayley/git/ardupilot"
+  },
+    {
+    "vehicle_type": "VRTL",
+    "vehicle_id": null,
+    "home": [41.6795175,-86.2524],
+    "ip": null,
+    "ardupath": "/home/bayley/git/ardupilot"
+  },
+    {
+    "vehicle_type": "VRTL",
+    "vehicle_id": null,
+    "home": [41.6795175,-86.2523],
+    "ip": null,
+    "ardupath": "/home/bayley/git/ardupilot"
+  }
+]
