@@ -27,7 +27,7 @@
 					%msg%n"</pattern> -->
 			</PatternLayout>
 			<Policies>
-				<SizeBasedTriggeringPolicy size="50 MB" /> <!-- Or every 100 MB -->
+				<SizeBasedTriggeringPolicy size="10 MB" /> <!-- Or every 100 MB -->
 			</Policies>
 			<DefaultRolloverStrategy max="2" />
 
@@ -47,7 +47,7 @@
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 
 			<Policies>
-				<SizeBasedTriggeringPolicy size="100 MB" /> <!-- Or every 100 MB -->
+				<SizeBasedTriggeringPolicy size="10 MB" /> <!-- Or every 100 MB -->
 			</Policies>
 			<DefaultRolloverStrategy max="5" />
 
