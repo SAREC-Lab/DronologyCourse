@@ -2,19 +2,13 @@ package edu.nd.dronology.gstation.python.connector;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import com.google.gson.Gson;
 
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.exceptions.DroneException;
@@ -30,7 +24,6 @@ import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
 import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMessageFactory;
 import edu.nd.dronology.gstation.python.connector.service.DroneConnectorService;
-import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -75,7 +68,7 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 	}
 
 	public void tearDown() {
-		readDispatcher.tearDonw();
+		readDispatcher.tearDown();
 		writeDispatcher.tearDown();
 		dispatchQueueManager.tearDown();
 	}
