@@ -27,7 +27,8 @@ Bundle-ClassPath: .,
  lib/dronology/nd.edu.dronology.util.jar,
  lib/nebula/org.eclipse.nebula.widgets.pshelf_1.0.0.201403032113.jar,
  lib/nebula/org.eclipse.nebula.visualization.xygraph_1.0.0.201502221352.jar,
- lib/dronology/nd.edu.dronology.monitoring.jar
+ lib/dronology/nd.edu.dronology.monitoring.jar,
+ lib/apache/commons-math3-3.6.1.jar
 Export-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.util.concurrent,

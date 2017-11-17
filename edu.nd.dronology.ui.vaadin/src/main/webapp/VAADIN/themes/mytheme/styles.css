@@ -12801,6 +12801,10 @@ div.v-layout.v-horizontal.v-widget {
 	z-index: 0 !important;
 }
 
+.mytheme .v-absolutelayout-wrapper-af_follow_bar {
+	left: calc(100%/2 - 440px) !important;
+}
+
 .mytheme .af_follow_bar {
 	background-color: #224080;
 	color: white;
@@ -12820,6 +12824,14 @@ div.v-layout.v-horizontal.v-widget {
 .mytheme .af_follow_bar .small_text {
 	font-size: 60%;
 	padding: 10px 80px 6px 8px;
+}
+
+.mytheme .af_follow_bar .v-slot-large_text {
+	width: 155px;
+}
+
+.mytheme .af_follow_bar .v-slot-small_text {
+	width: calc(880px - 155px - 150px);
 }
 
 .mytheme .af_assign_route .af_assign_route_top_content {

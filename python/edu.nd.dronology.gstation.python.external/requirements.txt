@@ -1,0 +1,14 @@
+PyYAML==3.12
+argparse==1.2.1
+boltons==17.1.0
+dronekit==2.9.1
+dronekit-sitl==3.2.0
+future==0.15.2
+geographiclib==1.49
+monotonic==1.2
+numpy==1.13.3
+nvector==0.5.2
+psutil==5.4.0
+pymavlink==2.0.6
+six==1.11.0
+wsgiref==0.1.2
