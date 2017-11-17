@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.media.jfxmedia.logging.Logger;
 
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
 import edu.nd.dronology.monitoring.safety.internal.UAVSaeftyCase;
