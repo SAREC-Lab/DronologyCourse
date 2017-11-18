@@ -18,7 +18,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.gstation.python.connector.messages.UAVHandshakeMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVMonitoringMessage;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage;

@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.util;
+package edu.nd.dronology.core.coordinate;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;

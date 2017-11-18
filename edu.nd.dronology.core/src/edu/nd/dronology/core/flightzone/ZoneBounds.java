@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.flightzone;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.LlaCoordinate;
 
 /**
  * Establishes geographical zone for the simulation Singleton

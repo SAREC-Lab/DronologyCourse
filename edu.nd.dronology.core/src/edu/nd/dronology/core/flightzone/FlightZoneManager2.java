@@ -8,7 +8,8 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.nd.dronology.core.DronologyConstants;
-import edu.nd.dronology.core.air_traffic_control.DroneSeparationMonitor;
+import edu.nd.dronology.core.collisionavoidance.CollisionAvoidanceCheckTask;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.fleet.DroneFleetManager;
@@ -18,7 +19,6 @@ import edu.nd.dronology.core.flight.IFlightPlan;
 import edu.nd.dronology.core.flight.IPlanStatusChangeListener;
 import edu.nd.dronology.core.flight.PlanPoolManager;
 import edu.nd.dronology.core.flight.internal.SoloDirector;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 import net.mv.logging.ILogger;
@@ -29,16 +29,14 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 	private static final ILogger LOGGER = LoggerProvider.getLogger(FlightZoneManager2.class);
 
 	private PlanPoolManager planPoolManager;
-	private DroneSeparationMonitor safetyMgr;
 	private DroneFleetManager droneFleet;
 
-	private Timer timer;
-
-	private AtomicInteger activeUAVS = new AtomicInteger(0);
+	private final AtomicInteger activeUAVS = new AtomicInteger(0);
 
 	private final List<IFlightPlan> awaitingTakeOffFlights = Collections.synchronizedList(new ArrayList<>());
+	private final List<IFlightPlan> awaitingLandingFlights = Collections.synchronizedList(new ArrayList<>());
 
-	private List<IFlightPlan> awaitingLandingFlights = Collections.synchronizedList(new ArrayList<>());
+	private final Timer timer = new Timer();
 
 	/**
 	 * Constructs a new FlightZoneManager.
@@ -47,15 +45,11 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 	 */
 	public FlightZoneManager2() throws InterruptedException {
 		droneFleet = DroneFleetManager.getInstance();
-		safetyMgr = DroneSeparationMonitor.getInstance();
 		planPoolManager = PlanPoolManager.getInstance();
 		planPoolManager.addPlanStatusChangeListener(this);
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new StatusCheckTask(), 100, 1000);
-	}
 
-	public DroneFleetManager getDroneFleet() {
-		return droneFleet; // replace with iterator later.
+		timer.scheduleAtFixedRate(new StatusCheckTask(), 100, DronologyConstants.FREQUENCY_STATUS_CHECKS);
+		timer.scheduleAtFixedRate(new CollisionAvoidanceCheckTask(), 100, DronologyConstants.FREQUENCY_COLLISION_CHECKS);
 	}
 
 	private ManagedDrone tryAssignUAV() throws DroneException, FlightZoneException {
@@ -72,7 +66,6 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 
 		// TODO try to find a free uav from all plans..
 		if (drone != null && (planPoolManager.getCurrentPlan(drone.getDroneName()) == null)) {
-			safetyMgr.attachDrone(drone);
 			planPoolManager.activatePlan(nextPlan, drone.getDroneName());
 			if (drone.getFlightModeState().isOnGround()) {
 				awaitingTakeOffFlights.add(nextPlan);
@@ -98,7 +91,6 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		@Override
 		public void run() {
 			try {
-				safetyMgr.checkForViolations();
 				try {
 					// checkForLandedFlights();
 					checkForCompletedPlans();
@@ -139,8 +131,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 	}
 
 	/**
-	 * Checks if the next pending flight is able to takeoff. Currently takeoff
-	 * occurs in order of pending list.
+	 * Checks if the next pending flight is able to takeoff. Currently takeoff occurs in order of pending list.
 	 * 
 	 * @param droneFleet
 	 * @throws FlightZoneException
@@ -151,8 +142,7 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		if (!awaitingTakeOffFlights.isEmpty()) {
 			IFlightPlan awaitingFlightPlan = awaitingTakeOffFlights.get(0);
 			ManagedDrone drone = awaitingFlightPlan.getAssignedDrone();
-			if (safetyMgr.permittedToTakeOff(drone)) {
-				// LOGGER.info(drone.getDroneName() + " taking off");
+			if (drone.permissionForTakeoff()) {
 				drone.setTargetAltitude(awaitingFlightPlan.getTakeoffAltitude());
 				drone.takeOff();
 				activeUAVS.incrementAndGet();
@@ -202,7 +192,6 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 			return;
 		}
 
-		safetyMgr.attachDrone(drone);
 		planPoolManager.activatePlan(pendingPlan, drone.getDroneName());
 
 		IFlightDirector flightDirectives = new SoloDirector(drone);
@@ -229,8 +218,6 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 		if (drone == null || (planPoolManager.getCurrentPlan(drone.getDroneName()) != null)) {
 			return;
 		}
-
-		safetyMgr.attachDrone(drone);
 		planPoolManager.activatePlan(pendingPlan, drone.getDroneName());
 
 		IFlightDirector flightDirectives = new SoloDirector(drone);

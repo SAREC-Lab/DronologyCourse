@@ -1,6 +1,6 @@
-package edu.nd.dronology.core.air_traffic_control;
+package edu.nd.dronology.core.util;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.util.NullUtil;
 
 public class DistanceUtil {

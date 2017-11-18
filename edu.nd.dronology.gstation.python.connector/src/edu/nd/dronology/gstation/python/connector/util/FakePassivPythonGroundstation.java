@@ -19,7 +19,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.commands.ConnectionResponseCommand;
 import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
 import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;

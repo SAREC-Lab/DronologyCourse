@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.simulator.simplesimulator;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.simulator.IFlightSimulator;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 
 public class SimpleSimulator implements IFlightSimulator {

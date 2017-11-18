@@ -2,6 +2,7 @@ package edu.nd.dronology.core.util;
 
 import java.io.Serializable;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.util.NullUtil;
 
 public class Waypoint implements Serializable {

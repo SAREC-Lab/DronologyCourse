@@ -32,6 +32,12 @@ public class DronologyConstants {
 	 * reached.
 	 */
 	public static final double THRESHOLD_WAYPOINT_DISTANCE = 5.0;
+	
+	/**
+	 * The distance to the altitude in m in which the takeoff height
+	 * reached.
+	 */
+	public static final double THRESHOLD_TAKEOFF_HEIGHT = 2.0;
 
 	public static final double HOME_ALTITUDE = 5;
 
@@ -46,5 +52,15 @@ public class DronologyConstants {
 	public static final boolean USE_SAFETY_CHECKS = false;
 
 	public static final boolean USE_MONITORING = true;
+
+	/**
+	 * Frequency the status check timer is executed (ms)
+	 */
+	public static final long FREQUENCY_STATUS_CHECKS = 1000;
+	
+	/**
+	 * Frequency the collision avoidance check timer is executed (ms)
+	 */
+	public static final long FREQUENCY_COLLISION_CHECKS = 1000;
 
 }

@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import edu.nd.dronology.core.flight.internal.SoloDirector;
-import edu.nd.dronology.core.status.DroneCollectionStatus;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxyManager;
 
 @RunWith(Parameterized.class)
 public class TestDroneCollectionStatus {
@@ -40,8 +40,8 @@ public class TestDroneCollectionStatus {
 	@Test
 	public void testgetInstanceNonThreaded() {
 		
-		instance1 = DroneCollectionStatus.getInstance();
-		instance2 = DroneCollectionStatus.getInstance();
+		instance1 = UAVProxyManager.getInstance();
+		instance2 = UAVProxyManager.getInstance();
 		
 		assertNotNull(instance1);
 		assertNotNull(instance2);
@@ -63,7 +63,7 @@ public class TestDroneCollectionStatus {
 				} catch (InterruptedException | BrokenBarrierException e) {
 					e.printStackTrace();
 				}
-				instance1 = DroneCollectionStatus.getInstance();
+				instance1 = UAVProxyManager.getInstance();
 			}
 		};
 		Thread t2 = new Thread() {
@@ -74,7 +74,7 @@ public class TestDroneCollectionStatus {
 				} catch (InterruptedException | BrokenBarrierException e) {
 					e.printStackTrace();
 				}
-				instance2 = DroneCollectionStatus.getInstance();
+				instance2 = UAVProxyManager.getInstance();
 			}
 		};
 
@@ -95,7 +95,7 @@ public class TestDroneCollectionStatus {
 
 	}
 
-	private volatile DroneCollectionStatus instance1;
-	private volatile DroneCollectionStatus instance2;
+	private volatile UAVProxyManager instance1;
+	private volatile UAVProxyManager instance2;
 
 }

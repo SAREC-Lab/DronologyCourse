@@ -7,8 +7,8 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.junit.Test;
 
-import edu.nd.dronology.core.util.AbstractPosition;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.AbstractPosition;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 
 public class TestAbstractPosition {
 

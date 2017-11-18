@@ -1,6 +1,8 @@
 package edu.nd.dronology.services.dronesetup;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +10,9 @@ import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.fleet.AbstractDroneFleetFactory;
 import edu.nd.dronology.core.fleet.PhysicalDroneFleetFactory;
 import edu.nd.dronology.core.fleet.VirtualDroneFleetFactory;
-import edu.nd.dronology.core.status.DroneCollectionStatus;
-import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxyManager;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
@@ -64,8 +67,8 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	}
 
 	@Override
-	public Map<String, DroneStatus> getDrones() {
-		return DroneCollectionStatus.getInstance().getDrones();
+	public Map<String, UAVProxy> getDrones() {
+		return UAVProxyManager.getInstance().getDrones();
 
 	}
 
@@ -88,7 +91,7 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 			virtualDroneFleetFactory.initializeDrone(di.getId(), di.getType(), di.getInitialLocation());
 		}
 
-		DroneStatus drStat = DroneCollectionStatus.getInstance().getDrone(di.getId());
+		IUAVProxy drStat = UAVProxyManager.getInstance().getDrone(di.getId());
 		notifyDroneStatusChange(drStat);
 	}
 
@@ -114,7 +117,7 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 
 	}
 
-	private void notifyDroneStatusChange(DroneStatus status) {
+	private void notifyDroneStatusChange(IUAVProxy status) {
 		List<IDroneStatusChangeListener> notifyList;
 		synchronized (listenerList) {
 			notifyList = new ArrayList<>(listenerList);
@@ -127,6 +130,11 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 				listenerList.remove(listener);
 			}
 		}
+	}
+
+	@Override
+	public Collection<IUAVProxy> getActiveUAVs() {
+		return UAVProxyManager.getInstance().getActiveUAVs();
 	}
 
 }

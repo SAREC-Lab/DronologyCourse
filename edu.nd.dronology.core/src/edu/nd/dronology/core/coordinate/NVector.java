@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.util;
+package edu.nd.dronology.core.coordinate;
 
 import edu.nd.dronology.core.simulator.nvecsimulator.NvecInterpolator;
 

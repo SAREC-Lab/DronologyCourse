@@ -2,11 +2,11 @@ package edu.nd.dronology.core.vehicle.internal;
 
 import com.google.common.util.concurrent.RateLimiter;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
 import edu.nd.dronology.core.simulator.IFlightSimulator;
 import edu.nd.dronology.core.simulator.SimulatorFactory;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.AbstractDrone;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
@@ -15,7 +15,7 @@ import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 /**
- * Creates a virtual drone. iDrone interface needs refactoring badly!!!!
+ * Creates a virtual drone.
  * 
  * @author Jane Cleland-Huang
  * @version 0.01
@@ -23,15 +23,10 @@ import net.mv.logging.LoggerProvider;
 public class VirtualDrone extends AbstractDrone implements IDrone {
 
 	private static final ILogger LOGGER = LoggerProvider.getLogger(VirtualDrone.class);
-	// private DroneVoltageSimulator voltageSimulator;
-	// private FlightSimulator flightSimulator;
-
 	IFlightSimulator simulator;
 
 	/**
-	 * Constructs drone without specifying its current position. This will be used
-	 * by the physical drone (later) where positioning status will be acquired from
-	 * the drone.
+	 * Constructs drone without specifying its current position. This will be used by the physical drone (later) where positioning status will be acquired from the drone.
 	 * 
 	 * @param drnName
 	 */
@@ -44,18 +39,9 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	public void takeOff(double targetAltitude) throws FlightZoneException {
 		simulator.startBatteryDrain();
 		droneStatus.updateBatteryLevel(simulator.getVoltage()); // Need more
-																// incremental
-																// drain!!
 		super.setCoordinates(droneStatus.getLatitude(), droneStatus.getLongitude(), targetAltitude);
 		try {
 			Thread.sleep(new Double(targetAltitude).intValue() * 100); // Simulates
-																		// attaining
-																		// height.
-																		// Later
-																		// move
-																		// to
-																		// simulator.
-
 		} catch (InterruptedException e) {
 			LOGGER.error(e);
 		}
@@ -85,11 +71,13 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 		droneStatus.updateBatteryLevel(simulator.getVoltage());
 		return simulator.getVoltage();
 	}
+
 	RateLimiter limiter = RateLimiter.create(5);
+
 	@Override
 	public boolean move(double i) { // ALSO NEEDS THINKING ABOUT FOR non-VIRTUAL
 		getBatteryStatus();
-		//limiter.acquire();
+		// limiter.acquire();
 		boolean moveStatus = simulator.move(2);
 		droneStatus.updateCoordinates(getLatitude(), getLongitude(), getAltitude());
 
@@ -123,7 +111,7 @@ public class VirtualDrone extends AbstractDrone implements IDrone {
 	@Override
 	public void sendCommand(AbstractDroneCommand command) throws DroneException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

@@ -1,7 +1,7 @@
 package edu.nd.dronology.services.core.items;
 
 import edu.nd.dronology.core.CoordinateChange;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 
 public class AssignedDrone {
 

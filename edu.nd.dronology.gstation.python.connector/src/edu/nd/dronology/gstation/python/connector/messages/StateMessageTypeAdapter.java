@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage.BatteryStatus;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage.DroneMode;
 import edu.nd.dronology.gstation.python.connector.messages.UAVStateMessage.DroneStatus;

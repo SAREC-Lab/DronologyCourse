@@ -3,7 +3,7 @@ package edu.nd.dronology.gstation.python.connector.messages;
 import java.io.Serializable;
 import java.util.Map;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 
 public class UAVHandshakeMessage extends AbstractUAVMessage<Object> implements Serializable {
 

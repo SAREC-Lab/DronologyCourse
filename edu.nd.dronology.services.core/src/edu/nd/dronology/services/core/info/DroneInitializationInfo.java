@@ -1,6 +1,6 @@
 package edu.nd.dronology.services.core.info;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.util.NullUtil;
 
 public class DroneInitializationInfo extends RemoteInfoObject {

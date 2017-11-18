@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.simulator.simplesimulator;
 
-import edu.nd.dronology.core.air_traffic_control.DistanceUtil;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.util.DistanceUtil;
 import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;

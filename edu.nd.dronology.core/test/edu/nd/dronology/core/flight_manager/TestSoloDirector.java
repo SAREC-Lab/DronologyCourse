@@ -3,8 +3,8 @@ package edu.nd.dronology.core.flight_manager;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.flight.internal.SoloDirector;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 
 public class TestSoloDirector {
