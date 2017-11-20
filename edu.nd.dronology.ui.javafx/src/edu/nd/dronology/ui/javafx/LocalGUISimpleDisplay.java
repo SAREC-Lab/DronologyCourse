@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.flightzone.ZoneBounds;
 import edu.nd.dronology.core.vehicle.IUAVProxy;
 import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;

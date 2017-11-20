@@ -4,7 +4,6 @@ package edu.nd.dronology.ui.javafx;
 import java.awt.Point;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.flightzone.ZoneBounds;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 

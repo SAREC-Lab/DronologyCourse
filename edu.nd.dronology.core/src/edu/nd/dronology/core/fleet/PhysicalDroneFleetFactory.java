@@ -61,8 +61,7 @@ public class PhysicalDroneFleetFactory extends AbstractDroneFleetFactory {
 		LOGGER.info("Drone initialized at: " + currentPosition.toString());
 
 		drone.setBaseCoordinates(currentPosition);
-		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(),
-				currentPosition.getAltitude());
+		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		managedDrone.start();
 		DroneFleetManager.getInstance().addDrone(managedDrone);
 		return managedDrone;

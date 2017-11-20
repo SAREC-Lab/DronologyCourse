@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.flightzone;
+package edu.nd.dronology.ui.javafx;
 
 import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
