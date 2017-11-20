@@ -28,6 +28,7 @@ Clone the Dronology repository.
 ```bash
 cd ~
 mkdir git
+cd git
 git clone https://github.com/SAREC-Lab/Dronology.git
 ```
 
