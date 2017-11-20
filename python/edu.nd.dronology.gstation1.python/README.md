@@ -25,7 +25,8 @@ sudo apt-get install git
 ### Setup
 
 Clone the Dronology repository.
-```cd ~
+```bash
+cd ~
 mkdir git
 git clone https://github.com/SAREC-Lab/Dronology.git
 ```
