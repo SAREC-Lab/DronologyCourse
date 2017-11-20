@@ -6,6 +6,8 @@ The following directions explain how to setup your computer as a development mac
 
 1. Install a [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and [Maven](https://maven.apache.org). Make sure the JDK's bin directory is in your `PATH`. On some platforms, like Windows, you also need to make sure that the `JAVA_HOME` environment variable is set up and pointing to the directory where the JDK is installed. On Windows, you also need to add the JDK's bin directory to your `PATH` variable. Make sure that Maven's bin directory is in your `PATH` too. On Ubuntu you can quickly install a JDK and Maven with:
 	```bash
+	sudo add-apt-repository ppa:openjdk-r/ppa
+	sudo apt-get update
 	sudo apt install openjdk-8-jdk maven
 	```
 	On Ubuntu, using the above command, you don't need to setup environment variables.
