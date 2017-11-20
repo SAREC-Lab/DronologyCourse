@@ -69,7 +69,7 @@ For now, you configure the vehicles (drones) for a simulation using a JSON confi
     "vehicle_id": null,
     "home": [41.6795175,-86.2525],
     "ip": null
-  } ...
+  },
 ]
 ```
 Each JSON entry corresponds to a single drone. For simulations, the only necessary fields are "vehicle_type" (VRTL) and "home" (the starting latitude and longitude of the drone). 
