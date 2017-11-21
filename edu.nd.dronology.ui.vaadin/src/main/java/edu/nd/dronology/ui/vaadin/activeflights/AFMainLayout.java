@@ -13,45 +13,45 @@ import com.vaadin.ui.CustomComponent;
 public class AFMainLayout extends CustomComponent {
 	private static final long serialVersionUID = 1L;
 	private AFControlsComponent controls = new AFControlsComponent();
-	private AFMapComponent map = new AFMapComponent(
-			"VAADIN/sbtiles/{z}/{x}/{y}.png",
-			"South Bend", controls.getPanel());
+	private AFMapComponent map = new AFMapComponent(controls.getPanel());
+
 	public AFMainLayout() {
 		addStyleName("main_layout");
-		
+
 		CssLayout content = new CssLayout();
-		content.setSizeFull();	
-		
-		controls.getPanel().getMapView().getViewButton().addClickListener( e -> {
-				map.setFollow(false);
-				map.setAverageCenter();
+		content.setSizeFull();
+
+		controls.getPanel().getMapView().getViewButton().addClickListener(e -> {
+			map.setFollow(false);
+			map.setAverageCenter();
 		});
-			
+
 		controls.getPanel().getMapView().getFollowButton().addClickListener(e -> {
 			map.setFollow(true);
 			map.setFollowZoom(true);
 			List<String> names = controls.getPanel().getChecked();
-			map.followDrones(names);	
+			map.followDrones(names);
 		});
-			
-			content.addComponents(controls, map);
-			setCompositionRoot(content);
+
+		content.addComponents(controls, map);
+		setCompositionRoot(content);
 	}
+
 	/**
 	 * determines if the map should continue in follow mode
 	 */
-	public void continueFollowing(){
-		if (map.getFollow()){
+	public void continueFollowing() {
+		if (map.getFollow()) {
 			List<String> names = controls.getPanel().getChecked();
 			map.followDrones(names);
 		}
 	}
-	
-	public AFControlsComponent getControls(){
+
+	public AFControlsComponent getControls() {
 		return controls;
 	}
-	
-	public AFMapComponent getAFMap(){
+
+	public AFMapComponent getAFMap() {
 		return map;
 	}
 }
