@@ -4,10 +4,24 @@ import edu.nd.dronology.core.collisionavoidance.guidancecommands.StopCommand;
 
 import java.util.ArrayList;
 
+/**
+ * The StopEveryone CollisionAvoider is a failsafe that only triggers if it detects two drones are intruding into each
+ * others space because something has gone wrong. Use this with mission plans that carefully navigate the drones to
+ * avoid crashing into one another. StopEveryone assumes the drones will follow a mission plan that takes into account
+ * where all the drones will be in space and time. When the StopEveryone CollisionAvoider is triggered the mission is
+ * aborted, and humans need to land the drones manually.
+ */
 public class StopEveryone implements CollisionAvoider {
 
     private final double threshold;
 
+    /**
+     * Initializes a newly created StopEveryone object that triggers all drones to stop whatever they're doing and hover
+     * in place, if any two drones move closer than the threshold distance to one another.
+     *
+     * @param threshold distance in meters. If any two drones move close enough to be within the threshold distance,
+     *                  then StopEveryone will command all drones to stop whatever they're doing and hover in place.
+     */
     public  StopEveryone(double threshold) {
         this.threshold = threshold;
     }
