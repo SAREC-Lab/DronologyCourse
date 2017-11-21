@@ -6,6 +6,7 @@ import org.vaadin.addon.leaflet.LMarker;
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.ButtonRenderer;
@@ -87,6 +88,11 @@ public class FRTableDisplay {
 		
 		grid.setColumnResizeMode(null);
 		grid.setSelectionMode(SelectionMode.NONE);
+		
+		grid.getColumn("latitudeFloat").setHidden(true);
+		grid.getColumn("longitudeFloat").setHidden(true);
+		grid.getColumn("altitudeFloat").setHidden(true);
+		grid.getColumn("transitSpeedFloat").setHidden(true);
 	}
 	public void makeEditable() {
 		grid.getColumn("latitude").setEditorComponent(latitude);
@@ -95,6 +101,7 @@ public class FRTableDisplay {
 		grid.getColumn("transitSpeed").setEditorComponent(transitSpeed);
 		// Makes all columns editable.
 		
+	
 		grid.getEditor().setEnabled(true);
 		grid.getEditor().addSaveListener(event -> {
 			updatePinForWayPoint(event.getBean());
