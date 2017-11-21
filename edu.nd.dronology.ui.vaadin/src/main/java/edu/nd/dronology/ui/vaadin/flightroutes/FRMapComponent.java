@@ -1,7 +1,6 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -165,45 +164,6 @@ public class FRMapComponent extends CustomComponent {
 			e1.printStackTrace();
 		}
 		return description;	
-	}
-	
-	// Sets either the name or description of the selected route based on the boolean passed in.
-	public void setRouteNameDescription(String name, String description) {
-		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
-		ByteArrayInputStream inStream;
-		IFlightRoute froute;
-
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-		// Sends the information to dronology to be saved.
-		try {
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-
-			// Gets id of the selected route, requests the corresponding froute object from the server, sets the name or description, and sends it back.
-			String id = this.getMainLayout().getControls().getInfoPanel().getHighlightedFRInfoBox().getId();
-			
-			byte[] information = service.requestFromServer(id);
-			inStream = new ByteArrayInputStream(information);
-			froute = routePersistor.loadItem(inStream);
-
-			if (name != null) {
-				froute.setName(name);
-			}
-			if (description != null) {
-				froute.setDescription(description);
-			}
-			ByteArrayOutputStream outs = new ByteArrayOutputStream();
-			routePersistor.saveItem(froute, outs);
-			byte[] bytes = outs.toByteArray();
-
-			service.transmitToServer(froute.getId(), bytes);
-
-		} catch (DronologyServiceException | RemoteException e1) {
-			e1.printStackTrace();
-		} catch (PersistenceException e1) {
-			e1.printStackTrace();
-		}
 	}
 
 	//TODO: Seems to be buggy...

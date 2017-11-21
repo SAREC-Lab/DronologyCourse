@@ -84,13 +84,20 @@ public class FRInfoPanel extends CustomComponent {
 	}
 	// Ensures routes are updated by removing and re-adding routes.
 	public void refreshRoutes() {
+		FRInfoBox highlightedBox = this.getHighlightedFRInfoBox();
+		String highlightedId = highlightedBox == null? "" : highlightedBox.getId();
+		
 		routeListLayout.removeAllComponents();
 		Collection<FlightRouteInfo> allFlights = getRoutesFromDronology();
 		mainPanel.setCaption(allFlights.size() + " Routes in database");
 	
 		// Iterates through the routes, gets the fields of each, and creates an infobox.
 		for (FlightRouteInfo info : allFlights) {
-			addRoute(info);
+			FRInfoBox routeBox = addRoute(info);
+			//To preserve previous route selection
+			if (highlightedId.equals(routeBox.getId())) {
+				this.getControls().getMainLayout().switchRoute(routeBox);
+			}
 		}
 	}
 	// Fetch routes information from dronology
@@ -140,9 +147,10 @@ public class FRInfoPanel extends CustomComponent {
 	}
 	
 	// Adds a route to the infobox based on parameters.
-	public void addRoute(FlightRouteInfo flightRouteInfo) {
+	public FRInfoBox addRoute(FlightRouteInfo flightRouteInfo) {
 		FRInfoBox routeBox = new FRInfoBox(this, flightRouteInfo);
 		routeListLayout.addComponent(routeBox);
+		return routeBox;
 	}
 
 	public void unhighlightAllInfoBoxes() {
