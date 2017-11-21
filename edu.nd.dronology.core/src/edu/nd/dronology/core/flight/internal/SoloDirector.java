@@ -3,6 +3,7 @@ package edu.nd.dronology.core.flight.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.dronology.util.NullUtil;
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
@@ -147,6 +148,7 @@ public class SoloDirector implements IFlightDirector {
 
 	@Override
 	public void returnHome(Waypoint home) {
+		NullUtil.checkNull(home);
 		addWayPoint(home);
 		ArrayList<Waypoint> tempWayPoints = new ArrayList<>(wayPoints);
 

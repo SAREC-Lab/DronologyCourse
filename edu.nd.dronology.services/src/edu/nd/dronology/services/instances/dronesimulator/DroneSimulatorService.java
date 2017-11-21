@@ -8,7 +8,8 @@ import edu.nd.dronology.services.core.info.SimulatorScenarioCategoryInfo;
 import edu.nd.dronology.services.core.info.SimulatorScenarioInfo;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 
-public class DroneSimulatorService extends AbstractFileTransmitServerService<IDroneSimulatorServiceInstance, SimulatorScenarioInfo> {
+public class DroneSimulatorService
+		extends AbstractFileTransmitServerService<IDroneSimulatorServiceInstance, SimulatorScenarioInfo> {
 
 	private static volatile DroneSimulatorService INSTANCE;
 
@@ -22,7 +23,9 @@ public class DroneSimulatorService extends AbstractFileTransmitServerService<IDr
 	public static DroneSimulatorService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (DroneSimulatorService.class) {
-				INSTANCE = new DroneSimulatorService();
+				if (INSTANCE == null) {
+					INSTANCE = new DroneSimulatorService();
+				}
 			}
 		}
 		return INSTANCE;
@@ -34,14 +37,12 @@ public class DroneSimulatorService extends AbstractFileTransmitServerService<IDr
 	}
 
 	public void activateScenario(SimulatorScenarioInfo scenario) throws DronologyServiceException {
-	serviceInstance.activateScenario(scenario);
-		
+		serviceInstance.activateScenario(scenario);
+
 	}
 
 	public Collection<SimulatorScenarioCategoryInfo> getCategories() {
 		return serviceInstance.getCategories();
 	}
-
-
 
 }

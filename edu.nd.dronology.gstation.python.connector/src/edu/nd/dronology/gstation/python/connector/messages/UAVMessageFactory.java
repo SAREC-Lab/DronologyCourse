@@ -10,6 +10,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.gstation.python.connector.GroundStationException;
 
 public class UAVMessageFactory {
@@ -48,6 +49,11 @@ public class UAVMessageFactory {
 		}
 		case UAVMonitoringMessage.MESSAGE_TYPE: {
 			message = GSON.fromJson(messagestring, UAVMonitoringMessage.class);
+			message.timestamp();
+			return message;
+		}
+		case ConnectionRequestMessage.MESSAGE_TYPE: {
+			message = GSON.fromJson(messagestring, ConnectionRequestMessage.class);
 			message.timestamp();
 			return message;
 		}

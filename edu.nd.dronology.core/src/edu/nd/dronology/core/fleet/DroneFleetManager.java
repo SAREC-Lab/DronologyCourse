@@ -39,8 +39,8 @@ public class DroneFleetManager {
 	}
 
 	/**
-	 * Specifies whether virtual or physical drones will be created according to
-	 * the previously specified runtime drone type. (See RuntimeDroneTypes.java)
+	 * Specifies whether virtual or physical drones will be created according to the
+	 * previously specified runtime drone type. (See RuntimeDroneTypes.java)
 	 */
 	protected DroneFleetManager() {
 		// if (RuntimeDroneTypes.getInstance().isSimulation())
@@ -97,7 +97,7 @@ public class DroneFleetManager {
 						LOGGER.error("Error when queuing uav '" + designatedDroneId + "'");
 					}
 				}
-				//LOGGER.error("Error when retrieving uav '" + designatedDroneId + "'");
+				// LOGGER.error("Error when retrieving uav '" + designatedDroneId + "'");
 			}
 			return null;
 		}
@@ -109,8 +109,7 @@ public class DroneFleetManager {
 	}
 
 	/**
-	 * When a drone completes a mission, returns it to the pool of available
-	 * drones.
+	 * When a drone completes a mission, returns it to the pool of available drones.
 	 * 
 	 * @param drone
 	 */
@@ -118,7 +117,8 @@ public class DroneFleetManager {
 		if (busyDrones.contains(drone)) {
 			busyDrones.remove(drone);
 		}
-		//LOGGER.info("Drone '"+drone.getDroneName()+"' added to available drone pool");
+		// LOGGER.info("Drone '"+drone.getDroneName()+"' added to available drone
+		// pool");
 		availableDrones.offer(drone);
 
 	}
@@ -132,13 +132,13 @@ public class DroneFleetManager {
 		notifyListeners(true, managedDrone);
 
 	}
-	
+
 	public void removeDrone(ManagedDrone managedDrone) throws DroneException {
 		ManagedDrone value = registeredDrones.remove(managedDrone.getDroneName());
 		if (value == null) {
 			throw new DroneException("Drone '" + managedDrone.getDroneName() + "' not found registered");
 		}
-		LOGGER.info("Drone '"+managedDrone.getDroneName()+"' removed from available dron pool");
+		LOGGER.info("Drone '" + managedDrone.getDroneName() + "' removed from available dron pool");
 		notifyListeners(false, managedDrone);
 	}
 
@@ -147,6 +147,11 @@ public class DroneFleetManager {
 			throw new DroneException("Drone '" + uavid + "' not found registered");
 		}
 		return registeredDrones.get(uavid);
+
+	}
+
+	public List<ManagedDrone> getRegisteredDrones() {
+		return new ArrayList<>(registeredDrones.values());
 
 	}
 

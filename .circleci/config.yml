@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    
+    working_directory: ~/dronology
+
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+
+    steps:
+
+      - checkout
+      
+      - run: mvn package
+      
+      - store_test_results:
+          path: target/surefire-reports
+

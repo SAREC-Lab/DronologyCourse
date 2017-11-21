@@ -6,7 +6,8 @@ import edu.nd.dronology.services.core.base.AbstractFileTransmitServerService;
 import edu.nd.dronology.services.core.info.DroneSpecificationInfo;
 import edu.nd.dronology.services.core.info.TypeSpecificationInfo;
 
-public class DroneSpecificationService extends AbstractFileTransmitServerService<IDroneSpecificationServiceInstance, DroneSpecificationInfo> {
+public class DroneSpecificationService
+		extends AbstractFileTransmitServerService<IDroneSpecificationServiceInstance, DroneSpecificationInfo> {
 
 	private static volatile DroneSpecificationService INSTANCE;
 
@@ -20,10 +21,13 @@ public class DroneSpecificationService extends AbstractFileTransmitServerService
 	public static DroneSpecificationService getInstance() {
 		if (INSTANCE == null) {
 			synchronized (DroneSpecificationService.class) {
-				INSTANCE = new DroneSpecificationService();
+				if (INSTANCE == null) {
+					INSTANCE = new DroneSpecificationService();
+				}
 			}
 		}
 		return INSTANCE;
+
 	}
 
 	@Override
@@ -34,7 +38,5 @@ public class DroneSpecificationService extends AbstractFileTransmitServerService
 	public Collection<TypeSpecificationInfo> getTypeSpecifications() {
 		return serviceInstance.getTypeSpecifications();
 	}
-
-
 
 }

@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.text.DateFormat;
+import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.core.util.FormatUtil;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
@@ -31,8 +27,8 @@ public class ReadDispatcher implements Runnable {
 	private DispatchQueueManager dispatchQueueManager;
 
 	public ReadDispatcher(Socket pythonSocket, DispatchQueueManager dispatchQueueManager) {
-		this.dispatchQueueManager = dispatchQueueManager;
 		try {
+			this.dispatchQueueManager = dispatchQueueManager;
 			inputStream = pythonSocket.getInputStream();
 			cont.set(true);
 		} catch (IOException e) {
@@ -45,13 +41,13 @@ public class ReadDispatcher implements Runnable {
 		try {
 			LOGGER.info("Read-Dispatcher started");
 			reader = new BufferedReader(new InputStreamReader(inputStream));
-			while (cont.get()) {
+			while (cont.get() && !Thread.currentThread().interrupted()) {
 				String line = reader.readLine();
 				if (line != null) {
 					// TODO: create the timestamp before deserializing the
 					// object....
 					try {
-						AbstractUAVMessage msg = UAVMessageFactory.create(line);
+						AbstractUAVMessage<?> msg = UAVMessageFactory.create(line);
 						processMessage(msg);
 						if (msg == null) {
 							LOGGER.hwFatal("Error when parsing incomming message '" + line + "'");
@@ -63,7 +59,8 @@ public class ReadDispatcher implements Runnable {
 					}
 
 				} else {
-					LOGGER.hwFatal("null message received!");
+					LOGGER.hwInfo("null message received: closing socket.");
+					tearDown();
 				}
 
 			}
@@ -80,6 +77,12 @@ public class ReadDispatcher implements Runnable {
 				LOGGER.error(e);
 			}
 
+		} catch (SocketException sex) {
+			LOGGER.error("Socket Exception groundstation " + dispatchQueueManager.getGroundstationid()
+					+ " disconnected - shutting down connection -- Error: " + sex.getMessage());
+			dispatchQueueManager.tearDown();
+			cont.set(false);
+			
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		} finally {
@@ -102,8 +105,10 @@ public class ReadDispatcher implements Runnable {
 
 	private void processMessage(AbstractUAVMessage<?> message) {
 		if (message instanceof UAVStateMessage) {
-//			LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "] "+FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
-//					+ " - " + message.toString());
+			// LOGGER.hwInfo("[" + message.getClass().getSimpleName() + "]
+			// "+FormatUtil.formatTimestamp(message.getTimestamp(),
+			// FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
+			// + " - " + message.toString());
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
 		} else if (message instanceof UAVHandshakeMessage) {
@@ -116,7 +121,11 @@ public class ReadDispatcher implements Runnable {
 		}
 	}
 
-	public void tearDonw() {
+	public void tearDown() {
 		cont.set(false);
+	}
+
+	public String getConnectionId() {
+		return "ADS";
 	}
 }

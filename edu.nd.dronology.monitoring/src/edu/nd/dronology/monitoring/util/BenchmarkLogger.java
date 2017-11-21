@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class BenchmarkLogger {
 
-	static boolean ACTIVE = false;
+	static boolean ACTIVE = true;
 
 	static {
 
@@ -100,7 +100,7 @@ public class BenchmarkLogger {
 			stringBuilder.append(SEPARATOR);
 			stringBuilder.append(uavid);
 			stringBuilder.append(SEPARATOR);
-			// writer.append(passed);
+			stringBuilder.append(rating);
 			stringBuilder.append(SEPARATOR);
 			stringBuilder.append(Long.toString(duration));
 
@@ -176,7 +176,7 @@ public class BenchmarkLogger {
 			stringBuilder.append(SEPARATOR);
 			stringBuilder.append(result);
 			stringBuilder.append(SEPARATOR);
-			stringBuilder.append(Long.toString(time));
+			stringBuilder.append(time);
 			monitorList.add(stringBuilder.toString());
 
 		} catch (Exception e) {
@@ -230,7 +230,7 @@ public class BenchmarkLogger {
 				trustWrite = new ArrayList<>(trustList);
 				trustList.clear();
 			}
-			
+
 			synchronized (trustUAVList) {
 				trustUAVWrite = new ArrayList<>(trustUAVList);
 				trustUAVList.clear();
@@ -248,7 +248,7 @@ public class BenchmarkLogger {
 					+ System.getProperty("line.separator");
 			String frequencyString = frequencyWrite.stream().collect(
 					Collectors.joining(System.getProperty("line.separator"))) + System.getProperty("line.separator");
-			
+
 			String uavTrustString = trustUAVWrite.stream().collect(
 					Collectors.joining(System.getProperty("line.separator"))) + System.getProperty("line.separator");
 

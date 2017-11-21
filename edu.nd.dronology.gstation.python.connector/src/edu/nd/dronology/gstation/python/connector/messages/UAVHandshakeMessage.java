@@ -16,11 +16,6 @@ public class UAVHandshakeMessage extends AbstractUAVMessage<Object> implements S
 		super(messagetype, uavid);
 	}
 
-	public void setType(String type) {
-		this.type = type;
-
-	}
-
 	public LlaCoordinate getHome() {
 		if (data.get(HOME) instanceof LlaCoordinate) {
 			return (LlaCoordinate) data.get(HOME);
@@ -31,7 +26,7 @@ public class UAVHandshakeMessage extends AbstractUAVMessage<Object> implements S
 	}
 
 	public String getSafetyCase() {
-		return data.get(SAFETY_CASE).toString();
+		return data.get(SAFETY_CASE) != null ? data.get(SAFETY_CASE).toString() : null;
 	}
 
 	public void setHome(LlaCoordinate coordinate) {
