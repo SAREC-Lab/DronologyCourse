@@ -60,7 +60,6 @@ public class WatchServiceRunner implements Runnable {
 					Path context = (Path) watchEvent.context();
 					for (String ext : fileExtensions) {
 						if (context.getFileName().toString().endsWith(ext)) {
-							System.out.println(watchEvent.kind().toString());
 							if ("ENTRY_DELETE".equals(watchEvent.kind().toString())
 									|| "ENTRY_CREATE".equals(watchEvent.kind().toString())
 									|| "ENTRY_MODIFY".equals(watchEvent.kind().toString())) {

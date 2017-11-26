@@ -27,7 +27,7 @@ public class ChartItem extends Composite {
 		super(parent, SWT.FLAT);
 		this.uavid = uavid;
 		GridLayoutFactory.fillDefaults().applyTo(this);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(this);
+		GridDataFactory.fillDefaults().minSize(200, 200).grab(true, true).applyTo(this);
 		this.info = info;
 		this.viewer = viewer;
 		createContents();
@@ -72,7 +72,7 @@ public class ChartItem extends Composite {
 		chart = ChartControlFactory.createChart(this, name);
 
 		GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(5, 5, 5, 5).applyTo(this);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(this);
+		//GridDataFactory.fillDefaults().grab(true, true).applyTo(this);
 		ControlUtil.paintCustomBorder(this, 1, SWT.LINE_DOT);
 
 		footer = new Label(this, SWT.FLAT);

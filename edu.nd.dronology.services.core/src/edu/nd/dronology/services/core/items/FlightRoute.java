@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import edu.nd.dronology.core.Discuss;
 import edu.nd.dronology.core.DronologyConstants;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 
 public class FlightRoute implements IFlightRoute {

@@ -102,4 +102,5 @@ public class UAVStateMessage extends AbstractUAVMessage<Object> implements Seria
 		}
 	}
 
+
 }

@@ -64,12 +64,12 @@ public class SafetyCaseValidator {
 
 			try {
 				evaluateMonitorable(ass, monitoringValidator);
-				entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.MONITORING_PROPERTY_PASSED);
+				entry = new ValidationEntry(ass.getId(), ass.getWeight(), Result.MONITORING_PROPERTY_PASSED);
 				validationResult.addValidationEntry(entry);
 
 			} catch (EvaluationException e) {
 				LOGGER.error("Error when evaluating safety case " + e.getMessage());
-				entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.MONITORING_PROPERTY_FAILED);
+				entry = new ValidationEntry(ass.getId(), ass.getWeight(), Result.MONITORING_PROPERTY_FAILED);
 				validationResult.addValidationEntry(entry);
 				valid = false;
 			}
@@ -101,9 +101,14 @@ public class SafetyCaseValidator {
 			if (!isISACParam(param)) {
 				String mappedParam = extAssumption.getParameterMapping(param);
 				if (mappedParam == null) {
-					throw new EvaluationException("ParameterMapping for param '" + param + "' not found");
+					String value = extAssumption.getParameterValue(param);
+					if (value == null) {
+						throw new EvaluationException("ParameterMapping for param '" + param + "' not found");
+					}
+					monitoringValidator.addValue(param, value);
+				} else {
+					monitoringValidator.addMapping(param, mappedParam);
 				}
-				monitoringValidator.addMapping(param, mappedParam);
 			}
 		}
 		return paramMap;
@@ -121,19 +126,19 @@ public class SafetyCaseValidator {
 				result = evaluate(ass);
 
 				if (result == null) {
-					entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.ERROR);
+					entry = new ValidationEntry(ass.getId(), ass.getWeight(), Result.ERROR);
 					LOGGER.error("Error when evaluating assumption '" + ass.getId() + "' " + ass.getExpression());
 					passed = false;
 				} else if (result.booleanValue()) {
-					entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.STATIC_CHECK_PASSED);
+					entry = new ValidationEntry(ass.getId(), ass.getWeight(), Result.STATIC_CHECK_PASSED);
 				} else {
-					entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.STATIC_CHECK_FAILED);
+					entry = new ValidationEntry(ass.getId(), ass.getWeight(), Result.STATIC_CHECK_FAILED);
 					LOGGER.warn("Assumption '" + ass.getId() + "' " + ass.getExpression() + " evaluated to false");
 					passed = false;
 				}
 			} catch (EvaluationException e) {
 				LOGGER.error("Error when evaluating safety case " + e.getMessage());
-				entry = new ValidationEntry(ass.getId(),ass.getWeight(), Result.ERROR);
+				entry = new ValidationEntry(ass.getId(), ass.getWeight(), Result.ERROR);
 				passed = false;
 			}
 			validationResult.addValidationEntry(entry);
@@ -186,7 +191,7 @@ public class SafetyCaseValidator {
 			params.append(",");
 		}
 		params.append("null");
-		return ass.getId() + "(" + params.substring(0, params.length() ) + ")";
+		return ass.getId() + "(" + params.substring(0, params.length()) + ")";
 	}
 
 	public static boolean isISACParam(String param) {

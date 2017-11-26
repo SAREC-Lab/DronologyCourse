@@ -40,6 +40,8 @@ public class FREditModeController extends CustomComponent{
 	private Label smallText = new Label("Left click to add a new waypoint. Drag waypoints to move.");
 	
 	private List<UIWayPoint> storedPoints = new ArrayList<>();
+	private String storedName = "";
+	private String storedDescription = "";
 	
 	public FREditModeController(FRMapComponent mapComponent) {
 		this.mapComponent = mapComponent;
@@ -69,8 +71,11 @@ public class FREditModeController extends CustomComponent{
 		for (int i = 0; i < storedPoints.size(); i++) {
 			UIWayPoint point = storedPoints.get(i);
 			mapComponent.getMapUtilities().addNewPin(point, -1);
-		}		
+		}
 		
+		mapComponent.getMetaInfo().setRouteName(storedName);
+		mapComponent.getMetaInfo().setRouteDescription(storedDescription);
+				
 		mapComponent.updateLinesAndGrid();
 		exitEditMode();
 	}
@@ -97,6 +102,9 @@ public class FREditModeController extends CustomComponent{
 			byte[] information = service.requestFromServer(id);
 			inStream = new ByteArrayInputStream(information);
 			froute = routePersistor.loadItem(inStream);
+			
+			froute.setName(mapComponent.getMetaInfo().getRouteName());
+			froute.setDescription(mapComponent.getMetaInfo().getRouteDescription());
 
 			ArrayList<Waypoint> oldCoords = new ArrayList<>(froute.getWaypoints());
 			for (Waypoint cord : oldCoords) {
@@ -148,28 +156,30 @@ public class FREditModeController extends CustomComponent{
 		}
 		
 		List<Waypoint> newWaypointsToSave = froute.getWaypoints();
+		String newRouteNameToSave = froute.getName();
 		mapComponent.getMainLayout().getWaitingWindow().showWindow(
 				"Saving route...",
 				() -> {
 					// Test if the route is updated in dronology
 					Collection<FlightRouteInfo> routes = 
 							mapComponent.getMainLayout().getControls().getInfoPanel().getRoutesFromDronology();
-					List<Waypoint> waypointsFromDronology = null;
+					FlightRouteInfo routeFromDronology = null;
 					for (FlightRouteInfo route : routes) {
 						if (route.getId().equals(id)) {
-							waypointsFromDronology = route.getWaypoints();
+							routeFromDronology = route;
 							break;
 						}
 					}
 					
-					if (waypointsFromDronology == null || 
-							waypointsFromDronology.size() != newWaypointsToSave.size()) {
+					if (routeFromDronology == null || 
+							routeFromDronology.getWaypoints().size() != newWaypointsToSave.size() ||
+							!newRouteNameToSave.equals(routeFromDronology.getName())) {
 						//if the waypoint sizes are different, then it is not updated
 						return false;
 					} else {
 						for (int i = 0; i < newWaypointsToSave.size(); ++i) {
 							//if the waypoint info is different, then it is not updated
-							if (!newWaypointsToSave.get(i).equals(waypointsFromDronology.get(i))) {
+							if (!newWaypointsToSave.get(i).equals(routeFromDronology.getWaypoints().get(i))) {
 								return false;
 							}
 						}
@@ -178,7 +188,6 @@ public class FREditModeController extends CustomComponent{
 					}
 				},
 				closeEvent -> {
-					storedPoints.clear();
 					exitEditMode();
 					mapComponent.getMainLayout().getControls().getInfoPanel().refreshRoutes();
 					mapComponent.getMainLayout().switchRoute(
@@ -189,6 +198,9 @@ public class FREditModeController extends CustomComponent{
 	// Enables editing, adds the edit bar, and calls the enableRouteEditing function from MapMarkerUtilities.
 	public void enterEditMode() {
 		storedPoints = mapComponent.getMapUtilities().getOrderedWayPoints();
+		storedName = mapComponent.getMetaInfo().getRouteName();
+		storedDescription = mapComponent.getMetaInfo().getRouteDescription();
+		
 		mapComponent.getMapUtilities().setEditable(true);
 		mapComponent.getTableDisplay().makeEditable();
 		this.setVisible(true);
@@ -200,6 +212,9 @@ public class FREditModeController extends CustomComponent{
 	// Disables editing, removes the edit bar, and changes the component styles accordingly.
 	public void exitEditMode() {
 		storedPoints.clear();
+		storedName = "";
+		storedDescription = "";
+		
 		mapComponent.getMapUtilities().setEditable(false);
 		mapComponent.getTableDisplay().makeUneditable();
 		this.setVisible(false);

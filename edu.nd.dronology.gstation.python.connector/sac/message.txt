@@ -1,0 +1,1 @@
+{"type":"state","uavid":"Drone1","sendtimestamp":1500310150000,"data":{"location":{"x":3.0,"y":4.0,"z":5.0},"attitude":{"x":1.0,"y":2.0,"z":3.0},"velocity":{"x":5.0,"y":6.0,"z":7.0},"status":"ACTIVE","mode":"CIRCLE","armed":true,"armable":true,"groundspeed":25.3,"batterystatus":{"current":0.0,"voltage":0.0,"level":0.0}}}

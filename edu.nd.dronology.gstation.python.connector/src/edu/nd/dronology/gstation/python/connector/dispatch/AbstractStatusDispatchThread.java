@@ -1,9 +1,10 @@
 package edu.nd.dronology.gstation.python.connector.dispatch;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class AbstractStatusDispatchThread<MESSAGE_TYPE> {
+public abstract class AbstractStatusDispatchThread<MESSAGE_TYPE> implements Callable {
 
 	protected AtomicBoolean cont = new AtomicBoolean(true);
 	protected BlockingQueue<MESSAGE_TYPE> queue;
@@ -20,5 +21,7 @@ public class AbstractStatusDispatchThread<MESSAGE_TYPE> {
 	public void tearDown() {
 		cont.set(false);
 	}
+
+	
 	
 }

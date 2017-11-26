@@ -10,6 +10,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +37,7 @@ public class SafetyViewer extends Composite {
 	private static final Color COLOR_WARN = StyleProvider.COLOR_DARK_ORANGE;
 	private static final Color COLOR_ERROR = StyleProvider.COLOR_LIGHT2_RED;
 	private static final Color COLOR_TRACE = StyleProvider.COLOR_LIGHT2_GREEN;
+	private ScrolledComposite cp;
 
 	public SafetyViewer(Composite parent) {
 		super(parent, SWT.FLAT);
@@ -49,11 +51,25 @@ public class SafetyViewer extends Composite {
 
 	private void createContents() {
 
-		chartComp = new Composite(this, SWT.FLAT);
+		cp = new ScrolledComposite(this, SWT.V_SCROLL);
+
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(cp);
+		GridLayoutFactory.fillDefaults().applyTo(cp);
+
+		cp.setBackground(StyleProvider.COLOR_DARK_RED);
+		chartComp = new Composite(cp, SWT.FLAT);
+		// chartComp.setSize(chartComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		chartComp.setRedraw(true);
+
+		cp.setContent(chartComp);
+		cp.setSize(chartComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		consoleComp = new Composite(this, SWT.FLAT);
 
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(chartComp);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(chartComp);
+
+		cp.setExpandHorizontal(true);
+		cp.setExpandVertical(true);
 
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(consoleComp);
 		GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 250).applyTo(consoleComp);
@@ -138,12 +154,15 @@ public class SafetyViewer extends Composite {
 	private void creatItems(UAVValidationInformation inf) {
 		for (ConstraintValidationInfo constraintInfo : inf.getConstraintValidationInfos()) {
 			String uniqueid = inf.getUAVId() + "_" + constraintInfo.getAssumptionid();
+
 			if (chartItems.containsKey(uniqueid)) {
 				chartItems.get(uniqueid).refreshData(constraintInfo);
 			} else {
-				ChartItem chartItem = new ChartItem(chartComp, this, constraintInfo,inf.getUAVId());
+				ChartItem chartItem = new ChartItem(chartComp, this, constraintInfo, inf.getUAVId());
 				chartItems.put(uniqueid, chartItem);
 				chartComp.layout();
+				cp.setMinSize(SWT.DEFAULT, chartItems.size() * 70);
+				cp.layout();
 			}
 
 		}

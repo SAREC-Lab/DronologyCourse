@@ -38,7 +38,7 @@ public class SafetyCaseValidationManager implements IUAVSafetyValidator {
 	}
 
 	@Override
-	public boolean validate(String uavid, String safetyCase) {
+	public synchronized boolean validate(String uavid, String safetyCase) {
 		TrustManager.getInstance().initializeUAV(uavid);
 		UAVSaeftyCase sac = GSON.fromJson(safetyCase, UAVSaeftyCase.class);
 		sac.setUAVId(uavid);

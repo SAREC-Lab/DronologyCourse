@@ -13,5 +13,5 @@ hs_err_pid*
 dronology-workspace/
 /.DS_Store
 
-.idea
 *.iml
+.idea/

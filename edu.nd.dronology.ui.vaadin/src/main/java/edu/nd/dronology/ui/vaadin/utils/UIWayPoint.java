@@ -16,8 +16,8 @@ public class UIWayPoint {
 	private String id = UUID.randomUUID().toString();
 	private String longitude = "";
 	private String latitude = "";
-	private String altitude = "";
-	private String transitSpeed = "";
+	private String altitude = "0";
+	private String transitSpeed = "0";
 	private boolean isreached = false;
 	private int order = 0;
 	
