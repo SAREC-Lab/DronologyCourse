@@ -62,7 +62,7 @@ public class NedCommand extends Command {
 
     /**
      *
-     * @return the amount of time to fly at the given velocity
+     * @return the amount of time to fly at the given velocity in seconds
      */
     public double getTime() {
         return time;
