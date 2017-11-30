@@ -1,5 +1,6 @@
 package edu.nd.dronology.core.vehicle.proxy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class UAVProxyManager {
 	}
 
 	public Collection<IUAVProxy> getActiveUAVs() {
-		return Collections.unmodifiableCollection(drones.values());
+		return Collections.unmodifiableCollection(new ArrayList(drones.values()));
 	}
 
 	public void addDrone(UAVProxy drone) {

@@ -2,6 +2,8 @@ package edu.nd.dronology.ui.vaadin.activeflights;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,7 +20,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
@@ -32,7 +34,7 @@ import edu.nd.dronology.ui.vaadin.start.MyUI;
  *
  */
 
-public class AFInfoPanel extends CustomComponent{
+public class AFInfoPanel extends CustomComponent {
 	private static final long serialVersionUID = -3663049148276256302L;
 	private Panel panel = new Panel();
 	private Button selectButton = new Button("Select all");
@@ -43,52 +45,51 @@ public class AFInfoPanel extends CustomComponent{
 	private boolean visible = false;
 	private String focused = "";
 	private AFMapViewOperations mapView = new AFMapViewOperations();
-	private Map<String, DroneStatus> drones;
+	private Collection<IUAVProxy> drones;
 	private IDroneSetupRemoteService service;
-  private BaseServiceProvider provider = MyUI.getProvider();
-//private static final ILogger LOGGER = LoggerProvider.getLogger(AFInfoPanel.class);
+	private BaseServiceProvider provider = MyUI.getProvider();
+	// private static final ILogger LOGGER = LoggerProvider.getLogger(AFInfoPanel.class);
 
 	@SuppressWarnings("deprecation")
-	public AFInfoPanel(){	
-		
+	public AFInfoPanel() {
+
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 		panel.setContent(content);
 		panel.addStyleName("af_info_panel");
 		panel.addStyleName("control_panel");
-		
+
 		HorizontalLayout buttons = new HorizontalLayout();
 		VerticalLayout sideBar = new VerticalLayout();
-		
+
 		AFEmergencyComponent emergency = new AFEmergencyComponent();
-		
-		emergency.getHome().addClickListener( e-> {  //sends all UAVs (or all checked UAVs) to their homes
+
+		emergency.getHome().addClickListener(e -> { // sends all UAVs (or all checked UAVs) to their homes
 			List<String> checked = this.getChecked();
 			String message = "";
 			boolean sendHome = true;
-			if (checked.size() > 0){
-				if (checked.size() == 1){
-					for(int i = 1; i < numUAVs + 1; i++){
+			if (checked.size() > 0) {
+				if (checked.size() == 1) {
+					for (int i = 1; i < numUAVs + 1; i++) {
 						AFInfoBox box = (AFInfoBox) content.getComponent(i);
-						if (box.getName().equals(checked.get(0))){
-							if (box.getStatus().equals("ON_GROUND")){
+						if (box.getName().equals(checked.get(0))) {
+							if (box.getStatus().equals("ON_GROUND")) {
 								Notification.show(checked.get(0) + " is already home.");
 								sendHome = false;
-							} else{
+							} else {
 								message = "Are you sure you want to send " + checked.get(0) + " to its home?";
 							}
 						}
 					}
-					
-				}
-				else{
+
+				} else {
 					String drones = "";
-					for (int i = 0; i < checked.size() - 1; i++){
+					for (int i = 0; i < checked.size() - 1; i++) {
 						drones += checked.get(i) + ", ";
 					}
-					message = "Are you sure you want to send " + drones + "and " + checked.get(checked.size()-1) + " to their homes?";
+					message = "Are you sure you want to send " + drones + "and " + checked.get(checked.size() - 1)
+							+ " to their homes?";
 				}
-			}
-			else {
+			} else {
 				message = "Are you sure to send all UAVs to their homes?";
 			}
 			Window confirm = new Window("Confirm");
@@ -100,26 +101,26 @@ public class AFInfoPanel extends CustomComponent{
 			Button yes = new Button("Yes");
 			yes.addStyleName("btn-danger");
 			Button no = new Button("No");
-			
+
 			yes.addClickListener(subEvent -> {
 				UI.getCurrent().removeWindow(confirm);
 				IFlightManagerRemoteService service;
 				try {
-					service = (IFlightManagerRemoteService) provider.getRemoteManager().getService(IFlightManagerRemoteService.class);
-					if (checked.size() > 0){
-						for (int i = 0; i < checked.size(); i++){
-							for(int j = 1; j < numUAVs + 1; j++){
+					service = (IFlightManagerRemoteService) provider.getRemoteManager()
+							.getService(IFlightManagerRemoteService.class);
+					if (checked.size() > 0) {
+						for (int i = 0; i < checked.size(); i++) {
+							for (int j = 1; j < numUAVs + 1; j++) {
 								AFInfoBox box = (AFInfoBox) content.getComponent(j);
-								if (box.getName().equals(checked.get(i))){
-									if (!box.getStatus().equals("ON_GROUND")){
+								if (box.getName().equals(checked.get(i))) {
+									if (!box.getStatus().equals("ON_GROUND")) {
 										service.returnToHome(checked.get(i));
 									}
 								}
 							}
 						}
-					}
-					else {
-						for (int i = 1; i < numUAVs + 1; i++){
+					} else {
+						for (int i = 1; i < numUAVs + 1; i++) {
 							AFInfoBox box = (AFInfoBox) content.getComponent(i);
 							if (!box.getStatus().equals("ON_GROUND"))
 								service.returnToHome(box.getName());
@@ -128,13 +129,13 @@ public class AFInfoPanel extends CustomComponent{
 				} catch (Exception exc) {
 					exc.printStackTrace();
 				}
-				
+
 			});
 
 			no.addClickListener(subEvent -> {
 				UI.getCurrent().removeWindow(confirm);
 			});
-			
+
 			subButtons.addComponents(yes, no);
 			subContent.addComponents(label, subButtons);
 			confirm.setContent(subContent);
@@ -143,18 +144,18 @@ public class AFInfoPanel extends CustomComponent{
 			confirm.center();
 			if (sendHome)
 				UI.getCurrent().addWindow(confirm);
-			
+
 		});
 
-		content.addLayoutClickListener( e-> { //determines if a box should be in focus
+		content.addLayoutClickListener(e -> { // determines if a box should be in focus
 			Component testChild = e.getChildComponent();
-			if (testChild.getClass() == AFInfoBox.class){
+			if (testChild.getClass() == AFInfoBox.class) {
 				AFInfoBox child = (AFInfoBox) e.getChildComponent();
-				if(!child.getCheckClick()){ //if the box was clicked but not the checkbox
+				if (!child.getCheckClick()) { // if the box was clicked but not the checkbox
 					child.addStyleName("info_box_focus");
 					child.setIsChecked(true);
 					focused = child.getName();
-					for (int i = 1; i < numUAVs + 1; i++){
+					for (int i = 1; i < numUAVs + 1; i++) {
 						AFInfoBox box = (AFInfoBox) content.getComponent(i);
 						if (!box.getName().equals(child.getName())) {
 							box.removeStyleName("info_box_focus");
@@ -162,78 +163,78 @@ public class AFInfoPanel extends CustomComponent{
 							box.setCheckClick(false);
 						}
 					}
-				}
-				else{
+				} else {
 					child.removeStyleName("info_box_focus");
 					if (focused.equals(child.getName()))
 						focused = "";
 				}
 			}
 		});
-		
+
 		sideBar.addComponents(panel, mapView, emergency);
 		setCompositionRoot(sideBar);
-		
-		
-	  selectButton.addStyleName(ValoTheme.BUTTON_LINK);
-	  selectButton.addStyleName("small_button_link");
-	  visibleButton.addStyleName(ValoTheme.BUTTON_LINK);
-	  visibleButton.addStyleName("small_button_link");
-	  
-	  buttons.addComponents(selectButton, visibleButton);
-	  buttons.addStyleName("af_uav_list_controls");
-	  
-	  selectButton.addClickListener( e -> {
-	  	if (selectAll){
-	  		selectAll(true);
-	  		selectButton.setCaption("Deselect all");
-	  		selectAll = false;
-	  	}
-	  	else {
-	  		selectAll(false);
-	  		selectButton.setCaption("Select all");
-	  		selectAll = true;
-	  	}
-	  });
-	  
-	  visibleButton.addClickListener( e -> {
-	  	if (visible){
-	  		visible = false;
-	  		setVisibility(true);
-	  		visibleButton.setCaption("Expand all");
-	  	}
-	  	else {
-	  		visible = true;
-	  		setVisibility(false);
-	  		visibleButton.setCaption("Collapse all");
-	  	}
-	  });
-		
-	  content.addComponent(buttons);
-	  numUAVs = content.getComponentCount() - 1;
-	  
-	  try {
+
+		selectButton.addStyleName(ValoTheme.BUTTON_LINK);
+		selectButton.addStyleName("small_button_link");
+		visibleButton.addStyleName(ValoTheme.BUTTON_LINK);
+		visibleButton.addStyleName("small_button_link");
+
+		buttons.addComponents(selectButton, visibleButton);
+		buttons.addStyleName("af_uav_list_controls");
+
+		selectButton.addClickListener(e -> {
+			if (selectAll) {
+				selectAll(true);
+				selectButton.setCaption("Deselect all");
+				selectAll = false;
+			} else {
+				selectAll(false);
+				selectButton.setCaption("Select all");
+				selectAll = true;
+			}
+		});
+
+		visibleButton.addClickListener(e -> {
+			if (visible) {
+				visible = false;
+				setVisibility(true);
+				visibleButton.setCaption("Expand all");
+			} else {
+				visible = true;
+				setVisibility(false);
+				visibleButton.setCaption("Collapse all");
+			}
+		});
+
+		content.addComponent(buttons);
+		numUAVs = content.getComponentCount() - 1;
+
+		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-			drones = service.getDrones();
-			for (Entry<String, DroneStatus> e:drones.entrySet()){
-				addBox(false, e.getValue().getID(), e.getValue().getStatus(), e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(), e.getValue().getAltitude(), e.getValue().getVelocity(), false);
+			Collection<IUAVProxy> activeDrones = service.getActiveUAVs();
+			drones = new ArrayList<>(activeDrones);
+			// Collections.sort(drones);
+			for (IUAVProxy e : drones) {
+				addBox(false, e.getID(), e.getStatus(), e.getBatteryLevel(), "green", e.getLatitude(), e.getLongitude(),
+						e.getAltitude(), e.getVelocity(), false);
 			}
 		} catch (DronologyServiceException | RemoteException e1) {
 			e1.printStackTrace();
 		}
-	
+
 	}
-	
-	public AFMapViewOperations getMapView(){
+
+	public AFMapViewOperations getMapView() {
 		return mapView;
 	}
-	
-	public String getFocusedName(){
+
+	public String getFocusedName() {
 		return focused;
 	}
-	
+
 	/**
 	 * Adds a box to the panel
+	 * 
 	 * @param isChecked
 	 * @param name
 	 * @param status
@@ -245,31 +246,33 @@ public class AFInfoPanel extends CustomComponent{
 	 * @param speed
 	 * @param hoverInPlace
 	 */
-	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat, double lon, double alt, double speed, boolean hoverInPlace){
-		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed, hoverInPlace);
+	public void addBox(boolean isChecked, String name, String status, double batteryLife, String healthColor, double lat,
+			double lon, double alt, double speed, boolean hoverInPlace) {
+		AFInfoBox box = new AFInfoBox(isChecked, name, status, batteryLife, healthColor, lat, lon, alt, speed,
+				hoverInPlace);
 		content.addComponent(box);
 		numUAVs = content.getComponentCount() - 1;
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 	}
-	
-	public void addBox(){
+
+	public void addBox() {
 		AFInfoBox box = new AFInfoBox();
 		content.addComponent(box);
 		numUAVs = content.getComponentCount() - 1;
 		panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
 	}
-	
+
 	/**
 	 * Removes a box from the panel
+	 * 
 	 * @param name
-	 * 				the name/ID of the drone
-	 * @return
-	 * 				returns true if successful. returns false if failed
+	 *          the name/ID of the drone
+	 * @return returns true if successful. returns false if failed
 	 */
-	public boolean removeBox(String name){
-		for(int i = 1; i < numUAVs + 1; i++){
+	public boolean removeBox(String name) {
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
-			if (box.getName().equals(name)){
+			if (box.getName().equals(name)) {
 				content.removeComponent(box);
 				numUAVs = content.getComponentCount() - 1;
 				panel.setCaption(Integer.toString(numUAVs) + " Active UAVs");
@@ -278,173 +281,172 @@ public class AFInfoPanel extends CustomComponent{
 		}
 		return false;
 	}
-	
-	public void selectAll(boolean select){
-		for(int i = 1; i < numUAVs + 1; i++){
+
+	public void selectAll(boolean select) {
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setIsChecked(select);
-			if (!select && focused.equals(box.getName())){
+			if (!select && focused.equals(box.getName())) {
 				box.removeStyleName("info_box_focus");
 				box.setCheckClick(false);
 				focused = "";
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return a list of all drones that have their checkbox checked
 	 */
-	public List<String> getChecked(){
+	public List<String> getChecked() {
 		List<String> names = new ArrayList<>();
-		for(int i = 1; i < numUAVs + 1; i++){
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getIsChecked())
 				names.add(box.getName());
 		}
 		return names;
 	}
-	
+
 	/**
 	 * 
 	 * @return true if all the drones are checked
 	 */
-	private boolean getAllChecked(){
+	private boolean getAllChecked() {
 		boolean checked = true;
-		for(int i = 1; i < numUAVs + 1; i++){
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (!box.getIsChecked())
 				checked = false;
 		}
 		return checked;
 	}
-	
+
 	/**
 	 * 
 	 * @return true if all drones are not checked
 	 */
-	private boolean getAllNotChecked(){
+	private boolean getAllNotChecked() {
 		boolean notChecked = true;
-		for(int i = 1; i < numUAVs + 1; i++){
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getIsChecked())
 				notChecked = false;
 		}
 		return notChecked;
 	}
-	
+
 	/**
 	 * Expands or collapses all the boxes
+	 * 
 	 * @param visible
 	 */
-	public void setVisibility(boolean visible){
-		for(int i = 1; i < numUAVs + 1; i++){
+	public void setVisibility(boolean visible) {
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setBoxVisible(visible);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return true if all boxes are expanded
 	 */
-	private boolean getAllVisible(){
+	private boolean getAllVisible() {
 		boolean visible = true;
-		for(int i = 1; i < numUAVs + 1; i++){
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (!box.getBoxVisible())
-				visible = false;	
+				visible = false;
 		}
 		return visible;
 	}
-	
+
 	/**
 	 * 
 	 * @return true if all boxes are collapsed
 	 */
-	private boolean getAllNotVisible(){
+	private boolean getAllNotVisible() {
 		boolean notVisible = true;
-		for(int i = 1; i < numUAVs + 1; i++){
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			if (box.getBoxVisible())
-				notVisible = false;			
+				notVisible = false;
 		}
 		return notVisible;
 	}
-	
-	public void setAllToHover(){
-		for(int i = 1; i < numUAVs + 1; i++){
+
+	public void setAllToHover() {
+		for (int i = 1; i < numUAVs + 1; i++) {
 			AFInfoBox box = (AFInfoBox) content.getComponent(i);
 			box.setHoverInPlace(true);
 		}
 	}
-	
-	public VerticalLayout getBoxes(){
+
+	public VerticalLayout getBoxes() {
 		return content;
 	}
-	
-	public int getNumUAVS(){
+
+	public int getNumUAVS() {
 		return numUAVs;
 	}
-	
+
 	/**
-	 * gets updated information from dronology about the UAV's location information and status.
-	 * adds any new drones to the panel and removes any drones that were deactivated
+	 * gets updated information from dronology about the UAV's location information and status. adds any new drones to the panel and removes any drones that were deactivated
 	 */
 	@SuppressWarnings("deprecation")
-	public void refreshDrones(){
-		//update select/deselect all button
-		if (this.getAllChecked() && selectButton.getCaption().equals("Select all") && numUAVs != 0){
-  		selectButton.setCaption("Deselect all");
-  		selectAll = false;
-		}
-		else if (this.getAllNotChecked() && selectButton.getCaption().equals("Deselect all") && numUAVs != 0){
+	public void refreshDrones() {
+		// update select/deselect all button
+		if (this.getAllChecked() && selectButton.getCaption().equals("Select all") && numUAVs != 0) {
+			selectButton.setCaption("Deselect all");
+			selectAll = false;
+		} else if (this.getAllNotChecked() && selectButton.getCaption().equals("Deselect all") && numUAVs != 0) {
 			selectButton.setCaption("Select all");
-  		selectAll = true;
+			selectAll = true;
 		}
-		//update expand/collapse all button
-		if (this.getAllVisible() && visibleButton.getCaption().equals("Expand all") && numUAVs != 0){
+		// update expand/collapse all button
+		if (this.getAllVisible() && visibleButton.getCaption().equals("Expand all") && numUAVs != 0) {
 			visibleButton.setCaption("Collapse all");
 			visible = true;
-		}
-		else if (this.getAllNotVisible() && visibleButton.getCaption().equals("Collapse all") && numUAVs != 0){
+		} else if (this.getAllNotVisible() && visibleButton.getCaption().equals("Collapse all") && numUAVs != 0) {
 			visibleButton.setCaption("Expand all");
 			visible = false;
 		}
 		try {
-			Map<String, DroneStatus> newDrones;
-			newDrones = service.getDrones();
+
+			Collection<IUAVProxy> newDrones = service.getActiveUAVs();
 			/**
 			 * add new drones to the panel
 			 */
-			if (newDrones.size() > drones.size()){
-				for (Entry<String, DroneStatus> e1:newDrones.entrySet()){
+			if (newDrones.size() > drones.size()) {
+				for (IUAVProxy e1 : newDrones) {
 					boolean nameMatch = false;
-					for (Entry<String, DroneStatus> e2:drones.entrySet()){
-						if (e1.getValue().getID().equals(e2.getValue().getID())){
+					for (IUAVProxy e2 : drones) {
+						if (e1.getID().equals(e2.getID())) {
 							nameMatch = true;
-						}	
+						}
 					}
-					if (!nameMatch){
-						this.addBox(false, e1.getValue().getID(), e1.getValue().getStatus(), e1.getValue().getBatteryLevel(), "green", e1.getValue().getLatitude(), e1.getValue().getLongitude(), e1.getValue().getAltitude(), e1.getValue().getVelocity(), false);
+					if (!nameMatch) {
+						this.addBox(false, e1.getID(), e1.getStatus(), e1.getBatteryLevel(), "green", e1.getLatitude(),
+								e1.getLongitude(), e1.getAltitude(), e1.getVelocity(), false);
 					}
 				}
 			}
 			/**
 			 * delete old drones from the panel
 			 */
-			if (newDrones.size() < drones.size()){
-				for (Entry<String, DroneStatus> old:drones.entrySet()){
+			if (newDrones.size() < drones.size()) {
+				for (IUAVProxy old : drones) {
 					boolean exists = false;
-					for (Entry<String, DroneStatus> current:newDrones.entrySet()){
-						if (old.getValue().getID().equals(current.getValue().getID()))
+					for (IUAVProxy current : newDrones) {
+						if (old.getID().equals(current.getID()))
 							exists = true;
 					}
-					if (!exists){
-						for (int i = 1; i < numUAVs + 1; i++){
+					if (!exists) {
+						for (int i = 1; i < numUAVs + 1; i++) {
 							AFInfoBox box = (AFInfoBox) content.getComponent(i);
-							if (old.getValue().getID().equals(box.getName()))
-									this.removeBox(box.getName());
+							if (old.getID().equals(box.getName()))
+								this.removeBox(box.getName());
 						}
 					}
 				}
@@ -464,17 +466,17 @@ public class AFInfoPanel extends CustomComponent{
 		 * update current drones' status
 		 */
 		try {
-			drones = service.getDrones();
-			for (Entry<String, DroneStatus> e:drones.entrySet()){
-				for (int i = 1; i < numUAVs + 1; i++){
+			drones = service.getActiveUAVs();
+			for (IUAVProxy e : drones) {
+				for (int i = 1; i < numUAVs + 1; i++) {
 					AFInfoBox box = (AFInfoBox) content.getComponent(i);
-					if (e.getValue().getID().equals(box.getName())){
-						box.setStatus(e.getValue().getStatus());
-						box.setBatteryLife(e.getValue().getBatteryLevel());
-						box.setLat(e.getValue().getLatitude());
-						box.setLon(e.getValue().getLongitude());
-						box.setAlt(e.getValue().getAltitude());
-						box.setSpeed(e.getValue().getVelocity());
+					if (e.getID().equals(box.getName())) {
+						box.setStatus(e.getStatus());
+						box.setBatteryLife(e.getBatteryLevel());
+						box.setLat(e.getLatitude());
+						box.setLon(e.getLongitude());
+						box.setAlt(e.getAltitude());
+						box.setSpeed(e.getVelocity());
 					}
 				}
 			}
@@ -490,6 +492,5 @@ public class AFInfoPanel extends CustomComponent{
 			numUAVs = 0;
 		}
 	}
-	
-}
 
+}

@@ -12,7 +12,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.items.IFlightRoute;
