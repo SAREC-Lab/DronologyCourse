@@ -1,10 +1,11 @@
 package edu.nd.dronology.core.vehicle;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import edu.nd.dronology.core.coordinate.LlaCoordinate;
 
-public interface IUAVProxy {
+public interface IUAVProxy extends Serializable {
 
 	String getID();
 

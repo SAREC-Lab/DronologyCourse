@@ -46,12 +46,6 @@ public class ManagedDrone implements Runnable {
 	private DroneFlightStateManager droneState;
 	private DroneSafetyStateManager droneSafetyState;
 
-	@Discuss(discuss = "do we need this here?")
-	private boolean missionCompleted = false;
-
-	@Discuss(discuss = "do we need this here?")
-	private LlaCoordinate targetCoordinates = null;
-
 	@Discuss(discuss = "why not final? - new flight director for each flight??")
 	private IFlightDirector flightDirector = null; // Each drone can be assigned
 	// a single flight plan.
@@ -128,7 +122,6 @@ public class ManagedDrone implements Runnable {
 	 * @throws FlightZoneException
 	 */
 	public void takeOff() throws FlightZoneException {
-		missionCompleted = false;
 		if (targetAltitude == 0) {
 			throw new FlightZoneException("Target Altitude is 0");
 		}
@@ -170,8 +163,8 @@ public class ManagedDrone implements Runnable {
 
 				// Probably not necessary anymore... TODO: fix- do not try to assign point in every iteration of the loop...
 				if (flightDirector != null && droneState.isFlying()) {
-					targetCoordinates = flightDirector.flyToNextPoint();
 
+					LlaCoordinate targetCoordinates = flightDirector.flyToNextPoint();
 					if (!drone.move(0.1)) {
 						LOGGER.missionInfo(drone.getDroneName() + " - Waypoint reached - " + targetCoordinates.toString());
 						flightDirector.clearCurrentWayPoint();
@@ -179,7 +172,7 @@ public class ManagedDrone implements Runnable {
 					checkForEndOfFlight();
 				}
 				if (droneState.isTakingOff()) {
-					if (drone.getAltitude() >= (targetAltitude - DronologyConstants.THRESHOLD_TAKEOFF_HEIGHT)) {
+					if (Math.abs(drone.getAltitude() - targetAltitude) < DronologyConstants.THRESHOLD_TAKEOFF_HEIGHT) {
 						LOGGER.info("Target Altitude reached - ready for flying");
 						try {
 							droneState.setModeToFlying();
@@ -214,20 +207,20 @@ public class ManagedDrone implements Runnable {
 		return true;
 	}
 
-	private boolean checkForTakeOff() {
-
-		if (flightDirector != null && !flightDirector.readyToTakeOff()) {
-			return false;
-		}
-		if (droneState.isTakingOff()) {
-			return false;
-		}
-		if (!permissionForTakeoff()) {
-			return false;
-		}
-		LOGGER.info("Passed takeoff test");
-		return true;
-	}
+	// private boolean checkForTakeOff() {
+	//
+	// if (flightDirector != null && !flightDirector.readyToTakeOff()) {
+	// return false;
+	// }
+	// if (droneState.isTakingOff()) {
+	// return false;
+	// }
+	// if (!permissionForTakeoff()) {
+	// return false;
+	// }
+	// LOGGER.info("Passed takeoff test");
+	// return true;
+	// }
 
 	// needs refactoring to improve performance...
 	public boolean permissionForTakeoff() {
@@ -253,22 +246,6 @@ public class ManagedDrone implements Runnable {
 	 */
 	public String getDroneName() {
 		return drone.getDroneName();
-	}
-
-	/**
-	 * 
-	 * @return target coordinates
-	 */
-	public LlaCoordinate getTargetCoordinates() {
-		return targetCoordinates;
-	}
-
-	/**
-	 * 
-	 * @return current flight directive assigned to the managed drone
-	 */
-	public IFlightDirector getFlightDirective() {
-		return flightDirector;
 	}
 
 	/**
@@ -327,30 +304,6 @@ public class ManagedDrone implements Runnable {
 	 */
 	public DroneSafetyStateManager getFlightSafetyModeState() {
 		return droneSafetyState;
-	}
-
-	/**
-	 * Set mission completed status
-	 */
-	public void setMissionCompleted() {
-		missionCompleted = true;
-	}
-
-	/**
-	 * 
-	 * @return mission status
-	 */
-	public boolean missionInProgress() {
-		return !missionCompleted;
-	}
-
-	/**
-	 * Retrieve battery status from drone
-	 * 
-	 * @return remaining voltage
-	 */
-	public double getBatteryStatus() {
-		return drone.getBatteryStatus();
 	}
 
 	public LlaCoordinate getBaseCoordinates() {

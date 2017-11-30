@@ -143,7 +143,8 @@ public class FlightZoneManager2 implements IPlanStatusChangeListener {
 			IFlightPlan awaitingFlightPlan = awaitingTakeOffFlights.get(0);
 			ManagedDrone drone = awaitingFlightPlan.getAssignedDrone();
 			if (drone.permissionForTakeoff()) {
-				drone.setTargetAltitude(awaitingFlightPlan.getTakeoffAltitude());
+				// drone.setTargetAltitude(awaitingFlightPlan.getTakeoffAltitude());
+				drone.setTargetAltitude(DronologyConstants.TAKE_OFF_ALTITUDE);
 				drone.takeOff();
 				activeUAVS.incrementAndGet();
 				awaitingTakeOffFlights.remove(awaitingFlightPlan);

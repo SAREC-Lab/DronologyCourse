@@ -25,7 +25,7 @@ public class DronologyConstants {
 	 * The takeoff altitude of the uav (vertical distance in m before going to the
 	 * first waypoint).
 	 */
-	public static final double TAKE_OFF_ALTITUDE = 25;
+	public static final double TAKE_OFF_ALTITUDE = 15;
 
 	/**
 	 * The distance to the waypoint in m in which the waypoint is considered
@@ -37,7 +37,7 @@ public class DronologyConstants {
 	 * The distance to the altitude in m in which the takeoff height
 	 * reached.
 	 */
-	public static final double THRESHOLD_TAKEOFF_HEIGHT = 2.0;
+	public static final double THRESHOLD_TAKEOFF_HEIGHT = 0.8;
 
 	public static final double HOME_ALTITUDE = 5;
 
