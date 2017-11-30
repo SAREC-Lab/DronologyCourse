@@ -54,7 +54,7 @@
 
 
 		<copy todir="${build.dir}/src">
-			<fileset dir="${src.dir}/../net.mv.logging/src" />
+			<fileset dir="${src.dir}/../net.mv.logging/src/main/java" />
 		</copy>
 
 
