@@ -325,14 +325,13 @@ class ArduCopter(CopterControl):
 
         try:
             if vehicle_type == DRONE_TYPE_PHYS:
-                vehicle = dronekit.connect(ip, wait_ready=False, baud=baud)
-                self._v_type = DRONE_TYPE_PHYS
+                vehicle = dronekit.connect(ip, wait_ready=True, baud=baud)
 
+                self._v_type = DRONE_TYPE_PHYS
                 if vehicle_id is None:
                     vehicle_id = ip
 
             elif vehicle_type == DRONE_TYPE_SITL_VRTL:
-                vehicle_id = self._vid
                 if vehicle_id is None:
                     vehicle_id = vehicle_type + str(instance)
 
@@ -344,7 +343,7 @@ class ArduCopter(CopterControl):
                     '--speedup', str(speedup),
                     '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
                 ]
-                _LOG.debug('Trying to launch SITL instance {} on tcp:127.0.0.1:{}'.format(instance, 5760 + instance * 10))
+                _LOG.debug('Trying to launch SITL instance {} on port {}'.format(instance, 5760 + instance * 10))
                 sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
                 sitl.launch(sitl_args, await_ready=True)
                 tcp, ip, port = sitl.connection_string().split(':')
@@ -435,6 +434,8 @@ class ArduCopter(CopterControl):
         if self._connection_initiated:
             while not self._connection_complete:
                 time.sleep(1.0)
+            if self._state_msg_timer is not None:
+                self._state_msg_timer.stop()
 
             if self._vehicle:
                 _LOG.info('Closing vehicle {} connection.'.format(self._vid))
