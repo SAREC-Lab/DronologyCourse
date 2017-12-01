@@ -26,7 +26,7 @@ class GCSRunner:
             _LOG.error('You must specify \"ardupath\" in the global config file at {}'.format(global_cfg_path))
             exit(1)
 
-        self._drone_cfgs = {}
+        self._drone_cfgs = []
         if drone_cfg_path is not None:
             self._drone_cfgs = util.load_json(drone_cfg_path)
 
