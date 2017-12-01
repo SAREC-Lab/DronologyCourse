@@ -1,0 +1,15 @@
+2017-12-01 12:03:21,554 | DEBUG    | copter.py            | line:356 | Trying to launch SITL instance 0 on port 5760...
+2017-12-01 12:03:21,572 | WARNING  | command.py           | line:136 | Unrecognized command: u'connectionResponse'
+2017-12-01 12:03:21,580 | DEBUG    | copter.py            | line:362 | SITL instance 0 launched on: tcp:127.0.0.1:5760
+2017-12-01 12:03:22,883 | INFO     | copter.py            | line:365 | Vehicle d1 connected on tcp:127.0.0.1:5760
+2017-12-01 12:03:34,893 | INFO     | copter.py            | line:391 | Vehicle d1 successfully initialized.
+2017-12-01 12:03:34,893 | WARNING  | message.py           | line:65  | [Errno 2] No such file or directory: '../cfg/sac.json'
+2017-12-01 12:03:44,287 | DEBUG    | control.py           | line:79  | Command received: Vehicle d1 Takeoff: {"altitude": 10.0}
+2017-12-01 12:03:47,094 | DEBUG    | control.py           | line:79  | Command received: Vehicle d1 GotoLocation: {"y": -86.250583, "x": 41.67917, "z": 10.0}
+2017-12-01 12:03:47,096 | DEBUG    | control.py           | line:79  | Command received: Vehicle d1 SetGroundSpeed: {"speed": 5.0}
+2017-12-01 12:03:47,097 | DEBUG    | control.py           | line:79  | Command received: Vehicle d1 SetMonitorFrequency: {"frequency": 9000}
+2017-12-01 12:03:47,097 | WARNING  | copter.py            | line:98  | Vehicle d1 received unrecognized command "SetMonitorFrequency" for "ArduCopter" controller!
+2017-12-01 12:04:35,626 | INFO     | copter.py            | line:449 | Closing vehicle d1 connection.
+2017-12-01 12:04:35,643 | INFO     | copter.py            | line:453 | Closing SITL connnection for vehicle d1
+2017-12-01 12:04:36,697 | INFO     | core.py              | line:125 | Shutting down socket.
+2017-12-01 12:04:36,697 | INFO     | core.py              | line:127 | Closing socket.
