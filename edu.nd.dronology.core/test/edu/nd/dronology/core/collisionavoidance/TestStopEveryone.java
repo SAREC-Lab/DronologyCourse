@@ -3,7 +3,7 @@ package edu.nd.dronology.core.collisionavoidance;
 import edu.nd.dronology.core.collisionavoidance.guidancecommands.Command;
 import edu.nd.dronology.core.collisionavoidance.guidancecommands.StopCommand;
 import edu.nd.dronology.core.collisionavoidance.guidancecommands.WaypointCommand;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.junit.Test;
 

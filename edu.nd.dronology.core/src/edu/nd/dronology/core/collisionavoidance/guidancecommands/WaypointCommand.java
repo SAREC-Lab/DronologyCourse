@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.collisionavoidance.guidancecommands;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 
 /**
  * A command that tells a UAV to fly to a specific place.

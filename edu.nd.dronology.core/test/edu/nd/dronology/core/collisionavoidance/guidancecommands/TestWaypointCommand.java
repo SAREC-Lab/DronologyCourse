@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.collisionavoidance.guidancecommands;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

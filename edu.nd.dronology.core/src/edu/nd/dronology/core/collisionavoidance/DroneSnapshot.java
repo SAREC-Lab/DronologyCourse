@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.collisionavoidance;
 
 import edu.nd.dronology.core.collisionavoidance.guidancecommands.Command;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 
 import java.util.ArrayList;
 
