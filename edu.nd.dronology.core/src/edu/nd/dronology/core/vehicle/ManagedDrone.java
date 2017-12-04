@@ -243,7 +243,7 @@ public class ManagedDrone extends Observable implements Runnable {
 					// checkForTakeOff();
 				}
 				if (droneState.isTakingOff()) {
-					if (drone.getAltitude() >= (targetAltitude - 3)) {
+					if (drone.getAltitude() >= (targetAltitude - DronologyConstants.THRESHOLD_TAKEOFF_ALTITUDE)) {
 						LOGGER.info("Target Altitude reached - ready for flying");
 						try {
 							droneState.setModeToFlying();

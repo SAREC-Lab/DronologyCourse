@@ -313,6 +313,7 @@ class ArduCopter(CopterControl):
         :param wait_till_armable:
         :return:
         """
+        self._connection_initiated = True
         status = 0
         vehicle = None
 
@@ -322,54 +323,60 @@ class ArduCopter(CopterControl):
             else:
                 home = tuple(home)
 
-        if vehicle_type == DRONE_TYPE_PHYS:
-            vehicle = dronekit.connect(ip, wait_ready=False, baud=baud)
-            self._v_type = DRONE_TYPE_PHYS
+        try:
+            if vehicle_type == DRONE_TYPE_PHYS:
+                vehicle = dronekit.connect(ip, wait_ready=False, baud=baud)
+                self._v_type = DRONE_TYPE_PHYS
 
-            if vehicle_id is None:
-                vehicle_id = ip
+                if vehicle_id is None:
+                    vehicle_id = ip
 
-        elif vehicle_type == DRONE_TYPE_SITL_VRTL:
-            vehicle_id = self._vid
-            if vehicle_id is None:
-                vehicle_id = vehicle_type + str(instance)
+            elif vehicle_type == DRONE_TYPE_SITL_VRTL:
+                vehicle_id = self._vid
+                if vehicle_id is None:
+                    vehicle_id = vehicle_type + str(instance)
 
-            sitl_args = [
-                '-I{}'.format(str(instance)),
-                '--model', '+',
-                '--home', ','.join(map(str, home)),
-                '--rate', str(rate),
-                '--speedup', str(speedup),
-                '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
-            ]
-            _LOG.debug('Trying to launch SITL instance {} on tcp:127.0.0.1:{}'.format(instance, 5760 + instance * 10))
-            sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
-            sitl.launch(sitl_args, await_ready=True)
-            tcp, ip, port = sitl.connection_string().split(':')
-            port = str(int(port) + instance * 10)
-            conn_string = ':'.join([tcp, ip, port])
-            _LOG.debug('SITL instance {} launched on: {}'.format(instance, conn_string))
-            vehicle = dronekit.connect(conn_string, baud=baud)
-            vehicle.wait_ready(timeout=120)
-            _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
-            self._v_type = DRONE_TYPE_SITL_VRTL
-            self._sitl = sitl
+                sitl_args = [
+                    '-I{}'.format(str(instance)),
+                    '--model', '+',
+                    '--home', ','.join(map(str, home)),
+                    '--rate', str(rate),
+                    '--speedup', str(speedup),
+                    '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
+                ]
+                _LOG.debug('Trying to launch SITL instance {} on tcp:127.0.0.1:{}'.format(instance, 5760 + instance * 10))
+                sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
+                sitl.launch(sitl_args, await_ready=True)
+                tcp, ip, port = sitl.connection_string().split(':')
+                port = str(int(port) + instance * 10)
+                conn_string = ':'.join([tcp, ip, port])
+                _LOG.debug('SITL instance {} launched on: {}'.format(instance, conn_string))
+                vehicle = dronekit.connect(conn_string, baud=baud)
+                vehicle.wait_ready(timeout=120)
+                _LOG.info('Vehicle {} connected on {}'.format(vehicle_id, conn_string))
+                self._v_type = DRONE_TYPE_SITL_VRTL
+                self._sitl = sitl
 
-        else:
-            _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
+            else:
+                _LOG.warn('vehicle type {} not supported!'.format(vehicle_type))
+                status = -1
+
+            if wait_till_armable:
+                # Force wait until vehicle is armable. (ensure all pre-flight checks are completed)
+                while not vehicle.is_armable:
+                    time.sleep(3.0)
+
+            # Allow some extra time for things to initialize
+            time.sleep(3.0)
+            with self._drone_lock:
+                self._vehicle = vehicle
+                self._vid = vehicle_id
+                self._register_message_handlers(vehicle)
+
+        except dronekit.APIException:
             status = -1
 
-        if wait_till_armable:
-            # Force wait until vehicle is armable. (ensure all pre-flight checks are completed)
-            while not vehicle.is_armable:
-                time.sleep(3.0)
-
-        # Allow some extra time for things to initialize
-        time.sleep(3.0)
-        with self._drone_lock:
-            self._vehicle = vehicle
-            self._vid = vehicle_id
-            self._register_message_handlers(vehicle)
+        self._connection_complete = True
 
         if status >= 0:
             _LOG.info('Vehicle {} successfully initialized.'.format(self._vid))
@@ -425,10 +432,14 @@ class ArduCopter(CopterControl):
         Close connection to vehicle and sitl.
         :return:
         """
-        if self._vehicle:
-            _LOG.info('Closing vehicle {} connection.'.format(self._vid))
-            self._vehicle.close()
-            self._state_msg_timer.stop()
-        if self._sitl:
-            _LOG.info('Closing SITL connnection for vehicle {}'.format(self._vid))
-            self._sitl.stop()
+        if self._connection_initiated:
+            while not self._connection_complete:
+                time.sleep(1.0)
+
+            if self._vehicle:
+                _LOG.info('Closing vehicle {} connection.'.format(self._vid))
+                self._vehicle.close()
+                self._state_msg_timer.stop()
+            if self._sitl:
+                _LOG.info('Closing SITL connnection for vehicle {}'.format(self._vid))
+                self._sitl.stop()

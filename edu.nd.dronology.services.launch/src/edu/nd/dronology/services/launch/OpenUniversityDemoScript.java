@@ -20,16 +20,16 @@ import edu.nd.dronology.services.core.remote.IFlightRouteplanningRemoteService;
 import edu.nd.dronology.services.core.remote.IRemoteManager;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 
-public class FlyingFieldDemoScript {
+public class OpenUniversityDemoScript {
 
 	private static final String ADDRESS_SCHEME = "rmi://%s:%s/Remote";
 
 	public static void main(String[] args) {
 		try {
 			// Flying Field
-			LlaCoordinate cord1 = new LlaCoordinate(41.519400, -86.239127, 0);
-			LlaCoordinate cord2 = new LlaCoordinate(41.519400, -86.239527, 0);
-			LlaCoordinate cord4 = new LlaCoordinate(41.717158, -86.228932, 0);
+			LlaCoordinate cord1 = new LlaCoordinate(52.024928, -0.705930, 0);
+			LlaCoordinate cord2 = new LlaCoordinate(52.026177, -0.713478,0);
+			LlaCoordinate cord3 = new LlaCoordinate(52.023837, -0.714029, 0);
 
 			IRemoteManager manager = (IRemoteManager) Naming.lookup(String.format(ADDRESS_SCHEME, "localhost", 9898));
 
@@ -42,16 +42,16 @@ public class FlyingFieldDemoScript {
 					.getService(IFlightRouteplanningRemoteService.class);
 			//
 
-			DroneInitializationInfo inff = new DroneInitializationInfo("TollRoad-SurveillanceUAV1", DroneMode.MODE_VIRTUAL,
-					"IRIS+", cord4);
+			DroneInitializationInfo inff = new DroneInitializationInfo("Bashars-UAV", DroneMode.MODE_VIRTUAL,
+					"IRIS+", cord1);
 			service.initializeDrones(inff);
 
-			DroneInitializationInfo inff2 = new DroneInitializationInfo("TollRoad-SurveillanceUAV2", DroneMode.MODE_VIRTUAL,
-					"IRIS+", cord4);
+			DroneInitializationInfo inff2 = new DroneInitializationInfo("Yijuns-UAV", DroneMode.MODE_VIRTUAL,
+					"IRIS+", cord2);
 			service.initializeDrones(inff2);
 
-			DroneInitializationInfo inff3 = new DroneInitializationInfo("TollRoad-SurveillanceUAV3", DroneMode.MODE_VIRTUAL,
-					"IRIS+", cord4);
+			DroneInitializationInfo inff3 = new DroneInitializationInfo("Royal-UAV", DroneMode.MODE_VIRTUAL,
+					"IRIS+", cord3);
 			service.initializeDrones(inff3);
 
 			List<FlightRouteInfo> allRoutes = new ArrayList<>(planningService.getItems());
