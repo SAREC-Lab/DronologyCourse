@@ -6,7 +6,6 @@ import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
@@ -122,12 +121,15 @@ public class FRMetaInfo extends CustomComponent {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void layoutClick(LayoutClickEvent event) {
+				if (!map.getMapUtilities().isEditable())
+					return;
 				if (event.getClickedComponent() == nameLabel) {
 					if (event.isDoubleClick()) {
 						// Change layout to accommodate for the textfield.
 						allContent.removeAllComponents();
 						
 						HorizontalLayout nameArea = new HorizontalLayout();
+						nameEditField.setValue(nameLabel.getValue());
 						nameArea.addComponents(nameEditField, waypointNumLabel);
 						
 						VerticalLayout textLayout = new VerticalLayout();
@@ -144,6 +146,8 @@ public class FRMetaInfo extends CustomComponent {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void layoutClick(LayoutClickEvent event) {
+				if (!map.getMapUtilities().isEditable())
+					return;
 				if (event.getClickedComponent() == descriptionLabel) {
 					if (event.isDoubleClick()) {	
 						// Change layout to accommodate for the textfield.
@@ -153,6 +157,8 @@ public class FRMetaInfo extends CustomComponent {
 						VerticalLayout textLayout = new VerticalLayout();
 						textLayout.addStyleName("route_meta_label_description");
 						labels.addComponents(nameLabel, waypointNumLabel);
+
+						descriptionEditField.setValue(descriptionLabel.getValue());
 						textLayout.addComponents(labels, descriptionEditField);		
 						allContent.addComponents(textLayout, rightSide);
 					}
@@ -160,50 +166,34 @@ public class FRMetaInfo extends CustomComponent {
 			}
 		});
 		// Textfield turns back into the correct label once the user clicks away.
-		nameEditField.addBlurListener(e -> {			
-			// Removes and re-adds components so that they are in correct layout.
-			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
-			allContent.removeAllComponents();
+		nameEditField.addBlurListener(e -> {
+			nameLabel.setValue(nameEditField.getValue());
+			
 			labels.removeAllComponents();
-			nameLabel = new Label("<b>" + nameEditField.getValue() + "</b>", ContentMode.HTML);
+			labels.addComponents(nameLabel, waypointNumLabel);
+			
+			leftSide.removeAllComponents();
+			leftSide.addComponents(labels, descriptionHolder);
+
+			allContent.removeAllComponents();
+			allContent.addComponents(leftSide, rightSide);
+			
+			rightSide.addStyleName("route_meta_controls");
+		});
+		// Once the user clicks away from the description field, the correct label is shown.
+		descriptionEditField.addBlurListener(e -> {
+			descriptionLabel.setValue(descriptionEditField.getValue());
+			
+			labels.removeAllComponents();
 			labels.addComponents(nameLabel, waypointNumLabel);
 			
 			leftSide.removeAllComponents();
 			leftSide.addComponents(labels, descriptionHolder);
 			
-			allContent.addComponents(leftSide, rightSide);
-			
-			// Gets the value from the textbox and saves it to Dronology.
-			rightSide.addStyleName("route_meta_controls");
-			String routeName = nameEditField.getValue();
-			map.setRouteNameDescription(routeName, null);
-			nameEditField.setValue(routeName);
-			
-			// Waits to refresh routes so dronology can save.
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-			
-			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();
-		});
-		// Once the user clicks away from the description field, the correct label is shown.
-		descriptionEditField.addBlurListener(e -> {
-			// Removes and re-adds components so that they are in correct layout.
-			String routeDescription = descriptionEditField.getValue();
-			descriptionLabel.setValue(routeDescription);
-			
 			allContent.removeAllComponents();
-			labels.removeAllComponents();
-			labels.addComponents(nameLabel, waypointNumLabel);
-			leftSide.addComponents(labels, descriptionHolder);
 			allContent.addComponents(leftSide, rightSide);
 			
-			// Gets the value from the textbox and saves it to Dronology.
 			rightSide.addStyleName("route_meta_controls");
-			map.setRouteNameDescription(null, routeDescription);			
-			map.getMainLayout().getControls().getInfoPanel().refreshRoutes();	
 		});
 		// Hides the table.
 		tableViewCheckBox.addValueChangeListener(event -> {
@@ -215,6 +205,19 @@ public class FRMetaInfo extends CustomComponent {
 		});
 		
 		setCompositionRoot(allContent);
+	}
+	
+	public String getRouteName() {
+		return nameLabel.getValue();
+	}
+	public void setRouteName(String name) {
+		nameLabel.setValue(name);
+	}
+	public String getRouteDescription() {
+		return descriptionLabel.getValue();
+	}
+	public void setRouteDescription(String description) {
+		descriptionLabel.setValue(description);
 	}
 
 	public void showInfoForSelectedRoute (FlightRouteInfo info) {

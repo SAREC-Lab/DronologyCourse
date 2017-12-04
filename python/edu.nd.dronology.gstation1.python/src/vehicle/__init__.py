@@ -33,6 +33,7 @@ def make_mavlink_command(cmd, trg_sys=0, trg_component=0, seq=0,
 
     return dronekit.Command(*cmd_args)
 
+
 class VehicleControl(object):
     def __init__(self, handshake_msg_queue, state_msg_queue, vehicle_id=None, state_interval=1.0):
         self._vehicle = None
@@ -44,6 +45,8 @@ class VehicleControl(object):
         self._responsive = True
         self._drone_lock = threading.Lock()
         self._msg_lock = threading.Lock()
+        self._connection_initiated = False
+        self._connection_complete = False
 
     def update_state_interval(self, state_interval):
         with self._msg_lock:

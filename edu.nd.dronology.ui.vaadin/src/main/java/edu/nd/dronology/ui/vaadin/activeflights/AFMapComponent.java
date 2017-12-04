@@ -34,11 +34,15 @@ import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
 import edu.nd.dronology.services.core.util.DronologyServiceException;
 import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
+import edu.nd.dronology.ui.vaadin.map.LeafletmapFactory;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.Configuration;
+import edu.nd.dronology.ui.vaadin.utils.LayerDescriptor;
+import edu.nd.dronology.ui.vaadin.utils.LayerDescriptor.LayerData;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
 import edu.nd.dronology.ui.vaadin.utils.WaypointReplace;
+import edu.nd.dronology.util.Pair;
 
 /**
  * This is the map component for the Active Flights UI
@@ -77,22 +81,16 @@ public class AFMapComponent extends CustomComponent {
 
 	private AFInfoPanel panel;
 
-	public AFMapComponent(String tileDataURL, String name, AFInfoPanel panel) {
+	public AFMapComponent(AFInfoPanel panel) {
 		this.panel = panel;
 
 		this.setWidth("100%");
 		addStyleName("map_component");
 		addStyleName("af_map_component");
 
-		leafletMap = new LMap();
+		leafletMap = LeafletmapFactory.generateMap();
 		utilities = new MapMarkerUtilities(leafletMap);
 
-		LTileLayer tiles = new LTileLayer();
-		tiles.setUrl(tileDataURL);
-
-		leafletMap.addBaseLayer(tiles, name);
-		leafletMap.zoomToContent();
-		leafletMap.addStyleName("bring_back");
 
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);

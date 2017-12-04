@@ -1,12 +1,10 @@
 package edu.nd.dronology.ui.vaadin.flightroutes;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.vaadin.addon.leaflet.LMap;
-import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import com.vaadin.ui.AbsoluteLayout;
@@ -25,6 +23,7 @@ import edu.nd.dronology.ui.vaadin.connector.BaseServiceProvider;
 import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRDeleteWayPointConfirmation;
 import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRNewWayPointWindow;
 import edu.nd.dronology.ui.vaadin.flightroutes.windows.FRWayPointPopupView;
+import edu.nd.dronology.ui.vaadin.map.LeafletmapFactory;
 import edu.nd.dronology.ui.vaadin.start.MyUI;
 import edu.nd.dronology.ui.vaadin.utils.MapMarkerUtilities;
 import edu.nd.dronology.ui.vaadin.utils.UIWayPoint;
@@ -57,16 +56,18 @@ public class FRMapComponent extends CustomComponent {
 		this.mainLayout = mainLayout;
 		this.setWidth("100%");
 
-		LTileLayer tiles = new LTileLayer();
-		tiles.setUrl("VAADIN/sbtiles/{z}/{x}/{y}.png");
-		LTileLayer satelliteTiles = new LTileLayer();
-		satelliteTiles.setUrl("VAADIN/sateltiles/{z}/{x}/{y}.png");
-
-		leafletMap = new LMap();
-		leafletMap.addBaseLayer(tiles, "Main map");
-		leafletMap.addOverlay(satelliteTiles, "Satellite");		
-		leafletMap.setCenter(41.68, -86.25);
-		leafletMap.setZoomLevel(13);
+//		LTileLayer tiles = new LTileLayer();
+//		tiles.setUrl("VAADIN/sbtiles/{z}/{x}/{y}.png");
+//		LTileLayer satelliteTiles = new LTileLayer();
+//		satelliteTiles.setUrl("VAADIN/sateltiles/{z}/{x}/{y}.png");
+//
+//		leafletMap = new LMap();
+//		leafletMap.addBaseLayer(tiles, "Main map");
+//		leafletMap.addOverlay(satelliteTiles, "Satellite");		
+//		leafletMap.setCenter(41.68, -86.25);
+//		leafletMap.setZoomLevel(13);
+		leafletMap = LeafletmapFactory.generateMap();
+		
 		
 		/* Creates a window that allows the user to input altitude and transit speed information about a newly created waypoint. 
 		 * Values are read in and used in the MapMarkerUtilties class. */
@@ -165,45 +166,6 @@ public class FRMapComponent extends CustomComponent {
 			e1.printStackTrace();
 		}
 		return description;	
-	}
-	
-	// Sets either the name or description of the selected route based on the boolean passed in.
-	public void setRouteNameDescription(String name, String description) {
-		FlightRoutePersistenceProvider routePersistor = FlightRoutePersistenceProvider.getInstance();
-		ByteArrayInputStream inStream;
-		IFlightRoute froute;
-
-		IFlightRouteplanningRemoteService service;
-		BaseServiceProvider provider = MyUI.getProvider();
-		// Sends the information to dronology to be saved.
-		try {
-			service = (IFlightRouteplanningRemoteService) provider.getRemoteManager()
-					.getService(IFlightRouteplanningRemoteService.class);
-
-			// Gets id of the selected route, requests the corresponding froute object from the server, sets the name or description, and sends it back.
-			String id = this.getMainLayout().getControls().getInfoPanel().getHighlightedFRInfoBox().getId();
-			
-			byte[] information = service.requestFromServer(id);
-			inStream = new ByteArrayInputStream(information);
-			froute = routePersistor.loadItem(inStream);
-
-			if (name != null) {
-				froute.setName(name);
-			}
-			if (description != null) {
-				froute.setDescription(description);
-			}
-			ByteArrayOutputStream outs = new ByteArrayOutputStream();
-			routePersistor.saveItem(froute, outs);
-			byte[] bytes = outs.toByteArray();
-
-			service.transmitToServer(froute.getId(), bytes);
-
-		} catch (DronologyServiceException | RemoteException e1) {
-			e1.printStackTrace();
-		} catch (PersistenceException e1) {
-			e1.printStackTrace();
-		}
 	}
 
 	//TODO: Seems to be buggy...
