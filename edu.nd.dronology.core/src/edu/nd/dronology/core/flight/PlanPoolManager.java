@@ -151,13 +151,22 @@ public class PlanPoolManager {
 		planList.get(uavid).overridePlan(homePlane);
 
 	}
-	
+
 	public void cancelPendingPlans(String uavid) throws DroneException {
 		if (planList.get(uavid) == null) {
 			throw new DroneException("Error no plan for '" + uavid + "' pending");
 
 		}
 		planList.get(uavid).cancelPendingPlans();
+		synchronized (pendingPlans) {
+			List<IFlightPlan> allPending = new ArrayList<>(pendingPlans);
+
+			for (IFlightPlan p : allPending) {
+				if (p.getDesignatedDroneId().equals(uavid)) {
+					pendingPlans.remove(p);
+				}
+			}
+		}
 	}
 
 	public List<IFlightPlan> getPendingPlans() {

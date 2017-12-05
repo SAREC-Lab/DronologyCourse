@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.nd.dronology.util.Immutables;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
@@ -38,7 +39,7 @@ public class DroneCollectionStatus {
 	}
 
 	public Map<String, DroneStatus> getDrones() {
-		return Collections.unmodifiableMap(drones);
+		return Immutables.hashMapCopy(drones);
 	}
 
 	public void addDrone(DroneStatus drone) {

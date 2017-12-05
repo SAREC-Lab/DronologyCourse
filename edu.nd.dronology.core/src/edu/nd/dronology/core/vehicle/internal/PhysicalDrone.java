@@ -42,6 +42,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IUAVProperty
 		try {
 			droneID = drnName;
 			baseStation.setStatusCallbackNotifier(droneID, this);
+			droneStatus.setGroundstationId(baseStation.getHandlerId());
 		} catch (Exception e) {
 			LOGGER.error(e);
 		}

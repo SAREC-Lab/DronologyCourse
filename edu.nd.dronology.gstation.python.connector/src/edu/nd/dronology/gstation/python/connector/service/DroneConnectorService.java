@@ -31,19 +31,21 @@ public class DroneConnectorService extends AbstractServerService<IDroneConnector
 		return new DroneConnectorServiceInstance();
 	}
 
-	public void closeConnection(String groundstationid) {
-		serviceInstance.closeConnection(groundstationid);
-
-	}
 
 	public void handleConnection(GroundstationConnector connector) {
 		serviceInstance.handleConnection(connector);
-		
+
 	}
 
-	public void registerConnection(GroundstationConnector connector, ConnectionRequestMessage msg) throws GroundStationException{
-		serviceInstance.registerConnection(connector,msg);
-		
+	public void registerConnection(GroundstationConnector connector, ConnectionRequestMessage msg)
+			throws GroundStationException {
+		serviceInstance.registerConnection(connector, msg);
+
+	}
+
+	public void unregisterConnection(String groundstationid) throws GroundStationException {
+		serviceInstance.unregisterConnection(groundstationid);
+
 	}
 
 }
