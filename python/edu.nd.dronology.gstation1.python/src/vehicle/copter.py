@@ -116,12 +116,14 @@ class ArduCopter(CopterControl):
         :return:
         """
         self._vehicle.mode = dronekit.VehicleMode(mode)
-        time.sleep(wait)
+        if self._v_type == DRONE_TYPE_PHYS:
+            time.sleep(wait)
         mode_ = self._vehicle.mode.name
 
         while mode_ != mode:
             self._vehicle.mode = dronekit.VehicleMode(mode)
-            time.sleep(wait)
+            if self._v_type == DRONE_TYPE_PHYS:
+                time.sleep(wait)
             mode_ = self._vehicle.mode.name
 
     def _set_armed(self, armed=True):
@@ -136,10 +138,12 @@ class ArduCopter(CopterControl):
                     time.sleep(2.0)
 
             self._vehicle.armed = armed
-            time.sleep(2.0)
+            if self._v_type == DRONE_TYPE_PHYS:
+                time.sleep(2.0)
             while self._vehicle.armed != armed:
                 self._vehicle.armed = armed
-                time.sleep(2.0)
+                if self._v_type == DRONE_TYPE_PHYS:
+                    time.sleep(2.0)
 
     def _takeoff(self, cmd):
         """
@@ -158,7 +162,8 @@ class ArduCopter(CopterControl):
         self.__set_mode(MODE_GUIDED)
         self._set_armed(armed=True)
         self._vehicle.simple_takeoff(alt)
-        time.sleep(wait)
+        if self._v_type == DRONE_TYPE_PHYS:
+            time.sleep(wait)
 
     def _goto_lla(self, cmd):
         """
@@ -276,7 +281,8 @@ class ArduCopter(CopterControl):
         self._vehicle.flush()
 
     def connect_vehicle(self, vehicle_type=None, vehicle_id=None, ip=None, instance=0, ardupath=ARDUPATH, rate=10,
-                        home=(41.519412, -86.239830, 0, 0), baud=57600, speedup=1.0, async=True):
+                        home=(41.519412, -86.239830, 0, 0), baud=57600, speedup=1.0, async=True,
+                        defaults=None, **kwargs):
         """
         Connect to a vehicle
         :param vehicle_type:
@@ -289,6 +295,7 @@ class ArduCopter(CopterControl):
         :param baud:
         :param speedup:
         :param async:
+        :param defaults:
         :return:
         """
         args = vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud, speedup
@@ -298,7 +305,7 @@ class ArduCopter(CopterControl):
             self._connect_vehicle(*args)
 
     def _connect_vehicle(self, vehicle_type, vehicle_id, ip, instance, ardupath, rate, home, baud, speedup,
-                         wait_till_armable=True):
+                         defaults=None, wait_till_armable=True):
         """
         Connect to a vehicle
         :param vehicle_type:
@@ -316,6 +323,9 @@ class ArduCopter(CopterControl):
         self._connection_initiated = True
         status = 0
         vehicle = None
+
+        if defaults is None:
+            defaults = os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
 
         if home is not None:
             if len(home) == 2:
@@ -341,9 +351,9 @@ class ArduCopter(CopterControl):
                     '--home', ','.join(map(str, home)),
                     '--rate', str(rate),
                     '--speedup', str(speedup),
-                    '--defaults', os.path.join(ardupath, 'Tools', 'autotest', 'default_params', 'copter.parm')
+                    '--defaults', defaults
                 ]
-                _LOG.debug('Trying to launch SITL instance {} on port {}'.format(instance, 5760 + instance * 10))
+                _LOG.debug('Trying to launch SITL instance {} on port {}...'.format(instance, 5760 + instance * 10))
                 sitl = dronekit_sitl.SITL(path=os.path.join(ardupath, 'build', 'sitl', 'bin', 'arducopter'))
                 sitl.launch(sitl_args, await_ready=True)
                 tcp, ip, port = sitl.connection_string().split(':')
@@ -444,3 +454,4 @@ class ArduCopter(CopterControl):
             if self._sitl:
                 _LOG.info('Closing SITL connnection for vehicle {}'.format(self._vid))
                 self._sitl.stop()
+

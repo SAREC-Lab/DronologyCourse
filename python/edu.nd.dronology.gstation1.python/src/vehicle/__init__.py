@@ -76,3 +76,6 @@ class VehicleControl(object):
 
     def stop(self):
         raise NotImplementedError
+
+    def is_ready(self):
+        return self._connection_complete

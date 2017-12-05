@@ -51,6 +51,13 @@ class ControlStation(object):
         with self._status_lock:
             return self._do_work
 
+    def is_vehicle_ready(self, v_id):
+        ready = False
+        if v_id in self._drones:
+            ready = self._drones[v_id].is_ready()
+
+        return ready
+
     def _v_in_work(self):
         cont = True
         while cont:
@@ -58,6 +65,7 @@ class ControlStation(object):
 
             for msg in v_messages:
                 self.register_vehicle(msg)
+                time.sleep(2.0)
 
             time.sleep(1.0)
             with self._status_lock:
@@ -91,15 +99,17 @@ class ControlStation(object):
                 cont = self._do_work
 
     def _handle_message(self, msg):
-        v_id = msg.get_target()
-        is_registered = self._is_registered(v_id)
-        if is_registered:
-            self._drones[msg.get_target()].handle_command(msg)
-        else:
-            _LOG.warn('Command issued for unregistered vehicle {}!'.format(v_id))
+        if self._do_work:
+            v_id = msg.get_target()
+            is_registered = self._is_registered(v_id)
+            if is_registered:
+                self._drones[msg.get_target()].handle_command(msg)
+            else:
+                _LOG.warn('Command issued for unregistered vehicle {}!'.format(v_id))
 
     def register_vehicle(self, v_spec):
-        threading.Thread(target=self._register_vehicle, args=(v_spec,)).start()
+        if self._do_work:
+            threading.Thread(target=self._register_vehicle, args=(v_spec,)).start()
 
     def remove_vehicle(self, v_id):
         threading.Thread(target=self._remove_vehicle, args=(v_id,)).start()
@@ -120,6 +130,9 @@ class ControlStation(object):
                     vehicle_id = v_spec['vehicle_type'] + str(instance)
                 else:
                     vehicle_id = v_spec['ip']
+            else:
+                if v_spec['vehicle_type'] == DRONE_TYPE_SITL_VRTL:
+                    self._n_vrtl_drones += 1
 
             if vehicle_id in self._drones:
                 _LOG.error('Failed to register new vehicle, vehicle with id {} already exists!'.format(vehicle_id))
