@@ -7,11 +7,13 @@ import edu.nd.dronology.services.core.api.IServiceInstance;
 
 public interface IDroneConnectorServiceInstance extends IServiceInstance {
 
-	void closeConnection(String groundstationid);
+	void unregisterConnection(String groundstationid)throws GroundStationException;
 
 	void handleConnection(GroundstationConnector handler);
 
 	void registerConnection(GroundstationConnector connector, ConnectionRequestMessage msg) throws GroundStationException;
+
+
 
 
 

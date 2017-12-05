@@ -68,9 +68,22 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 	}
 
 	public void tearDown() {
-		readDispatcher.tearDown();
-		writeDispatcher.tearDown();
-		dispatchQueueManager.tearDown();
+		try {
+			readDispatcher.tearDown();
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+		try {
+			writeDispatcher.tearDown();
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+		try {
+			dispatchQueueManager.tearDown();
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+
 	}
 
 	@Override
@@ -117,7 +130,7 @@ public class GroundstationConnector implements IDroneCommandHandler, Runnable {
 			writer.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOGGER.hwFatal("Error when establishing connection to groundstation" + e.getMessage());
+			LOGGER.hwFatal("Error when establishing connection to groundstation " + e.getMessage());
 		}
 
 	}

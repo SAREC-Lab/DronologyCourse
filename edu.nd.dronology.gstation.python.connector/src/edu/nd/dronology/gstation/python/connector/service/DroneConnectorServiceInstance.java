@@ -12,11 +12,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import edu.nd.dronology.core.DronologyConstants;
+import edu.nd.dronology.core.exceptions.DroneException;
+import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
+import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.gstation.python.connector.GroundStationException;
 import edu.nd.dronology.gstation.python.connector.GroundstationConnector;
 import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
+import edu.nd.dronology.gstation.python.connector.dispatch.PysicalDroneIdGenerator;
 import edu.nd.dronology.gstation.python.connector.messages.ConnectionRequestMessage;
 import edu.nd.dronology.services.core.base.AbstractServiceInstance;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.services.dronesetup.DroneSetupService;
 import edu.nd.dronology.util.NamedThreadFactory;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -28,11 +34,11 @@ public class DroneConnectorServiceInstance extends AbstractServiceInstance imple
 	private static final ILogger LOGGER = LoggerProvider.getLogger(DroneConnectorServiceInstance.class);
 
 	static final transient Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().serializeNulls()
-			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
-			.setVersion(1.0).serializeSpecialFloatingPointValues().create();
+			.setDateFormat(DateFormat.LONG).setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).setVersion(1.0)
+			.serializeSpecialFloatingPointValues().create();
 
 	private IncommingGroundstationConnectionServer server;
-	private Map<String, Future> activeConnections = new HashMap<>();
+	private Map<String, GroundstationConnector> activeConnections = new HashMap<>();
 
 	public DroneConnectorServiceInstance() {
 		super("DRONECONNECTOR");
@@ -68,13 +74,33 @@ public class DroneConnectorServiceInstance extends AbstractServiceInstance imple
 	}
 
 	@Override
-	public void closeConnection(String connectionId) {
+	public void unregisterConnection(String connectionId) throws GroundStationException {
 		if (activeConnections.containsKey(connectionId)) {
 			LOGGER.info("Removing connection!" + connectionId);
-			Future<?> conn = activeConnections.remove(connectionId);
-			conn.cancel(true);
+			GroundstationConnector conn = activeConnections.remove(connectionId);
+			conn.tearDown();
+			unregisterDrones(connectionId);
+			try {
+				RuntimeDroneTypes.getInstance().unregisterCommandHandler(connectionId);
+			} catch (DroneException e) {
+				throw new GroundStationException("Connection with id " + connectionId + " not found");
+			}
 		} else {
-			LOGGER.warn("Connection with id " + connectionId + " not found");
+			throw new GroundStationException("Connection with id " + connectionId + " not found");
+		}
+	}
+
+	private void unregisterDrones(String groundstationid) {
+
+		Map<String, DroneStatus> activeDrones = DroneSetupService.getInstance().getDrones();
+		for (DroneStatus st : activeDrones.values()) {
+			if (st.getGroundstationId().equals(groundstationid)) {
+				try {
+					DroneSetupService.getInstance().deactivateDrone(st);
+				} catch (DronologyServiceException e) {
+					LOGGER.error(e);
+				}
+			}
 		}
 	}
 
@@ -96,7 +122,7 @@ public class DroneConnectorServiceInstance extends AbstractServiceInstance imple
 		if (activeConnections.containsKey(groundstationId)) {
 			throw new GroundStationException("Groundstation already registered! " + groundstationId);
 		}
-		activeConnections.put(msg.getUavid(), null);
+		activeConnections.put(msg.getUavid(), connector);
 	}
 
 }

@@ -31,6 +31,8 @@ public class StatusDispatchThread extends AbstractStatusDispatchThread<UAVStateM
 				listener.updateCoordinates(state.getLocation());
 				listener.updateVelocity(state.getGroundspeed());
 				listener.updateBatteryLevel(state.getBatterystatus().getBatteryVoltage());
+			} catch (InterruptedException e) {
+				LOGGER.warn("Status Dispatch Thread terminated");
 			} catch (Exception e) {
 				LOGGER.error(e);
 			}

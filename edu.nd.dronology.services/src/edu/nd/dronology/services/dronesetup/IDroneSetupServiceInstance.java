@@ -10,15 +10,14 @@ import edu.nd.dronology.services.core.util.DronologyServiceException;
 
 public interface IDroneSetupServiceInstance extends IServiceInstance {
 
-
 	Map<String, DroneStatus> getDrones();
 
-	void initializeDrones(DroneInitializationInfo[] info)throws DronologyServiceException;
+	void initializeDrones(DroneInitializationInfo[] info) throws DronologyServiceException;
 
 	void addDroneStatusChangeListener(IDroneStatusChangeListener listener);
 
 	void removeDroneStatusChangeListener(IDroneStatusChangeListener listener);
 
- 
+	void deactivateDrone(DroneStatus status) throws DronologyServiceException;
 
 }

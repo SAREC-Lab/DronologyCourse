@@ -54,4 +54,9 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 
 	}
 
+	public void deactivateDrone(DroneStatus status) throws DronologyServiceException {
+		serviceInstance.deactivateDrone(status);
+		
+	}
+
 }
