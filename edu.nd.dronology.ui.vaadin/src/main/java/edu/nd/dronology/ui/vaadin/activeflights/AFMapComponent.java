@@ -186,7 +186,7 @@ public class AFMapComponent extends CustomComponent {
 						}
 					}
 					if (!drawn) {
-						utilities.removeAllLines();
+					//	utilities.removeAllLines();
 						polyLines = utilities.drawLinesForWayPoints(wayPoints, 0, true);
 					}
 				}
