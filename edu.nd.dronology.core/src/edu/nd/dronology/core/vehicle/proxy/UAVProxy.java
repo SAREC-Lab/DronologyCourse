@@ -26,6 +26,7 @@ public class UAVProxy implements Serializable, IUAVProxy {
 	private double velocity;
 	private Map<String, String> info;
 	private String status;
+	private String groundstationId;
 
 	public UAVProxy(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity) {
 		this.ID = ID;
@@ -45,6 +46,10 @@ public class UAVProxy implements Serializable, IUAVProxy {
 	@Override
 	public String getID() {
 		return ID;
+	}
+
+	public String getGroundstationId() {
+		return groundstationId;
 	}
 
 	public void setStatus(String status) {
@@ -138,6 +143,16 @@ public class UAVProxy implements Serializable, IUAVProxy {
 	@Override
 	public LlaCoordinate getCoordinates() {
 		return new LlaCoordinate(latitude, longitude, altitude);
+	}
+
+	public void setVelocity(double velocity) {
+		this.velocity = velocity;
+
+	}
+
+	public void setGroundstationId(String groundstationId) {
+		this.groundstationId = groundstationId;
+
 	}
 
 }

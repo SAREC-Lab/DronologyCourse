@@ -43,7 +43,7 @@ public class MonitoringDispatchThread extends AbstractStatusDispatchThread<Abstr
 				}
 
 			} catch (InterruptedException e) {
-				LOGGER.info("Monitoring Dispatcher shutdown! --" + e.getMessage());
+				LOGGER.info("Monitoring Dispatcher shutdown! -- " + e.getMessage());
 
 			} catch (Exception e) {
 				LOGGER.error(e);

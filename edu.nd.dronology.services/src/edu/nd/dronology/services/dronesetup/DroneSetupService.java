@@ -60,4 +60,9 @@ public class DroneSetupService extends AbstractServerService<IDroneSetupServiceI
 		return serviceInstance.getActiveUAVs();
 	}
 
+	public void deactivateDrone(UAVProxy status) throws DronologyServiceException {
+		serviceInstance.deactivateDrone(status);
+		
+	}
+
 }

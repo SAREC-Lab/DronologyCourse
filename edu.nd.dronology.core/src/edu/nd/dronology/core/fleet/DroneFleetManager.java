@@ -39,8 +39,7 @@ public class DroneFleetManager {
 	}
 
 	/**
-	 * Specifies whether virtual or physical drones will be created according to the
-	 * previously specified runtime drone type. (See RuntimeDroneTypes.java)
+	 * Specifies whether virtual or physical drones will be created according to the previously specified runtime drone type. (See RuntimeDroneTypes.java)
 	 */
 	protected DroneFleetManager() {
 		// if (RuntimeDroneTypes.getInstance().isSimulation())
@@ -138,7 +137,9 @@ public class DroneFleetManager {
 		if (value == null) {
 			throw new DroneException("Drone '" + managedDrone.getDroneName() + "' not found registered");
 		}
-		LOGGER.info("Drone '" + managedDrone.getDroneName() + "' removed from available dron pool");
+		LOGGER.info("Drone '" + managedDrone.getDroneName() + "' removed from available drone pool");
+		availableDrones.remove(value);
+		value.stop();
 		notifyListeners(false, managedDrone);
 	}
 
@@ -153,6 +154,11 @@ public class DroneFleetManager {
 	public List<ManagedDrone> getRegisteredDrones() {
 		return new ArrayList<>(registeredDrones.values());
 
+	}
+
+	public void unregisterDroe(String id) throws DroneException {
+		ManagedDrone managedDrone = getRegisteredDrone(id);
+		removeDrone(managedDrone);
 	}
 
 }

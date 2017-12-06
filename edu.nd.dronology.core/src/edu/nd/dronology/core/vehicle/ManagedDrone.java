@@ -185,6 +185,7 @@ public class ManagedDrone implements Runnable {
 		} catch (Throwable e) {
 			LOGGER.error(e);
 		}
+		LOGGER.info("UAV-Thread '" + drone.getDroneName() + "' terminated");
 	}
 
 	// Check for end of flight. Land if conditions are satisfied
@@ -335,6 +336,16 @@ public class ManagedDrone implements Runnable {
 	public void sendCommand(AbstractDroneCommand command) throws DroneException {
 		drone.sendCommand(command);
 
+	}
+
+	public void stop() {
+		if (!droneState.isOnGround()) {
+			LOGGER.warn("Removing uav '" + drone.getDroneName() + "' while in state " + droneState.getStatus());
+		} else {
+			LOGGER.info("Removing uav '" + drone.getDroneName() + "'");
+		}
+		cont.set(false);
+		haltTimer.cancel();
 	}
 
 }

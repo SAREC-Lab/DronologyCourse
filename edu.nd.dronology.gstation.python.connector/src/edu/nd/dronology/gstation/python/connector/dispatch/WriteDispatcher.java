@@ -1,6 +1,5 @@
 package edu.nd.dronology.gstation.python.connector.dispatch;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -12,8 +11,7 @@ import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 /**
- * Writer Thread takes items from the outbound queue and writes it to the
- * socket.
+ * Writer Thread takes items from the outbound queue and writes it to the socket.
  * 
  * @author Michael
  *
@@ -21,7 +19,7 @@ import net.mv.logging.LoggerProvider;
 public class WriteDispatcher implements Runnable {
 
 	private OutputStream outputStream;
-	private AtomicBoolean cont = new AtomicBoolean(false);
+	private AtomicBoolean cont = new AtomicBoolean(true);
 	private BlockingQueue<IDroneCommand> outputQueue;
 	private static final ILogger LOGGER = LoggerProvider.getLogger(WriteDispatcher.class);
 
@@ -38,10 +36,13 @@ public class WriteDispatcher implements Runnable {
 	@Override
 	public void run() {
 		LOGGER.info("Write-Dispatcher started");
+		try {
 		while (cont.get()) {
 			try {
 				IDroneCommand toSend = outputQueue.take();
-
+				if (toSend instanceof MarkerObject) {
+					continue;
+				}
 				LOGGER.hwInfo("Sending Command to UAV -" + toSend.toString());
 				toSend.timestamp();
 				outputStream.write(toSend.toJsonString().getBytes());
@@ -57,10 +58,34 @@ public class WriteDispatcher implements Runnable {
 		} catch (IOException e) {
 			LOGGER.error(e);
 		}
+		}catch(Throwable t) {
+			t.printStackTrace();
+		}
 	}
 
 	public void tearDown() {
 		cont.set(false);
+		try {
+			outputQueue.put(new MarkerObject());
+		} catch (InterruptedException e) {
+			LOGGER.error(e);
+		}
+	}
+
+	public class MarkerObject implements IDroneCommand {
+
+		@Override
+		public String toJsonString() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void timestamp() {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 }

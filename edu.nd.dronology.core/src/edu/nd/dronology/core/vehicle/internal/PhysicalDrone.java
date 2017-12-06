@@ -42,6 +42,7 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IUAVProperty
 		try {
 			droneID = drnName;
 			baseStation.setStatusCallbackNotifier(droneID, this);
+			droneStatus.setGroundstationId(baseStation.getHandlerId());
 		} catch (Exception e) {
 			LOGGER.error(e);
 		}
@@ -74,7 +75,6 @@ public class PhysicalDrone extends AbstractDrone implements IDrone, IUAVProperty
 				baseStation.sendCommand(new GoToCommand(droneID, targetCoordinates));
 				if (speed != null && speed > 0) {
 					baseStation.sendCommand(new SetGroundSpeedCommand(droneID, speed));
-					baseStation.sendCommand(new SetMonitoringFrequencyCommand(droneID, r.nextInt(10) * 1000));
 				}
 			} catch (DroneException e) {
 				LOGGER.error(e);

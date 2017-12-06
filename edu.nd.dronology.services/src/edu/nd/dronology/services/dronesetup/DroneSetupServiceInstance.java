@@ -8,8 +8,11 @@ import java.util.Map;
 
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.fleet.AbstractDroneFleetFactory;
+import edu.nd.dronology.core.fleet.DroneFleetManager;
 import edu.nd.dronology.core.fleet.PhysicalDroneFleetFactory;
 import edu.nd.dronology.core.fleet.VirtualDroneFleetFactory;
+import edu.nd.dronology.core.flight.PlanPoolManager;
+import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.vehicle.IUAVProxy;
 import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
 import edu.nd.dronology.core.vehicle.proxy.UAVProxyManager;
@@ -135,6 +138,37 @@ public class DroneSetupServiceInstance extends AbstractServiceInstance implement
 	@Override
 	public Collection<IUAVProxy> getActiveUAVs() {
 		return UAVProxyManager.getInstance().getActiveUAVs();
+	}
+	
+	public void deactivateDrone(UAVProxy status) throws DronologyServiceException {
+		try {
+			DroneFleetManager.getInstance().unregisterDroe(status.getID());
+
+			DroneCollectionStatus.getInstance().removeDrone(status);
+			cancelPlans(status.getID());
+			notifyDroneStatusChange(status);
+		} catch (DroneException e) {
+			throw new DronologyServiceException(e.getMessage());
+		}
+
+	}
+
+	private void cancelPlans(String id) {
+		if (PlanPoolManager.getInstance().getCurrentPlan(id) != null) {
+			try {
+				PlanPoolManager.getInstance().overridePlan(null, id);
+			} catch (DroneException e) {
+				LOGGER.error(e);
+			}
+		}
+		if (PlanPoolManager.getInstance().getPendingPlans(id).size() > 0) {
+			try {
+				PlanPoolManager.getInstance().cancelPendingPlans(id);
+			} catch (DroneException e) {
+				LOGGER.error(e);
+			}
+		}
+
 	}
 
 }

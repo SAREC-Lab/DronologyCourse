@@ -82,7 +82,7 @@ public class ReadDispatcher implements Runnable {
 					+ " disconnected - shutting down connection -- Error: " + sex.getMessage());
 			dispatchQueueManager.tearDown();
 			cont.set(false);
-			
+
 		} catch (Throwable t) {
 			LOGGER.error(t);
 		} finally {
@@ -112,8 +112,8 @@ public class ReadDispatcher implements Runnable {
 			dispatchQueueManager.postDroneStatusUpdate(message.getUavid(), (UAVStateMessage) message);
 
 		} else if (message instanceof UAVHandshakeMessage) {
-			LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS)
-					+ " - " + message.toString());
+			LOGGER.hwInfo(FormatUtil.formatTimestamp(message.getTimestamp(), FormatUtil.FORMAT_YEAR_FIRST_MILLIS) + " - "
+					+ message.toString());
 			dispatchQueueManager.postDoneHandshakeMessage(message.getUavid(), (UAVHandshakeMessage) message);
 
 		} else if (message instanceof UAVMonitoringMessage) {
@@ -123,6 +123,7 @@ public class ReadDispatcher implements Runnable {
 
 	public void tearDown() {
 		cont.set(false);
+		dispatchQueueManager.tearDown();
 	}
 
 	public String getConnectionId() {

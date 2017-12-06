@@ -16,6 +16,7 @@ import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
 import edu.nd.dronology.core.vehicle.proxy.UAVProxyManager;
+import edu.nd.dronology.gstation.python.connector.GroundStationException;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;
 import edu.nd.dronology.gstation.python.connector.messages.AbstractUAVMessage;
@@ -32,10 +33,8 @@ import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
 
 /**
- * The {@link DispatchQueueManager} handles both <i>incoming</i> and
- * <i>outgoing</i> queues. </br>
- * Incoming queues contain {@link UAVState} received from the UAV to be
- * dispatched to the {@link PhysicalDrone}.<br>
+ * The {@link DispatchQueueManager} handles both <i>incoming</i> and <i>outgoing</i> queues. </br>
+ * Incoming queues contain {@link UAVState} received from the UAV to be dispatched to the {@link PhysicalDrone}.<br>
  * The outgoing queue contains {@link IDroneCommand}s being sent to the UAV.
  * 
  * @author Michael Vierhauser
@@ -120,9 +119,8 @@ public class DispatchQueueManager {
 
 	private void registerNewDrone(String uavid, UAVHandshakeMessage message) {
 		LOGGER.hwInfo("New drone registered with  '" + uavid + "' -> " + message.toString());
-		DroneInitializationInfo info = new DroneInitializationInfo(
-				PysicalDroneIdGenerator.generate(uavid, groundstationid), DroneMode.MODE_PHYSICAL, uavid,
-				message.getHome());
+		DroneInitializationInfo info = new DroneInitializationInfo(PysicalDroneIdGenerator.generate(uavid, groundstationid),
+				DroneMode.MODE_PHYSICAL, uavid, message.getHome());
 		try {
 			DroneSetupService.getInstance().initializeDrones(info);
 		} catch (DronologyServiceException e) {
@@ -161,7 +159,13 @@ public class DispatchQueueManager {
 	}
 
 	public void tearDown() {
-		DroneConnectorService.getInstance().closeConnection(groundstationid);
+
+		LOGGER.hwInfo("Ground Control Station '" + groundstationid + "' terminated");
+		try {
+			DroneConnectorService.getInstance().unregisterConnection(groundstationid);
+		} catch (GroundStationException e) {
+			LOGGER.error("No groundstation connection with id '" + groundstationid + "' registered");
+		}
 		for (Future<?> ft : dispatchThreads) {
 			ft.cancel(true);
 		}
