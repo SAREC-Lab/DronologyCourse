@@ -20,12 +20,18 @@ public class DronologyConstants {
 	/**
 	 * The takeoff altitude of the uav (vertical distance in m before going to the first waypoint).
 	 */
-	public static final double TAKE_OFF_ALTITUDE = 10;
+	public static final double TAKE_OFF_ALTITUDE = 15;
 
 	/**
 	 * The distance to the waypoint in m in which the waypoint is considered reached.
 	 */
 	public static final double THRESHOLD_WAYPOINT_DISTANCE = 5.0;
+	
+	/**
+	 * The distance to the altitude in m in which the takeoff height
+	 * reached.
+	 */
+	public static final double THRESHOLD_TAKEOFF_HEIGHT = 0.8;
 
 	/**
 	 * The threshold distance in which the take-off altitude is considered reached.
@@ -46,5 +52,15 @@ public class DronologyConstants {
 	public static final boolean USE_SAFETY_CHECKS = false;
 
 	public static final boolean USE_MONITORING = true;
+
+	/**
+	 * Frequency the status check timer is executed (ms)
+	 */
+	public static final long FREQUENCY_STATUS_CHECKS = 1000;
+	
+	/**
+	 * Frequency the collision avoidance check timer is executed (ms)
+	 */
+	public static final long FREQUENCY_COLLISION_CHECKS = 1000;
 
 }

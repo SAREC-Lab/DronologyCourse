@@ -1,8 +1,8 @@
 package edu.nd.dronology.core.vehicle;
 
-import edu.nd.dronology.core.status.DroneCollectionStatus;
-import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxyManager;
 import edu.nd.dronology.util.NullUtil;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;
@@ -21,14 +21,14 @@ public abstract class AbstractDrone implements IDrone {
 	private LlaCoordinate basePosition; // In current version drones always return to base at the end of their flights.
 	protected LlaCoordinate currentPosition;
 	protected final String droneName;
-	protected DroneStatus droneStatus; // PHY
+	protected UAVProxy droneStatus; // PHY
 
 	protected AbstractDrone(String drnName) {
 		NullUtil.checkNull(drnName);
 		this.droneName = drnName;
 		currentPosition = null;
-		droneStatus = new DroneStatus(drnName, 0, 0, 0, 0.0, 0.0); // Not initialized yet //PHYS
-		DroneCollectionStatus.getInstance().addDrone(droneStatus); // PHYS
+		droneStatus = new UAVProxy(drnName, 0, 0, 0, 0.0, 0.0); // Not initialized yet //PHYS
+		UAVProxyManager.getInstance().addDrone(droneStatus); // PHYS
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class AbstractDrone implements IDrone {
 	}
 
 	@Override
-	public DroneStatus getDroneStatus() {
+	public UAVProxy getDroneStatus() {
 		return droneStatus;
 	}
 
@@ -98,13 +98,13 @@ public abstract class AbstractDrone implements IDrone {
 	}
 
 	public void setVelocity(double velocity) {
-		droneStatus.setVelocity(velocity);
+		droneStatus.updateVelocity(velocity);
 
 	}
 
 	public void updateBatteryLevel(double batteryLevel) {
 		droneStatus.updateBatteryLevel(batteryLevel);
-		
+
 	}
 
 }

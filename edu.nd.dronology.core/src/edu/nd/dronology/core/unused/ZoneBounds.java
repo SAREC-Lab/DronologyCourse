@@ -1,0 +1,135 @@
+//package edu.nd.dronology.core.unused;
+//
+//import edu.nd.dronology.core.coordinate.LlaCoordinate;
+//import edu.nd.dronology.core.exceptions.FlightZoneException;
+//
+///**
+// * Establishes geographical zone for the simulation Singleton
+// * 
+// * @author Jane
+// * @version 0.1
+// */
+//public class ZoneBounds {
+//	private double westLongitude = 0;
+//	private double eastLongitude = 0;
+//	private double northLatitude = 0;
+//	private double southLatitude = 0;
+//	private double maxAltitude = 0;
+//
+//	private static volatile ZoneBounds INSTANCE = null;
+//
+//	protected ZoneBounds() {
+//	}
+//
+//	/**
+//	 * Return an instance of ZoneBounds
+//	 * 
+//	 * @return
+//	 */
+//	public static ZoneBounds getInstance() {
+//		if (INSTANCE == null) {
+//			synchronized (ZoneBounds.class) {
+//				if (INSTANCE == null) {
+//					INSTANCE = new ZoneBounds();
+//				}
+//			}
+//		}
+//		return INSTANCE;
+//	}
+//
+//	/**
+//	 * setup the boundary of the Zone based on top left and bottom right coordinates as well as maximum altitude
+//	 * 
+//	 * @param northLat
+//	 * @param westLon
+//	 * @param southLat
+//	 * @param eastLon
+//	 * @param maxAlt
+//	 */
+//	public void setZoneBounds(double northLat, double westLon, double southLat, double eastLon, double maxAlt) {
+//		westLongitude = westLon;
+//		eastLongitude = eastLon;
+//		northLatitude = northLat;
+//		southLatitude = southLat;
+//		maxAltitude = maxAlt;
+//	}
+//
+//	/**
+//	 * Checks whether a coordinate is inside the zone
+//	 * 
+//	 * @param coords
+//	 * @return
+//	 * @throws FlightZoneException
+//	 */
+//	public boolean inBounds(LlaCoordinate coords) throws FlightZoneException {
+//		if (westLongitude != 0 || eastLongitude != 0) { // Assume two longitude values must not both be zero if bounds are set.
+//			// Check if in bounds
+//			return true; // or false
+//		}
+//		throw new FlightZoneException("Coordinate check has failed - because you have not set zone bounds yet.");
+//	}
+//
+//	/**
+//	 * Get westerly longitude degree
+//	 * 
+//	 * @return longitude degree
+//	 */
+//	public double getWestLongitude() {
+//		return westLongitude;
+//	}
+//
+//	/**
+//	 * Get most easterly longitude degree
+//	 * 
+//	 * @return
+//	 */
+//	public double getEastLongitude() {
+//		return eastLongitude;
+//	}
+//
+//	/**
+//	 * Get north most latitude degree
+//	 * 
+//	 * @return
+//	 */
+//	public double getNorthLatitude() {
+//		return northLatitude;
+//	}
+//
+//	/**
+//	 * Get south most latitude degree
+//	 * 
+//	 * @return southLatitude degree
+//	 */
+//	public double getSouthLatitude() {
+//		return southLatitude;
+//	}
+//
+//	/**
+//	 * Return top left coordinates
+//	 * 
+//	 * @return Coordinates representing the top left position
+//	 */
+//	public LlaCoordinate getTopLeft() {
+//		return new LlaCoordinate(northLatitude, westLongitude, maxAltitude);
+//	}
+//
+//	/**
+//	 * Return delta in degrees between leftmost and rightmost longitude
+//	 * 
+//	 * @return distance in degrees of longitude (x axis)
+//	 */
+//	public double getXRange() {
+//		return Math.abs(eastLongitude - westLongitude);
+//	}
+//
+//	/**
+//	 * Return delta in degrees between northmost and southmost latitude
+//	 * 
+//	 * @return
+//	 */
+//	public double getYRange() {
+//		return Math.abs(northLatitude - southLatitude);
+//	}
+//
+//}

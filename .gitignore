@@ -15,3 +15,5 @@ dronology-workspace/
 
 *.iml
 .idea/
+
+*.pyc

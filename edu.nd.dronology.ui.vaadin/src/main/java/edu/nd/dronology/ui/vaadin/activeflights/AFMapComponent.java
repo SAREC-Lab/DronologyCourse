@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
@@ -29,8 +27,8 @@ import com.vaadin.ui.PopupView;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import edu.nd.dronology.core.status.DroneStatus;
 import edu.nd.dronology.core.util.Waypoint;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
 import edu.nd.dronology.services.core.info.FlightPlanInfo;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
@@ -57,7 +55,7 @@ public class AFMapComponent extends CustomComponent {
 
 	private LMap leafletMap;
 	private ArrayList<LMarker> markers = new ArrayList<>();
-	private Map<String, DroneStatus> drones;
+	private Collection<IUAVProxy> drones;
 	private Collection<FlightPlanInfo> currentFlights;
 	private IDroneSetupRemoteService service;
 	private IFlightManagerRemoteService flightRouteService;
@@ -240,8 +238,7 @@ public class AFMapComponent extends CustomComponent {
 				utilities.removeAllLines();
 				boolean exists = true; // determines if flight route is still active
 				for (List<LMarker> e : wayPointMarkers) {
-					boolean individualExist = false; // helper variable to determine if each flight route is still
-					// active
+					boolean individualExist = false; // helper variable to determine if each flight route is still active
 					for (FlightPlanInfo q : currentFlights) {
 						if (e.get(0).getPoint().getLat() == q.getWaypoints().get(0).getCoordinate().getLatitude()
 								&& e.get(0).getPoint().getLon() == q.getWaypoints().get(0).getCoordinate().getLongitude()) {
@@ -251,16 +248,14 @@ public class AFMapComponent extends CustomComponent {
 					if (individualExist == false)
 						exists = false;
 				}
-				if (!exists || wayPointMarkers.size() != currentFlights.size()) { // if flight doesn't exist, remove
-					// it's waypoint markers
+				if (!exists || wayPointMarkers.size() != currentFlights.size()) { // if flight doesn't exist, remove it's waypoint markers
 					for (List<LMarker> lmarkers : wayPointMarkers) {
 						for (LMarker m : lmarkers) {
 							utilities.getMap().removeComponent(m);
 						}
 					}
 					wayPointMarkers.clear();
-					if (!follow && flightRoutes.size() < currentFlights.size()) // only reset the center when a flight
-						// route is added
+					if (!follow && flightRoutes.size() < currentFlights.size()) // only reset the center when a flight route is added
 						this.setAverageCenter();
 				}
 			}
@@ -295,7 +290,7 @@ public class AFMapComponent extends CustomComponent {
 	@SuppressWarnings("deprecation")
 	public void addDroneMarkers(String focused, List<String> checked) {
 		try {
-			drones = service.getDrones();
+			drones = service.getActiveUAVs();
 		} catch (RemoteException e) {
 			try {
 				service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
@@ -306,9 +301,9 @@ public class AFMapComponent extends CustomComponent {
 			}
 			Notification.show("Reconnecting...");
 		}
-		for (Entry<String, DroneStatus> e : drones.entrySet()) {
-			LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude());
-			marker.setId(e.getValue().getID());
+		for (IUAVProxy e : drones) {
+			LMarker marker = new LMarker(e.getLatitude(), e.getLongitude());
+			marker.setId(e.getID());
 			if (marker.getId().equals(focused))
 				marker.setIcon(droneIconFocused);
 			else {
@@ -342,16 +337,16 @@ public class AFMapComponent extends CustomComponent {
 	@SuppressWarnings("deprecation")
 	public void updateDroneMarkers(String focused, List<String> checked) {
 		try {
-			drones = service.getDrones();
+			drones = service.getActiveUAVs();
 			ArrayList<LMarker> remove = new ArrayList<>();
 			if (markers.size() == drones.size()) {
 				for (LMarker marker : markers) {
 					boolean exists = false;
-					for (Entry<String, DroneStatus> e : drones.entrySet()) {
-						if (marker.getId().equals(e.getValue().getID())) { // if the marker correlates to the drone
+					for (IUAVProxy e : drones) {
+						if (marker.getId().equals(e.getID())) { // if the marker correlates to the drone
 							Point temp = new Point();
-							temp.setLat(e.getValue().getLatitude()); // update location
-							temp.setLon(e.getValue().getLongitude());
+							temp.setLat(e.getLatitude()); // update location
+							temp.setLon(e.getLongitude());
 							marker.setPoint(temp);
 							if (marker.getId().equals(focused))
 								marker.setIcon(droneIconFocused);
@@ -369,18 +364,17 @@ public class AFMapComponent extends CustomComponent {
 							exists = true;
 						}
 					}
-					if (!exists) { // if the drone that is represented by the marker is no longer active or if the
-						// drone is new
+					if (!exists) { // if the drone that is represented by the marker is no longer active or if the drone is new
 						remove.add(marker);
-						for (Entry<String, DroneStatus> e1 : drones.entrySet()) {
+						for (IUAVProxy e1 : drones) {
 							boolean old = false;
 							for (LMarker marker1 : markers) {
-								if (e1.getValue().getID().equals(marker1.getId()))
+								if (e1.getID().equals(marker1.getId()))
 									old = true;
 							}
 							if (!old) { // the drone does not have a marker represented by it
-								LMarker newMarker = new LMarker(e1.getValue().getLatitude(), e1.getValue().getLongitude());
-								newMarker.setId(e1.getValue().getID());
+								LMarker newMarker = new LMarker(e1.getLatitude(), e1.getLongitude());
+								newMarker.setId(e1.getID());
 								if (marker.getId().equals(focused))
 									marker.setIcon(droneIconFocused);
 								else {
@@ -405,20 +399,15 @@ public class AFMapComponent extends CustomComponent {
 					}
 				}
 			} else if (markers.size() < drones.size()) {
-				for (Entry<String, DroneStatus> e : drones.entrySet()) {
+				for (IUAVProxy e: drones) {
 					boolean exists = false;
 					for (LMarker marker : markers) {
-						if (e.getValue().getID().equals(marker.getId()))
+						if (e.getID().equals(marker.getId()))
 							exists = true;
 					}
 					if (!exists) {
-						LMarker marker = new LMarker(e.getValue().getLatitude(), e.getValue().getLongitude()); // create
-						// new
-						// marker
-						// for
-						// the
-						// drone
-						marker.setId(e.getValue().getID());
+						LMarker marker = new LMarker(e.getLatitude(), e.getLongitude()); // create new marker for the drone
+						marker.setId(e.getID());
 						if (marker.getId().equals(focused))
 							marker.setIcon(droneIconFocused);
 						else {
@@ -444,8 +433,8 @@ public class AFMapComponent extends CustomComponent {
 			} else if (markers.size() > drones.size()) {
 				for (LMarker marker : markers) {
 					boolean exists = false;
-					for (Entry<String, DroneStatus> e : drones.entrySet()) {
-						if (e.getValue().getID().equals(marker.getId()))
+					for (IUAVProxy e : drones) {
+						if (e.getID().equals(marker.getId()))
 							exists = true;
 					}
 					if (!exists) // remove marker that represents a deactivated drone
@@ -488,14 +477,13 @@ public class AFMapComponent extends CustomComponent {
 		Configuration configuration = Configuration.getInstance();
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-			drones = service.getDrones();
+			drones = service.getActiveUAVs();
 			double avgLat = 0;
 			double avgLon = 0;
 			int numPoints = 0;
-			for (Entry<String, DroneStatus> e : drones.entrySet()) { // finding the average latitude and longitude of
-				// the drones and flight routes
-				avgLat += e.getValue().getLatitude();
-				avgLon += e.getValue().getLongitude();
+			for ( IUAVProxy e : drones) { // finding the average latitude and longitude of the drones and flight routes
+				avgLat += e.getLatitude();
+				avgLon += e.getLongitude();
 				numPoints++;
 			}
 			currentFlights = flightRouteService.getCurrentFlights();
@@ -511,12 +499,12 @@ public class AFMapComponent extends CustomComponent {
 			avgLon /= (numPoints * 1.0);
 			double farthestLat = 0;
 			double farthestLon = 0; // finding the farthest point from the center
-			for (Entry<String, DroneStatus> e : drones.entrySet()) {
-				if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat) {
-					farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
+			for (IUAVProxy e : drones) {
+				if (Math.abs(e.getLatitude() - avgLat) > farthestLat) {
+					farthestLat = Math.abs(e.getLatitude() - avgLat);
 				}
-				if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon) {
-					farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
+				if (Math.abs(e.getLongitude() - avgLon) > farthestLon) {
+					farthestLon = Math.abs(e.getLongitude() - avgLon);
 				}
 			}
 			for (FlightPlanInfo e : currentFlights) {
@@ -598,15 +586,15 @@ public class AFMapComponent extends CustomComponent {
 		}
 		try {
 			service = (IDroneSetupRemoteService) provider.getRemoteManager().getService(IDroneSetupRemoteService.class);
-			drones = service.getDrones();
+			drones = service.getActiveUAVs();
 			double avgLat = 0; // finds the average latitude and longitude
 			double avgLon = 0;
 			int numPoints = 0;
-			for (Entry<String, DroneStatus> e : drones.entrySet()) {
+			for (IUAVProxy e : drones) {
 				for (String name : names) {
-					if (e.getValue().getID().equals(name)) {
-						avgLat += e.getValue().getLatitude();
-						avgLon += e.getValue().getLongitude();
+					if (e.getID().equals(name)) {
+						avgLat += e.getLatitude();
+						avgLon += e.getLongitude();
 						numPoints++;
 					}
 				}
@@ -615,21 +603,20 @@ public class AFMapComponent extends CustomComponent {
 			avgLon /= (numPoints * 1.0);
 			double farthestLat = 0; // finds the farthest point from the center
 			double farthestLon = 0;
-			for (Entry<String, DroneStatus> e : drones.entrySet()) {
+			for (IUAVProxy e : drones) {
 				for (String name : names) {
-					if (e.getValue().getID().equals(name)) {
-						if (Math.abs(e.getValue().getLatitude() - avgLat) > farthestLat) {
-							farthestLat = Math.abs(e.getValue().getLatitude() - avgLat);
+					if (e.getID().equals(name)) {
+						if (Math.abs(e.getLatitude() - avgLat) > farthestLat) {
+							farthestLat = Math.abs(e.getLatitude() - avgLat);
 						}
-						if (Math.abs(e.getValue().getLongitude() - avgLon) > farthestLon) {
-							farthestLon = Math.abs(e.getValue().getLongitude() - avgLon);
+						if (Math.abs(e.getLongitude() - avgLon) > farthestLon) {
+							farthestLon = Math.abs(e.getLongitude() - avgLon);
 						}
 					}
 				}
 			}
 			Point point = new Point(avgLat, avgLon);
-			if (this.followZoom) { // if the first time after the button click, set the zoom level to fit all
-				// drones
+			if (this.followZoom) { // if the first time after the button click, set the zoom level to fit all drones
 				double zoom;
 				if (farthestLat == 0 && farthestLon == 0) {
 					zoom = 17;
@@ -673,7 +660,7 @@ public class AFMapComponent extends CustomComponent {
 		@Override
 		public void onMouseOver(LeafletMouseOverEvent event) {
 			try {
-				drones = service.getDrones();
+				drones = service.getActiveUAVs();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -684,23 +671,21 @@ public class AFMapComponent extends CustomComponent {
 
 			VerticalLayout popupContent = (VerticalLayout) dronePopup.getContent().getPopupComponent();
 			popupContent.removeAllComponents();
-			for (Entry<String, DroneStatus> e : drones.entrySet()) { // change the popup content to display the right
-				// AFInfoBox
-				if (e.getValue().getID().equals(leafletMarker.getId())) {
-					AFInfoBox box = new AFInfoBox(false, e.getValue().getID(), e.getValue().getStatus(),
-							e.getValue().getBatteryLevel(), "green", e.getValue().getLatitude(), e.getValue().getLongitude(),
-							e.getValue().getAltitude(), e.getValue().getVelocity(), false);
+			for (IUAVProxy e : drones) { // change the popup content to display the right AFInfoBox
+				if (e.getID().equals(leafletMarker.getId())) {
+					AFInfoBox box = new AFInfoBox(false, e.getID(), e.getStatus(),
+							e.getBatteryLevel(), "green", e.getLatitude(), e.getLongitude(),
+							e.getAltitude(), e.getVelocity(), false);
 					box.setBoxVisible(false);
 					VerticalLayout boxes = panel.getBoxes();
 					int numUAVs = panel.getNumUAVS();
 					for (int i = 1; i < numUAVs + 1; i++) {
 						AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
-						if (panelBox.getName().equals(box.getName())) { // get the updated information from the
-							// AFInfoPanel
+						if (panelBox.getName().equals(box.getName())) { // get the updated information from the AFInfoPanel
 							box.setIsChecked(panelBox.getIsChecked());
 							box.setHealthColor(panelBox.getHealthColor());
 							box.setHoverInPlace(panelBox.getHoverInPlace());
-							box.setStatus(e.getValue().getStatus());
+							box.setStatus(e.getStatus());
 						}
 					}
 					box.getRouteButton().addClickListener(click -> {
@@ -717,8 +702,7 @@ public class AFMapComponent extends CustomComponent {
 							}
 						}
 					});
-					box.getCheckBox().addValueChangeListener(click -> { // if checkbox clicked in popup, it will change
-						// in AFInfoPanel
+					box.getCheckBox().addValueChangeListener(click -> { // if checkbox clicked in popup, it will change in AFInfoPanel
 						if (box.getCheckBox().getValue()) {
 							for (int i = 1; i < numUAVs + 1; i++) {
 								AFInfoBox panelBox = (AFInfoBox) boxes.getComponent(i);
@@ -789,8 +773,7 @@ public class AFMapComponent extends CustomComponent {
 			LMarker leafletMarker = (LMarker) event.getSource();
 
 			VerticalLayout popupContent = (VerticalLayout) popup.getContent().getPopupComponent();
-			Iterator<Component> it = popupContent.iterator(); // iterates through the popup content and updates the
-			// waypoint information
+			Iterator<Component> it = popupContent.iterator(); // iterates through the popup content and updates the waypoint information
 			while (it.hasNext()) {
 				Component c = it.next();
 				try {

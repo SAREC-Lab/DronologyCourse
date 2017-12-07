@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
-import edu.nd.dronology.core.util.NVector;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.NVector;
 
 public class NvecInterpolatorTest {
 

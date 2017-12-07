@@ -1,10 +1,10 @@
 package edu.nd.dronology.core.vehicle;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
 
 /**
  * iDrone interface
@@ -15,7 +15,7 @@ import edu.nd.dronology.core.vehicle.commands.AbstractDroneCommand;
  */
 public interface IDrone {
 
-	public DroneStatus getDroneStatus();
+	public UAVProxy getDroneStatus();
 
 	/**
 	 * 
@@ -73,11 +73,11 @@ public interface IDrone {
 	 * Sets drones coordinates
 	 * 
 	 * @param lat
-	 *            latitude
+	 *          latitude
 	 * @param lon
-	 *            Longitude
+	 *          Longitude
 	 * @param alt
-	 *            Altitude
+	 *          Altitude
 	 */
 	public void setCoordinates(double lat, double lon, double alt);
 

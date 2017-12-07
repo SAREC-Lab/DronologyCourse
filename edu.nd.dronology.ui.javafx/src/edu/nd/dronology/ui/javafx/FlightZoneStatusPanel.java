@@ -69,7 +69,7 @@ public class FlightZoneStatusPanel {
 				writeText(10, false, "Orgn: " + (flightPlan.getStartLocation()).toString(), 5, rowCtr += 15);
 				writeText(10, false, "Dest:" + (flightPlan.getEndLocation()).toString(), 5, rowCtr += 15);
 				writeText(10, false, "Remaining Waypoints: " + flightPlan.getNumberWayPoints(), 5, rowCtr += 15);
-				int volts = ((int) (flightPlan.getAssignedDrone().getBatteryStatus() * 100));
+				int volts = 100;//((int) (flightPlan.getAssignedDrone().getBatteryStatus() * 100)); broken... needs fix
 				double dVolts = ((double) volts) / 100;
 				writeText(10, false, "Voltage: " + dVolts, 5, rowCtr += 15);
 				if (flightPlan.getStartTime() != -1) {

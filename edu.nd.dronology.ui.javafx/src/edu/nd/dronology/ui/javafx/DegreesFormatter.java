@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.util;
+package edu.nd.dronology.ui.javafx;
 
 public class DegreesFormatter {
 

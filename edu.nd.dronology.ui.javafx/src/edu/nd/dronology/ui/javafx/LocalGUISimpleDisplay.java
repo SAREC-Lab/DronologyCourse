@@ -6,21 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.flightzone.ZoneBounds;
-import edu.nd.dronology.core.status.DroneCollectionStatus;
-import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.DecimalDegreesToXYConverter;
-import edu.nd.dronology.core.util.DegreesFormatter;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.ui.javafx.start.DronologyFXUIRunner;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -47,8 +41,6 @@ public class LocalGUISimpleDisplay extends Application {
 		try {
 			setupService = (IDroneSetupRemoteService) DronologyFXUIRunner.provider.getRemoteManager()
 					.getService(IDroneSetupRemoteService.class);
-
-		
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,7 +83,7 @@ public class LocalGUISimpleDisplay extends Application {
 
 	private void loadDroneStatus() {
 		/// Map<String,DroneStatus> drones = DroneCollectionStatus.getInstance().getDrones();
-		Map<String, DroneStatus> drones = null;
+		Map<String, UAVProxy> drones = null;
 		try {
 			drones = setupService.getDrones();
 		} catch (RemoteException e1) {
@@ -105,7 +97,7 @@ public class LocalGUISimpleDisplay extends Application {
 
 			// Get current coordinates for each drone
 			// These need to be transformed to x,y coordinates for the screen.
-			DroneStatus droneStatus = drones.get(droneID);
+			IUAVProxy droneStatus = drones.get(droneID);
 			Point point = new Point();
 			try {
 				point = coordTransform.getPoint(droneStatus.getLatitude(), droneStatus.getLongitude());

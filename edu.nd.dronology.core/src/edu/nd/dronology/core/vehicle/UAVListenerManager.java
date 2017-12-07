@@ -1,7 +1,5 @@
 package edu.nd.dronology.core.vehicle;
 
-import edu.nd.dronology.core.fleet.DroneFleetManager;
-
 public class UAVListenerManager {
 
 	private static volatile UAVListenerManager INSTANCE = null;

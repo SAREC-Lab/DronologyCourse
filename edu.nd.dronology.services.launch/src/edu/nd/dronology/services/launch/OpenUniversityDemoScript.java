@@ -9,8 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;

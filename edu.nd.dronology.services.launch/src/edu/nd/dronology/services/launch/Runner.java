@@ -5,14 +5,10 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import edu.nd.dronology.core.status.DroneStatus;
-import edu.nd.dronology.core.util.LlaCoordinate;
-import edu.nd.dronology.services.core.info.DroneInitializationInfo;
-import edu.nd.dronology.services.core.info.DroneInitializationInfo.DroneMode;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
 import edu.nd.dronology.services.core.info.FlightRouteInfo;
 import edu.nd.dronology.services.core.remote.IDroneSetupRemoteService;
 import edu.nd.dronology.services.core.remote.IFlightManagerRemoteService;
@@ -29,8 +25,7 @@ public class Runner {
 
 			IRemoteManager manager = (IRemoteManager) Naming.lookup(String.format(ADDRESS_SCHEME, "localhost", 9898));
 
-			IDroneSetupRemoteService service = (IDroneSetupRemoteService) manager
-					.getService(IDroneSetupRemoteService.class);
+			IDroneSetupRemoteService service = (IDroneSetupRemoteService) manager.getService(IDroneSetupRemoteService.class);
 
 			IFlightManagerRemoteService managerService = (IFlightManagerRemoteService) manager
 					.getService(IFlightManagerRemoteService.class);
@@ -39,15 +34,15 @@ public class Runner {
 					.getService(IFlightRouteplanningRemoteService.class);
 
 			List<FlightRouteInfo> allRoutes = new ArrayList<>(planningService.getItems());
-//			int NUM_DRONES = 0;
-//			for (int i = 0; i < NUM_DRONES; i++) {
-//				double coordofset = (double) i / 10000;
-//				LlaCoordinate coord = new LlaCoordinate((41.519400 + coordofset), -86.239927, 0);
-//				DroneInitializationInfo dr = new DroneInitializationInfo("Sim-Drone" + i, DroneMode.MODE_VIRTUAL,
-//						"IRIS+", coord);
-//
-//				service.initializeDrones(dr);
-//			}
+			// int NUM_DRONES = 0;
+			// for (int i = 0; i < NUM_DRONES; i++) {
+			// double coordofset = (double) i / 10000;
+			// LlaCoordinate coord = new LlaCoordinate((41.519400 + coordofset), -86.239927, 0);
+			// DroneInitializationInfo dr = new DroneInitializationInfo("Sim-Drone" + i, DroneMode.MODE_VIRTUAL,
+			// "IRIS+", coord);
+			//
+			// service.initializeDrones(dr);
+			// }
 
 			// for (DroneStatus dr : service.getDrones().values()) {
 			// FlightRouteInfo inf = getRandomRoute(allRoutes);
@@ -56,8 +51,7 @@ public class Runner {
 			//
 			// }
 			FlightRouteInfo inf = allRoutes.remove(0);
-			for (DroneStatus dr : service.getDrones().values()) {
-
+			for (IUAVProxy dr : service.getActiveUAVs()) {
 
 				managerService.planFlight(dr.getID(), "randplan", inf.getWaypoints());
 

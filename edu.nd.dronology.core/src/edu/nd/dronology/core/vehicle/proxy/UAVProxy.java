@@ -1,12 +1,19 @@
-package edu.nd.dronology.core.status;
+package edu.nd.dronology.core.vehicle.proxy;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
 
-public class DroneStatus implements Serializable {
+/**
+ * 
+ * Proxy class for Manged Drones. <br>
+ * This datastructure is intended to be passed to external clients and contains necessary information regarding the actual UAV managed by Dronology
+ *
+ */
+public class UAVProxy implements Serializable, IUAVProxy {
 	/**
 	 * 
 	 */
@@ -21,7 +28,7 @@ public class DroneStatus implements Serializable {
 	private String status;
 	private String groundstationId;
 
-	public DroneStatus(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity) {
+	public UAVProxy(String ID, long latitude, long longitude, int altitude, double batteryLevel, double velocity) {
 		this.ID = ID;
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -32,15 +39,11 @@ public class DroneStatus implements Serializable {
 		status = "UNKNOWN";
 	}
 
-	public void setInfoItem(String infoID, String infoValue) {
-		info.put(infoID, infoValue);
-	}
 
-	public void delInfoItem(String infoID) {
-		if (info.containsKey(infoID))
-			info.remove(infoID);
-	}
-
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getID()
+	 */
+	@Override
 	public String getID() {
 		return ID;
 	}
@@ -53,6 +56,10 @@ public class DroneStatus implements Serializable {
 		this.status = status;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getStatus()
+	 */
+	@Override
 	public String getStatus() {
 		return status;
 	}
@@ -82,30 +89,58 @@ public class DroneStatus implements Serializable {
 		return 17 + ID.hashCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getLongitude()
+	 */
+	@Override
 	public double getLongitude() {
 		return longitude;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getLatitude()
+	 */
+	@Override
 	public double getLatitude() {
 		return latitude;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getAltitude()
+	 */
+	@Override
 	public double getAltitude() {
 		return altitude;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getBatteryLevel()
+	 */
+	@Override
 	public double getBatteryLevel() {
 		return batteryLevel;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getVelocity()
+	 */
+	@Override
 	public double getVelocity() {
 		return velocity;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getInfo()
+	 */
+	@Override
 	public Map<String, String> getInfo() {
 		return info;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.nd.dronology.core.vehicle.proxy.IUAVProxy2#getCoordinates()
+	 */
+	@Override
 	public LlaCoordinate getCoordinates() {
 		return new LlaCoordinate(latitude, longitude, altitude);
 	}

@@ -1,10 +1,10 @@
 package edu.nd.dronology.core.simulator.nvecsimulator;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.NVector;
 import edu.nd.dronology.core.simulator.IFlightSimulator;
 import edu.nd.dronology.core.simulator.simplesimulator.DroneVoltageSimulator;
 import edu.nd.dronology.core.simulator.simplesimulator.FlightSimulator;
-import edu.nd.dronology.core.util.LlaCoordinate;
-import edu.nd.dronology.core.util.NVector;
 import edu.nd.dronology.core.vehicle.internal.VirtualDrone;
 import net.mv.logging.ILogger;
 import net.mv.logging.LoggerProvider;

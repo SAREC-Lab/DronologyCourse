@@ -19,7 +19,7 @@
 //			FlightPlanInfo fpl = createPlanInfo(flt);
 //			info.addCurrentFlight(fpl);
 //
-//		}
+//		}asdsa
 //
 //		for (IFlightPlan flt : flights.getAwaitingTakeOffFlights()) {
 //			FlightPlanInfo fpl = createPlanInfo(flt);

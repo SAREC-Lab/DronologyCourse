@@ -6,7 +6,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.commands.GoToCommand;
 import edu.nd.dronology.core.vehicle.commands.SetModeCommand;
 import edu.nd.dronology.core.vehicle.commands.TakeoffCommand;

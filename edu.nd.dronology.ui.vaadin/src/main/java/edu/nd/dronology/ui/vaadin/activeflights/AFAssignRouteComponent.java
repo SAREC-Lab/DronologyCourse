@@ -4,6 +4,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import org.vaadin.teemu.switchui.Switch;
 
 import com.vaadin.icons.VaadinIcons;

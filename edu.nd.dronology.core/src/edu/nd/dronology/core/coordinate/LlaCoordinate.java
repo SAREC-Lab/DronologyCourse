@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.nd.dronology.core.util;
+package edu.nd.dronology.core.coordinate;
 
 import java.io.Serializable;
 

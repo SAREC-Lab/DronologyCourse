@@ -13,9 +13,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.IUAVPropertyUpdateNotifier;
-import edu.nd.dronology.core.status.DroneCollectionStatus;
 import edu.nd.dronology.core.vehicle.commands.IDroneCommand;
 import edu.nd.dronology.core.vehicle.internal.PhysicalDrone;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxyManager;
 import edu.nd.dronology.gstation.python.connector.GroundStationException;
 import edu.nd.dronology.gstation.python.connector.IMonitoringMessageHandler;
 import edu.nd.dronology.gstation.python.connector.IUAVSafetyValidator;

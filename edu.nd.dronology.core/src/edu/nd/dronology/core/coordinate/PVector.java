@@ -1,4 +1,4 @@
-package edu.nd.dronology.core.util;
+package edu.nd.dronology.core.coordinate;
 
 /**
  * A position on Earth, represented as an X, Y and Z coordinate in an

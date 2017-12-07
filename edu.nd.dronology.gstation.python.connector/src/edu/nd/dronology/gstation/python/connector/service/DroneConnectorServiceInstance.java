@@ -14,7 +14,7 @@ import com.google.gson.GsonBuilder;
 import edu.nd.dronology.core.DronologyConstants;
 import edu.nd.dronology.core.exceptions.DroneException;
 import edu.nd.dronology.core.fleet.RuntimeDroneTypes;
-import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
 import edu.nd.dronology.gstation.python.connector.GroundStationException;
 import edu.nd.dronology.gstation.python.connector.GroundstationConnector;
 import edu.nd.dronology.gstation.python.connector.connect.IncommingGroundstationConnectionServer;
@@ -92,8 +92,8 @@ public class DroneConnectorServiceInstance extends AbstractServiceInstance imple
 
 	private void unregisterDrones(String groundstationid) {
 
-		Map<String, DroneStatus> activeDrones = DroneSetupService.getInstance().getDrones();
-		for (DroneStatus st : activeDrones.values()) {
+		Map<String, UAVProxy> activeDrones = DroneSetupService.getInstance().getDrones();
+		for (UAVProxy st : activeDrones.values()) {
 			if (st.getGroundstationId().equals(groundstationid)) {
 				try {
 					DroneSetupService.getInstance().deactivateDrone(st);

@@ -1,8 +1,10 @@
 package edu.nd.dronology.services.dronesetup;
 
+import java.util.Collection;
 import java.util.Map;
 
-import edu.nd.dronology.core.status.DroneStatus;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
+import edu.nd.dronology.core.vehicle.proxy.UAVProxy;
 import edu.nd.dronology.services.core.api.IServiceInstance;
 import edu.nd.dronology.services.core.info.DroneInitializationInfo;
 import edu.nd.dronology.services.core.listener.IDroneStatusChangeListener;
@@ -10,7 +12,7 @@ import edu.nd.dronology.services.core.util.DronologyServiceException;
 
 public interface IDroneSetupServiceInstance extends IServiceInstance {
 
-	Map<String, DroneStatus> getDrones();
+	Map<String, UAVProxy> getDrones();
 
 	void initializeDrones(DroneInitializationInfo[] info) throws DronologyServiceException;
 
@@ -18,6 +20,8 @@ public interface IDroneSetupServiceInstance extends IServiceInstance {
 
 	void removeDroneStatusChangeListener(IDroneStatusChangeListener listener);
 
-	void deactivateDrone(DroneStatus status) throws DronologyServiceException;
+	Collection<IUAVProxy> getActiveUAVs();
+
+	void deactivateDrone(UAVProxy status) throws DronologyServiceException;
 
 }

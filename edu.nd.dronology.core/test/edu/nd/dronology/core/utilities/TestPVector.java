@@ -6,8 +6,8 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
-import edu.nd.dronology.core.util.PVector;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.PVector;
 
 public class TestPVector {
 

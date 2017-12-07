@@ -1,8 +1,8 @@
 package edu.nd.dronology.core.fleet;
 
 import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.IDrone;
 import edu.nd.dronology.core.vehicle.IDroneCommandHandler;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
@@ -61,8 +61,7 @@ public class PhysicalDroneFleetFactory extends AbstractDroneFleetFactory {
 		LOGGER.info("Drone initialized at: " + currentPosition.toString());
 
 		drone.setBaseCoordinates(currentPosition);
-		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(),
-				currentPosition.getAltitude());
+		drone.setCoordinates(currentPosition.getLatitude(), currentPosition.getLongitude(), currentPosition.getAltitude());
 		managedDrone.start();
 		DroneFleetManager.getInstance().addDrone(managedDrone);
 		return managedDrone;

@@ -1,7 +1,7 @@
 package edu.nd.dronology.core.fleet;
 
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.DroneException;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
 /**

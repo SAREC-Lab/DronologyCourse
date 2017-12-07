@@ -2,7 +2,7 @@ package edu.nd.dronology.services.core.persistence;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.services.core.items.DroneSpecification;
 import edu.nd.dronology.services.core.items.FlightRoute;

@@ -1,6 +1,6 @@
 package edu.nd.dronology.core.simulator.nvecsimulator;
 
-import edu.nd.dronology.core.util.NVector;
+import edu.nd.dronology.core.coordinate.NVector;
 
 /**
  * 

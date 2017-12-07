@@ -3,7 +3,7 @@ package edu.nd.dronology.services.core.info;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 
 public class FlightPlanInfo extends RemoteInfoObject {

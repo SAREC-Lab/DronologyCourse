@@ -2,7 +2,7 @@ package edu.nd.dronology.core.flight;
 
 import java.util.List;
 
-import edu.nd.dronology.core.util.LlaCoordinate;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 
 public interface IFlightDirector {

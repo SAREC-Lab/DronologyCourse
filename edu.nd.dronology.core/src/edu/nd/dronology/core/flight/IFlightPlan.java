@@ -3,8 +3,8 @@ package edu.nd.dronology.core.flight;
 import java.util.List;
 
 import edu.nd.dronology.core.Discuss;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
 import edu.nd.dronology.core.exceptions.FlightZoneException;
-import edu.nd.dronology.core.util.LlaCoordinate;
 import edu.nd.dronology.core.util.Waypoint;
 import edu.nd.dronology.core.vehicle.ManagedDrone;
 
