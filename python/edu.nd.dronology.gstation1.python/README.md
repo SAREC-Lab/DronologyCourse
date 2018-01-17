@@ -41,7 +41,7 @@ git submodule update --init --recursive
 
 Install a few ArduPilot dependencies.
 ```bash
-sudo apt-get install python-matplotlib python-serial python-wxgtk2.8 python-wxtools python-lxml
+sudo apt-get install python-dev python-opencv python-wxgtk3.0 python-pip python-matplotlib python-pygame python-lxml
 sudo pip install future pymavlink MAVProxy
 ```
 Temporarily add some directories to your search path (to make this permanent, add these lines to ~/.bashrc). _Note: if you did not clone ardpilot into ~/git you will need to modify the first line to point to the correct location._
