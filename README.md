@@ -1,4 +1,17 @@
-# Dronology
+# DronologyCourse
+
+The Dronology Project has primarily been funded by the National Science Foundation with the explicit goal of creating a research incubator for Software Engineering research in Cyber Physical Systems.  The project provides a framework for managing and coordinating the flight of both physical and simulated small Unmanned Aerial Systems (sUAS). Project collaborators are committed to not only creating executable, functioning, (flying!), code, but to deliver other artifacts commensurate with a medium-level safety-critical system. This repository houses Dronology releases.
+
+This project is licensed under the terms of a modified MIT license. 
+
+To learn more about the project please visit our website at http://Dronology.info or contact:
+<br>Jane Cleland-Huang, University of Notre Dame
+<br>Michael Vierhauser, University of Notre Dame
+<br>Sean Bayley, University of Notre Dame
+
+
+
+
 
 ## Getting Started
 
@@ -14,30 +27,36 @@ The following directions explain how to setup your computer as a development mac
 
 1. Clone the project:
    ```bash
-   git clone git@github.com:SAREC-Lab/Dronology.git
+   git clone https://github.com/SAREC-Lab/DronologyCourse.git
+   cd DronologyCourse
+   git checkout 2018_01_Dronology
    ```
 
 1. Build, test, package, and install the project in your local Maven repository:
     ```bash
-    cd /path/to/Dronology
+    (cd /path/to/DronologyCourse)
     mvn install
     ````
 	
 1. In a terminal, run the Vaadin UI:
     ```bash
-    cd /path/to/Dronology/edu.nd.dronology.ui.vaadin
+    cd /path/to/DronologyReleases/edu.nd.dronology.ui.vaadin
     mvn jetty:run
     ```
     This starts a web server that you will connect to in a later step. This runs until you stop it with Ctrl + C.
 
 1. In a terminal, run Dronology:
     ```bash
-    cd /path/to/Dronology/edu.nd.dronology.services.launch
+    cd /path/to/DronologyCourse/edu.nd.dronology.services.launch
     mvn exec:java
     ```
     This runs until you stop it with Ctrl + C.
 
 1. Open your browser and navigate to the Dronology web UI at [http://localhost:8080/vaadinui](http://localhost:8080/vaadinui).
+
+
+1. To install and setup the GroundStation and the SITL Simulator continue [here](python/edu.nd.dronology.gstation1.python/README.md)
+
 
 ### Tips and Troubleshooting
 * If you plan to work with the source code, consider installing an IDE. Popular IDEs like [Eclipse](https://www.eclipse.org), [Netbeans](https://netbeans.org/downloads/) and [IntelliJ](https://www.jetbrains.com/idea/) all work well with maven projects like this one.
@@ -49,10 +68,10 @@ The following directions explain how to setup your computer as a development mac
 
 * If your local maven repository gets messed up, you can force maven to re-download dependencies, rebuild everything and install:
     ```bash
-    cd /path/to/Dronology
+    cd /path/to/DronologyCourse
     mvn clean
     cd ~/.m2/repository
     rm -rf *
-    cd /path/to/Dronology
+    cd /path/to/DronologyCourse
     mvn install
     ```
