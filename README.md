@@ -40,7 +40,7 @@ The following directions explain how to setup your computer as a development mac
 	
 1. In a terminal, run the Vaadin UI:
     ```bash
-    cd /path/to/DronologyReleases/edu.nd.dronology.ui.vaadin
+    cd /path/to/DronologyCourse/edu.nd.dronology.ui.vaadin
     mvn jetty:run
     ```
     This starts a web server that you will connect to in a later step. This runs until you stop it with Ctrl + C.
