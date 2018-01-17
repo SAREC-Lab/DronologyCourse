@@ -29,7 +29,7 @@ Clone the Dronology repository.
 cd ~
 mkdir git
 cd git
-git clone https://github.com/SAREC-Lab/Dronology.git
+git clone https://github.com/SAREC-Lab/DronologyCourse.git
 ```
 
 Clone the ArduPilot repository.
@@ -58,12 +58,12 @@ Once everything is built you can kill the process (ctrl+c).
 
 Lastly, install all Groundstation dependencies.
 ```bash
-cd ~/git/Dronology/python/edu.nd.dronology.gstation1.python
+cd ~/git/DronologyCourse/python/edu.nd.dronology.gstation1.python
 sudo pip install -r requirements.txt
 ```
 
 ### Configuring Simulations
-For now, you configure the vehicles (drones) for a simulation using a JSON configuration file. Some sample configuration files are located in _~/git/Dronology/python/edu.nd.dronology.gstation1.python/cfg/drone_cfgs_ e.g., _default.json_:
+For now, you configure the vehicles (drones) for a simulation using a JSON configuration file. Some sample configuration files are located in _~/git/DronologyCourse/python/edu.nd.dronology.gstation1.python/cfg/drone_cfgs_ e.g., _default.json_:
 ```json
 [
   {
@@ -76,7 +76,7 @@ For now, you configure the vehicles (drones) for a simulation using a JSON confi
 ```
 Each JSON entry corresponds to a single drone. For simulations, the only necessary fields are "vehicle_type" (VRTL) and "home" (the starting latitude and longitude of the drone). 
 
-Before running a simulation, you must also modify the ardupath specified in _~/git/Dronology/python/edu.nd.dronology.gstation1.python/cfg/global_cfg.json_:
+Before running a simulation, you must also modify the ardupath specified in _~/git/DronologyCourse/python/edu.nd.dronology.gstation1.python/cfg/global_cfg.json_:
 
 ```json
 {
@@ -90,7 +90,7 @@ This should point to your cloned copy of ArduPilot.
 ### Running
 Once you've [setup and started Dronology](https://github.com/SAREC-Lab/Dronology/blob/master/README.md), you can start the groundstation.
 ```bash
-cd ~/git/Dronology/python/edu.nd.dronology.gstation1.python/src
+cd ~/git/DronologyCourse/python/edu.nd.dronology.gstation1.python/src
 python main.py -gid mygid -addr localhost -p 1234 -d ../cfg/drone_cfgs/default.json -c ../cfg/global_cfg.json
 ```
 All command line arguments have default values. 
