@@ -56,12 +56,25 @@ class Connection:
         return self.get_status() == Connection._CONNECTED
 
     def start(self):
+        """
+        Start the connection
+        :return:
+        """
         threading.Thread(target=self._work).start()
 
     def stop(self):
+        """
+        Shutdown the connection.
+        :return:
+        """
         self.set_status(Connection._DEAD)
 
     def send(self, msg):
+        """
+        Send a message to Dronology.
+        :param msg: the message to be sent over the socket (string)
+        :return: True if the message was able to be sent else False
+        """
         success = False
         with self._conn_lock:
             if self._status == Connection._CONNECTED:
@@ -75,6 +88,12 @@ class Connection:
         return success
 
     def get_messages(self, vid):
+        """
+        Get all the messages for a specific vehicle.
+        :param vid:
+        :return:
+        """
+        # TODO: is this deprecated?
         return self._msgs.get_messages(vid)
 
     def _work(self):
