@@ -34,11 +34,11 @@ cd ardupilot
 git submodule update --init --recursive
 
 # Install ardupilot dependencies
-if version_ge $CURR_VER '16.0'; then
+#if version_ge $CURR_VER '16.0'; then
 export WXGTK_VERSION=3.0
-else
-export WXGTK_VERSION=2.8
-fi
+#else
+#export WXGTK_VERSION=2.8
+#fi
 echo "Linux Version is: $CURR_VER -- wxgtk $WXGTK_VERSION needs to be installed"
 sudo apt-get install python-dev python-opencv python-wxgtk$WXGTK_VERSION python-pip python-matplotlib python-pygame python-lxml
 sudo pip install future pymavlink MAVProxy
