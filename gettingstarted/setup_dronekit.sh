@@ -47,8 +47,8 @@ sudo pip install pyudev
 sudo pip install PyYAML 
 sudo pip install nvector 
 sudo pip install boltons 
-sudo pip install dronekit 
-sudo pip install dronekit-sitl
+sudo pip install dronekit==2.9.1
+sudo pip install dronekit-sitl==3.2.0
 
 
 # Build SITL
