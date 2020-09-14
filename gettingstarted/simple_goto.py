@@ -100,4 +100,4 @@ vehicle.close()
 
 # Shut down simulator if it was started.
 if sitl:
-	sitl.stop()
+    sitl.stop()
