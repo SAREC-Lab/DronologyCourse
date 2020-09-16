@@ -35,17 +35,6 @@ def connect_virtual_vehicle(instance, home):
     copters.append(vehicle)
     sitls.append(sitl)
 
-def copters_armable():
-    unarmed = False
-    for c in copters:
-        print ("Trying one")
-        if (not c.is_armable):
-             unarmed = True
-        else:
-            print ("Copter armed")
-    time.sleep(3)
-    return not unarmed
-
 def copters_at_altitude(aTargetAltitude):
     while True:
         at_altitude = True
