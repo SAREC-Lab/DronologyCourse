@@ -10,8 +10,8 @@ Full documentation is provided at http://python.dronekit.io/examples/simple_goto
 
 from __future__ import print_function
 import time
-from dronekit import connect, VehicleMode, LocationGlobalRelative
-
+from dronekit_sitl import SITL
+from dronekit import Vehicle, VehicleMode, connect, LocationGlobalRelative
 
 # Set up option parsing to get connection string
 import argparse
@@ -19,22 +19,24 @@ parser = argparse.ArgumentParser(description='Commands vehicle using vehicle.sim
 parser.add_argument('--connect',
                     help="Vehicle connection target string. If not specified, SITL automatically started and used.")
 args = parser.parse_args()
-
 connection_string = args.connect
 sitl = None
 
 
 # Start SITL if no connection string specified
+# This technique for starting SITL allows us to specify defffaults 
 if not connection_string:
-    import dronekit_sitl
-    sitl = dronekit_sitl.start_default()
-    connection_string = sitl.connection_string()
-
+    sitl_defaults = '~/git/ardupilot/tools/autotest/default_params/copter.parm'
+    sitl = SITL()
+    sitl.download('copter', '3.3', verbose=True)
+    sitl_args = ['-I0', '--model', 'quad', '--home=35.361350, 149.165210,0,180']
+    sitl.launch(sitl_args, await_ready=True, restart=True)
+    connection_string = 'tcp:127.0.0.1:5760'
 
 # Connect to the Vehicle
 print('Connecting to vehicle on: %s' % connection_string)
-vehicle = connect(connection_string, wait_ready=True)
-
+vehicle = connect(connection_string, wait_ready=True, baud=57600)
+print ('Current position of vehicle is: %s' % vehicle.location.global_frame)
 
 def arm_and_takeoff(aTargetAltitude):
     """
