@@ -1,6 +1,6 @@
 marker_count=0;
 markers = {}
-number_drones = 1
+number_drones = 2
 function initMap() {
 
   // map center on the screen - 50,50 
@@ -17,7 +17,7 @@ function initMap() {
 
 
 
-    marker.setMap( map );
+    
     //markers[1] = marker1;
 
     //marker2.setMap(map);
@@ -32,6 +32,7 @@ function add_markers(position,map){
   while(marker_count!=number_drones){
     marker_count+=1;
     marker = new google.maps.Marker( {position: position, map: map} );
+    marker.setMap( map );
     markers[marker_count] = marker;
     
   }

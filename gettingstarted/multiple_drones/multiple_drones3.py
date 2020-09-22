@@ -12,8 +12,12 @@ import time
 from dronekit_sitl import SITL
 from dronekit import Vehicle, VehicleMode, connect, LocationGlobalRelative
 
+
+
 copters = []
 sitls = []
+drone_models = []
+
 
 def connect_virtual_vehicle(instance, home):
     sitl = SITL()
