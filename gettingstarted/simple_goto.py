@@ -13,6 +13,14 @@ import time
 from dronekit_sitl import SITL
 from dronekit import Vehicle, VehicleMode, connect, LocationGlobalRelative
 
+
+import json
+from websocket import create_connection
+from drone_model import Drone_Model
+ws = create_connection("ws://localhost:8000")
+
+drone_model_object =  Drone_Model(1,0,0)
+
 # Set up option parsing to get connection string
 import argparse
 parser = argparse.ArgumentParser(description='Commands vehicle using vehicle.simple_goto.')
@@ -28,6 +36,7 @@ sitl = None
 if not connection_string:
     sitl_defaults = '~/git/ardupilot/tools/autotest/default_params/copter.parm'
     sitl = SITL()
+    
     sitl.download('copter', '3.3', verbose=True)
     sitl_args = ['-I0', '--model', 'quad', '--home=35.361350, 149.165210,0,180']
     sitl.launch(sitl_args, await_ready=True, restart=True)
@@ -37,6 +46,15 @@ if not connection_string:
 print('Connecting to vehicle on: %s' % connection_string)
 vehicle = connect(connection_string, wait_ready=True, baud=57600)
 print ('Current position of vehicle is: %s' % vehicle.location.global_frame)
+
+
+def custom_sleep(drone_model, sleep_time):
+        current_time = 0
+        while(current_time<sleep_time):
+            drone_model.update_status(vehicle.location.global_relative_frame.lat, vehicle.location.global_relative_frame.lon)
+            ws.send(drone_model.toJSON())
+            time.sleep(1)
+            current_time+=1
 
 def arm_and_takeoff(aTargetAltitude):
     """
@@ -65,6 +83,8 @@ def arm_and_takeoff(aTargetAltitude):
     #   immediately).
     while True:
         print(" Altitude: ", vehicle.location.global_relative_frame.alt)
+        drone_model_object.update_status(vehicle.location.global_relative_frame.lat, vehicle.location.global_relative_frame.lon)
+        ws.send(drone_model_object.toJSON())
         # Break and return from function just below target altitude.
         if vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95:
             print("Reached target altitude")
@@ -72,7 +92,12 @@ def arm_and_takeoff(aTargetAltitude):
         time.sleep(1)
 
 
+
+
 arm_and_takeoff(10)
+
+
+
 
 print("Set default/target airspeed to 3")
 vehicle.airspeed = 3
@@ -81,15 +106,21 @@ print("Going towards first point for 30 seconds ...")
 point1 = LocationGlobalRelative(-35.361354, 149.165218, 20)
 vehicle.simple_goto(point1)
 
+
+
+
 # sleep so we can see the change in map
-time.sleep(30)
+#time.sleep(30)
+custom_sleep(drone_model_object,30)
+
 
 print("Going towards second point for 30 seconds (groundspeed set to 10 m/s) ...")
 point2 = LocationGlobalRelative(-35.363244, 149.168801, 20)
 vehicle.simple_goto(point2, groundspeed=10)
 
 # sleep so we can see the change in map
-time.sleep(30)
+#time.sleep(30)
+custom_sleep(drone_model_object,30)
 
 print("Returning to Launch")
 vehicle.mode = VehicleMode("RTL")
@@ -101,3 +132,14 @@ vehicle.close()
 # Shut down simulator if it was started.
 if sitl:
     sitl.stop()
+
+
+
+
+
+
+
+
+
+
+
