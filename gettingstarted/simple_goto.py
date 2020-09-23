@@ -37,7 +37,7 @@ if not connection_string:
     sitl_defaults = '~/git/ardupilot/tools/autotest/default_params/copter.parm'
     sitl = SITL()
     sitl.download('copter', '3.3', verbose=True)
-    sitl_args = ['-I0', '--model', 'quad', '--home=-41.714469, -86.241786,0,180']
+    sitl_args = ['-I0', '--model', 'quad', '--home=41.714469, -86.241786,0,180']
     sitl.launch(sitl_args, await_ready=True, restart=True)
     connection_string = 'tcp:127.0.0.1:5760'
 
@@ -78,7 +78,13 @@ def arm_and_takeoff(aTargetAltitude):
     
     print("Vehicle armed!")
     print("Taking off!")
+    lat = vehicle.location.global_relative_frame.lat
+    lon = vehicle.location.global_relative_frame.lon
+    print('Current location before takeoff is: {0},{1}'.format(lat,lon))
     vehicle.simple_takeoff(aTargetAltitude)  # Take off to target altitude
+    lat = vehicle.location.global_relative_frame.lat
+    lon = vehicle.location.global_relative_frame.lon
+    print('Current location after takeoff is: {0},{1}'.format(lat,lon))
 
     # Wait until the vehicle reaches a safe height before processing the goto
     #  (otherwise the command after Vehicle.simple_takeoff will execute
@@ -105,7 +111,7 @@ print("Set default/target airspeed to 3")
 vehicle.airspeed = 3
 
 print("Going towards first point for 30 seconds ...")
-point1 = LocationGlobalRelative(41.714469, -86.241786, 20)
+point1 = LocationGlobalRelative(41.714900, -86.241100, 20)
 vehicle.simple_goto(point1)
 
 # sleep so we can see the change in map
@@ -114,7 +120,7 @@ custom_sleep(drone_model_object,30)
 
 
 print("Going towards second point for 30 seconds (groundspeed set to 10 m/s) ...")
-point2 = LocationGlobalRelative(-41.714500, -86.241650, 20)
+point2 = LocationGlobalRelative(41.715000, -86.241650, 20)
 vehicle.simple_goto(point2, groundspeed=10)
 
 # sleep so we can see the change in map
