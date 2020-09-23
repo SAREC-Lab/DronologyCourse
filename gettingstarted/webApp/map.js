@@ -1,28 +1,19 @@
 marker_count=0;
 markers = {}
-number_drones = 2
+number_drones = 1
 function initMap() {
 
   // map center on the screen - 50,50 
   // change it according to the home location of the drone. 
     var myLatLng = new google.maps.LatLng( 41.714469, -86.241786 )
         myOptions = {
-            zoom: 4,
+            zoom: 17,
             center: myLatLng,
             mapTypeId: google.maps.MapTypeId.ROADMAP
             }
         map = new google.maps.Map( document.getElementById( 'map-canvas' ), myOptions )
 
         add_markers(myLatLng, map)
-
-
-
-    
-    //markers[1] = marker1;
-
-    //marker2.setMap(map);
-    //marker3.setMap(map);
-
 }
 function get_marker_for_drone(drone_id){
   return markers[drone_id]
@@ -44,16 +35,10 @@ function move(id,lat,lon) {
     marker_obj = get_marker_for_drone(id)
     console.log(marker_obj);
     marker_obj.setPosition( new google.maps.LatLng( lat, lon ) );
-    
-    
-   // map.panTo( new google.maps.LatLng( 0, 0 ) );
-
 };
 
 initMap();
 doConnect();
-
-
 
 function doConnect()
 {
@@ -66,14 +51,12 @@ function doConnect()
 
 function onOpen(evt)
 {
-console.log("connected\n");
-
+  console.log("connected\n");
 }
 
 function onClose(evt)
 {
-console.log("disconnected\n");
-
+  console.log("disconnected\n");
 }
 
 function onMessage(evt)
@@ -88,8 +71,6 @@ function onMessage(evt)
 function onError(evt)
 {
   console.log('error: ' + evt.data + '\n');
-
-websocket.close();
-
+  websocket.close();
 }
 
