@@ -46,6 +46,8 @@ sudo pip install future pymavlink MAVProxy
 sudo pip install pyudev
 sudo pip install PyYAML 
 sudo pip install nvector 
+sudo pip install geographiclib
+sudo pip install numpy==1.16.6
 sudo pip install boltons 
 sudo pip install dronekit==2.9.1
 sudo pip install dronekit-sitl==3.2.0
