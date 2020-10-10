@@ -4,6 +4,7 @@
 """
 NED Utilities
 """
+import math
 from pymavlink import mavutil
 import time
 import numpy as np
@@ -138,3 +139,73 @@ class ned_controller:
 
         return Nedvalues(n,e,d)
 
+def get_velocity(vehicle):
+    v = vehicle.velocity
+    return Nedvalues(v[0], v[1], v[2])
+
+def rotate_velocity(ned_velocity, degrees_clockwise, preserve_down_component=True):
+    """
+    Returns a Nedvalues object holding the velocity vector that is rotated
+    clockwise as seen from above. 
+
+    Parameters:
+        ned_velocity: a Nedvalues object representing a velocity. Must not be
+            Nedvalues(0.0, 0.0, 0.0), pure up or pure down.
+        degrees_clockwise: a float
+        preserve_down_component: a boolean
+    
+    When preserve_down_component is true, the down component of the velocity is
+    not changed. When it is false, the down component is changed, as the new velocity
+    is found by rotating around an axis that is orthogonal to ned_velocity but
+    as close to the down axis as possible.
+
+    Here is the use case for this function:
+    A drone is traveling in any direction and at any speed.  We want it to turn
+    at an X degree angle and send it a new NED.
+
+    Example 0:
+    Our vehicle is flying and we want to turn 42 degrees clockwise (as seen from above).
+
+    rotate_velocity(get_velocity(vehicle), 42.0)
+    
+    This would return a Nedvalues object. Its value would depend on the vehicle's
+    current velocity
+
+    Example 1:
+    We have a velocity of north and 45 degrees up. We want to rotate this velocity
+    180 degrees while not changing the down component. We can do so by calling:
+    
+    rotate_velocity(Nedvalues(3.0, 0.0, -3.0), 180.0)
+    
+    This would return Nedvalues(-3.0, 0.0, -3.0)
+
+    Example 2:
+    We are flying north and up at 45 degrees. We want to rotate the velocity 180
+    degrees while changing down component of velocity:
+
+    rotate_velocity(Nedvalues(3.0, 0.0, -3.0), 180.0, False)
+    Would return: Nedvalues(-3.0, 0.0, 3.0)
+
+    Example 3:
+    We are flying north west at 1.4 meters per second. We want to rotate 90 degrees
+    counter-clockwise:
+
+    rotate_velocity(Nedvalues(1.0, -1.0, 0.0), -90.0)
+    would return  Nedvalues(-1.0, -1.0, 0.0)
+    """
+    # This uses Rodrigues' rotation formula.
+    # https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+    v = np.array([ned_velocity.north, ned_velocity.east, ned_velocity.down])
+    theta = math.radians(degrees_clockwise)
+    down_axis = np.array([0.0, 0.0, 1.0])
+    if preserve_down_component:
+        k = down_axis
+    else:
+        left = np.cross(v, down_axis)
+        k = np.cross(left, v)
+        magnitude = math.sqrt(np.dot(k, k))
+        k = k * (1.0 / magnitude)
+    
+    # https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula#Statement
+    v_rot = v * math.cos(theta) + np.cross(k, v) * math.sin(theta) + k * (np.dot(k, v)) * (1.0 - math.cos(theta))
+    return Nedvalues(v_rot[0], v_rot[1], v_rot[2])
