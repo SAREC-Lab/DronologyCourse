@@ -22,6 +22,9 @@ class Nedvalues:
         self.north = north
         self.east = east
         self.down = down
+    
+    def __repr__(self):
+        return 'Nedvalues({self.north}, {self.east}, {self.down})'.format(self=self)
 
 
 class ned_controller:
